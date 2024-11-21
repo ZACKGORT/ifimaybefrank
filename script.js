@@ -150,11 +150,12 @@ const tabGridData = [
   const closeModal = () => setModalData(null);
 
 const tabData = [
-  { title: "BNY Mellon—Pershing X", content: "" },
-  { title: "TikTok For Business", content: "" },
-  { title: "GNC {Shopify}", content: "" },
-  { title: "B2B E-Commerce {SalesForce}", content: "" }
+  { title: "BNY Mellon—Pershing X" },
+  { title: "TikTok For Business" },
+  { title: "GNC {Shopify}" },
+  { title: "B2B E-Commerce {SalesForce}" }
 ];
+
 
   return (
     <div className="wrapper">
