@@ -114,25 +114,25 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "The Finance of the Future",
+    headline: "B2C/B SalesForce Integrations and Overhauls.",
     description: "Discover delicious recipes based on ingredients you have",
     image: "https://via.placeholder.com/400?text=13" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Meal Planner",
+    headline: "Modern E-commerce solutions for Aquasana, Hardinge, Simpson Strong-tie, West Marine",
     description: "Organize your meals and grocery lists effortlessly",
     image: "https://via.placeholder.com/400?text=14" },
 
   {
     upperHeadline: "The Result",
-    headline: "Health Apps",
+    headline: "Winning",
     description: "Apps designed to improve your well-being",
     image: "https://via.placeholder.com/400?text=15" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Mindful Eating",
+    headline: "Small teams > Big Teams",
     description: "Track your meals and build healthier habits",
     image: "https://via.placeholder.com/400?text=16" }]];
 
