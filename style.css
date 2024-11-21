@@ -29,7 +29,7 @@ a:focus {
   min-width: 400px;
   max-width: 920px;
   position: relative;
-
+  padding: 20px 0;
 }
 
 /* Header Section with Tabs */
@@ -217,41 +217,6 @@ a:focus {
   color: #333;
 }
 
-/* Mobile Modal Styling */
-@media (max-width: 768px) {
-  .modal {
-    width: 90%; /* Make modal width take up most of the screen */
-    max-width: 90%; /* Ensure it doesn't exceed 90% of the viewport */
-    padding: 15px; /* Reduced padding for better space utilization */
-    box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.15); /* Adjust shadow for better mobile appearance */
-  }
-
-  .modal h1 {
-    font-size: 1.4em; /* Adjust heading size */
-  }
-
-  .modal h2 {
-    font-size: 1.1em; /* Adjust subheading size */
-  }
-
-  .modal p {
-    font-size: 1em; /* Adjust paragraph size */
-    line-height: 1.6; /* Improve readability on mobile */
-  }
-
-  .modal .close {
-    font-size: 1.3em; /* Larger close button for easier access */
-    top: 5px; /* Slightly adjust position */
-    right: 5px; /* Adjust for better placement */
-  }
-}
-
-
-
-
-
-
-
 /* Mobile Breakpoint (max-width: 768px) */
 @media (max-width: 768px) {
   body {
@@ -280,21 +245,47 @@ a:focus {
     padding-left: 10px;  /* Adjust padding */
   }
 
+@media (max-width: 768px) {
   .tabs {
-    flex-direction: column; /* Stack tabs vertically on mobile */
-    margin-left: 0;  /* Reset margin */
-    margin-top: 20px;  /* Add margin between tabs and content */
-    padding-left: 10px;  /* Match left padding of grid */
-    padding-right: 0px;  /* Match right padding of grid */
+    display: flex;
+    flex-direction: column; /* Stack tabs vertically */
+    padding: 0; /* Remove extra padding */
+    gap: 8px; /* Add consistent spacing between tabs */
   }
 
   .tab {
-    margin-bottom: 10px;  /* Add margin between tabs */
-    padding: 12px;
-    font-size: 14px; /* Smaller font for tabs */
-    text-align: center; /* Center align text in tabs */
-    box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+    background-color: transparent; /* Remove background color */
+    border: none; /* Remove border */
+    box-shadow: none; /* Remove shadow */
+    padding: 4px 0; /* Adjust padding for text appearance */
+    margin-left: -5px; /* Remove margin to avoid uneven gaps */
+    font-weight: normal; /* Default weight */
+    color: #262626; /* Maintain text color */
+    text-align: left; /* Align text to the left */
+    text-decoration: none; /* Remove underline for cleaner text */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
+    height: auto; /* Ensure consistent height */
   }
+
+  .tab:hover {
+    background-color: #ffff00; /* Yellow background similar to active state */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #262626; /* Ensure text color remains consistent */
+  }
+
+  .tab.active {
+    background-color: #ffff00; /* Yellow highlight for active tab */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #262626; /* Ensure text color matches default */
+  }
+
+  /* Optional: Make sure there's consistent gap between the tabs */
+  .tabs {
+    gap: 8px; /* Ensure consistent vertical spacing between tabs */
+    transition: gap 0.3s ease; /* Smooth transition when tabs change */
+  }
+}
+
 
   .grid-container {
     padding: 10px; /* Reduce padding in grid */
@@ -421,3 +412,4 @@ a:focus {
 .logo:hover img {
   transform: rotate(360deg);
 }*/
+
