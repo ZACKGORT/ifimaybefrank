@@ -37,13 +37,13 @@ const App = () => {
   {
     upperHeadline: "The Ask",
     headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
-    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems.",
-    image: "https://i.ibb.co/cNx6CCH/image-444-min.png" },
+    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems. \n\n The work wasn't wow-worthy. The client wasn't asking for miracles. They wanted smart, carefully considered actionable deliverables to propel them forward.",
+    image: "https://i.ibb.co/hRnRByb/wove-advisory-landing-main.png" },
 
   {
     upperHeadline: "The Answer",
     headline: "Tech stack migration, data refactorization, & design system documentation.",
-    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.\n\n ",
+    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind. \n\n ",
     image: "https://i.ibb.co/ZW3j6T1/Photo-Selects-Sketch-Prep-1-1-Houghton-Nav.jpg" },
 
   {
@@ -55,7 +55,7 @@ const App = () => {
   {
     upperHeadline: "The Takeaway",
     headline: "Elevating my output and influence.",
-    description: "Their words, not mine. #boncourage",
+    description: "At Publicis Sapient, I strove to be a valued contributor and collaborator. In that, I succeeded. \n\n Unluckily for me, I was part of a sweeping round of layoffs. I would be thrilled to be welcomed back into the hustle-and-bustle where I can continue to make meaningful contributions.",
     image: "https://i.ibb.co/BLvfNRG/image-452-min.png" }],
 
 
@@ -64,7 +64,7 @@ const App = () => {
     upperHeadline: "The Ask",
     headline: "Brand activation & Contentful replatforming for the world's top social media brand.",
     description: "Enhancing content delivery and scalability through a headless CMS architecture tailored for TikTok's business platform.",
-    image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
+    image: "https://i.ibb.co/9qFzTQH/tiktok-proto-gif.gif" },
 
   {
     upperHeadline: "The Answer",
@@ -76,13 +76,13 @@ const App = () => {
     upperHeadline: "The Result",
     headline: "Semi-successful",
     description: "I wish I could tell you",
-    image: "https://i.ibb.co/nkrqvCR/1-q3r-Mmx9-UBf-P3-g-M7c1qbjg.png" },
+    image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "A top-heavy organization that's slow to move.",
     description: "Relax with apps designed to reduce stress and anxiety",
-    image: "https://i.ibb.co/C8nLrNB/image-625.png" }],
+    image: "https://i.ibb.co/yPyHvw2/Screenshot-20230217-101719.png" }],
 
 
   [
