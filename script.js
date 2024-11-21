@@ -150,35 +150,10 @@ const App = () => {
   const closeModal = () => setModalData(null);
 
   const tabData = [
-  { title: "BNY Mellon—Pershing X", content:
-    `<h2>Introduction to the App</h2>
-      <p>This app allows you to explore the latest in technology, with detailed views of featured apps, collection recommendations, and insights into the future of digital experiences. Our mission is to curate the best apps for all your needs, from productivity to entertainment.</p>
-      <p>Whether you're a tech enthusiast, a casual user, or someone in search of useful tools, our selection ensures you have access to only the best.</p>` },
-
-  { title: "TikTok For Business", content:
-    `<h2>App Features</h2>
-      <ul>
-        <li><strong>Curated Collections:</strong> Dive into unique collections of apps that cater to different lifestyles and needs.</li>
-        <li><strong>Daily Updates:</strong> Stay informed with daily updates about trending apps, new releases, and developer news.</li>
-        <li><strong>Exclusive Offers:</strong> Get exclusive access to app discounts and limited-time deals.</li>
-      </ul>
-      <p>Our goal is to provide a seamless and intuitive experience for all users. Browse by category, discover new releases, and keep up with the latest in tech!</p>` },
-
-  { title: "GNC {Shopify}", content:
-    `<h2>App of the Day</h2>
-      <p>Every day, we spotlight a new app that we think you'll love. From productivity tools to games, we highlight apps that provide a unique experience or offer exceptional value.</p>
-      <p>Today's featured app is Hitlist – a tool that helps you find the best flight deals for your dream vacation. Plan your next adventure with ease, and get notified when flight prices drop.</p>` },
-
-  { title: "B2B E-Commerce {SalesForce}", content:
-    `<h2>Support & FAQs</h2>
-      <p>If you have any issues with the app or need help navigating through it, we're here to assist you! Below you'll find answers to the most commonly asked questions:</p>
-      <ul>
-        <li><strong>How do I create an account?</strong> To create an account, click the "Sign Up" button on the top-right corner of the homepage.</li>
-        <li><strong>How can I track app updates?</strong> You can subscribe to our newsletter or follow our social media channels to stay updated on new releases and features.</li>
-        <li><strong>Can I suggest an app?</strong> Yes! If you have a suggestion, simply reach out to us via the "Contact Us" page.</li>
-      </ul>
-      <p>If you need further assistance, please don't hesitate to contact our support team. We're here to help!</p>` }];
-
+  { title: "BNY Mellon—Pershing X" },
+  { title: "TikTok For Business" },
+  { title: "GNC {Shopify}" },
+  { title: "B2B E-Commerce {SalesForce}" }];
 
 
   return /*#__PURE__*/(
