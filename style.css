@@ -482,19 +482,21 @@ a:focus {
 
 
 
-.client-info {
-  text-align: left;
-	padding-top: .25em;
-  margin: 5px 1em 0 1em;
-	line-height: .5em;
+
+/* Remove the blue shaded fill on mobile links */
+a {
+  -webkit-tap-highlight-color: transparent;
 }
 
-.client-info h3 {
-  font-size: 1rem;
-  font-weight: bold;
+
+/* Disable tap highlight for all elements */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-.client-info p {
-  font-size: .75rem;
-  color: #555;
+
+/* Disable tap highlight for links and buttons */
+a, button, input, textarea {
+  -webkit-tap-highlight-color: transparent;
+  outline: none; /* Removes any visible focus outline */
 }

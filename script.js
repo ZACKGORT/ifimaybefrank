@@ -114,26 +114,26 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "The Finance of the Future",
+    headline: "B2C+B E-Commerce for Aquasana, Hardinge, Simpson Strong-Tie, YETI, West Marine...",
     description: "Discover delicious recipes based on ingredients you have",
     image: "https://i.ibb.co/0DPv3vQ/Frame-4349.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "SaleForce commerce implementation brought to life with Design Systems ",
+    headline: "SalesForce Solutions Architecture & Design Systems ",
     description: "Organize your meals and grocery lists effortlessly",
     image: "https://i.ibb.co/2yJjFNQ/image-426-min.png" },
 
   {
     upperHeadline: "The Result",
-    headline: "Health Apps",
-    description: "Apps designed to improve your well-being",
+    headline: "Shipped",
+    description: "I just looked up Aquasana, and it's the same as what I shipped 4 years ago; which is to say that my due diligence paired with the right teams has proven longevity, aka ROI.",
     image: "https://i.ibb.co/8bpY3DJ/Frame-4353.png" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Mindful Eating",
-    description: "Track your meals and build healthier habits",
+    headline: "An Elevating Paradigm shift",
+    description: "So, the work shown here was all during the COVID crisis, which drastically changed the work environment as it were. This disruption of normal working routines offered me the time and space to dive deep into my work, and elevate my experience and level of contribution.",
     image: "https://i.ibb.co/B6vFwH6/zoom-zack.gif" }]];
 
 
