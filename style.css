@@ -303,6 +303,15 @@ a:focus {
   position: relative; /* Ensure relative positioning for the hover shadow */
   
   /* Hover Shadow Effect */
+  @-webkit-keyframes hover {
+    50% {
+      transform: translateY(-3px);
+    }
+
+    100% {
+      transform: translateY(-6px);
+    }
+  }
   @keyframes hover {
     50% {
       transform: translateY(-3px);
@@ -310,6 +319,23 @@ a:focus {
 
     100% {
       transform: translateY(-6px);
+    }
+  }
+
+  @-webkit-keyframes hover-shadow {
+    0% {
+      transform: translateY(6px);
+      opacity: 0.4;
+    }
+
+    50% {
+      transform: translateY(3px);
+      opacity: 1;
+    }
+
+    100% {
+      transform: translateY(6px);
+      opacity: 0.4;
     }
   }
 
@@ -354,22 +380,34 @@ a:focus {
 
     &:hover {
       transform: translateY(-6px);
-      animation-name: hover;
-      animation-duration: 1.5s;
-      animation-delay: 0.3s;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-      animation-direction: alternate;
+      -webkit-animation-name: hover;
+              animation-name: hover;
+      -webkit-animation-duration: 1.5s;
+              animation-duration: 1.5s;
+      -webkit-animation-delay: 0.3s;
+              animation-delay: 0.3s;
+      -webkit-animation-timing-function: linear;
+              animation-timing-function: linear;
+      -webkit-animation-iteration-count: infinite;
+              animation-iteration-count: infinite;
+      -webkit-animation-direction: alternate;
+              animation-direction: alternate;
 
       &::before {
         opacity: 0.4;
         transform: translateY(6px);
-        animation-name: hover-shadow;
-        animation-duration: 1.5s;
-        animation-delay: 0.3s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-direction: alternate;
+        -webkit-animation-name: hover-shadow;
+                animation-name: hover-shadow;
+        -webkit-animation-duration: 1.5s;
+                animation-duration: 1.5s;
+        -webkit-animation-delay: 0.3s;
+                animation-delay: 0.3s;
+        -webkit-animation-timing-function: linear;
+                animation-timing-function: linear;
+        -webkit-animation-iteration-count: infinite;
+                animation-iteration-count: infinite;
+        -webkit-animation-direction: alternate;
+                animation-direction: alternate;
       }
     }
   }
@@ -386,4 +424,3 @@ a:focus {
 .logo:hover img {
   transform: rotate(360deg);
 }*/
-
