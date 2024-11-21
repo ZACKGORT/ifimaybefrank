@@ -54,7 +54,7 @@ const App = () => {
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Talk is talk.",
+    headline: "Corporate culture sucks.",
     description: "Discover the perfect coffee apps!",
     image: "https://via.placeholder.com/400?text=4" }],
 
@@ -66,23 +66,23 @@ const App = () => {
     upperHeadline: "The Ask",
     headline: "Brand Activation & {Contentful} Replatformng or the world's top social media brand.",
     description: "Enhancing content delivery and scalability through a headless CMS architecture tailored for TikTok's business platform.",
-    image: "https://via.placeholder.com/400?text=5" },
+    image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Travel Buddy",
+    headline: "An Enhanced B2B Content Strategy & Modern Design System",
     description: "Your personal travel assistant for seamless journeys",
     image: "https://via.placeholder.com/400?text=6" },
 
   {
     upperHeadline: "The Result",
-    headline: "Fitness Tracker",
-    description: "Track your daily workouts and health progress",
+    headline: "Semi-Successful",
+    description: "I wish I could tell you ",
     image: "https://via.placeholder.com/400?text=7" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Mindfulness Apps",
+    headline: "A top-heavy organization that's slow to move.",
     description: "Relax with apps designed to reduce stress and anxiety",
     image: "https://via.placeholder.com/400?text=8" }],
 
@@ -92,25 +92,25 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "The Future of Finance",
+    headline: "GNC asked us to "shake things up"; providing them with a modern e-commerce solution.",
     description: "A deep dive into next-gen financial apps",
     image: "https://via.placeholder.com/400?text=9" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Cryptocurrency for Beginners",
+    headline: "We Shopified the sh*t out of GNC's brand.",
     description: "Learn the basics of cryptocurrency apps",
     image: "https://via.placeholder.com/400?text=10" },
 
   {
     upperHeadline: "The Result",
-    headline: "Budget Master",
+    headline: ""This is the whey"",
     description: "Manage your finances with ease",
     image: "https://via.placeholder.com/400?text=11" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Investment Apps",
+    headline: "Satisfied with a win.",
     description: "Discover the top apps to grow your wealth",
     image: "https://via.placeholder.com/400?text=12" }],
 
