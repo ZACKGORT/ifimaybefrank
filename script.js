@@ -70,19 +70,19 @@ const App = () => {
 
   {
     upperHeadline: "The Answer",
-    headline: "Travel Buddy",
+    headline: "An Enhanced B2B Content Strategy & Modern Design System",
     description: "Your personal travel assistant for seamless journeys",
     image: "https://via.placeholder.com/400?text=6" },
 
   {
     upperHeadline: "The Result",
-    headline: "Fitness Tracker",
+    headline: "Semi-Successful",
     description: "Track your daily workouts and health progress",
     image: "https://via.placeholder.com/400?text=7" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Mindfulness Apps",
+    headline: "A top-heavy organization that's slow to move.",
     description: "Relax with apps designed to reduce stress and anxiety",
     image: "https://via.placeholder.com/400?text=8" }],
 
@@ -92,25 +92,25 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "The Future of Finance",
+    headline: "GNC asked us to "shake things up"; providing them with a modern e-commerce solution.",
     description: "A deep dive into next-gen financial apps",
     image: "https://via.placeholder.com/400?text=9" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Cryptocurrency for Beginners",
+    headline: "We Shopified the sh*t out of GNC's brand.",
     description: "Learn the basics of cryptocurrency apps",
     image: "https://via.placeholder.com/400?text=10" },
 
   {
     upperHeadline: "The Result",
-    headline: "Budget Master",
+    headline: "This is the whey",
     description: "Manage your finances with ease",
     image: "https://via.placeholder.com/400?text=11" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Investment Apps",
+    headline: "If the bar ain't bending, you're just pretending",
     description: "Discover the top apps to grow your wealth",
     image: "https://via.placeholder.com/400?text=12" }],
 
