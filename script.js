@@ -43,7 +43,7 @@ const App = () => {
   {
     upperHeadline: "The Answer",
     headline: "Tech Stack Migration, Data Refactorization, & Design System Documentation.",
-    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.",
+    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.\n\n Now, technically speaking, my official role was as a full-time remote-employ individual contributor, but to lead my team effectively, I opted to bring my collaborative energy to the offices. ",
     image: "https://i.ibb.co/ZW3j6T1/Photo-Selects-Sketch-Prep-1-1-Houghton-Nav.jpg" },
 
   {
@@ -247,7 +247,6 @@ const App = () => {
 
     React.createElement("img", { src: modalData.image, alt: modalData.headline }), /*#__PURE__*/
     React.createElement("h1", null, modalData.headline), /*#__PURE__*/
-    React.createElement("h2", null, modalData.upperHeadline), /*#__PURE__*/
 
     React.createElement(ReactMarkdown, null, modalData.description)))));
 
