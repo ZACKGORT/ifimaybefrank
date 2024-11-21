@@ -245,47 +245,21 @@ a:focus {
     padding-left: 10px;  /* Adjust padding */
   }
 
-@media (max-width: 768px) {
   .tabs {
-    display: flex;
-    flex-direction: column; /* Stack tabs vertically */
-    padding: 0; /* Remove extra padding */
-    gap: 8px; /* Add consistent spacing between tabs */
+    flex-direction: column; /* Stack tabs vertically on mobile */
+    margin-left: 0;  /* Reset margin */
+    margin-top: 5px;  /* Add margin between tabs and content */
+    padding-left: 10px;  /* Match left padding of grid */
+    padding-right: 10px;  /* Match right padding of grid */
   }
 
   .tab {
-    background-color: transparent; /* Remove background color */
-    border: none; /* Remove border */
-    box-shadow: none; /* Remove shadow */
-    padding: 4px 0; /* Adjust padding for text appearance */
-    margin-left: -5px; /* Remove margin to avoid uneven gaps */
-    font-weight: normal; /* Default weight */
-    color: #262626; /* Maintain text color */
-    text-align: left; /* Align text to the left */
-    text-decoration: none; /* Remove underline for cleaner text */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
-    height: auto; /* Ensure consistent height */
+    margin-bottom: 5px;  /* Add margin between tabs */
+    padding: 6px;
+    font-size: 14px; /* Smaller font for tabs */
+    text-align: center; /* Center align text in tabs */
+    box-sizing: border-box; /* Ensure padding doesn't cause overflow */
   }
-
-  .tab:hover {
-    background-color: #ffff00; /* Yellow background similar to active state */
-    font-weight: bold; /* Bold text for emphasis */
-    color: #262626; /* Ensure text color remains consistent */
-  }
-
-  .tab.active {
-    background-color: #ffff00; /* Yellow highlight for active tab */
-    font-weight: bold; /* Bold text for emphasis */
-    color: #262626; /* Ensure text color matches default */
-  }
-
-  /* Optional: Make sure there's consistent gap between the tabs */
-  .tabs {
-    gap: 8px; /* Ensure consistent vertical spacing between tabs */
-    transition: gap 0.3s ease; /* Smooth transition when tabs change */
-  }
-}
-
 
   .grid-container {
     padding: 10px; /* Reduce padding in grid */
