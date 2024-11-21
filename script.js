@@ -90,25 +90,25 @@ const App = () => {
         upperHeadline: "The Ask",
         headline: "GNC asked us to shake things up; providing them with a modern e-commerce solution.",
         description: "A deep dive into next-gen financial apps",
-        image: "https://via.placeholder.com/400?text=9"
+        image: "https://i.ibb.co/qFKN21p/image-431-min.png"
       },
       {
         upperHeadline: "The Answer",
         headline: "We Shopified the sh*t out of GNC's brand.",
         description: "Learn the basics of cryptocurrency apps",
-        image: "https://via.placeholder.com/400?text=10"
+        image: "https://i.ibb.co/fpbcrXp/Frame-4348.png"
       },
       {
         upperHeadline: "The Result",
         headline: "This is the whey",
         description: "Manage your finances with ease",
-        image: "https://via.placeholder.com/400?text=11"
+        image: "https://i.ibb.co/pbchQFh/dash-gnc-screen.png"
       },
       {
         upperHeadline: "The Takeaway",
         headline: "If the bar ain't bending, you're just pretending",
         description: "Discover the top apps to grow your wealth",
-        image: "https://via.placeholder.com/400?text=12"
+        image: "https://i.ibb.co/Hrx2Pfy/image-432-min.png"
       }
     ],
     [
