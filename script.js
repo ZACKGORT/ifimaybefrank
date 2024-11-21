@@ -1,24 +1,3 @@
-const cursor = document.createElement('div');
-cursor.classList.add('cursor');
-
-const follower = document.createElement('div');
-follower.classList.add('follower');
-
-document.body.appendChild(cursor);
-document.body.appendChild(follower);
-
-document.addEventListener('mousemove', e => {
-  const { clientX, clientY } = e;
-
-  cursor.style.transform = `translate(${clientX}px, ${clientY}px)`;
-  follower.style.transform = `translate(${clientX}px, ${clientY}px)`;
-});
-
-
-
-
-
-
 const { useState } = React;
 const ReactMarkdown = window.ReactMarkdown; // Make sure ReactMarkdown is available
 
@@ -59,7 +38,7 @@ const App = () => {
     upperHeadline: "The Ask",
     headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
     description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems.\n\nHere, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.",
-    image: "https://i.ibb.co/68t5b9S/Mask-group-7-min.png" },
+    image: "https://i.ibb.co/cNx6CCH/image-444-min.png" },
 
   {
     upperHeadline: "The Answer",
@@ -71,13 +50,13 @@ const App = () => {
     upperHeadline: "The Result",
     headline: "Semi-successful",
     description: "Cheap flights, airline tickets",
-    image: "https://i.ibb.co/FgstGVs/image-441-min.png" },
+    image: "https://i.ibb.co/GWbb4pb/image-450-min.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "Corporate culture sucks.",
     description: "Discover the perfect coffee apps!",
-    image: "https://i.ibb.co/GWbb4pb/image-450-min.png" }],
+    image: "https://i.ibb.co/BLvfNRG/image-452-min.png" }],
 
 
   [
@@ -91,19 +70,19 @@ const App = () => {
     upperHeadline: "The Answer",
     headline: "An Enhanced B2B Content Strategy & Modern Design System",
     description: "Your personal travel assistant for seamless journeys",
-    image: "https://via.placeholder.com/400?text=6" },
+    image: "https://i.ibb.co/qdMFmd1/1-Oh-X-z1i-Tuza-Ezs-Lv1-Uz37w.png" },
 
   {
     upperHeadline: "The Result",
     headline: "Semi-Successful",
     description: "I wish I could tell you",
-    image: "https://via.placeholder.com/400?text=7" },
+    image: "https://i.ibb.co/nkrqvCR/1-q3r-Mmx9-UBf-P3-g-M7c1qbjg.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "A top-heavy organization that's slow to move.",
     description: "Relax with apps designed to reduce stress and anxiety",
-    image: "https://via.placeholder.com/400?text=8" }],
+    image: "https://i.ibb.co/C8nLrNB/image-625.png" }],
 
 
   [
@@ -123,13 +102,13 @@ const App = () => {
     upperHeadline: "The Result",
     headline: "This is the whey",
     description: "Manage your finances with ease",
-    image: "https://i.ibb.co/pbchQFh/dash-gnc-screen.png" },
+    image: "https://i.ibb.co/Hrx2Pfy/image-432-min.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "If the bar ain't bending, you're just pretending",
     description: "Discover the top apps to grow your wealth",
-    image: "https://i.ibb.co/Hrx2Pfy/image-432-min.png" }],
+    image: "https://i.ibb.co/pbchQFh/dash-gnc-screen.png" }],
 
 
   [
@@ -137,26 +116,35 @@ const App = () => {
     upperHeadline: "The Ask",
     headline: "The Finance of the Future",
     description: "Discover delicious recipes based on ingredients you have",
-    image: "https://via.placeholder.com/400?text=13" },
+    image: "https://i.ibb.co/0DPv3vQ/Frame-4349.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Meal Planner",
+    headline: "SaleForce commerce implementation brought to life with Design Systems ",
     description: "Organize your meals and grocery lists effortlessly",
-    image: "https://via.placeholder.com/400?text=14" },
+    image: "https://i.ibb.co/2yJjFNQ/image-426-min.png" },
 
   {
     upperHeadline: "The Result",
     headline: "Health Apps",
     description: "Apps designed to improve your well-being",
-    image: "https://via.placeholder.com/400?text=15" },
+    image: "https://i.ibb.co/8bpY3DJ/Frame-4353.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "Mindful Eating",
     description: "Track your meals and build healthier habits",
-    image: "https://via.placeholder.com/400?text=16" }]];
+    image: "https://i.ibb.co/B6vFwH6/zoom-zack.gif" }]];
 
+
+
+
+  // Add client info for each tab
+  const clientInfo = [
+  { client: "BNY Mellon — Pershing X // Publicis Sapient", company: "Serving as a Senior UX Designer, IC" },
+  { client: "TikTok For Business // Code And Theory", company: "Serving as a ACD, UX" },
+  { client: "General Nutrition Centers // Elva Design Group", company: "Serving as a Senior UX Designer, IC" },
+  { client: "B2B+C+E SalesForce E-Commerce, Livearea", company: "Serving as a UX Manager" }];
 
 
 
@@ -206,8 +194,8 @@ const App = () => {
     React.createElement(Logo, null), " ", /*#__PURE__*/
     React.createElement("h1", { className: "main-title" }, "Hello,"), /*#__PURE__*/
     React.createElement("h2", { className: "sub-title" }, "I'm Zack, but ", /*#__PURE__*/React.createElement("span", { className: "span" }, "if I may be frank:")), /*#__PURE__*/
-    React.createElement("p", { className: "description" }, "The Ask. The Answer. The Result. The Takeaway. More @ ", /*#__PURE__*/
-    React.createElement("a", { href: "https://reasonandresolution.com/" }, "reasonandresolution.com"), ".")), /*#__PURE__*/
+    React.createElement("p", { className: "description" }, "Here's some of my latest, condensed for your consideration. More @ ", /*#__PURE__*/
+    React.createElement("a", { href: "https://reasonandresolution.com/" }, /*#__PURE__*/React.createElement("strong", null, "reasonandresolution.com")), ".")), /*#__PURE__*/
 
 
 
@@ -298,13 +286,6 @@ function highlightTextOnHover() {
     });
   });
 }
-
-
-
-
-
-
-
 
 // Call the function after the DOM is loaded
 document.addEventListener('DOMContentLoaded', highlightTextOnHover);
