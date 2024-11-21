@@ -250,7 +250,7 @@ a:focus {
     margin-left: 0;  /* Reset margin */
     margin-top: 5px;  /* Add margin between tabs and content */
     padding-left: 10px;  /* Match left padding of grid */
-    padding-right: 10px;  /* Match right padding of grid */
+    padding-right: 0px;  /* Match right padding of grid */
   }
 
   .tab {
