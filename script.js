@@ -248,4 +248,38 @@ const App = () => {
 
 };
 
+
+
+// Function to highlight the entire text block on hover
+function highlightTextOnHover() {
+  const grids = document.querySelectorAll('.grid');
+
+  grids.forEach(grid => {
+    grid.addEventListener('mouseenter', () => {
+      const textElements = grid.querySelectorAll('.content, .headline'); // Exclude .upper-headline
+
+      textElements.forEach(element => {
+        // Wrap the entire text content in a span for highlighting
+        if (!element.querySelector('.highlighted')) {// Avoid wrapping if already wrapped
+          element.innerHTML = `<span class="highlighted">${element.innerHTML}</span>`;
+        }
+      });
+    });
+
+    grid.addEventListener('mouseleave', () => {
+      // Remove the highlight by clearing the span tag
+      const textElements = grid.querySelectorAll('.content, .headline');
+
+      textElements.forEach(element => {
+        const originalText = element.textContent; // Get the raw text content
+        element.innerHTML = originalText; // Reset the HTML to original text
+      });
+    });
+  });
+}
+
+// Call the function after the DOM is loaded
+document.addEventListener('DOMContentLoaded', highlightTextOnHover);
+
+
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById("root"));

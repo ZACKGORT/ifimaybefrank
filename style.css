@@ -9,18 +9,18 @@ body {
 
 
 a {
-  color: #262626;
-  border-bottom: 2px solid #262626; /* Optional underline */
-  cursor: pointer;
-  transition: background-color 0.25s ease-in-out;
-  text-decoration: none;
+  position: relative; /* Ensure it can move */
+  transition: transform 0.3s ease; /* Smooth transition */
 }
 
 a:hover,
 a:focus {
   background-color: #ffff00;
-  color: #262626; /* Ensure text color remains consistent on hover */
+  color: #262626;
+  transform: translateY(-5px); /* Moves the link up by 5px */
 }
+
+
 
 .span {
   background-color: #ffff00;
@@ -80,7 +80,14 @@ a:focus {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.tab:hover,
+.tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 2px 4px 8px -3px rgba(0, 0, 0, 0.2);
+  background-color: #ffff00;
+  color: #2d2d2d;
+}
+
+
 .tab.active {
   transform: translateY(-2px);
   box-shadow: 2px 4px 8px -3px rgba(0, 0, 0, 0.2);
@@ -446,3 +453,16 @@ a:focus {
 .logo:hover img {
   transform: rotate(360deg);
 }*/
+
+
+/* Highlight the text inside the span 
+.grid .highlighted:hover {
+  background-color: #ffff00;  Yellow background 
+  color: #262626; /* Text color stays the same 
+}*/
+
+/* Highlight the entire text block on hover */
+.grid .highlighted {
+  background-color: #ffff00; /* Yellow background */
+  color: #262626; /* Keep text color consistent */
+}
