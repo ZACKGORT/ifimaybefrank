@@ -173,12 +173,13 @@ a:focus {
   transform: translate(-50%, -50%);
   background: white;
   border: 1px solid #1a1a1a;
-  padding: 20px;
+  padding: 3em;
   max-width: 90%;
   width: 728px;
   border-radius: 0px;
   box-shadow: 4px 24px 32px rgba(0, 0, 0, 0.1);
   z-index: 1001;
+	
 }
 
 .modal.open {
@@ -277,7 +278,7 @@ a:focus {
   .modal {
     width: 90%; /* Ensure modal takes up most of the screen on mobile */
     max-width: 90%;
-    padding: 15px; /* Adjust padding inside modal */
+    padding: 3em; /* Adjust padding inside modal */
   }
 
   .modal h1, .modal h2, .modal p {
@@ -323,15 +324,6 @@ a:focus {
   position: relative; /* Ensure relative positioning for the hover shadow */
   
   /* Hover Shadow Effect */
-  @-webkit-keyframes hover {
-    50% {
-      transform: translateY(-3px);
-    }
-
-    100% {
-      transform: translateY(-6px);
-    }
-  }
   @keyframes hover {
     50% {
       transform: translateY(-3px);
@@ -339,23 +331,6 @@ a:focus {
 
     100% {
       transform: translateY(-6px);
-    }
-  }
-
-  @-webkit-keyframes hover-shadow {
-    0% {
-      transform: translateY(6px);
-      opacity: 0.4;
-    }
-
-    50% {
-      transform: translateY(3px);
-      opacity: 1;
-    }
-
-    100% {
-      transform: translateY(6px);
-      opacity: 0.4;
     }
   }
 
@@ -400,34 +375,22 @@ a:focus {
 
     &:hover {
       transform: translateY(-6px);
-      -webkit-animation-name: hover;
-              animation-name: hover;
-      -webkit-animation-duration: 1.5s;
-              animation-duration: 1.5s;
-      -webkit-animation-delay: 0.3s;
-              animation-delay: 0.3s;
-      -webkit-animation-timing-function: linear;
-              animation-timing-function: linear;
-      -webkit-animation-iteration-count: infinite;
-              animation-iteration-count: infinite;
-      -webkit-animation-direction: alternate;
-              animation-direction: alternate;
+      animation-name: hover;
+      animation-duration: 1.5s;
+      animation-delay: 0.3s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
 
       &::before {
         opacity: 0.4;
         transform: translateY(6px);
-        -webkit-animation-name: hover-shadow;
-                animation-name: hover-shadow;
-        -webkit-animation-duration: 1.5s;
-                animation-duration: 1.5s;
-        -webkit-animation-delay: 0.3s;
-                animation-delay: 0.3s;
-        -webkit-animation-timing-function: linear;
-                animation-timing-function: linear;
-        -webkit-animation-iteration-count: infinite;
-                animation-iteration-count: infinite;
-        -webkit-animation-direction: alternate;
-                animation-direction: alternate;
+        animation-name: hover-shadow;
+        animation-duration: 1.5s;
+        animation-delay: 0.3s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
       }
     }
   }
@@ -444,3 +407,4 @@ a:focus {
 .logo:hover img {
   transform: rotate(360deg);
 }*/
+
