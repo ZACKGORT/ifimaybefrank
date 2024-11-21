@@ -184,7 +184,7 @@ const App = () => {
     React.createElement("div", { className: "header-section" }, /*#__PURE__*/
     React.createElement(Logo, null), " ", /*#__PURE__*/
     React.createElement("h1", { className: "main-title" }, "Hello,"), /*#__PURE__*/
-    React.createElement("h2", { className: "sub-title" }, "I'm Zack. Here's what I've been up to:"), /*#__PURE__*/
+    React.createElement("h2", { className: "sub-title" }, "I'm Zack, but if I may be frank:"), /*#__PURE__*/
     React.createElement("p", { className: "description" }, "The Ask. The Answer. The Result. The Takeaway. For more, see ", /*#__PURE__*/
     React.createElement("a", { href: "https://reasonandresolution.com/" }, "reasonandresolution.com"), ".")), /*#__PURE__*/
 
