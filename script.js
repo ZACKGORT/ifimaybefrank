@@ -64,9 +64,9 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "Brand Activation & {Contentful} Replatformng or the world's top social media brand.",
-    description: "Enhancing content delivery and scalability through a headless CMS architecture tailored for TikTok's business platform.",
-    image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
+    headline: "Focus Timer",
+    description: "Boost your productivity with the Pomodoro technique",
+    image: "https://via.placeholder.com/400?text=5" },
 
   {
     upperHeadline: "The Answer",
