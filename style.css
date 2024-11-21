@@ -283,6 +283,26 @@ a:focus {
   .modal h1, .modal h2, .modal p {
     font-size: 1em;  /* Adjust text sizes inside modal */
   }
+
+	
+.modal img {
+  max-width: 100%;
+  margin-top: 25px;
+  margin-bottom: 20px;
+}
+	
+	
+.modal .close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 2em;
+  font-weight: bold;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: #333;
+}
 }
 
 

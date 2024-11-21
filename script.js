@@ -35,28 +35,28 @@ const App = () => {
   const tabGridData = [
   [
   {
-    upperHeadline: "The Ask",
+
     headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
-    description: "This is **bold** text.\n\nThis is a new paragraph.",
-    image: "https://i.ibb.co/FgstGVs/image-441-min.png" },
+    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems.\n\nHere, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.",
+    image: "https://i.ibb.co/68t5b9S/Mask-group-7-min.png" },
 
   {
-    upperHeadline: "The Answer",
+
     headline: "Tech Stack Migration, Data Refactorization, & Design System Documentation.",
-    description: "Inside the extraordinary world of Monument Valley 2",
-    image: "https://via.placeholder.com/400?text=2" },
+    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.",
+    image: "https://i.ibb.co/ZW3j6T1/Photo-Selects-Sketch-Prep-1-1-Houghton-Nav.jpg" },
 
   {
     upperHeadline: "The Result",
     headline: "Semi-successful",
     description: "Cheap flights, airline tickets",
-    image: "https://via.placeholder.com/400?text=3" },
+    image: "https://i.ibb.co/FgstGVs/image-441-min.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "Corporate culture sucks.",
     description: "Discover the perfect coffee apps!",
-    image: "https://via.placeholder.com/400?text=4" }],
+    image: "https://i.ibb.co/GWbb4pb/image-450-min.png" }],
 
 
   [
@@ -183,8 +183,8 @@ const App = () => {
 
     React.createElement("div", { className: "header-section" }, /*#__PURE__*/
     React.createElement(Logo, null), " ", /*#__PURE__*/
-    React.createElement("h1", { className: "main-title" }, "Hello."), /*#__PURE__*/
-    React.createElement("h2", { className: "sub-title" }, "Here are some case studies done quickly."), /*#__PURE__*/
+    React.createElement("h1", { className: "main-title" }, "Hello,"), /*#__PURE__*/
+    React.createElement("h2", { className: "sub-title" }, "I'm Zack. Here's what I've been up to:"), /*#__PURE__*/
     React.createElement("p", { className: "description" }, "The Ask. The Answer. The Result. The Takeaway. For more, see ", /*#__PURE__*/
     React.createElement("a", { href: "https://reasonandresolution.com/" }, "reasonandresolution.com"), ".")), /*#__PURE__*/
 
