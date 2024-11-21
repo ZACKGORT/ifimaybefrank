@@ -1,3 +1,24 @@
+const cursor = document.createElement('div');
+cursor.classList.add('cursor');
+
+const follower = document.createElement('div');
+follower.classList.add('follower');
+
+document.body.appendChild(cursor);
+document.body.appendChild(follower);
+
+document.addEventListener('mousemove', e => {
+  const { clientX, clientY } = e;
+
+  cursor.style.transform = `translate(${clientX}px, ${clientY}px)`;
+  follower.style.transform = `translate(${clientX}px, ${clientY}px)`;
+});
+
+
+
+
+
+
 const { useState } = React;
 const ReactMarkdown = window.ReactMarkdown; // Make sure ReactMarkdown is available
 
@@ -277,6 +298,13 @@ function highlightTextOnHover() {
     });
   });
 }
+
+
+
+
+
+
+
 
 // Call the function after the DOM is loaded
 document.addEventListener('DOMContentLoaded', highlightTextOnHover);
