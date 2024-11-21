@@ -498,9 +498,3 @@ a:focus {
   font-size: .75rem;
   color: #555;
 }
-
-
-/* Remove the blue shaded fill on mobile links */
-a {
-  -webkit-tap-highlight-color: transparent;
-}
