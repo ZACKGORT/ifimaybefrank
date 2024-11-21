@@ -1,4 +1,5 @@
 const { useState } = React;
+const ReactMarkdown = window.ReactMarkdown; // Make sure ReactMarkdown is available
 
 const Logo = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -32,12 +33,11 @@ const App = () => {
 
   // Define grid data for each tab with at least 4 items per tab
   const tabGridData = [
-  // Grid Data for Tab 1
   [
   {
     upperHeadline: "The Ask",
     headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
-    description: "Description for Welcome to the App Store",
+    description: "This is **bold** text.\n\nThis is a new paragraph.",
     image: "https://i.ibb.co/FgstGVs/image-441-min.png" },
 
   {
@@ -59,8 +59,6 @@ const App = () => {
     image: "https://via.placeholder.com/400?text=4" }],
 
 
-
-  // Grid Data for Tab 2
   [
   {
     upperHeadline: "The Ask",
@@ -87,8 +85,6 @@ const App = () => {
     image: "https://via.placeholder.com/400?text=8" }],
 
 
-
-  // Grid Data for Tab 3
   [
   {
     upperHeadline: "The Ask",
@@ -115,8 +111,6 @@ const App = () => {
     image: "https://via.placeholder.com/400?text=12" }],
 
 
-
-  // Grid Data for Tab 4
   [
   {
     upperHeadline: "The Ask",
@@ -145,7 +139,6 @@ const App = () => {
 
 
 
-
   const openModal = data => setModalData(data);
   const closeModal = () => setModalData(null);
 
@@ -155,6 +148,17 @@ const App = () => {
   { title: "GNC {Shopify}" },
   { title: "B2B E-Commerce {SalesForce}" }];
 
+
+  const handleModalClick = e => {
+    // Prevents closing when clicking inside the modal content
+    e.stopPropagation();
+  };
+
+  const handleOutsideClick = e => {
+    if (e.target === e.currentTarget) {
+      closeModal(); // Close modal only when clicking outside of it
+    }
+  };
 
   return /*#__PURE__*/(
     React.createElement("div", { className: "wrapper" }, /*#__PURE__*/
@@ -209,14 +213,17 @@ const App = () => {
 
 
     modalData && /*#__PURE__*/
-    React.createElement("div", { className: "modal open", onClick: closeModal }, /*#__PURE__*/
+    React.createElement("div", { className: "modal open", onClick: handleOutsideClick }, /*#__PURE__*/
+    React.createElement("div", { className: "modal-content", onClick: handleModalClick }, /*#__PURE__*/
     React.createElement("button", { className: "close", onClick: closeModal }, "\xD7"), /*#__PURE__*/
 
 
     React.createElement("img", { src: modalData.image, alt: modalData.headline }), /*#__PURE__*/
     React.createElement("h1", null, modalData.headline), /*#__PURE__*/
     React.createElement("h2", null, modalData.upperHeadline), /*#__PURE__*/
-    React.createElement("p", null, modalData.description), " ")));
+
+    React.createElement(ReactMarkdown, null, modalData.description)))));
+
 
 
 
