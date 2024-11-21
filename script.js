@@ -37,44 +37,44 @@ const App = () => {
   {
     upperHeadline: "The Ask",
     headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
-    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems.\n\nHere, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.",
+    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems.",
     image: "https://i.ibb.co/cNx6CCH/image-444-min.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "Tech Stack Migration, Data Refactorization, & Design System Documentation.",
-    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.\n\n Now, technically speaking, my official role was as a full-time remote-employ individual contributor, but to lead my team effectively, I opted to bring my collaborative energy to the offices. ",
+    headline: "Tech stack migration, data refactorization, & design system documentation.",
+    description: "Here, I led product discovery sessions, UX and Data Architecture workshops, as well as design-system integrations leveraging React.js and Tailwind.\n\n ",
     image: "https://i.ibb.co/ZW3j6T1/Photo-Selects-Sketch-Prep-1-1-Houghton-Nav.jpg" },
 
   {
     upperHeadline: "The Result",
-    headline: "Semi-successful",
-    description: "Cheap flights, airline tickets",
+    headline: "Setting up for success",
+    description: "Now, technically speaking, my official role was as a full-time remote-employ individual contributor, but to lead my team effectively, I opted to bring my collaborative energy to the offices. ",
     image: "https://i.ibb.co/GWbb4pb/image-450-min.png" },
 
   {
     upperHeadline: "The Takeaway",
-    headline: "Corporate culture sucks.",
-    description: "Discover the perfect coffee apps!",
+    headline: "Elevating my output and influence.",
+    description: "Their words, not mine. #boncourage",
     image: "https://i.ibb.co/BLvfNRG/image-452-min.png" }],
 
 
   [
   {
     upperHeadline: "The Ask",
-    headline: "Brand Activation & Contentful Replatforming for the world's top social media brand.",
+    headline: "Brand activation & Contentful replatforming for the world's top social media brand.",
     description: "Enhancing content delivery and scalability through a headless CMS architecture tailored for TikTok's business platform.",
     image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "An Enhanced B2B Content Strategy & Modern Design System",
+    headline: "An enhanced B2B content strategy & modern design system",
     description: "Your personal travel assistant for seamless journeys",
     image: "https://i.ibb.co/qdMFmd1/1-Oh-X-z1i-Tuza-Ezs-Lv1-Uz37w.png" },
 
   {
     upperHeadline: "The Result",
-    headline: "Semi-Successful",
+    headline: "Semi-successful",
     description: "I wish I could tell you",
     image: "https://i.ibb.co/nkrqvCR/1-q3r-Mmx9-UBf-P3-g-M7c1qbjg.png" },
 
@@ -193,7 +193,7 @@ const App = () => {
     React.createElement("div", { className: "header-section" }, /*#__PURE__*/
     React.createElement(Logo, null), " ", /*#__PURE__*/
     React.createElement("h1", { className: "main-title" }, "Hello,"), /*#__PURE__*/
-    React.createElement("h2", { className: "sub-title" }, "I'm Zack, but ", /*#__PURE__*/React.createElement("span", { className: "span" }, "if I may be frank:")), /*#__PURE__*/
+    React.createElement("h2", { className: "sub-title" }, "I'm Zack (Sr. UX Designer) but ", /*#__PURE__*/React.createElement("span", { className: "span" }, "if I may be frank:")), /*#__PURE__*/
     React.createElement("p", { className: "description" }, "Here's some of my latest, condensed for your consideration. More @ ", /*#__PURE__*/
     React.createElement("a", { href: "https://reasonandresolution.com/" }, /*#__PURE__*/React.createElement("strong", null, "reasonandresolution.com")), ".")), /*#__PURE__*/
 
