@@ -508,3 +508,15 @@ a, button, input, textarea {
   -webkit-tap-highlight-color: transparent;
   outline: none; /* Removes any visible focus outline */
 }
+
+
+
+
+.client-info {
+  margin-top: 1em;
+	margin-bottom: .25em;
+	margin-left: 2em;
+  font-size: .75rem;
+  line-height: 1.5;
+  color: #333;
+}

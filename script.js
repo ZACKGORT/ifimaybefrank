@@ -141,10 +141,10 @@ const App = () => {
 
   // Add client info for each tab
   const clientInfo = [
-  { client: "BNY Mellon — Pershing X // Publicis Sapient", company: "Serving as a Senior UX Designer, IC" },
-  { client: "TikTok For Business // Code And Theory", company: "Serving as a ACD, UX" },
-  { client: "General Nutrition Centers // Elva Design Group", company: "Serving as a Senior UX Designer, IC" },
-  { client: "B2B+C+E SalesForce E-Commerce, Livearea", company: "Serving as a UX Manager" }];
+  { client: "BNY Mellon — Pershing X vis-à-vis Publicis Sapient", company: "Serving as a Senior UX Designer, IC" },
+  { client: "TikTok For Business vis-à-vis Code And Theory", company: "Serving as a ACD, UX" },
+  { client: "General Nutrition Centers vis-à-vis Elva Design Group", company: "Serving as a Senior UX Designer, IC" },
+  { client: "SalesForce Builds vis-à-vis PFSweb, Livearea", company: "Serving as a UX Manager" }];
 
 
 
@@ -208,6 +208,13 @@ const App = () => {
       onClick: () => setActiveTab(index) },
 
     tab.title))), /*#__PURE__*/
+
+
+
+
+    React.createElement("div", { className: "client-info" }, /*#__PURE__*/
+    React.createElement("strong", null, "Client:"), " ", clientInfo[activeTab].client, " ", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/
+    React.createElement("strong", null, "Role:"), " ", clientInfo[activeTab].company), /*#__PURE__*/
 
 
 
