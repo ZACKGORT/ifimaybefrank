@@ -133,7 +133,7 @@ const App = () => {
   {
     upperHeadline: "The Takeaway",
     headline: "An Elevating Paradigm shift",
-    description: "So, the work shown here was all during the COVID crisis, which drastically changed the work environment as it were. This disruption of normal working routines offered me the time and space to dive deep into my work, and elevate my experience and level of contribution.",
+    description: "So, the work shown here was all during the COVID crisis, which drastically changed the work environment as it were. This disruption of normal working routines offered me the time and space to dive deep into my work, and elevate my experience and level of contribution.\n\nCheers!",
     image: "https://i.ibb.co/B6vFwH6/zoom-zack.gif" }]];
 
 
