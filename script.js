@@ -89,25 +89,25 @@ const App = () => {
   {
     upperHeadline: "The Ask",
     headline: "GNC asked us to shake things up; providing them with a modern e-commerce solution.",
-    description: "A deep dive into next-gen financial apps",
+    description: "Honestly, this was the best work of my career, working with what I consider to be the most professional and operationally-mature team I've had the joy to work with.\n\n Enter Elva Design Group, a boutique digital design agency specializing in full-spectrum Shopify e-commerce builds.",
     image: "https://i.ibb.co/qFKN21p/image-431-min.png" },
 
   {
     upperHeadline: "The Answer",
-    headline: "We Shopified the sh*t out of GNC's brand.",
-    description: "Learn the basics of cryptocurrency apps",
+    headline: "We Shopified the sh*p out of GNC's brand.",
+    description: "We dove deep into GNC's analytics, backed by our expertise with the Shopify platform, and supported by a top-tier design and strategy team. From market research, to Q&Q user data, to wireframe feature prototyping, brought to life via a well-considered e-commerce design system.",
     image: "https://i.ibb.co/fpbcrXp/Frame-4348.png" },
 
   {
     upperHeadline: "The Result",
-    headline: "This is the whey",
-    description: "Manage your finances with ease",
+    headline: "Heavy lift. Huge Gains.",
+    description: "This is the whey — it should go when building a ground-up e-commerce solution. The project wasn't without its challenges, not withstanding a complete re-approach midway through the contract (at risk of contract abandonment). But, where we landed, and what we delivered, helped GNC reclaim over $500m in revenue annually. ",
     image: "https://i.ibb.co/Hrx2Pfy/image-432-min.png" },
 
   {
     upperHeadline: "The Takeaway",
     headline: "If the bar ain't bending, you're just pretending",
-    description: "Discover the top apps to grow your wealth",
+    description: "From market and user research, to concept exploration, to prototyping and design iteration, to implementing proven e-commerce UX, to exploring unproven ideation, to shipping a modular and future-flexible solution for a nationally beloved brand.\n\n\I'm ready for round two!",
     image: "https://i.ibb.co/pbchQFh/dash-gnc-screen.png" }],
 
 
@@ -115,20 +115,20 @@ const App = () => {
   {
     upperHeadline: "The Ask",
     headline: "B2C+B E-Commerce for Aquasana, Hardinge, Simpson Strong-Tie, YETI, West Marine...",
-    description: "Discover delicious recipes based on ingredients you have",
+    description: "At LiveArea, we specialized in SalesForce Solutions Architecture, E-commerce Design Systems, Taxonomy & Content Architecture, Q&Q User Research & Data, and Development & Integrations.\n\n  ",
     image: "https://i.ibb.co/0DPv3vQ/Frame-4349.png" },
 
   {
     upperHeadline: "The Answer",
     headline: "SalesForce Solutions Architecture & Design Systems ",
-    description: "Organize your meals and grocery lists effortlessly",
+    description: "You might think we design-folk just spend our days scrutinizing squares and joking about geometry, but ninety-nine percent of our job is actually just sorting through .xlsx tables, and leaving tons of post-it notes everywhere.\n\n I jest, but the reality is, design is only a fraction of what our job is. Design isn't meant to just look nice, but to communicate effectively, especially with folks who don't joke about geometry.",
     image: "https://i.ibb.co/2yJjFNQ/image-426-min.png" },
 
   {
     upperHeadline: "The Result",
     headline: "Shipped",
-    description: "I just looked up Aquasana, and it's the same as what I shipped 4 years ago; which is to say that my due diligence paired with the right teams has proven longevity, aka ROI.",
-    image: "https://i.ibb.co/8bpY3DJ/Frame-4353.png" },
+    description: "LiveArea had a good template for design ops; we had a deep library to leverage for our builds, which allowed us to focus on key customizations and particularities from our clients. \n\nAs an aside, I just looked up Aquasana, and it's the same as what I shipped 4 years ago; which is to say that my due diligence paired with the right team structure has proven longevity, aka ROI.",
+    image: "https://i.ibb.co/kDXnBz5/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif" },
 
   {
     upperHeadline: "The Takeaway",
@@ -155,7 +155,7 @@ const App = () => {
   { title: "BNY Mellon—Pershing X" },
   { title: "TikTok For Business" },
   { title: "GNC {Shopify}" },
-  { title: "B2B E-Commerce {SalesForce}" }];
+  { title: "B2C & B2B E-Commerce {SalesForce}" }];
 
 
   const handleModalClick = e => {

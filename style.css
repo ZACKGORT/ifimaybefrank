@@ -338,7 +338,7 @@ a:focus {
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
-  margin-top: .5em;
+  margin-top: 0;
 	margin-left: .6em;
   margin-bottom: .6em;
   position: relative; /* Ensure relative positioning for the hover shadow */
