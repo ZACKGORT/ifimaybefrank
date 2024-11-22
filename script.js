@@ -16,7 +16,7 @@ const Logo = () => {
 
     React.createElement("a", { href: "#", "data-page": "reason-and-resolution" }, /*#__PURE__*/
     React.createElement("img", {
-      src: "https://i.ibb.co/x5h6J5D/Frankly.png",
+      src: "https://i.ibb.co/YWBLKfN/Frankly-1.png",
       alt: "Logo",
       width: "70",
       height: "40",
@@ -37,7 +37,7 @@ const App = () => {
   {
     upperHeadline: "The Ask",
     headline: "Pershing X required a total data & design overhaul towards unifying their financial product ecosystem.",
-    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems. \n\n The work wasn't wow-worthy. The client wasn't asking for miracles. They wanted smart, carefully considered actionable deliverables to propel them forward.",
+    description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems. \n\n The work wasn't wow-worthy. The client wasn't expecting spectacle. They wanted smart, carefully considered actionable deliverables to propel them forward.",
     image: "https://i.ibb.co/hRnRByb/wove-advisory-landing-main.png" },
 
   {
@@ -69,7 +69,7 @@ const App = () => {
   {
     upperHeadline: "The Answer",
     headline: "An enhanced B2B content strategy & modern design system",
-    description: "Our priority was providing convenient B2B pathways with simultaneous global and regional reach, B2C+B lead generation, content architecture, and brand activation; all through a modern and accessible design system. ",
+    description: "Our priority was providing convenient pathways with global and regional reach; add B2C+B2B lead generation, content architecture, and brand activation; all through a modern and accessible design system. ",
     image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
 
   {
@@ -81,7 +81,7 @@ const App = () => {
   {
     upperHeadline: "The Takeaway",
     headline: "Too much code, too much theory.",
-    description: "Too many cooks in the kitchen; without a head chef; and the sous chef isn't allowed to stand in, because; and  there's a fire in the fryer; and the customer has already returned one dish; & ...\n\n\ Suffice to say, while the project ultimately was delivered successfully, I'd nay say it was a success.  The design team, the tech team, the strategy team, the excecutive team; all great in their own right, but also admittedely amidst a restructuring phase ... which ultimately showed in the final product.\n\n It was a true learning experience.",
+    description: "Too many cooks in the kitchen; without a head chef; no, the sous chef isn't allowed to stand in, because; and  there's a fire in the fryer—no, don't use water! And, the customer has already returned one dish; & ...\n\n\ Suffice to say, while the project ultimately was delivered successfully, I'd nay say it was a success.  The design team, the tech team, the strategy team, the excecutive team; all great in their own right, but also admittedely amidst a restructuring phase ... which ultimately showed in the final product.\n\n It was a true learning experience.",
     image: "https://i.ibb.co/yPyHvw2/Screenshot-20230217-101719.png" }],
 
 
@@ -192,9 +192,9 @@ const App = () => {
 
     React.createElement("div", { className: "header-section" }, /*#__PURE__*/
     React.createElement(Logo, null), " ", /*#__PURE__*/
-    React.createElement("h1", { className: "main-title" }, "Hello,"), /*#__PURE__*/
+    React.createElement("h1", { className: "main-title" }, "Hello!"), /*#__PURE__*/
     React.createElement("h2", { className: "sub-title" }, "I'm Zack (Sr. UX Designer) but ", /*#__PURE__*/React.createElement("span", { className: "span" }, "if I may be frank:")), /*#__PURE__*/
-    React.createElement("p", { className: "description" }, "Here's some of my latest, condensed for your consideration. More @ ", /*#__PURE__*/
+    React.createElement("p", { className: "description" }, "Here's some of my UX work, condensed conveniently for your consideration. More @ ", /*#__PURE__*/
     React.createElement("a", { href: "https://reasonandresolution.com/" }, /*#__PURE__*/React.createElement("strong", null, "reasonandresolution.com")), ".")), /*#__PURE__*/
 
 
