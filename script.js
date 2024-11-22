@@ -36,7 +36,7 @@ const App = () => {
   [
   {
     upperHeadline: "The Ask",
-    headline: "Pershing X required a data & design overhaul towards unifying their financial product ecosystem.",
+    headline: "Pershing X required a total data & design overhaul towards unifying their financial product ecosystem.",
     description: "Through a collaborative multi-track effort, we partnered with the technology teams at Pershing X to deep dive into their product ecosystem with a focus on data architecture and branded design systems. \n\n The work wasn't wow-worthy. The client wasn't asking for miracles. They wanted smart, carefully considered actionable deliverables to propel them forward.",
     image: "https://i.ibb.co/hRnRByb/wove-advisory-landing-main.png" },
 
@@ -55,33 +55,33 @@ const App = () => {
   {
     upperHeadline: "The Takeaway",
     headline: "Elevating my output and influence.",
-    description: "At Publicis Sapient, I strove to be a valued contributor and collaborator. In that, I succeeded. \n\n Unluckily for me, I was part of a sweeping round of layoffs. I would be thrilled to be welcomed back into the hustle-and-bustle where I can continue to make meaningful contributions.",
+    description: "At Publicis Sapient, I strove to be a valued contributor and collaborator. In that, I succeeded (making some friends along the way, too) \n\n Unluckily for me, I was part of a sweeping round of layoffs. I would be thrilled to be welcomed back into the hustle-and-bustle where I can continue to make meaningful contributions.",
     image: "https://i.ibb.co/BLvfNRG/image-452-min.png" }],
 
 
   [
   {
     upperHeadline: "The Ask",
-    headline: "Brand activation & Contentful replatforming for the world's top social media brand.",
-    description: "Enhancing content delivery and scalability through a headless CMS architecture tailored for TikTok's business platform.",
+    headline: "TikTok For Business requested a comprehensive B2B Brand Strategy & Replatforming to Contentful. ",
+    description: "From the 62nd floor of the World One Trade Center Tower, we devised a comprehensive content delivery strategy focusing on scalability through a headless CMS architecture tailored for TikTok's business platform.",
     image: "https://i.ibb.co/9qFzTQH/tiktok-proto-gif.gif" },
 
   {
     upperHeadline: "The Answer",
     headline: "An enhanced B2B content strategy & modern design system",
-    description: "Your personal travel assistant for seamless journeys",
-    image: "https://i.ibb.co/qdMFmd1/1-Oh-X-z1i-Tuza-Ezs-Lv1-Uz37w.png" },
-
-  {
-    upperHeadline: "The Result",
-    headline: "Semi-successful",
-    description: "I wish I could tell you",
+    description: "Our priority was providing convenient B2B pathways with simultaneous global and regional reach, B2C+B lead generation, content architecture, and brand activation; all through a modern and accessible design system. ",
     image: "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png" },
 
   {
+    upperHeadline: "The Result",
+    headline: "Code? Yes. Theory? Yes.",
+    description: "As its namesake might suggest, research and diligence played a huge role behind our strategic explorations; diving deep into TT4B's analytics and userbase to guide our solutioning.",
+    image: "https://i.ibb.co/qdMFmd1/1-Oh-X-z1i-Tuza-Ezs-Lv1-Uz37w.png" },
+
+  {
     upperHeadline: "The Takeaway",
-    headline: "A top-heavy organization that's slow to move.",
-    description: "Relax with apps designed to reduce stress and anxiety",
+    headline: "Too much code, too much theory.",
+    description: "Too many cooks in the kitchen; without a head chef; and the sous chef isn't allowed to stand in, because; and  there's a fire in the fryer; and the customer has already returned one dish; & ...\n\n\ Suffice to say, while the project ultimately was delivered successfully, I'd nay say it was a success.  The design team, the tech team, the strategy team, the excecutive team; all great in their own right, but also admittedely amidst a restructuring phase ... which ultimately showed in the final product.\n\n It was a true learning experience.",
     image: "https://i.ibb.co/yPyHvw2/Screenshot-20230217-101719.png" }],
 
 
