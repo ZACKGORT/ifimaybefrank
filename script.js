@@ -81,7 +81,7 @@ const App = () => {
   {
     upperHeadline: "The Takeaway",
     headline: "Too much code, too much theory.",
-    description: "Too many cooks in the kitchen; without a head chef; no, the sous chef isn't allowed to stand in, because; and  there's a fire in the fryer—no, don't use water! And, the customer has already returned one dish; & ...\n\n\ Suffice to say, while the project ultimately was delivered successfully, I'd nay say it was a success.  The design team, the tech team, the strategy team, the excecutive team; all great in their own right, but also admittedely amidst a restructuring phase ... which ultimately showed in the final product.\n\n It was a true learning experience.",
+    description: "Suffice to say, while the project ultimately was delivered successfully, I'd nay say it was a success.  The design team, the tech team, the strategy team, the excecutive team; all great in their own right, but also admittedely amidst a restructuring phase ... which ultimately showed in the final product.\n\n It was a true learning experience.",
     image: "https://i.ibb.co/yPyHvw2/Screenshot-20230217-101719.png" }],
 
 
@@ -94,7 +94,7 @@ const App = () => {
 
   {
     upperHeadline: "The Answer",
-    headline: "We Shopified the sh*p out of GNC's brand.",
+    headline: "We Shopified the sh*p into GNC's brand.",
     description: "We dove deep into GNC's analytics, backed by our expertise with the Shopify platform, and supported by a top-tier design and strategy team. From market research, to Q&Q user data, to wireframe feature prototyping, brought to life via a well-considered e-commerce design system.",
     image: "https://i.ibb.co/fpbcrXp/Frame-4348.png" },
 
