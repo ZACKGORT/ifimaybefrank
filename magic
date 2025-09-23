@@ -306,10 +306,11 @@ void main(){
     }
   }
 
+  // ✅ Send CSS pixels; shader multiplies by u_pixelRatio
   function updateMouse(e){
     const r = canvas.getBoundingClientRect();
-    const x = (e.clientX - r.left) * dpr;
-    const y = (e.clientY - r.top) * dpr;
+    const x = (e.clientX - r.left);   // <-- removed * dpr
+    const y = (e.clientY - r.top);    // <-- removed * dpr
     set2f('u_mouse', x, y);
     draw();
   }
