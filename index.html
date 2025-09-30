@@ -4,19 +4,23 @@
   saved date: Wed Sep 24 2025 03:44:23 GMT-0400 (Eastern Daylight Time)
  --><meta charset=utf-8>
  <meta name=viewport content="width=device-width, initial-scale=1">
- <title>String Tune</title>
+ <title>Frankly</title>
 <style>
+
+
+
+
 /* =======================================================
    STRING TUNE — FULL CONSOLIDATED STYLESHEET (optimized)
-   - Tokens unified in one :root
-   - Media queries grouped & labeled (MQ:A…K)
-   - Duplicates removed, order stabilized
    ======================================================= */
+
+/* 0) FONT IMPORTS (Instrument Sans + Mono) */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:opsz,wght@14..32,300..900&family=Instrument+Sans+Mono:wght@300..700&display=swap");
 
 /* =========================================
    1) TOKENS & GLOBAL KNOBS (CONSOLIDATED)
    ========================================= */
-   :root{
+:root{
   /* Scale & rhythm */
   --ui: 1.4;
   --type-step: 1.333;
@@ -61,11 +65,14 @@
   --f-smooth: cubic-bezier(0.5, 0, 0.3, 1);
   --f-smooth-alt: cubic-bezier(0.6, 0, 0.05, 1);
 
-  /* Fonts */
-  --font: "KHTeka", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  --font-mono: "KHTekaMono", "KHTeka", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  /* Fonts — switched to Instrument Sans */
+  --font: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 
-  
+  /* If you want a mono to match, keep Instrument Sans Mono */
+  --font-mono: "Instrument Sans Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+               Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Section sizing */
   --section-vh: 100;
@@ -108,9 +115,7 @@
   --cursor-tip-pad-y: 6px;
 }
 
-/* =================================
-   2) FONTS (as provided/original)
-   ================================= */
+/* 2) (Legacy) custom faces kept but unused by tokens — safe to remove if you like */
 @font-face { font-family: KHTeka; font-style: normal; src: url("/fonts/KHTeka-Regular.woff") format("woff"), url("/fonts/KHTeka-Regular.woff2") format("woff2"); }
 @font-face { font-family: KHTekaMono; font-style: normal; src: url("/fonts/KHTekaMono-Regular.woff") format("woff"), url("/fonts/KHTekaMono-Regular.woff2") format("woff2"); }
 @font-face {
@@ -121,11 +126,10 @@
        url("/fonts/fdsi.woff?wud5tw") format("woff"),
        url("/fonts/fdsi.svg?wud5tw#fdsi") format("svg");
 }
-
 /* =========================
    3) BASE RESET & ELEMENTS
    ========================= */
-*{ border:0; box-sizing:border-box; margin:0; padding:0; }
+   *{ border:0; box-sizing:border-box; margin:0; padding:0; }
 h1,h2,h3,h4,h5,h6,p{ margin:0; }
 ol,ol *,ul,ul *{ list-style-type:none; margin:0; padding:0; }
 figure{ margin:0; }
@@ -135,8 +139,10 @@ hr{ background-color: rgba(var(--c-white-rgb), .1); border:none; height:1px; }
 
 html{
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "dlig","ss03","ss08","ss06";
-  background-color: var(--c-black); color: var(--c-black); font-family: var(--font);
+  /* Instrument Sans reads best without extra ligatures */
+  font-feature-settings: "ss03","ss08","ss06"; /* dropped 'dlig' to avoid unexpected stylistics */
+  background-color: var(--c-black); color: var(--c-black);
+  font-family: var(--font);
   font-size:16px; line-height: var(--body-line-height); text-rendering: optimizeLegibility;
 }
 body{ height:100vh; height:calc(var(--vh,1vh) * 100); margin:0; overflow:hidden; }
@@ -263,9 +269,6 @@ html.-cursor-tooltips [data-tooltip]::after{ display:none; }
   [data-tooltip]::after{ background: rgba(0,0,0,.72); color: var(--c-white); }
 }
 
-
-/* Mobile bubble width nudges handled in MQ:A */
-
 /* Storyline HUD */
 .storyline-hud{
   position:fixed; left:0; right:0;
@@ -333,6 +336,7 @@ html.-ready, html.-ready body, html.-ready a, html.-ready button{ cursor:none; }
 .cursor .cursor-2{ width:36px; height:36px; background:transparent; border:2px solid #fff; }
 .cursor.-down .cursor-1, .cursor.-down .cursor-2{ transform: translateZ(0) scale(.9); }
 .cursor.-hide{ opacity:0; transition: opacity .15s ease; }
+
 /* Bubble sits top-right relative to the pointer */
 .cursor .cursor-tip{
   position: absolute;
@@ -343,33 +347,17 @@ html.-ready, html.-ready body, html.-ready a, html.-ready button{ cursor:none; }
   border: 1px solid rgba(255,255,255,.25);
   background: #000; color: #fff; border-radius: 0;
   white-space: nowrap; pointer-events: none;
-
-  /* use CSS vars to place bubble */
   transform: translate3d(var(--cursor-tip-x, 16px), var(--cursor-tip-y, -24px), 0);
   opacity: 0; transition: opacity .25s ease, transform .25s ease;
 }
-
-.cursor.-tips > .cursor-tip{
-  opacity: 1;
-  transform: translate3d(var(--cursor-tip-x, 16px), var(--cursor-tip-y, -24px), 0);
-}
-
+.cursor.-tips > .cursor-tip{ opacity: 1; transform: translate3d(var(--cursor-tip-x, 16px), var(--cursor-tip-y, -24px), 0); }
 .cursor.-down > .cursor-tip{
-  transform:
-    translate3d(var(--cursor-tip-x, 16px), var(--cursor-tip-y, -24px), 0)
-    scale(.96);
+  transform: translate3d(var(--cursor-tip-x, 16px), var(--cursor-tip-y, -24px), 0) scale(.96);
 }
 
-
-/* Marquee */
-.-marquee{
-  display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:center;
-  width:100%; color:#FF8DA1; overflow:hidden; align-content:stretch;
-}
-.-marquee .-move{
-  position:relative; flex-shrink:0; white-space:nowrap; will-change:transform;
-  animation: marquee 32s linear infinite; animation-play-state:paused; transform:translateZ(0);
-}
+/* Marquee + Split/Lazy (unchanged logic) */
+.-marquee{ display:flex; flex-direction:row; flex-wrap:nowrap; align-items:center; justify-content:center; width:100%; color:#FF8DA1; overflow:hidden; align-content:stretch; }
+.-marquee .-move{ position:relative; flex-shrink:0; white-space:nowrap; will-change:transform; animation: marquee 32s linear infinite; animation-play-state:paused; transform:translateZ(0); }
 .-marquee .-move .-part{ display:inline-block; height:100%; width:auto; }
 .-marquee .-move .-part span{ display:inline-block; vertical-align:middle; padding-inline:2rem; }
 .-marquee .-move .-part img{ display:inline-block; height:2rem; width:auto; vertical-align:middle; }
@@ -378,7 +366,6 @@ html.-ready, html.-ready body, html.-ready a, html.-ready button{ cursor:none; }
 @keyframes marquee{ 0%{ transform: translate3d(25%,0,0) rotate(.01deg); } to{ transform: translate3d(-25%,0,0) rotate(.01deg); } }
 @keyframes marqueeHor{ 0%{ transform: translate3d(0,25%,0) rotate(.01deg); } to{ transform: translate3d(0,-25%,0) rotate(.01deg); } }
 
-/* Split text / lazy */
 .-a-scale-in,.-a-scale-out,.-a-to-bottom,.-a-to-bottom100,.-a-to-top,.-a-to-top100{ --l-modifier:1; --l-delay:0; }
 .-onload{ visibility:hidden; }
 .-a-scale-in{ opacity:0; transform:scale(.5); transition: transform .3s var(--f-cubic), opacity .3s var(--f-cubic); }
@@ -413,11 +400,10 @@ html.-loaded .-a-p.-splitt-random.-inview .-splitted .-s-word{
 .-lzl-reverse .lazyLoad{ scale:1; }
 .lazyLoad.-loaded{ opacity:1; scale:1; }
 .-splitted .-s-char{ will-change: transform, opacity; backface-visibility:hidden; }
-
 /* ==============================
    7) LAYOUT: GRID & BLOCKS
    ============================== */
-.page{ position:relative; min-height: calc(var(--vh,1vh) * 100); }
+   .page{ position:relative; min-height: calc(var(--vh,1vh) * 100); }
 section{ position:relative; }
 svg{ fill:var(--c-black); aspect-ratio:1 / 1; width:100%; }
 .-w{ margin:0 var(--g-margin); }
@@ -546,171 +532,79 @@ html:not(.-guidelines) .guide-grid{ visibility:hidden; }
 .-w .rel-2[data-v-05b709a3]{ --left:7; }
 .-w .rel-3[data-v-05b709a3]{ --left:11; }
 
-
-
 /* Tier line (shared base for Glide + Parallax) */
 .block.string-glide .tier,
 .block.string-parallax .tier{
   grid-column: 1 / -1;
   position: relative;
   display: block;
-  height: 0;                         /* border-only line */
+  height: 0;
   border-bottom: 2px dashed var(--block-pink);
   z-index: 2;
   margin-block: clamp(.5rem, 3vh, 1.5rem);
 }
-
 .block.string-glide .tier::after,
 .block.string-parallax .tier::after{
   content: attr(data-tier-label);
   position: absolute;
   inset-inline-start: 50%;
-  inset-block-start: 0;               /* anchor at the line */
-  transform: translate(-50%, -50%);   /* centered on the line */
+  inset-block-start: 0;
+  transform: translate(-50%, -50%);
   padding: .2rem .5rem;
   white-space: nowrap;
   line-height: 1;
-  background: var(--block-pink);      /* covers the dashed line under the chip */
+  background: var(--block-pink);
   border: 1px solid rgba(var(--c-white-rgb), .2);
   color: var(--c-black);
 }
 
-/* Per-section knobs (same exact settings for both) */
-.block.string-glide{
-  --tier-font: calc(var(--mm) * .85); /* smaller text */
-  --tier-nudge-x: -5em;               /* left from center (adjust as needed) */
-
-}
-.block.string-parallax{
-  --tier-font: calc(var(--mm) * .85); /* smaller text */
-  --tier-nudge-x: -5em;               /* left from center (same as Glide) */
-
-}
-
-/* Apply knobs */
+/* Per-section knobs */
+.block.string-glide{ --tier-font: calc(var(--mm) * .85); --tier-nudge-x: -5em; }
+.block.string-parallax{ --tier-font: calc(var(--mm) * .85); --tier-nudge-x: -5em; }
 .block.string-glide .tier::after,
 .block.string-parallax .tier::after{
   font-size: var(--tier-font);
-  transform:
-    translate(
-      calc(-50% + var(--tier-nudge-x)),
-      calc(-50% + var(--tier-nudge-y))
-    );
+  transform: translate(calc(-50% + var(--tier-nudge-x)), calc(-50% + var(--tier-nudge-y)));
 }
 
-/* ============================================
-   PARALLAX — full CSS (centered row, 12-col, baseline, de-jitter)
-   - Filled blocks: exact 150×150 squares
-   - Empty blocks: taller (outline only)
-   - Vertically centered row with a line behind
-   - Column placement via --left / --width (e.g., 6, 9, 12)
-   ============================================ */
-
-/* Section layout: title on top, stage centered vertically */
+/* PARALLAX — centered row + baseline */
 .block.string-parallax.-centered{
-  display: grid;
-  grid-template-rows: auto 1fr;                 /* title, then the stage */
-  row-gap: clamp(12px, 2.5vw, 24px);
+  display: grid; grid-template-rows: auto 1fr; row-gap: clamp(12px, 2.5vw, 24px);
   min-height: clamp(520px, 70vh, 920px);
 }
-
-/* Stage: 12-col grid, vertical centering, and baseline behind tiles */
 .block.string-parallax .parallax-stage{
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0,1fr));
-  align-items: center;                           /* center items vertically */
-  min-height: clamp(260px, 44vh, 420px);
-  isolation: isolate;                            /* contain compositing (de-jitter) */
-  will-change: contents;
+  position: relative; display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
+  align-items: center; min-height: clamp(260px, 44vh, 420px); isolation: isolate; will-change: contents;
 }
-
-/* Baseline behind the row */
 .block.string-parallax .parallax-stage::before{
-  content:"";
-  position: absolute;
-  left: clamp(8px, 2vw, 24px);
-  right: clamp(8px, 2vw, 24px);
-  top: 50%;
-  height: 1px;                                   /* crisp line */
-  background: rgba(16,18,20,.22);
-  transform: translateY(-0.5px);                 /* snap to pixel grid */
-  z-index: 0;                                    /* behind tiles */
+  content:""; position: absolute; left: clamp(8px, 2vw, 24px); right: clamp(8px, 2vw, 24px);
+  top: 50%; height: 1px; background: rgba(16,18,20,.22); transform: translateY(-0.5px); z-index: 0;
 }
-@supports (translate: 0){
-  .block.string-parallax .parallax-stage::before{ translate: 0 -0.5px; }
-}
+@supports (translate: 0){ .block.string-parallax .parallax-stage::before{ translate: 0 -0.5px; } }
 
-/* Place each item via CSS vars: --left (start col) and --width (span) */
 .block.string-parallax .parallax-stage .rel{
   grid-column: var(--left, 1) / span var(--width, 1);
-  justify-self: start;
-  z-index: 1;                                    /* above baseline */
+  justify-self: start; z-index: 1;
 }
 
-/* ======================
-   Tile sizing & variants
-   ====================== */
-
-/* Base sizing for all parallax tiles (String Tune hook retained) */
+/* Tile sizing & variants */
 .block.string-parallax .child > [string="parallax"]{
-  /* size knobs (override per .rel with inline CSS vars if needed) */
-  --box-w: 150px;          /* width */
-  --box-ratio: 1 / 1;      /* square by default */
-
-  display: block;
-  inline-size: var(--box-w);
-  aspect-ratio: var(--box-ratio);
-  box-sizing: border-box;
-  background: currentColor;
-
-  /* De-jitter: layer promotion & rendering hints */
-  will-change: transform;
-  transform: translate3d(0,0,0);
-  backface-visibility: hidden;
-  contain: layout paint;
+  --box-w: 150px; --box-ratio: 1 / 1;
+  display: block; inline-size: var(--box-w); aspect-ratio: var(--box-ratio);
+  box-sizing: border-box; background: currentColor;
+  will-change: transform; transform: translate3d(0,0,0); backface-visibility: hidden; contain: layout paint;
 }
-
-/* FILLED (non-empty): exactly 150×150 black squares */
-.block.string-parallax .rel:not(.-empty) .child > [string="parallax"]{
-  --box-w: 150px;
-  --box-ratio: 1 / 1;
-  color: var(--c-black, #000);
-}
-
-/* EMPTY variant: outline only, no fill */
+.block.string-parallax .rel:not(.-empty) .child > [string="parallax"]{ --box-w:150px; --box-ratio:1/1; color: var(--c-black, #000); }
 .block.string-parallax .rel.-empty .child > [string="parallax"]{
-  background: transparent !important;
-  outline: max(1px, .12rem) solid currentColor;
-  color: rgba(16,18,20,.9);                      /* outline color */
+  background: transparent !important; outline: max(1px, .12rem) solid currentColor; color: rgba(16,18,20,.9);
 }
+.block.string-parallax .rel.-tall .child > [string="parallax"]{ --box-ratio: 1 / 2; }
+.block.string-parallax .desc{ margin-top: .5rem; text-align: center; }
 
-/* Taller empties (combine with .-empty) */
-.block.string-parallax .rel.-tall .child > [string="parallax"]{
-  --box-ratio: 1 / 2;                            /* taller rectangle */
-  /* try: --box-ratio: 2 / 5; or 1 / 2.2 for different proportions */
-}
-
-/* Labels */
-.block.string-parallax .desc{
-  margin-top: .5rem;
-  text-align: center;
-}
-
-/* ======================
-   Small-screen tweaks
-   ====================== */
 @media (max-width: 640px){
-  /* Keep filled at 150; empties keep ratio but can wrap vertically */
   .block.string-parallax .child > [string="parallax"]{ --box-w: 150px; }
-
-  /* Slightly taller stage for breathing room */
-  .block.string-parallax .parallax-stage{
-    min-height: clamp(220px, 50vh, 360px);
-  }
+  .block.string-parallax .parallax-stage{ min-height: clamp(220px, 50vh, 360px); }
 }
-
-
 
 /* Glide block */
 .-w .title span[data-v-ccb4a0eb]{ display:block; margin-top:var(--mm); }
@@ -756,76 +650,29 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 .block.string-lerp .lerp-grid .rel:not(.-active) > .child > [data-v-270bb328]{ background:transparent; }
 .block.string-lerp .lerp-grid .rel > .child > [data-v-270bb328]{ width:100%; height:100%; padding:0; background-color:var(--c-black); transform: translateZ(0); }
 
-/* Allow the shadow to extend beyond the box */
+/* Shadow tuning */
 .block.string-lerp .rel .child{ overflow: visible; }
-
-/* Anchor the shadow to the box */
 .block.string-lerp .rel .child > [data-v-270bb328][string="lerp"]{
-  position: relative;
-  z-index: 1;
-  bottom: 0;
-  border-radius: 2px;
+  position: relative; z-index: 1; bottom: 0; border-radius: 2px;
 }
-
-/* Directional, depth-aware, *peaked* opacity shadow */
 .block.string-lerp .rel .child > [data-v-270bb328][string="lerp"]::before{
-  content:"";
-  position:absolute; inset:0;
-  border-radius: inherit;
-  z-index:-1; pointer-events:none;
+  content:""; position:absolute; inset:0; border-radius: inherit; z-index:-1; pointer-events:none;
   background: rgba(var(--c-black-rgb,16,18,20), 1);
-
-  /* ---- knobs ---- */
-  /* direction vector: 1,1 = down-right; -1,1 = down-left; etc. */
-  --shadow-dir-x: 1;
-  --shadow-dir-y: 1;
-
-  /* offset/blur growth across depth */
-  --offset-min: 0px;     /* no offset at start */
-  --offset-max: 36px;    /* stronger pull by the end */
-  --blur-min:   1px;     /* crisp early */
-  --blur-max:  32px;     /* softer later */
-
-  /* opacity peaks early, then fades */
-  --alpha-peak: .46;     /* max opacity at the “crisp” phase */
-
-  /* “size” growth of the chip (subtle) */
-  --scale-min: 1;
-  --scale-max: 1.3;
-
-  /* ---- depth & shaping (0 → 1) ---- */
+  --shadow-dir-x: 1; --shadow-dir-y: 1;
+  --offset-min: 0px; --offset-max: 36px; --blur-min: 1px; --blur-max: 32px;
+  --alpha-peak: .46; --scale-min: 1; --scale-max: 1.3;
   --d: clamp(var(--lerp-progress, 0), 0, 1);
-
-  /* quick ramp up (0 → 1) over first 30% */
-  --up:   min(1, calc(var(--d) / .30));
-
-  /* fade out portion after 30% (0 → 1 from .30 → 1) */
+  --up: min(1, calc(var(--d) / .30));
   --down: max(0, calc((var(--d) - .30) / .70));
-
-  /* peaked opacity: rise fast, then fall → alpha = peak * up * (1 - down) */
   --_alpha: calc(var(--alpha-peak) * var(--up) * (1 - var(--down)));
-
-  /* offset/blur/scale all grow with depth */
   --_offset: calc(var(--offset-min) + (var(--offset-max) - var(--offset-min)) * var(--d));
   --_blur:   calc(var(--blur-min)   + (var(--blur-max)   - var(--blur-min))   * var(--d));
   --_scale:  calc(var(--scale-min)  + (var(--scale-max)  - var(--scale-min))  * var(--d));
-
-  /* apply */
   opacity: var(--_alpha);
   filter: blur(var(--_blur));
-  transform:
-    translate(
-      calc(var(--_offset) * var(--shadow-dir-x)),
-      calc(var(--_offset) * var(--shadow-dir-y))
-    )
-    scale(var(--_scale));
-  transition:
-    filter .12s linear,
-    opacity .12s linear,
-    transform .12s linear;
+  transform: translate(calc(var(--_offset) * var(--shadow-dir-x)), calc(var(--_offset) * var(--shadow-dir-y))) scale(var(--_scale));
+  transition: filter .12s linear, opacity .12s linear, transform .12s linear;
 }
-
-
 
 /* Magnetic grid */
 .block.string-magnetic{
@@ -860,23 +707,18 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 .block.string-split.-interstitial .title{ margin:0; }
 .block.string-split.-interstitial > *:last-child{ margin-bottom:0; }
 
-/* Word Wall (unified) */
+/* Word Wall (unified) + Touch affordances left intact */
 .block.string-split.-wordwall{
   --section-vh:100; display:grid; align-items:center; min-height:100vh; height:100vh;
   box-sizing:border-box; padding-block: clamp(1rem, 6vh, 3rem);
 }
-.block.string-split.-wordwall .text-container{
-  --left:1; --width: var(--g-columns); width:100%; max-width:none; box-sizing:border-box; padding-inline:var(--g-margin);
-}
+.block.string-split.-wordwall .text-container{ --left:1; --width: var(--g-columns); width:100%; max-width:none; box-sizing:border-box; padding-inline:var(--g-margin); }
 .block.string-split.-wordwall .text-container > .wall-wrap > span{ display:block; margin-top:var(--m); font-size:var(--mm); letter-spacing:normal; opacity:.85; }
-
-/* Inline sentences variant */
 .wall{ pointer-events:none; }
 .wall .wall-sentence{ pointer-events:auto; cursor:pointer; touch-action:manipulation; }
 .wall.-has-active .wall-sentence:not(.active){ opacity:.35; }
 .wall .wall-sentence.-over:not(.active){ opacity:.65; }
 .wall .wall-sentence{ padding:.08em .12em; margin:0 .02em; border-radius:.25em; }
-
 .block.string-split.-wordwall .wall-wrap{ width:100%; }
 .block.string-split.-wordwall .wall{ display:block; line-height:1.2; width:100%; }
 .block.string-split.-wordwall .wall .wall-sentence{
@@ -900,40 +742,14 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 .block.string-split.-wordwall .wall .wall-sentence:focus-visible{
   text-decoration:underline; text-decoration-thickness:.04em; text-underline-offset:.08em;
 }
-
-/* Tap should behave like hover on touch devices */
 @media (pointer:coarse){
-  .block.string-split.-wordwall .wall{
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Neutralize the persistent 'active/pressed' fade on mobile */
-  .block.string-split.-wordwall .wall:has(.wall-sentence.active) .wall-sentence,
-  .block.string-split.-wordwall .wall:has(.wall-sentence[aria-pressed="true"]) .wall-sentence{
-    opacity: 1;
-  }
-
-  /* Simulate hover while finger is down */
-  .block.string-split.-wordwall .wall.-touching .wall-sentence{
-    opacity: .10;
-  }
+  .block.string-split.-wordwall .wall{ -webkit-tap-highlight-color: transparent; }
+  .block.string-split.-wordwall .wall:has(.wall-sentence.active) .wall-sentence{ opacity: 1; }
+  .block.string-split.-wordwall .wall.-touching .wall-sentence{ opacity: .10; }
   .block.string-split.-wordwall .wall.-touching .wall-sentence.is-hovered{
-    opacity: 1;
-    background-image: linear-gradient(90deg, rgba(255,141,161,0.06), transparent);
+    opacity: 1; background-image: linear-gradient(90deg, rgba(255,141,161,0.06), transparent);
   }
 }
-
-
-
-/* Legacy <li> wall items (size knob) */
-.block.string-split.-wordwall .wall{ gap:.25em; }
-.block.string-split.-wordwall .wall li{
-  color:var(--c-black); font-size: var(--wall-li-size); outline:none;
-  transition: opacity .18s var(--f-smooth), transform .18s var(--f-smooth);
-  will-change: opacity, transform;
-}
-.-wordwall .wall-wrap:hover li, .-wordwall .wall li:hover{ opacity:1; transform:none; }
-
 /* Rapier playground */
 .block.string-rapier{
   --section-vh:90; position:relative; overflow:hidden;
@@ -953,8 +769,6 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 /* ====================================
    9) PING-PONG & PRELOADER ANIMATIONS
    ==================================== */
-
-/* Ping-pong section container */
 .ping-pong-section{
   padding: clamp(16px, 4vw, 40px);
   background: var(--c-gray-100, color-mix(in oklab, var(--c-white, #fff) 92%, #000));
@@ -968,25 +782,12 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 .ping-pong__paddle-x{ animation: ping-pong-paddle-x 1.5s var(--pp-ease-out) infinite; }
 .ping-pong__paddle-y{ animation: ping-pong-paddle-y 1.5s linear infinite; }
 
-/* Ping-pong keyframes */
-@keyframes ping-pong-ball-x{
-  from,to{ transform: translate(40px, 80px); }
-  50%{ transform: translate(88px, 80px); }
-}
-@keyframes ping-pong-ball-y{
-  from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); }
-  25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,-68px); }
-}
-@keyframes ping-pong-paddle-x{
-  from,to{ transform: translate(36px, 92px) rotate(6deg); }
-  50%{ transform: translate(92px, 92px) rotate(-6deg); }
-}
-@keyframes ping-pong-paddle-y{
-  from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); }
-  25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,28px); }
-}
+@keyframes ping-pong-ball-x{ from,to{ transform: translate(40px, 80px); } 50%{ transform: translate(88px, 80px); } }
+@keyframes ping-pong-ball-y{ from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); } 25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,-68px); } }
+@keyframes ping-pong-paddle-x{ from,to{ transform: translate(36px, 92px) rotate(6deg); } 50%{ transform: translate(92px, 92px) rotate(-6deg); } }
+@keyframes ping-pong-paddle-y{ from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); } 25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,28px); } }
 
-/* Preloader base sizing */
+/* Preloader base sizing & keyframes */
 .pl1,.pl2,.pl3{ display:block; width:8em; height:8em; }
 .pl1__g,.pl1__rect,.pl2__rect,.pl2__rect-g,.pl3__rect{ animation: pl1-a 1.5s cubic-bezier(.65,0,.35,1) infinite; }
 .pl1__g{ transform-origin:64px 64px; }
@@ -1003,11 +804,7 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 .pl3__rect-g{ transform-origin:64px 64px; }
 .pl1 rect, .pl2 rect, .pl3 rect{ rx:0; ry:0; shape-rendering:crispEdges; }
 
-/* Preloader keyframes */
-@keyframes pl1-a{
-  from{ transform:rotate(0); }
-  80%,to{ animation-timing-function: steps(1,start); transform: rotate(90deg); }
-}
+@keyframes pl1-a{ from{ transform:rotate(0); } 80%,to{ animation-timing-function: steps(1,start); transform: rotate(90deg); } }
 @keyframes pl1-b{
   from{ animation-timing-function: cubic-bezier(.33,0,.67,0); width:40px; height:40px; }
   20%{ animation-timing-function: steps(1,start); width:40px; height:0; }
@@ -1021,10 +818,7 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
   60%{ animation-timing-function: cubic-bezier(.33,1,.67,1); width:88px; height:40px; transform: translate(0,0); }
   80%,to{ width:40px; height:40px; transform: translate(48px,0); }
 }
-@keyframes pl2-a{
-  from,25%,66.67%,to{ transform: translateY(0); }
-  50%{ animation-timing-function: cubic-bezier(.33,0,.67,0); transform: translateY(-80px); }
-}
+@keyframes pl2-a{ from,25%,66.67%,to{ transform: translateY(0); } 50%{ animation-timing-function: cubic-bezier(.33,0,.67,0); transform: translateY(-80px); } }
 @keyframes pl2-b{
   from,to{ animation-timing-function: cubic-bezier(.33,0,.67,0); width:40px; height:24px; transform: rotate(180deg) translateX(0); }
   33.33%{ animation-timing-function: cubic-bezier(.33,1,.67,1); width:20px; height:64px; transform: rotate(180deg) translateX(10px); }
@@ -1041,297 +835,64 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ con
 /* ========================================
    10) OVERLAYS / DEBUG CHIPS / OFFSETS
    ======================================== */
-
-/* Knob: control overlay height (in vh units). Set to 0 to hide. */
-:root{ --offset-h: 2; } /* was 10; try 2 for “much shorter”, 0 to hide */
-
-div[data-fps]::after,
-div[data-position]::after{
+:root{ --offset-h: 2; } /* was 10; now shorter */
+div[data-fps]::after, div[data-position]::after{
   font-feature-settings:"ss03";
   font-family:var(--font-mono);
-  font-size:var(--mm);
-  letter-spacing:normal;
-  line-height: var(--body-line-height);
+  font-size:var(--mm); letter-spacing:normal; line-height: var(--body-line-height);
 }
-
-/* Top/Bottom glass overlays */
-.offset-bottom,
-.offset-top{
-  position: fixed;
-  left: 0;
-  width: 100%;
-  z-index: 100;
-  pointer-events: none;
-  display: block;
-
-  /* Height driven by knob */
+.offset-bottom, .offset-top{
+  position: fixed; left: 0; width: 100%; z-index: 100; pointer-events: none; display: block;
   height: calc(var(--vh, 2.2vh) * var(--offset-h));
-
-  /* Softer glass by default */
   background-color: rgba(var(--c-white-rgb), .18);
-  -webkit-backdrop-filter: blur(8px) saturate(110%);
-          backdrop-filter: blur(8px) saturate(110%);
+  -webkit-backdrop-filter: blur(8px) saturate(110%); backdrop-filter: blur(8px) saturate(110%);
   border-top: 1px solid rgba(255,255,255,.12);
 }
-
-/* Labels (debug) */
-.offset-bottom::after,
-.offset-top::after{
-  position: absolute;
-  left: 10px;
-  display: block;
-  padding: 5px 8px;
-  background-color: rgba(0,0,0,.65);
-  color: var(--c-white);
-  border: 1px solid rgba(255,255,255,.15);
-  content: "";
-  -webkit-backdrop-filter: blur(6px);
-          backdrop-filter: blur(6px);
+.offset-bottom::after, .offset-top::after{
+  position: absolute; left: 10px; display: block; padding: 5px 8px;
+  background-color: rgba(0,0,0,.65); color: var(--c-white);
+  border: 1px solid rgba(255,255,255,.15); content: "";
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
 }
-
-/* Top overlay */
 .offset-top{ top: 0; }
-.offset-top::after{
-  bottom: 0;
-  content: "Offset top: -10%";
-}
-
-/* Bottom overlay */
+.offset-top::after{ bottom: 0; content: "Offset top: -10%"; }
 .offset-bottom{ bottom: 0; }
-/* Hide the debug chip on bottom bar by default */
 .offset-bottom::after{ content: none !important; display: none !important; }
-
-/* --- Utility flags ------------------------------------------------------ */
-/* Completely hide overlays without removing DOM */
 :root:has(html.-no-offsets){ --offset-h: 0; }
-html.-no-offsets .offset-bottom,
-html.-no-offsets .offset-top{ display: none !important; }
-
-/* Make them extra short (e.g., for mobile “big mode”) */
+html.-no-offsets .offset-bottom, html.-no-offsets .offset-top{ display: none !important; }
 html.-short-offsets :root{ --offset-h: 1.25; }
-
-
-
-/* ===================================================
-   11) MEDIA QUERIES (CONSOLIDATED & LABELED)
-   =================================================== */
-
-/* --- MQ:A ≤640px : phones / small --- */
-@media (max-width:640px){
-  :root{
-    --cursor-tip-x: 12px;   /* a little closer on phones */
-    --cursor-tip-y: -28px;  /* a touch higher to avoid thumb */
-    --cursor-tip-font: 11px;
-  }
-
-  .cursor{ transform: translate3d(calc(var(--x) * 1px + 8px), calc(var(--y) * 1px + 8px), 0); }
-  .cursor .cursor-tip{ left:36px; font-size:11px; }
-
-  [data-tooltip]::after{ max-width: min(70vw, 240px); }
-
-  .-w .text-container{ --left:1 !important; --width: calc(var(--g-columns) - 2) !important; max-width:100%; }
-
-  .-w > div[data-v-33216d84]:last-child .button[data-v-065f1151]{ min-height:44px; }
-  .-w > div[data-v-33216d84]:last-child{ gap:.5rem; padding:.75rem; }
-
-  .block.string-split.-wordwall .wall li{ font-size: clamp(.8rem, 4.6vw, .8rem); line-height:1.6; }
-
-  [string="parallax"], [string="glide"]{ transform:none !important; }
-}
-
-/* --- MQ:B ≤720px : narrow tablets (fluid VH ramp) --- */
-@media (max-width:720px){
-  :root{ --section-vh: clamp(60, calc(90 - 30 * (720px - 100vw) / 360), 90); }
-}
-
-/* --- MQ:C 641–1024px : tablets / small laptops --- */
-@media (min-width:641px) and (max-width:1024px){
-  :root{ --g-columns: 12; }
-}
-
-/* --- MQ:D ≤1024px : mobile typographic helpers --- */
-@media (max-width:1024px){
-  .-m-h1{ font-size:var(--h1); letter-spacing: calc(var(--h1)/100*var(--ls-intencity)); line-height:.857; }
-  .-m-h2{ font-size:var(--h2); letter-spacing: calc(var(--h2)/100*var(--ls-intencity)); line-height:.952; }
-  .-m-h3{ font-size:var(--h3); letter-spacing: calc(var(--h3)/100*var(--ls-intencity)); line-height:1; }
-  .-m-h4{ font-size:var(--h4); letter-spacing: calc(var(--h4)/100*var(--ls-intencity)); line-height:1; }
-  .-m-h5{ font-size:var(--h5); letter-spacing: calc(var(--h5)/100*var(--ls-intencity)); line-height:1.1; }
-  .-m-h6{ font-size:var(--h6); letter-spacing: calc(var(--h6)/100*var(--ls-intencity)); line-height:1.1; }
-  .-m-lrg{ font-size:var(--large); line-height:.859; }
-  .-m-p{ font-size:var(--p); }
-  .-m-m{ font-size:var(--m); }
-  .-m-m, .-m-mm{ letter-spacing:normal; line-height:1; }
-  .-m-mm{ font-size:var(--mm); }
-  .-m-up{ text-transform:uppercase; }
-  .-m-tac{ text-align:center; }
-  .-m-taj{ text-align:justify; -moz-text-align-last:justify; text-align-last:justify; }
-}
-
-/* --- MQ:E ≥1024px : desktop helpers --- */
-@media (min-width:1024px){
-  .-link, a{
-    --h-underline:1px;
-    background: linear-gradient(0deg, var(--c-black), var(--c-black)) no-repeat 100% 100% / 0 var(--h-underline);
-    transition: background-size .45s var(--f-smooth);
-  }
-  .-black .-link, .-black a{
-    background: linear-gradient(0deg, var(--c-white), var(--c-white)) no-repeat 100% 100% / 0 var(--h-underline);
-  }
-  .-link:hover, a:hover{
-    background-position-x:left; background-size:100% var(--h-underline);
-    transition: background-size .45s var(--f-cubic);
-  }
-
-  .button[data-v-065f1151]{ min-height: calc(var(--p) * 2); }
-  .button[data-v-065f1151],
-  .button[data-v-065f1151]::after,
-  .button[data-v-065f1151]::before{
-    -webkit-mask:url("/images/r16.svg"); mask:url("/images/r16.svg");
-  }
-
-  .storyline-hud{ font-size:12px; }
-}
-
-/* --- MQ:F ≥1025px : large desktop grid tracks --- */
-@media (min-width:1025px){
-  :root{ --g-columns: 14; --columns:14; --g-margin: calc(var(--g-gap) * 4); }
-}
-
-/* --- MQ:G 1024→∞ : progressive root font scale --- */
-@media (min-width:1024px){ html{ font-size:20px; } }
-@media (min-width:1600px){ html{ font-size:22px; } }
-@media (min-width:1920px){ html{ font-size:24px; } }
-@media (min-width:2560px){ html{ font-size:28px; } }
-
-/* --- MQ:H ≤1600px : “mid” typographic helpers --- */
-@media (max-width:1600px){
-  .-mid-h1{ font-size:var(--h1); letter-spacing: calc(var(--h1)/100*var(--ls-intencity)); line-height:.857; }
-  .-mid-h2{ font-size:var(--h2); letter-spacing: calc(var(--h2)/100*var(--ls-intencity)); line-height:.952; }
-  .-mid-h3{ font-size:var(--h3); letter-spacing: calc(var(--h3)/100*var(--ls-intencity)); line-height:1; }
-  .-mid-h4{ font-size:var(--h4); letter-spacing: calc(var(--h4)/100*var(--ls-intencity)); line-height:1; }
-  .-mid-h5{ font-size:var(--h5); letter-spacing: calc(var(--h5)/100*var(--ls-intencity)); line-height:1.1; }
-  .-mid-h6{ font-size:var(--h6); letter-spacing: calc(var(--h6)/100*var(--ls-intencity)); line-height:1.1; }
-  .-mid-lrg{ font-size:var(--large); line-height:.859; }
-  .-mid-p{ font-size:var(--p); }
-  .-mid-m{ font-size:var(--m); }
-  .-mid-m, .-mid-mm{ letter-spacing:normal; line-height:1; }
-  .-mid-mm{ font-size:var(--mm); }
-  .-mid-up{ text-transform:uppercase; }
-  .-mid-tac{ text-align:center; }
-  .-mid-taj{ text-align:justify; -moz-text-align-last:justify; text-align-last:justify; }
-}
-
-/* --- MQ:I Prefers Color Scheme: dark --- */
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg: hsl(var(--hue),90%,10%);
-    --fg: hsl(var(--hue),90%,90%);
-    --pp-bg: hsl(var(--pp-hue) 90% 10%);
-    --pp-fg: hsl(var(--pp-hue) 90% 90%);
-  }
-}
-
-/* --- MQ:J Prefers Reduced Motion --- */
-@media (prefers-reduced-motion: reduce){
-  .ping-pong__ball-x, .ping-pong__ball-y, .ping-pong__paddle-x, .ping-pong__paddle-y{ animation:none !important; }
-  .-splitted .-s-word .-s-char{ transition:none; }
-}
-
-/* --- MQ:K Tooltip widths by density (desktop) --- */
-@media (min-width:1025px){
-  [data-tooltip]::after{ max-width:360px; }
-}
-
-/* --- FEATURE QUERIES (single instance) --- */
-@supports (height: 100dvh){
-  .block{ height: calc(var(--section-vh) * 1dvh); }
-}
-
-
 
 /* --- MONDRIAN --- */
 .block.string-enter.-mond{
   min-height: clamp(520px, 80vh, 1000px);
-  display: grid;
-  grid-template-rows: auto 1fr;    /* title, then canvas area */
-  justify-items: center;           /* center horizontally */
-  align-items: center;             /* center vertically */
-  row-gap: clamp(12px, 2.5vw, 24px);
+  display: grid; grid-template-rows: auto 1fr; justify-items: center; align-items: center; row-gap: clamp(12px, 2.5vw, 24px);
 }
-
-/* Figure groups grid + caption (semantic) */
-.mond-figure{
-  margin: 0;
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: .6rem;
-}
-
-/* Mondrian caption (smaller) */
+.mond-figure{ margin: 0; display: grid; justify-items: center; align-content: center; gap: .6rem; }
 .mond-caption{
-  margin: .4rem 0 0;
-  text-align: center;
+  margin: .4rem 0 0; text-align: center;
   font-size: var(--mond-caption-size, clamp(.7rem, .6vw + .6rem, .7rem));
-  line-height: 1.25;
-  letter-spacing: .01em;
-  opacity: .8;
-  color: var(--c-fg, currentColor);
-  max-width: 40ch;
+  line-height: 1.25; letter-spacing: .01em; opacity: .8; color: var(--c-fg, currentColor); max-width: 40ch;
 }
 .block.string-enter.-mond .mond-caption{ opacity: .75; }
 @media (prefers-color-scheme: dark){ .mond-caption{ opacity: .85; } }
-
-/* Mondrian grid — no outer container needed */
 .mond-grid{
-  /* knobs */
-  --mond-line: 6px;
-  --mond-aspect: 4 / 3;
+  --mond-line: 6px; --mond-aspect: 4 / 3;
   --mond-red:#d40920; --mond-yellow:#f7d842; --mond-blue:#1356a2;
   --mond-white:#f2f2f2; --mond-black:#111;
-
-  /* centered canvas, smaller */
-  width: min(320px, 65vw);
-  aspect-ratio: var(--mond-aspect);
-
-  /* no vertical margin so centering works cleanly */
-  margin: 0 auto;
-  place-self: center;
-
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(9, 1fr);
-  gap: var(--mond-line);
-  background: var(--mond-black);
-  border: var(--mond-line) solid var(--mond-black);
+  width: min(320px, 65vw); aspect-ratio: var(--mond-aspect);
+  margin: 0 auto; place-self: center;
+  display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(9, 1fr);
+  gap: var(--mond-line); background: var(--mond-black); border: var(--mond-line) solid var(--mond-black);
 }
-
-/* tiles fill their grid cells using your String Tune box */
 .mond-grid .tile{ position:relative; --box-radius:0; color:var(--mond-white); }
 .mond-grid .tile > .child{ position:absolute; inset:0; padding:0; }
-.mond-grid .tile > .child > .-a-scale-in{
-  width:100%; height:100%;
-  border:none; border-radius:var(--box-radius);
-  background: currentColor;
-  transform-origin: center;
-}
-
-/* colors */
+.mond-grid .tile > .child > .-a-scale-in{ width:100%; height:100%; border:none; border-radius:var(--box-radius); background: currentColor; transform-origin: center; }
 .mond-grid .tile.red{color:var(--mond-red)}
 .mond-grid .tile.yellow{color:var(--mond-yellow)}
 .mond-grid .tile.blue{color:var(--mond-blue)}
 .mond-grid .tile.white{color:var(--mond-white)}
-
-/* focus ring for accessibility */
-.mond-grid .tile:focus-within .-a-scale-in{
-  outline: 2px solid rgba(255,255,255,.6);
-  outline-offset: -2px;
-}
-
-/* small-screen tweaks */
-@media (max-width:640px){
-  .mond-grid{ --mond-line:5px; width: min(520px, 82vw); }
-}
+.mond-grid .tile:focus-within .-a-scale-in{ outline: 2px solid rgba(255,255,255,.6); outline-offset: -2px; }
+@media (max-width:640px){ .mond-grid{ --mond-line:5px; width: min(520px, 82vw); } }
 
 
 
@@ -1339,65 +900,6 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 
 
 
-
-/* --- MQ:A ≤640px : phones / small — MOBILE-AS-DESKTOP --- */
-@media (max-width:640px){
-  :root{
-    /* keep desktop grid, just smaller */
-    --g-columns: 14;
-    --columns: 14;
-    --ui: 1.2;                               /* global type/space scale */
-    --g-gap: clamp(.12rem, 0.9vw, .24rem);  /* tighter gaps */
-    --g-margin: calc(var(--g-gap) * 1.5);   /* tighter side gutters */
-    --section-vh: 68;                       /* shorter sections */
-
-    /* word wall tune so lines don’t balloon */
-    --wall-sentence-min: 1.1rem;
-    --wall-sentence-max: 1.1rem;
-  }
-
-  /* keep 14 tracks (don’t collapse to 6) */
-  .-w[data-v-4f043ceb]{ grid-template-columns: repeat(14, minmax(0,1fr)); }
-
-  /* comfortable text width while preserving grid alignment */
-  .-w .text-container{
-    --left:1 !important;
-    --width: calc(var(--g-columns) - 2) !important;
-    max-width:100%;
-  }
-
-  /* shorter blocks; gentler paddings */
-  .block{
-    min-height: 420px;
-    padding-top: clamp(.75rem, 3vh, 1.2rem);
-    padding-bottom: clamp(.75rem, 3vh, 1.6rem);
-  }
-
-  /* cursor/tip ergonomics */
-  .cursor{ transform: translate3d(calc(var(--x) * 1px + 8px), calc(var(--y) * 1px + 8px), 0); }
-  .cursor .cursor-tip{ left:36px; font-size:11px; }
-  [data-tooltip]::after{ max-width: min(70vw, 240px); }
-
-  /* scale down preloaders & ping-pong a touch */
-  .pl1, .pl2, .pl3 { width: 6.5em; height: 6.5em; }
-  .ping-pong{ inline-size: min(68vmin, 420px); }
-
-  /* Parallax stage breathing room at phone sizes */
-  .block.string-parallax .parallax-stage{
-    min-height: clamp(220px, 48vh, 360px);
-  }
-
-  /* IMPORTANT: allow transforms/FX on mobile.
-     Remove the original rule that forced:
-       [string="parallax"], [string="glide"] { transform:none !important; }
-     If you can’t remove it, this override restores animations: */
-  html.-mobile-desktop [string="parallax"],
-  html.-mobile-desktop [string="glide"]{
-    /* Let effect code own transform again */
-    transform: translateZ(0) !important;
-    will-change: transform;
-  }
-}
 
 </style>  
 </head>
