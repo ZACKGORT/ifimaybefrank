@@ -106,7 +106,7 @@
   --tt-scale: 1;
 
   --cursor-tip-x: 16px;
-  --cursor-tip-y: -24px;
+  --cursor-tip-y: -32px;
   --cursor-tip-font: 12px;
   --cursor-tip-pad-x: 10px;
   --cursor-tip-pad-y: 6px;
@@ -254,7 +254,7 @@ html:not(.-ready) .-t-p .fdda-l span[data-v-d6e5c8df]{ clip-path: polygon(0 0, 1
   font: var(--tt-font-size)/1 var(--font);
   letter-spacing: .01em; color: var(--c-black); white-space: nowrap;
   background: rgba(255,255,255,.001);
-  -webkit-backdrop-filter: blur(10px) saturate(135%); backdrop-filter: blur(10px) saturate(135%);
+  -webkit-backdrop-filter: blur(120px) saturate(135%); backdrop-filter: blur(10px) saturate(135%);
   border: 0; border-radius: 0;
   transition: opacity .14s ease, transform .14s ease; will-change: opacity, transform;
 }
@@ -262,7 +262,7 @@ html.-cursor-tooltips [data-tooltip]::after{ display:none; }
 [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after{
   opacity: 1; transform: translate(var(--tt-offset-x), calc(var(--tt-offset-y) - 2px)) scale(var(--tt-scale));
 }
-@supports not ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))){
+@supports not ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(2px))){
   [data-tooltip]::after{ background: rgba(0,0,0,.72); color: var(--c-white); }
 }
 
@@ -529,8 +529,39 @@ html:not(.-guidelines) .guide-grid{ visibility:hidden; }
 .-w .rel-2[data-v-05b709a3]{ --left:7; }
 .-w .rel-3[data-v-05b709a3]{ --left:11; }
 
-/* Tier line (shared base for Glide + Parallax) */
-.block.string-glide .tier,
+/* 1) Shared knobs so tier/tiles can agree */
+.block.string-parallax{
+  /* keep it responsive but predictable */
+  --parallax-box: clamp(120px, 10vmin, 150px);
+  --tier-font: calc(var(--mm) * .85);
+  --tier-nudge-x: -5em; /* keep your existing label nudge */
+}
+
+/* 2) Use the same outer grid as Glide (no inner stage grid) */
+.block.string-parallax .rel{
+  /* same column behavior as Glide: rely on --left/--width from .-w */
+  justify-self: start;
+  align-self: center;
+  z-index: 1;
+}
+
+/* 3) Make tiles use the same “box” concept everywhere */
+.block.string-parallax .child > [string="parallax"]{
+  /* mirror Glide’s square footprint */
+  --box-w: var(--parallax-box);
+  --box-ratio: 1 / 1;
+  inline-size: var(--box-w);
+  aspect-ratio: var(--box-ratio);
+  display: block;
+  box-sizing: border-box;
+  background: currentColor;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout paint;
+}
+
+/* 4) Tier line: centered vertically through the row of squares */
 .block.string-parallax .tier{
   grid-column: 1 / -1;
   position: relative;
@@ -538,69 +569,39 @@ html:not(.-guidelines) .guide-grid{ visibility:hidden; }
   height: 0;
   border-bottom: 2px dashed var(--block-pink);
   z-index: 2;
-  margin-block: clamp(.5rem, 3vh, 1.5rem);
+
+  /* Center the rule through the midline of the tiles.
+     translate() moves the visual line; margins preserve flow. */
+  translate: 0 calc(var(--parallax-box) * -0.5);
+  margin-block: calc(var(--parallax-box) * 0.5) calc(var(--parallax-box) * 0.5);
 }
-.block.string-glide .tier::after,
+
 .block.string-parallax .tier::after{
   content: attr(data-tier-label);
   position: absolute;
   inset-inline-start: 50%;
   inset-block-start: 0;
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--tier-nudge-x)), -50%);
   padding: .2rem .5rem;
   white-space: nowrap;
   line-height: 1;
   background: var(--block-pink);
   border: 1px solid rgba(var(--c-white-rgb), .2);
   color: var(--c-black);
-}
-
-/* Per-section knobs */
-.block.string-glide{ --tier-font: calc(var(--mm) * .85); --tier-nudge-x: -5em; }
-.block.string-parallax{ --tier-font: calc(var(--mm) * .85); --tier-nudge-x: -5em; }
-.block.string-glide .tier::after,
-.block.string-parallax .tier::after{
   font-size: var(--tier-font);
-  transform: translate(calc(-50% + var(--tier-nudge-x)), calc(-50% + var(--tier-nudge-y)));
 }
 
-/* PARALLAX — centered row + baseline */
-.block.string-parallax.-centered{
-  display: grid; grid-template-rows: auto 1fr; row-gap: clamp(12px, 2.5vw, 24px);
-  min-height: clamp(520px, 70vh, 920px);
-}
-.block.string-parallax .parallax-stage{
-  position: relative; display: grid; grid-template-columns: repeat(12, minmax(0,1fr));
-  align-items: center; min-height: clamp(260px, 44vh, 420px); isolation: isolate; will-change: contents;
-}
-.block.string-parallax .parallax-stage::before{
-  content:""; position: absolute; left: clamp(8px, 2vw, 24px); right: clamp(8px, 2vw, 24px);
-  top: 50%; height: 1px; background: rgba(16,18,20,.22); transform: translateY(-0.5px); z-index: 0;
-}
-@supports (translate: 0){ .block.string-parallax .parallax-stage::before{ translate: 0 -0.5px; } }
-
-.block.string-parallax .parallax-stage .rel{
-  grid-column: var(--left, 1) / span var(--width, 1);
-  justify-self: start; z-index: 1;
+/* 5) Tiny helpers so captions sit like Glide’s */
+.block.string-parallax .desc{
+  margin-top: .5rem;
+  text-align: center;
 }
 
-/* Tile sizing & variants */
-.block.string-parallax .child > [string="parallax"]{
-  --box-w: 150px; --box-ratio: 1 / 1;
-  display: block; inline-size: var(--box-w); aspect-ratio: var(--box-ratio);
-  box-sizing: border-box; background: currentColor;
-  will-change: transform; transform: translate3d(0,0,0); backface-visibility: hidden; contain: layout paint;
-}
-.block.string-parallax .rel:not(.-empty) .child > [string="parallax"]{ --box-w:150px; --box-ratio:1/1; color: var(--c-black, #000); }
-.block.string-parallax .rel.-empty .child > [string="parallax"]{
-  background: transparent !important; outline: max(1px, .12rem) solid currentColor; color: rgba(16,18,20,.9);
-}
-.block.string-parallax .rel.-tall .child > [string="parallax"]{ --box-ratio: 1 / 2; }
-.block.string-parallax .desc{ margin-top: .5rem; text-align: center; }
-
-@media (max-width: 640px){
-  .block.string-parallax .child > [string="parallax"]{ --box-w: 150px; }
-  .block.string-parallax .parallax-stage{ min-height: clamp(220px, 50vh, 360px); }
+/* 6) Mobile keeps parity with Glide */
+@media (max-width:640px){
+  .block.string-parallax{
+    --parallax-box: clamp(110px, 22vmin, 150px);
+  }
 }
 
 /* Glide block */
@@ -1062,7 +1063,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 	</div>
 
 
-	<div id="logo-zckgrt">Frankly</div>
+	<div id="logo-zckgrt">If I May Be Frank</div>
 
 
 	<!-- Storyline HUD
@@ -1114,7 +1115,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 
     <span class="-m"
           data-v-8129bdd7
-          tabindex="0">... of all websites look like this.</span>
+          tabindex="0"data-tooltip="erm, probably">... of all websites look like this.</span>
   </div>
 </div>
 
@@ -1311,7 +1312,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
   <!-- Product A (FILLED) -->
   <div class="rel rel-1" data-v-1a9dc9c4 style="--left:1;">
       <!-- PL-1 -->
-      <svg class="pl1" viewBox="0 0 128 128" aria-label="preloader 1">
+      <svg class="pl1" viewBox="0 0 128 128" aria-label="preloader 1"data-tooltip="ooh, responsive design">
         <defs>
           <linearGradient id="pl-grad-pre-1" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#000" />
@@ -1356,7 +1357,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
   <!-- Product B (FILLED) -->
   <div class="rel rel-1" data-v-1a9dc9c4 style="--left:6;">
       <!-- PL-2 -->
-      <svg class="pl2" viewBox="0 0 128 128" aria-label="preloader 2">
+      <svg class="pl2" viewBox="0 0 128 128" aria-label="preloader 2"data-tooltip="ooh data">
         <g fill="currentColor">
           <g class="pl2__rect-g">
             <rect class="pl2__rect" rx="8" ry="8" x="0"  y="128" width="40" height="24" transform="rotate(180)" />
@@ -1397,7 +1398,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
   <!-- Product C (FILLED) -->
   <div class="rel rel-1" data-v-1a9dc9c4 style="--left:12;">
       <!-- PL-3 -->
-      <svg class="pl3" viewBox="0 0 128 128" aria-label="preloader 3">
+      <svg class="pl3" viewBox="0 0 128 128" aria-label="preloader 3"data-tooltip="ahh, adaptability">
         <g fill="currentColor">
           <rect class="pl3__rect" rx="8" ry="8" width="64" height="64" transform="translate(64,0)" />
           <g class="pl3__rect-g" transform="scale(-1,-1)">
@@ -1514,7 +1515,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
     <div class="-m desc" data-v-ccb4a0eb><p data-v-ccb4a0eb>#vibe #aura #bet</p></div>
   </div>
 
-  <div class="rel rel-2" data-v-ccb4a0eb style="--left:6;">
+  <div class="rel rel-2" data-v-ccb4a0eb style="--left:6;"data-tooltip="team anchor vibes">
     <div class="child" data-v-ccb4a0eb>
       <div string="glide" string-glide="5" data-v-ccb4a0eb string-id="string-18"></div>
     </div>
@@ -1554,14 +1555,14 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 				 string="cursor" string-cursor-class="cursor-2"
 				 data-storyline="Bend toward intent."
 				 data-cursor-tip="Bend toward intent."
-				 data-v-021d6718 data-v-40fb9db4 data-v-4f043ceb string-id="string-21">
+				 data-v-021d6718 data-v-40fb9db4 data-v-4f043ceb string-id="string-21" data-tooltip="a stand-up fellow!">
 
-			<h6 class="title -tac" data-v-40fb9db4>More "stand-up" <span class="-mm" data-v-ccb4a0eb>Be #magnetic</span></h6>
+			<h6 class="title -tac" data-v-40fb9db4>More "stand-in" :) <span class="-mm" data-v-ccb4a0eb>Be #magnetic</span></h6>
 
 
 			<div class="rel rel-1 -a-p" data-v-40fb9db4>
 				<div class="child" data-v-40fb9db4>
-					<div string="magnetic" string-radius="450" string-strength="0.75" data-v-40fb9db4 string-id="string-22" data-tooltip="Be wanted."></div>
+					<div string="magnetic" string-radius="450" string-strength="0.75" data-v-40fb9db4 string-id="string-22"></div>
 				</div>
 				<div class="-m desc" data-v-40fb9db4>
 					<p data-v-40fb9db4>string="magnetic"</p><p data-v-40fb9db4>radius="450"</p><p data-v-40fb9db4>strength="0.75"</p>
@@ -1627,9 +1628,14 @@ data-cursor-tip="Click, hold, and fling.">
 	<div class="guide-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
 	<span class="offset-bottom -mm"></span>
 
-	<a class="ko-fi -mm" href="https://zackgort.com" target="_blank" rel="noopener noreferrer">
-		<span>0.000001%</span>
-	</a>
+  <a class="ko-fi -mm"
+  href="https://zackgort.com"
+  target="_blank" rel="noopener noreferrer"
+  aria-label="Buy me a coffee on Ko-fi"
+  data-tooltip="XP Portfolio">
+ <span>0.000001%</span>
+</a>
+
 
 	<!-- cursor HUD -->
 	<div class="cursor -mm" string-cursor aria-hidden="true">
