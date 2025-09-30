@@ -619,6 +619,42 @@ html.-scroll-forward .-w .rel-1 .desc p[data-v-ccb4a0eb]:last-child::before{ con
 html.-scroll-back .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ content:"↑"; }
 html.-scroll-forward .-w .rel-1 .desc p[data-v-270bb328]:last-child::before{ content:"↓"; }
 
+
+
+/* === GLIDE: show the tier line (to match the look/spacing) === */
+.block.string-glide{
+  --tier-font: calc(var(--mm) * .85);
+  --tier-nudge-x: -5em; /* optional label nudge (keeps parity with Parallax label) */
+}
+
+.block.string-glide .tier{
+  grid-column: 1 / -1;
+  position: relative;
+  display: block;
+  height: 0;
+  border-bottom: 2px dashed var(--block-pink);
+  z-index: 2;
+  margin-block: clamp(.5rem, 3vh, 1.5rem);
+  /* No translate here so Glide’s tier sits cleanly between title and tiles */
+}
+
+.block.string-glide .tier::after{
+  content: attr(data-tier-label);
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 0;
+  transform: translate(calc(-50% + var(--tier-nudge-x)), -50%);
+  padding: .2rem .5rem;
+  white-space: nowrap;
+  line-height: 1;
+  background: var(--block-pink);
+  border: 1px solid rgba(var(--c-white-rgb), .2);
+  color: var(--c-black);
+  font-size: var(--tier-font);
+}
+
+
+
 /* Lerp grid (mirrors magnetic sizing) */
 .block.string-lerp{
   --lerp-cols:2;
@@ -1555,7 +1591,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 				 string="cursor" string-cursor-class="cursor-2"
 				 data-storyline="Bend toward intent."
 				 data-cursor-tip="Bend toward intent."
-				 data-v-021d6718 data-v-40fb9db4 data-v-4f043ceb string-id="string-21" data-tooltip="a stand-up fellow!">
+				 data-v-021d6718 data-v-40fb9db4 data-v-4f043ceb string-id="string-21">
 
 			<h6 class="title -tac" data-v-40fb9db4>More "stand-in" :) <span class="-mm" data-v-ccb4a0eb>Be #magnetic</span></h6>
 
