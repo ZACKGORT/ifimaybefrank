@@ -1,7 +1,10 @@
-<!DOCTYPE html> <html lang=en class="-ready -string -loaded -scroll-backward">
+<!DOCTYPE html> <html lang=en class="-ready -string -loaded -scroll-backward"><!--
+  Page saved with SingleFile 
+  url: https://tune-demo.fiddle.digital/ 
+  saved date: Wed Sep 24 2025 03:44:23 GMT-0400 (Eastern Daylight Time)
  --><meta charset=utf-8>
  <meta name=viewport content="width=device-width, initial-scale=1">
- <title>Frankly</title>
+ <title>String Tune</title>
 <style>
 /* =======================================================
    STRING TUNE — FULL CONSOLIDATED STYLESHEET (optimized)
@@ -61,6 +64,8 @@
   /* Fonts */
   --font: "KHTeka", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   --font-mono: "KHTekaMono", "KHTeka", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  
 
   /* Section sizing */
   --section-vh: 100;
@@ -1403,7 +1408,7 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 	</div>
 
 
-	<div id="logo-zckgrt">Frankly</div>
+	<div id="logo-zckgrt">ZCKGRT</div>
 
 
 	<!-- Storyline HUD
@@ -1986,16 +1991,18 @@ data-cursor-tip="Click, hold, and fling.">
 
 <!-- String Tune runtime -->
 <script>
-/*! StringTune – unified desktop/mobile wall interactions, safe sentence split, BR support, and full runtime (parallax/glide/progress/rapier) */
+/*! StringTune – unified desktop/mobile wall interactions, safe sentence split, BR support, and full runtime (parallax/glide/progress/rapier)
+   Mobile enabled: effects now respect prefers-reduced-motion only (no UA gating)
+*/
 (() => {
   const d = document, de = d.documentElement, w = window;
   if (de.__stringTuneMounted) return;
   de.__stringTuneMounted = !0;
   de.classList.add("-ready", "-loaded");
 
-  // -------------------- utils
-  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  // -------------------- capabilities & utils
   const prefersReduced = (w.matchMedia && w.matchMedia("(prefers-reduced-motion: reduce)")).matches || !1;
+  const allowMotion = !prefersReduced; // ← mobile allowed; only accessibility gates
   const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
   const lerp = (a,b,t)=>a+(b-a)*t;
   const toPx = (v, axis="y") => {
@@ -2011,9 +2018,9 @@ data-cursor-tip="Click, hold, and fling.">
   // -------------------- constants / tuning
   const BOX_SCALE = 0.8;
   const PROGRESS_MULT = 1;
-  const PARALLAX_TRAVEL = prefersReduced ? 0 : 140;
-  const LERP_AMP = prefersReduced ? 0 : 1.2;
-  const GLIDE_AMP = prefersReduced ? 0 : 1.35;
+  const PARALLAX_TRAVEL = allowMotion ? 140 : 0;
+  const LERP_AMP = allowMotion ? 1.2 : 0;
+  const GLIDE_AMP = allowMotion ? 1.35 : 0;
   de.style.setProperty("--progress-mult", String(PROGRESS_MULT));
 
   // -------------------- CSS injection (wall click/hover parity)
@@ -2086,9 +2093,7 @@ data-cursor-tip="Click, hold, and fling.">
             cSpan.textContent = ch;
             wSpan.appendChild(cSpan);
           });
-        } else {
-          wSpan.textContent = wrd;
-        }
+        } else { wSpan.textContent = wrd; }
         el.appendChild(wSpan);
         if (i < words.length-1) el.appendChild(d.createTextNode(" "));
         wordIndex++;
@@ -2158,12 +2163,7 @@ data-cursor-tip="Click, hold, and fling.">
       if (id){
         const esc = (w.CSS && CSS.escape) ? CSS.escape(id) : id.replace(/"/g, '\\"');
         d.querySelectorAll(`[data-progress-of="${esc}"]`).forEach((n)=> n.textContent = Math.round(p*100));
-        d.querySelectorAll(`[data-stage-of="${esc}"]`).forEach((n)=>{
-          const v = p*100;
-          let label = " ";
-          if (v>=100) label=" "; else if (v>=75) label=" "; else if (v>=50) label=" "; else if (v>=25) label=" ";
-          n.textContent = label;
-        });
+        d.querySelectorAll(`[data-stage-of="${esc}"]`).forEach((n)=>{ n.textContent = " "; });
       }
     }
   }
@@ -2180,13 +2180,14 @@ data-cursor-tip="Click, hold, and fling.">
     }
   }
 
-  // -------------------- parallax + glide
+  // -------------------- parallax + glide (mobile enabled)
   let parallaxEls = [];
   function collectParallaxEls(){
-    parallaxEls = (isMobile || prefersReduced) ? [] :
-      [...d.querySelectorAll('[string="parallax"],[string-parallax]')].map((el)=>({
-        el, factor: parseFloat(el.getAttribute("string-parallax")||"0.5")||0.5
-      }));
+    parallaxEls = allowMotion
+      ? [...d.querySelectorAll('[string="parallax"],[string-parallax]')].map((el)=>({
+          el, factor: parseFloat(el.getAttribute("string-parallax")||"0.5")||0.5
+        }))
+      : [];
   }
   function parallaxTick(){
     if (!parallaxEls.length) return;
@@ -2206,8 +2207,9 @@ data-cursor-tip="Click, hold, and fling.">
   let lerpVal = 0, glideVal = 0;
   let glideEls = [];
   function collectGlideEls(){
-    glideEls = (isMobile || prefersReduced) ? [] :
-      [...d.querySelectorAll('[string="glide"]')].map((el)=>({ el, k: parseFloat(el.getAttribute("string-glide")||"0.35")||0.35, y:0 }));
+    glideEls = allowMotion
+      ? [...d.querySelectorAll('[string="glide"]')].map((el)=>({ el, k: parseFloat(el.getAttribute("string-glide")||"0.35")||0.35, y:0 }))
+      : [];
   }
   function smoothTick(){
     const y = w.scrollY || w.pageYOffset;
@@ -2455,178 +2457,108 @@ data-cursor-tip="Click, hold, and fling.">
   }
 
   // -------------------- sentence split (em dash + BR-aware) + wall builder
+  const BR = "⟦BR⟧";
+  const BR_TOKEN_RX = /\{\s*br\s*\}/gi;
+  let PUNCTUATION_BREAK_RX;
+  try { PUNCTUATION_BREAK_RX = new RegExp('((?<!\\d)\\.(?!\\d)|[;:])(?=(\\s|$))', 'g'); }
+  catch { PUNCTUATION_BREAK_RX = /([.;:])(?=(\s|$))/g; }
 
-// -------------------- sentence split (em dash + BR-aware) + wall builder
+  function extractTextWithBreaks(fromElOrHTML) {
+    const rawHTML = typeof fromElOrHTML === "string"
+      ? fromElOrHTML
+      : (fromElOrHTML?.innerHTML || "");
 
-// Hard break sentinel + author token
-const BR = "⟦BR⟧";
-const BR_TOKEN_RX = /\{\s*br\s*\}/gi; // {BR}, {br}, { br }, etc.
+    const marked = rawHTML
+      .replace(/<br\s*\/?>(?![^]*<\/code>)/gi, ` ${BR} `)
+      .replace(/<\/p>\s*<p[^>]*>/gi, ` ${BR} `)
+      .replace(/\n{2,}/g, ` ${BR} `)
+      .replace(BR_TOKEN_RX, ` ${BR} `)
+      .replace(PUNCTUATION_BREAK_RX, `$1 ${BR} `);
 
-// Soft-break injection after punctuation.
-// Includes '.' but is decimal-safe via lookbehind; fallback uses a simpler rule.
-let PUNCTUATION_BREAK_RX;
-try {
-  // dot not between digits, OR ; :
-  PUNCTUATION_BREAK_RX = new RegExp('((?<!\\d)\\.(?!\\d)|[;:])(?=(\\s|$))', 'g');
-} catch {
-  // No lookbehind support
-  PUNCTUATION_BREAK_RX = /([.;:])(?=(\s|$))/g;
-}
-
-/**
- * Map HTML and author tokens to BR sentinels, then normalize.
- * - {BR}, <br>, paragraph seams (</p><p>), double newlines → BR
- * - Punctuation soft breaks (. ; :) → BR (soft; still a boundary)
- * - Strip tags, collapse whitespace, de-dupe BRs
- */
-function extractTextWithBreaks(fromElOrHTML) {
-  const rawHTML = typeof fromElOrHTML === "string"
-    ? fromElOrHTML
-    : (fromElOrHTML?.innerHTML || "");
-
-  const marked = rawHTML
-    .replace(/<br\s*\/?>/gi, ` ${BR} `)          // HTML <br>
-    .replace(/<\/p>\s*<p[^>]*>/gi, ` ${BR} `)    // paragraph seams
-    .replace(/\n{2,}/g, ` ${BR} `)               // blank lines
-    .replace(BR_TOKEN_RX, ` ${BR} `)             // {BR} author token
-    .replace(PUNCTUATION_BREAK_RX, `$1 ${BR} `); // punctuation soft break
-
-  return marked
-    .replace(/<[^>]+>/g, " ")                    // strip tags
-    .replace(/\s+/g, " ")                        // collapse whitespace
-    .replace(new RegExp(`(?:\\s*${BR}\\s*)+`, "g"), ` ${BR} `) // de-dupe consecutive BRs
-    .trim();
-}
-
-// Lookbehind-capable sentence splitter, else fallback.
-// Break after . ; : ? ! ] } / (space required),
-// or after em dash (—) or slash (/) with optional space.
-// Next token may start with quotes, caps, digits, or the BR sentinel (⟦).
-let SENTENCE_BREAK = null;
-try {
-  SENTENCE_BREAK = new RegExp(
-    '(?:(?<=[.?!;:\\/\\]\\}])\\s+|(?<=\\u2014|\\/)\\s*)(?=["“\'‘`A-Z0-9\\u27E6])',
-    'g'
-  );
-} catch { /* no lookbehind support */ }
-
-/**
- * BR-first sentence splitting.
- * If BR is present, we respect author/HTML boundaries and do not
- * sentence-split inside those segments.
- */
-function safeSplitSentences(text) {
-  if (!text) return [];
-  const normalized = text.replace(/\s+/g, ' ').trim();
-
-  if (normalized.includes(BR)) {
-    return normalized.split(BR).map(s => s.trim()).filter(Boolean);
+    return marked
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .replace(new RegExp(`(?:\\s*${BR}\\s*)+`, "g"), ` ${BR} `)
+      .trim();
   }
 
-  if (SENTENCE_BREAK) {
-    return normalized.split(SENTENCE_BREAK).map(s => s.trim()).filter(Boolean);
+  let SENTENCE_BREAK = null;
+  try {
+    SENTENCE_BREAK = new RegExp(
+      '(?:(?<=[.?!;:\\/\\]\\})\\s+|(?<=\\u2014|\\/)\\s*)(?=["“\'‘`A-Z0-9\\u27E6])',
+      'g'
+    );
+  } catch {}
+
+  function safeSplitSentences(text) {
+    if (!text) return [];
+    const normalized = text.replace(/\s+/g, ' ').trim();
+
+    if (normalized.includes(BR)) {
+      return normalized.split(BR).map(s => s.trim()).filter(Boolean);
+    }
+
+    if (SENTENCE_BREAK) {
+      return normalized.split(SENTENCE_BREAK).map(s => s.trim()).filter(Boolean);
+    }
+
+    return (
+      normalized.match(/[^.?!;:\/\]\\}\u2014]+[.?!;:\/\]\\}\u2014]*(?:\s+|$|(?=["“'‘`A-Z0-9\u27E6]))/g) || []
+    ).map(s => s.trim()).filter(Boolean);
   }
 
-  // Fallback (no lookbehind): includes em dash and slash; allows BR lookahead start
-  return (
-    normalized.match(/[^.?!;:\/\]\}\u2014]+[.?!;:\/\]\}\u2014]*(?:\s+|$|(?=["“'‘`A-Z0-9\u27E6]))/g) || []
-  ).map(s => s.trim()).filter(Boolean);
-}
+  function wireWallInteractions(wallEl) {
+    const SEL = '.wall-sentence';
 
-/**
- * Adds interactivity (hover/click focus) to wall sentences.
- */
-function wireWallInteractions(wallEl) {
-  const SEL = '.wall-sentence';
+    function setPressed(el, on) {
+      el.classList.toggle('active', on);
+      el.setAttribute('aria-pressed', String(on));
+      wallEl.classList.toggle('-has-active', wallEl.querySelector(SEL + '.active') !== null);
+    }
+    function clearAll() {
+      wallEl.querySelectorAll(SEL + '.active').forEach(s => setPressed(s, false));
+      wallEl.classList.remove('-has-active');
+    }
 
-  function setPressed(el, on) {
-    el.classList.toggle('active', on);
-    el.setAttribute('aria-pressed', String(on));
-    wallEl.classList.toggle('-has-active', wallEl.querySelector(SEL + '.active') !== null);
-  }
-  function clearAll() {
-    wallEl.querySelectorAll(SEL + '.active').forEach(s => setPressed(s, false));
-    wallEl.classList.remove('-has-active');
-  }
+    wallEl.addEventListener('pointerenter', e => {
+      const t = e.target.closest(SEL);
+      if (!t || e.pointerType === 'touch') return;
+      t.classList.add('-over');
+    }, true);
+    wallEl.addEventListener('pointerleave', e => {
+      const t = e.target.closest(SEL);
+      if (!t || e.pointerType === 'touch') return;
+      t.classList.remove('-over');
+    }, true);
 
-  // Hover highlight for mouse/pen only
-  wallEl.addEventListener('pointerenter', e => {
-    const t = e.target.closest(SEL);
-    if (!t || e.pointerType === 'touch') return;
-    t.classList.add('-over');
-  }, true);
-  wallEl.addEventListener('pointerleave', e => {
-    const t = e.target.closest(SEL);
-    if (!t || e.pointerType === 'touch') return;
-    t.classList.remove('-over');
-  }, true);
-
-  // Click/Tap toggles one active (single-select)
-  wallEl.addEventListener('pointerdown', e => {
-    const t = e.target.closest(SEL);
-    if (!t) return;
-    if (e.pointerType === 'touch') e.preventDefault(); // avoid text select
-    const wasOn = t.classList.contains('active');
-    clearAll();
-    setPressed(t, !wasOn);
-  });
-
-  // Keyboard
-  wallEl.addEventListener('keydown', e => {
-    const t = e.target.closest(SEL);
-    if (!t) return;
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
+    wallEl.addEventListener('pointerdown', e => {
+      const t = e.target.closest(SEL);
+      if (!t) return;
+      if (e.pointerType === 'touch') e.preventDefault();
       const wasOn = t.classList.contains('active');
       clearAll();
       setPressed(t, !wasOn);
-    }
-    if (e.key === 'Escape') {
-      clearAll();
-      t.blur();
-    }
-  });
+    });
 
-  // Click/tap outside → clear dimming
-  document.addEventListener('pointerdown', e => {
-    if (!wallEl.contains(e.target)) clearAll();
-  });
-}
+    wallEl.addEventListener('keydown', e => {
+      const t = e.target.closest(SEL);
+      if (!t) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const wasOn = t.classList.contains('active');
+        clearAll();
+        setPressed(t, !wasOn);
+      }
+      if (e.key === 'Escape') {
+        clearAll();
+        t.blur();
+      }
+    });
 
-/**
- * Build an inline "word wall" from a .wall-wrap container.
- * Produces spans for sentences and real <br> nodes for BR boundaries.
- */
-function buildInlineWall(wrap){
-  const existingWall = wrap.querySelector(".wall");
-  const srcP = existingWall?.querySelector("p") || wrap.querySelector("p");
-  const sourceText = extractTextWithBreaks(srcP || existingWall || wrap);
-
-  wrap.innerHTML = "";
-  const wall = document.createElement("div"); wall.className = "wall";
-
-  const sentences = safeSplitSentences(sourceText);
-
-  // Emit spans and real <br> nodes
-  sentences.forEach((seg, idx) => {
-    if (idx > 0) {
-      const br = document.createElement("br");
-      br.className = "wall-br";
-      wall.appendChild(br);
-    }
-    const span = document.createElement("span");
-    span.className = "wall-sentence";
-    span.textContent = seg;
-    span.setAttribute("role","button");
-    span.setAttribute("tabindex","0");
-    span.setAttribute("aria-pressed","false");
-    wall.appendChild(span);
-  });
-
-  wrap.appendChild(wall);
-  wireWallInteractions(wall);
-}
-
+    document.addEventListener('pointerdown', e => {
+      if (!wallEl.contains(e.target)) clearAll();
+    });
+  }
 
   function buildInlineWall(wrap){
     const existingWall = wrap.querySelector(".wall");
@@ -2703,21 +2635,16 @@ function buildInlineWall(wrap){
         const p = viewportProgress(block, 0.1, 0.9);
         block.style.setProperty("--progress", p.toFixed(4));
         if (meter) meter.textContent = Math.round(p*100);
-        if (stage){
-          const idx = Math.min(STAGES.length-1, Math.floor(p*STAGES.length));
-          stage.textContent = STAGES[idx];
-        }
+        if (stage){ stage.textContent = " "; }
       });
     }
-    function onScrollOrResize(){
-      if (!ticking){ ticking = true; requestAnimationFrame(update); }
-    }
+    function onScrollOrResize(){ if (!ticking){ ticking = true; requestAnimationFrame(update); } }
     w.addEventListener("scroll", onScrollOrResize, { passive: !0 });
     w.addEventListener("resize", onScrollOrResize, { passive: !0 });
     onScrollOrResize();
   })();
 
-  // -------------------- Rapier physics playground (async)
+  // -------------------- Rapier physics playground (async) — drop only at absolute bottom
   async function initRapierPlayground(){
     const stageBlock = d.querySelector(".block.string-rapier");
     const canvas = d.getElementById("rapier-canvas");
@@ -2809,20 +2736,16 @@ function buildInlineWall(wrap){
     makeBoxCollider();
 
     let hasDropped = !1;
-    let dropObserver = null;
-    function armDropObserver(){
-      if (dropObserver) dropObserver.disconnect();
-      dropObserver = new IntersectionObserver((entries)=>{
-        const e = entries[0];
-        if (!hasDropped && e.isIntersecting && e.intersectionRatio > 0.35){
-          world.gravity = { x:0, y: DROP_G };
-          body.wakeUp();
-          hasDropped = !0;
-        }
-      }, { root:null, threshold:[0, .35, .6] });
-      dropObserver.observe(stageBlock);
+    function atAbsoluteBottom(){
+      return (w.scrollY + w.innerHeight) >= (d.body.scrollHeight - 1);
     }
-    armDropObserver();
+
+    function tryDrop(){
+      if (hasDropped || !atAbsoluteBottom()) return;
+      world.gravity = { x:0, y: DROP_G };
+      body.wakeUp();
+      hasDropped = !0;
+    }
 
     const goal = {
       visible: !1,
@@ -2843,7 +2766,6 @@ function buildInlineWall(wrap){
       body.setAngularDamping(0.04);
       hasDropped = !1;
       world.gravity = { x:0, y:0 };
-      armDropObserver();
     }
 
     function addWear(amount){
@@ -2996,6 +2918,7 @@ function buildInlineWall(wrap){
         confetti({ particleCount: 160, spread: 70, origin: { y: 0.35 } });
         resetSection();
       }
+      tryDrop(); // drop only when at absolute bottom
       const W = canvas.width, H = canvas.height;
       ctx.clearRect(0,0,W,H);
       ctx.save();
@@ -3017,13 +2940,8 @@ function buildInlineWall(wrap){
       ctx.setLineDash([4*DPR, 4*DPR]);
       ctx.lineWidth = 1*DPR;
       ctx.strokeStyle = stroke;
-      if (current.isBall){
-        ctx.beginPath(); ctx.arc(0,0,current.half, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-      } else {
-        const radius = current.wear * current.half;
-        roundedRectPath(0,0,current.half, radius);
-        ctx.fill(); ctx.stroke();
-      }
+      if (current.isBall){ ctx.beginPath(); ctx.arc(0,0,current.half, 0, Math.PI*2); ctx.fill(); ctx.stroke(); }
+      else { const radius = current.wear * current.half; roundedRectPath(0,0,current.half, radius); ctx.fill(); ctx.stroke(); }
       ctx.restore();
       pinkBgTick();
       requestAnimationFrame(tick);
@@ -3093,34 +3011,26 @@ function buildInlineWall(wrap){
 
 })();
 
-  </script>
-  
-  <script>
-    (function(){
-      const d = document;
-    
-      // Delegate touch to any wall
-      d.addEventListener('touchstart', (e) => {
-        const sentence = e.target.closest('.wall .wall-sentence');
-        const wall = e.target.closest('.wall');
-        if (!wall) return;
-    
-        // Enter "hover" mode for the duration of the touch
-        wall.classList.add('-touching');
-        wall.querySelectorAll('.is-hovered').forEach(n => n.classList.remove('is-hovered'));
-        if (sentence) sentence.classList.add('is-hovered');
-      }, {passive:true});
-    
-      const clearTouch = () => {
-        d.querySelectorAll('.wall.-touching').forEach(wall => {
-          wall.classList.remove('-touching');
-          wall.querySelectorAll('.is-hovered').forEach(n => n.classList.remove('is-hovered'));
-        });
-      };
-    
-      d.addEventListener('touchend', clearTouch, {passive:true});
-      d.addEventListener('touchcancel', clearTouch, {passive:true});
-    })();
+// ---- Touch hover helper for inline walls ----
+(function(){
+  const d = document;
+  d.addEventListener('touchstart', (e) => {
+    const sentence = e.target.closest('.wall .wall-sentence');
+    const wall = e.target.closest('.wall');
+    if (!wall) return;
+    wall.classList.add('-touching');
+    wall.querySelectorAll('.is-hovered').forEach(n => n.classList.remove('is-hovered'));
+    if (sentence) sentence.classList.add('is-hovered');
+  }, {passive:true});
+  const clearTouch = () => {
+    d.querySelectorAll('.wall.-touching').forEach(wall => {
+      wall.classList.remove('-touching');
+      wall.querySelectorAll('.is-hovered').forEach(n => n.classList.remove('is-hovered'));
+    });
+  };
+  d.addEventListener('touchend', clearTouch, {passive:true});
+  d.addEventListener('touchcancel', clearTouch, {passive:true});
+})();
     </script>
     
 
