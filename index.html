@@ -1087,6 +1087,74 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 
 
 
+/* ===== Folding Cube Logo (top-left) ===== */
+:root{
+  /* quick knobs */
+  --cube-size: 40px;          /* base size of the cube */
+  --cube-color: #fff;        /* inherits currentColor if you prefer */
+  --logo-offset: 1.5em;        /* distance from viewport edges */
+  --logo-z: 9999;             /* stacking */
+}
+
+.logo-cube{
+  position: fixed;
+  top: var(--logo-offset);
+  left: var(--logo-offset);
+  width: calc(var(--cube-size) * 2);
+  height: calc(var(--cube-size) * 2);
+  display: grid;
+  place-items: center;
+  color: var(--cube-color);
+  text-decoration: none;
+  z-index: var(--logo-z);
+  /* make it feel like a “logo” target */
+  cursor: pointer;
+}
+
+.cube-folding{
+  width: var(--cube-size);
+  height: var(--cube-size);
+  transform: rotate(90deg);
+  font-size: 0;
+}
+
+/* leaves */
+.cube-folding span{
+  position: relative;
+  width: calc(var(--cube-size) / 2);
+  height: calc(var(--cube-size) / 2);
+  transform: scale(1.1);
+  display: inline-block;
+}
+.cube-folding span::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform-origin: 100% 100%;
+  animation: folding 2.5s linear infinite both;
+}
+
+/* per-leaf rotation & stagger */
+.cube-folding .leaf2{ transform: rotateZ(90deg)  scale(1.1); }
+.cube-folding .leaf3{ transform: rotateZ(270deg) scale(1.1); }
+.cube-folding .leaf4{ transform: rotateZ(180deg) scale(1.1); }
+
+.cube-folding .leaf2::before{ animation-delay: .3s;  filter: brightness(.95); }
+.cube-folding .leaf3::before{ animation-delay: .9s;  filter: brightness(.95); }
+.cube-folding .leaf4::before{ animation-delay: .6s;  filter: brightness(.90); }
+
+/* animation core */
+@keyframes folding{
+  0%,10%   { transform: perspective(140px) rotateX(-180deg); opacity: 0; }
+  25%,75%  { transform: perspective(140px) rotateX(0deg);    opacity: 1; }
+  90%,100% { transform: perspective(140px) rotateY(180deg);  opacity: 0; }
+}
+
+/* accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .cube-folding span::before{ animation: none; opacity: 1; }
+}
 
 
 
@@ -1100,6 +1168,15 @@ html.-short-offsets :root{ --offset-h: 1.25; }
 
 
 	<div id="logo-zckgrt">If I May Be Frank</div>
+<!-- Logo: top-left folding cube -->
+<a class="logo-cube" href="/" aria-label="Frankly logo">
+  <div class="cube-folding">
+    <span class="leaf1"></span>
+    <span class="leaf2"></span>
+    <span class="leaf3"></span>
+    <span class="leaf4"></span>
+  </div>
+</a>
 
 
 	<!-- Storyline HUD
