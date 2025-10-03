@@ -717,26 +717,7 @@
   .block.string-rapier.-grab{ cursor:grab; }
   .block.string-rapier.-grabbing{ cursor:grabbing; }
   
-  /* ====================================
-     9) PING-PONG & PRELOADER ANIMATIONS
-     ==================================== */
-  .ping-pong-section{
-    padding: clamp(16px, 4vw, 40px);
-    background: var(--c-gray-100, color-mix(in oklab, var(--c-white, #fff) 92%, #000));
-    border-radius:.5rem;
-  }
-  .ping-pong-section .child{ display:grid; place-items:center; min-block-size: clamp(200px, 36vmin, 420px); }
-  .ping-pong{ display:block; inline-size: min(56vmin, 520px); aspect-ratio:1; margin:0 auto; }
-  .ping-pong__ball-x, .ping-pong__paddle-x, .ping-pong__ball-y, .ping-pong__paddle-y{ transform-box:fill-box; transform-origin:50% 50%; }
-  .ping-pong__ball-x{ animation: ping-pong-ball-x 1.5s linear infinite; }
-  .ping-pong__ball-y{ animation: ping-pong-ball-y 1.5s linear infinite; }
-  .ping-pong__paddle-x{ animation: ping-pong-paddle-x 1.5s var(--pp-ease-out) infinite; }
-  .ping-pong__paddle-y{ animation: ping-pong-paddle-y 1.5s linear infinite; }
-  
-  @keyframes ping-pong-ball-x{ from,to{ transform: translate(40px, 80px); } 50%{ transform: translate(88px, 80px); } }
-  @keyframes ping-pong-ball-y{ from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); } 25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,-68px); } }
-  @keyframes ping-pong-paddle-x{ from,to{ transform: translate(36px, 92px) rotate(6deg); } 50%{ transform: translate(92px, 92px) rotate(-6deg); } }
-  @keyframes ping-pong-paddle-y{ from,50%,to{ animation-timing-function: var(--pp-ease-out); transform: translate(0,0); } 25%,75%{ animation-timing-function: var(--pp-ease-in); transform: translate(0,28px); } }
+
   
 /* Preloader base sizing & keyframes */
 .pl1,.pl2,.pl3{ display:block; width:8em; height:8em; }
@@ -1279,7 +1260,7 @@
 
     <div class="wall-wrap">
   		<p class="wall-source">
-        Frankly: We “designers” aren’t engineers, architects, or scientists. We’re not building monuments people will remember in twenty, fifty, or a hundred years. Nobody’s building the pyramids with DIV containers.
+        Please understand: We “designers” aren’t engineers, architects, or scientists. We’re not building monuments people will remember in twenty, fifty, or a hundred years. Nobody’s building the pyramids with DIV containers.
         {BR}{BR}{BR}
         At the end of the day, we all need to move product; whatever {our} product may be. Every craft takes blood, sweat, and tears {design is no different}; so it behooves us to showcase our sh*t in an interesting way. Anyway...
         
@@ -2877,9 +2858,9 @@ data-cursor-tip="Click, hold, and fling.">
         if (!host || !stage || !svgEl) return;
     
         var vals = window.vals || [
-          ["Process","Design & Interactive Systems"],
-          ["Process","Data & User Taxonomies/Flows"],
-          ["Process","Information Architecture"]
+          ["Process","Design"],
+          ["Process","Data"],
+          ["Process","IA"]
         ];
         var rootTitle = window.rootTitle || "BEHIND THE BOX:";
     
@@ -2920,7 +2901,7 @@ data-cursor-tip="Click, hold, and fling.">
           svg.attr("viewBox", "0 0 " + W + " " + H).attr("width", "100%").attr("height","100%");
     
           var TILE = tileSize() * 1.3;
-          var NX   = Math.max(200, TILE * 3.6);
+          var NX   = Math.max(200, TILE * 3.2);
           var NY   = Math.max(56,  TILE * 1.6);
     
           tree.nodeSize([NY, NX])(xroot);
@@ -3017,25 +2998,38 @@ g.attr("transform", "translate(" + tx + "," + ty + ") scale(" + s + ")");
             .style("stroke", "#000")
             .style("stroke-width", 1);
     
-          enter.append("text")
-            .attr("dy", 5)
-            .attr("x", TILE/2 + 8)
-            .text(function(d){
-              if (d.data.name === "root") return rootTitle;
-              if (d.depth === 3) return "# " + d.data.name;
-              return "  " + String(d.data.name).toUpperCase();
-            });
+            enter.append("text")
+  .attr("class", "node-label")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .attr("x", 0)
+  .attr("y", TILE/2 + 10) // 10px gap below square; tweak as needed
+  .text(function(d){
+    if (d.data.name === "root") return rootTitle;
+    if (d.depth === 3) return "# " + d.data.name;
+    return String(d.data.name).toUpperCase();
+  });
     
           enter.transition().duration(600)
             .attr("transform", d => "translate(" + d.y + "," + d.x + ")")
             .style("opacity", d => d.depth > 0 ? 1 : .7);
     
-          var upd = node.transition().duration(600)
-            .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
+            var upd = node.transition().duration(600)
+  .attr("transform", d => "translate(" + d.y + "," + d.x + ")");
     
-          upd.select("rect.node-square")
-            .attr("x", -TILE/2).attr("y", -TILE/2)
-            .attr("width", TILE).attr("height", TILE);
+    upd.select("rect.node-square")
+  .attr("x", -TILE/2).attr("y", -TILE/2)
+  .attr("width", TILE).attr("height", TILE);
+
+  // update label position + text on resize/toggle
+upd.select("text.node-label")
+  .attr("x", 0)
+  .attr("y", TILE/2 + 10)
+  .text(function(d){
+    if (d.data.name === "root") return rootTitle;
+    if (d.depth === 3) return "# " + d.data.name;
+    return String(d.data.name).toUpperCase();
+  });
     
           upd.select("text")
             .attr("x", TILE/2 + 8)
