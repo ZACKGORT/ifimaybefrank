@@ -1244,7 +1244,7 @@
 
     <span class="-m"
           data-v-8129bdd7
-          tabindex="0"data-tooltip="erm, probably">... of all websites are made with boxes.</span>
+          tabindex="0"data-tooltip="erm, probably">... of all websites look like this.</span>
   </div>
 </div>
 
@@ -2161,36 +2161,56 @@ data-cursor-tip="Click, hold, and fling.">
   }
 
   function buildMagneticGrid(block, cols=3, rows=3, activeCol, activeRow){
-    if (!block) return;
-    block.classList.add("-gridified");
-    const legacyMag = block.querySelector(':scope > .rel [string="magnetic"]');
-    const legacyId = legacyMag?.getAttribute("string-id") || "string-22-grid";
-    const legacyRel = block.querySelector(":scope > .rel");
-    if (legacyRel) legacyRel.remove();
-    block.querySelectorAll(".mag-grid").forEach((n)=>n.remove());
-    if (activeCol == null) activeCol = Math.ceil(cols/2);
-    if (activeRow == null) activeRow = Math.ceil(rows/2);
-    const wrap = d.createElement("div");
-    wrap.className = "mag-grid";
-    for (let r=1;r<=rows;r++){
-      for (let c=1;c<=cols;c++){
-        const rel = d.createElement("div"); rel.className = "rel tile";
-        const child = d.createElement("div"); child.className = "child";
-        const box = d.createElement("div"); box.setAttribute("data-v-40fb9db4","");
-        if (c===activeCol && r===activeRow){
-          rel.classList.add("-active");
-          box.setAttribute("string","magnetic");
-          box.setAttribute("string-radius","650");
-          box.setAttribute("string-strength","0.95");
-          box.setAttribute("string-id", legacyId);
-          rel.addEventListener("mouseenter", ()=>block.classList.add("-bg-pink"));
-          rel.addEventListener("mouseleave", ()=>block.classList.remove("-bg-pink"));
-        }
-        child.appendChild(box); rel.appendChild(child); wrap.appendChild(rel);
+  if (!block) return;
+  block.classList.add("-gridified");
+
+  // keep original ID if present
+  const legacyMag = block.querySelector(':scope > .rel [string="magnetic"]');
+  const legacyId = legacyMag?.getAttribute("string-id") || "string-22-grid";
+
+  // clear legacy
+  const legacyRel = block.querySelector(":scope > .rel");
+  if (legacyRel) legacyRel.remove();
+  block.querySelectorAll(".mag-grid").forEach((n)=>n.remove());
+
+  if (activeCol == null) activeCol = Math.ceil(cols/2);
+  if (activeRow == null) activeRow = Math.ceil(rows/2);
+
+  const wrap = document.createElement("div");
+  wrap.className = "mag-grid";
+
+  for (let r=1;r<=rows;r++){
+    for (let c=1;c<=cols;c++){
+      const rel = document.createElement("div"); rel.className = "rel tile";
+      const child = document.createElement("div"); child.className = "child";
+      const box = document.createElement("div"); box.setAttribute("data-v-40fb9db4","");
+
+      if (c===activeCol && r===activeRow){
+        rel.classList.add("-active");
+
+        // the magnetic target
+        box.setAttribute("string","magnetic");
+        box.setAttribute("string-radius","650");
+        box.setAttribute("string-strength","0.95");
+        box.setAttribute("string-id", legacyId);
+
+        // ⬇️ ensure the cursor system has something to show
+        box.setAttribute("data-tooltip","Donut?");
+        box.setAttribute("role","button");
+        box.setAttribute("aria-label","I brought donuts!");
+
+        rel.addEventListener("mouseenter", ()=>block.classList.add("-bg-pink"));
+        rel.addEventListener("mouseleave", ()=>block.classList.remove("-bg-pink"));
       }
+
+      child.appendChild(box);
+      rel.appendChild(child);
+      wrap.appendChild(rel);
     }
-    block.appendChild(wrap);
   }
+  block.appendChild(wrap);
+}
+
     
       // -------------------- lerp grid
       function buildLerpGrid(block, cols=3, activeCol){
@@ -3064,6 +3084,59 @@ upd.select("text.node-label")
       };
     </script>
     
-  
+  <script>
+(() => {
+  const d = document;
+  const cursor = d.querySelector('.cursor');
+  if (!cursor) return;
+
+  const tip = cursor.querySelector('.cursor-tip') || (() => {
+    const t = d.createElement('div');
+    t.className = 'cursor-tip';
+    cursor.appendChild(t);
+    return t;
+  })();
+
+  const DONUT = 'I brought donuts!';
+
+  // 1) Optional: remove storyline sources that feed the HUD tip
+  d.querySelectorAll('[data-storyline]').forEach(el => el.removeAttribute('data-storyline'));
+
+  // 2) Guard against any script overwriting the tip with "scroll pls :)"
+  const blockBadTip = () => {
+    const txt = (tip.textContent || '').trim().toLowerCase();
+    if (txt.includes('scroll pls')) tip.textContent = DONUT;
+  };
+  const mo = new MutationObserver(blockBadTip);
+  mo.observe(tip, { childList: true, characterData: true, subtree: true });
+  blockBadTip();
+
+  // 3) Default: keep the tip hidden unless we deliberately show it
+  cursor.classList.remove('-tips');
+
+  // 4) Show donuts while hovering magnetized elements only
+  const mags = Array.from(d.querySelectorAll('[data-magnet], .-magnet, .mag'));
+  mags.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      tip.textContent = DONUT;
+      cursor.classList.add('-tips');
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.classList.remove('-tips');
+    });
+  });
+
+  // 5) Fallback: click anywhere to flash donuts for 2s (useful for testing)
+  let hideT;
+  d.addEventListener('click', e => {
+    if (e.target.closest('[data-magnet], .-magnet, .mag')) return; // magnets handled above
+    tip.textContent = DONUT;
+    cursor.classList.add('-tips');
+    clearTimeout(hideT);
+    hideT = setTimeout(() => cursor.classList.remove('-tips'), 2000);
+  }, { capture: true });
+})();
+</script>
+
   
 </body></html>
