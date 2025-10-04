@@ -2197,7 +2197,6 @@ data-cursor-tip="Click, hold, and fling.">
         // ⬇️ ensure the cursor system has something to show
         box.setAttribute("data-tooltip","Donut?");
         box.setAttribute("role","button");
-        box.setAttribute("aria-label","I brought donuts!");
 
         rel.addEventListener("mouseenter", ()=>block.classList.add("-bg-pink"));
         rel.addEventListener("mouseleave", ()=>block.classList.remove("-bg-pink"));
@@ -3097,7 +3096,7 @@ upd.select("text.node-label")
     return t;
   })();
 
-  const DONUT = 'I brought donuts!';
+
 
   // 1) Optional: remove storyline sources that feed the HUD tip
   d.querySelectorAll('[data-storyline]').forEach(el => el.removeAttribute('data-storyline'));
