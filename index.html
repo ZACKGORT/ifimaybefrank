@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zack Gort - Twenty Years of Bootstrap Design">
+    <title>Zack Gort · Bootstrap Startup · Twenty Years</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-color: #000000;
+    --ink: #ffffff;
+    --ink-2: #b8b8b8;
+    --ink-3: #808080;
+    --accent: #daa520;
+    --curve-k: 1;
+    --vig-opacity: 0.85;
+    --vig-inner: 30%;
+    --vig-mid: 75%;
+    --vig-outer: 100%;
+    --edge-blur: 6px;
+    --edge-mask-i: 65%;
+    --edge-mask-o: 80%;
+    --z-content: 0;
+    --z-grain: 149;
+    --z-blur: 150;
+    --z-vig: 151;
+    --z-ui: 220;
+    --z-dropdown: 230;
+    --bracket-color: #8b6f47;
+    --bracket-hover: #daa520;
+    --bracket-bg: rgba(218, 165, 32, 0.04);
+    
+    --text-parallax-strength: 0.03;
+    --image-parallax-strength: 0.15;
+    --center-magnet-strength: 0.25;
+}
+
+body.layout-layered .text-layer {
+    width: 95%;
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+body.layout-layered .stream {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+body.layout-layered .hover-image {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+body.layout-split .text-layer {
+    width: 50%;
+    margin: 0;
+    padding-left: 6vw;
+}
+
+body.layout-split .stream {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: clamp(16px, 2vw, 28px);
+}
+
+body.layout-split .hover-image {
+    position: fixed;
+    left: 72%;
+    top: 50%;
+    width: 45vw;
+    height: 34vw;
+}
+
+.scroll-progress {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    z-index: var(--z-ui);
+    pointer-events: auto;
+}
+
+.scroll-progress-bar-container {
+    width: 2px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1px;
+    position: relative;
+}
+
+.scroll-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: height 0.3s ease;
+}
+
+.nav-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--ink-3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    pointer-events: auto;
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+.nav-button:active {
+    transform: scale(0.95);
+}
+
+.nav-button svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.page-up {
+    margin-bottom: 10px;
+}
+
+.page-down {
+    margin-top: 10px;
+}
+
+.prev-sentence {
+    margin-bottom: 8px;
+}
+
+.next-sentence {
+    margin-top: 8px;
+}
+
+.chapter-nav {
+    margin-bottom: 10px;
+}
+
+.prev-chapter {
+    margin-bottom: 5px;
+}
+
+.next-chapter {
+    margin-top: 5px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+}
+
+body,
+html {
+    height: 100%;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--ink);
+    font: 18px/1.8 'Crimson Text', Georgia, serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    cursor: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+::selection {
+    background: rgba(218, 165, 32, 0.25);
+    color: #fff;
+}
+
+.edge-blur {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--z-blur);
+    backdrop-filter: blur(var(--edge-blur));
+    -webkit-backdrop-filter: blur(var(--edge-blur));
+    mask: radial-gradient(100% 64% at 50% 50%, transparent var(--edge-mask-i), rgb(255 255 255 / 0.98) var(--edge-mask-o));
+    -webkit-mask: radial-gradient(100% 64% at 50% 50%, transparent var(--edge-mask-i), rgb(255 255 255 / 0.98) var(--edge-mask-o));
+}
+
+.vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--z-vig);
+    background: radial-gradient(120% 90% at 50% 50%, #fff0 var(--vig-inner), rgb(0 0 0 / 0.55) var(--vig-mid), rgb(0 0 0 / 0.9) var(--vig-outer));
+    opacity: calc(var(--vig-opacity) * var(--curve-k));
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--z-grain);
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
+}
+
+.curved {
+    position: fixed;
+    inset: 0;
+    transform-style: preserve-3d;
+    transform: perspective(1000px) translateZ(calc(-200px * var(--curve-k))) scale(calc(1 + var(--curve-k) * 0.06));
+    will-change: transform;
+    z-index: var(--z-content);
+}
+
+.parallax-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.text-layer {
+    position: relative;
+    z-index: 10;
+    padding: 15vh 8vw 25vh;
+    max-width: 85%;
+    margin: 0 auto;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
+.image-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
+.stream {
+    font-size: clamp(18px, 2.5vw, 32px);
+    line-height: 1.8;
+    letter-spacing: -0.01em;
+    max-width: 100%;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.sentence {
+    display: inline;
+    transition: opacity 0.3s ease, color 0.3s ease;
+    cursor: none;
+    position: relative;
+    z-index: 2;
+    letter-spacing: -0.01em;
+}
+
+.sentence.active {
+    color: #fff;
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.sentence.dimmed {
+    opacity: 0.4;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.chapter-break {
+    display: block;
+    margin: 3em 0 2em;
+    padding: 1.5em 0;
+    border-top: 1px solid rgba(218, 165, 32, 0.2);
+    border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.chapter-break:hover {
+    opacity: 1;
+    background: rgba(218, 165, 32, 0.05);
+    padding: 1.5em 1em;
+}
+
+.chapter-break .chapter-number {
+    display: block;
+    font-size: 0.7em;
+    margin-bottom: 0.5em;
+    color: var(--ink-3);
+}
+
+.chapter-break .chapter-title {
+    display: block;
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.bracket-trigger {
+    all: unset;
+    cursor: none;
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.65em;
+    color: var(--bracket-color);
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+    border-bottom: 1px dotted rgba(139, 111, 71, 0.5);
+    padding-bottom: 1px;
+    display: inline;
+    vertical-align: baseline;
+    line-height: inherit;
+    margin: 0 0.1em;
+}
+
+.bracket-trigger:hover {
+    color: var(--bracket-hover);
+    opacity: 1;
+    border-bottom-color: var(--bracket-hover);
+}
+
+.bracket-trigger.expanded {
+    opacity: 0.5;
+}
+
+.bracket-content {
+    display: inline;
+    font-size: 0.8em;
+    color: rgba(184, 184, 184, 0.8);
+    font-style: italic;
+    line-height: inherit;
+    padding-left: 0.2em;
+    margin-left: 0.2em;
+    border-left: 1px solid rgba(218, 165, 32, 0.5);
+    padding-right: 0.2em;
+    background: rgba(218, 165, 32, 0.02);
+    animation: bracketFadeIn 0.3s ease-out;
+}
+
+@keyframes bracketFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.image-trigger {
+    position: relative;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+    cursor: help;
+    transition: all 0.2s ease;
+    opacity: 0.9;
+}
+
+.image-trigger:hover {
+    color: var(--accent);
+    border-bottom-style: solid;
+    opacity: 1;
+}
+
+.hover-image {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.1s linear;
+    width: 1400px;
+    height: 1050px;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%) scale(0.95);
+    filter: brightness(0.9) contrast(1.05);
+    will-change: transform, opacity;
+    left: 50%;
+    top: 50%;
+}
+
+.hover-image.active {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.hover-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-ui);
+    padding: clamp(16px, 2vh, 28px) clamp(20px, 4vw, 50px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+}
+
+.brand-container {
+    position: relative;
+    pointer-events: auto;
+}
+
+.brand {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 6px 10px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ink);
+    border-color: var(--accent);
+}
+
+.brand:active {
+    transform: scale(0.95);
+}
+
+.brand-dropdown-icon {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.brand.open .brand-dropdown-icon {
+    transform: rotate(180deg);
+}
+
+.chapter-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 280px;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: var(--z-dropdown);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.chapter-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.chapter-dropdown-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 8px;
+}
+
+.chapter-dropdown-header h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0;
+    font-weight: 400;
+}
+
+.chapter-dropdown-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.chapter-dropdown-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chapter-dropdown-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.chapter-dropdown-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+.chapter-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chapter-item:hover {
+    background: rgba(218, 165, 32, 0.08);
+}
+
+.chapter-item.active {
+    background: rgba(218, 165, 32, 0.12);
+}
+
+.chapter-item-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    min-width: 40px;
+}
+
+.chapter-item-title {
+    font-family: 'Crimson Text', serif;
+    font-size: 14px;
+    color: var(--ink-2);
+    font-style: italic;
+}
+
+.chapter-item.active .chapter-item-title {
+    color: var(--accent);
+    font-style: normal;
+}
+
+.chapter-item-progress {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-3);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+.curve-control {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 6px 12px;
+    border-radius: 3px;
+}
+
+.curve-slider {
+    width: 70px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.curve-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+}
+
+.curve-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.curve-slider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+}
+
+.curve-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+}
+
+.layout-toggle {
+    pointer-events: auto;
+}
+
+.layout-button {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 8px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.layout-button:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.layout-button:active {
+    transform: scale(0.95);
+}
+
+.layout-icon {
+    width: 24px;
+    height: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.layout-icon.layered::before,
+.layout-icon.layered::after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 6px;
+    background: var(--ink-3);
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.layout-icon.layered::after {
+    opacity: 0.5;
+    margin-top: -4px;
+}
+
+.layout-icon.split::before,
+.layout-icon.split::after {
+    content: '';
+    display: block;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.layout-icon.split::before {
+    width: 10px;
+    height: 100%;
+    background: var(--ink-3);
+}
+
+.layout-icon.split::after {
+    width: 10px;
+    height: 100%;
+    background: var(--ink-3);
+    margin-left: 4px;
+    opacity: 0.5;
+}
+
+#cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s, height 0.25s, background-color 0.25s, border-color 0.25s;
+    mix-blend-mode: difference;
+}
+
+#cursor.hovering {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+}
+
+#cursor.pointer {
+    width: 14px;
+    height: 14px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.scroll-hint {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: var(--z-ui);
+    opacity: 0;
+    animation: fadeInOut 4s ease-in-out;
+    pointer-events: none;
+}
+
+.scroll-hint-icon {
+    width: 24px;
+    height: 24px;
+    border-right: 2px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+    transform: rotate(45deg);
+    animation: bounce 1.5s ease-in-out infinite;
+}
+
+.scroll-hint-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: rotate(45deg) translateY(0);
+    }
+    50% {
+        transform: rotate(45deg) translateY(8px);
+    }
+}
+
+@keyframes fadeInOut {
+    0%, 100% {
+        opacity: 0;
+    }
+    20%, 80% {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .text-layer {
+        padding: 12vh 6vw 20vh;
+        max-width: 95%;
+    }
+    
+    .stream {
+        font-size: clamp(16px, 4vw, 28px);
+    }
+
+    .hover-image {
+        width: 800px;
+        height: 600px;
+    }
+
+    .curve-control {
+        font-size: 9px;
+        padding: 5px 8px;
+    }
+
+    .curve-slider {
+        width: 50px;
+    }
+
+    .chapter-dropdown {
+        min-width: 240px;
+        left: -10px;
+    }
+
+    body.layout-split .text-layer {
+        width: 100%;
+        padding-left: 6vw;
+        padding-right: 6vw;
+    }
+
+    body.layout-split .hover-image {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 800px;
+        height: 600px;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .edge-blur {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+    
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div id="cursor" aria-hidden="true"></div>
+    
+    <header class="header">
+        <div class="brand-container">
+            <div class="brand" id="brandLogo" aria-label="Open chapter menu">
+                <span>Zack Gort · Bootstrap</span>
+                <span class="brand-dropdown-icon">▼</span>
+            </div>
+            <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
+                <div class="chapter-dropdown-header">
+                    <h3>Chapters</h3>
+                </div>
+                <ul class="chapter-dropdown-list" id="chapterDropdownList">
+                    <!-- Chapters will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+        <div class="curve-control">
+            <label for="curveSlider">Lens</label>
+            <input 
+                type="range" 
+                class="curve-slider" 
+                id="curveSlider"
+                min="0" 
+                max="1" 
+                step="0.01" 
+                value="1"
+                aria-label="Adjust lens curvature effect"
+            >
+        </div>
+        <div class="layout-toggle">
+            <button 
+                id="layoutToggle" 
+                class="layout-button"
+                aria-label="Toggle layout mode"
+                title="Switch between layered and split layout"
+            >
+                <span class="layout-icon layered"></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="edge-blur" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="scroll-progress" aria-label="Navigation controls">
+        <button class="nav-button prev-chapter" id="prevChapterBtn" title="Previous Chapter ([)" aria-label="Previous Chapter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z"/>
+            </svg>
+        </button>
+        
+        <button class="nav-button page-up" id="pageUpBtn" title="Page Up (move 10 sentences back)" aria-label="Page Up">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 4l-8 8h16l-8-8zm0 4l8 8H4l8-8zm0 4l8 8H4l8-8z"/>
+            </svg>
+        </button>
+        
+        <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+        </button>
+        
+        <div class="scroll-progress-bar-container">
+            <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+        </div>
+        
+        <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+            </svg>
+        </button>
+        
+        <button class="nav-button page-down" id="pageDownBtn" title="Page Down (move 10 sentences forward)" aria-label="Page Down">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 20l8-8H4l8 8zm0-4l-8-8h16l-8 8zm0-4l-8-8h16l-8 8z"/>
+            </svg>
+        </button>
+        
+        <button class="nav-button next-chapter" id="nextChapterBtn" title="Next Chapter (])" aria-label="Next Chapter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+        <div class="scroll-hint-icon"></div>
+        <span class="scroll-hint-text">Scroll to navigate</span>
+    </div>
+
+    <main class="curved">
+        <div class="parallax-container">
+            <div id="imageLayer" class="image-layer">
+                <div id="hoverImage" class="hover-image" role="tooltip" aria-hidden="true">
+                    <img src="" alt="" id="hoverImageImg" loading="lazy">
+                </div>
+            </div>
+            
+            <div id="textLayer" class="text-layer">
+                <article class="stream" id="stream" role="article"></article>
+            </div>
+        </div>
+    </main>
+
+    <script>
+const TAIL_LENGTH = 12;
+const CURSOR_SMOOTHING = 0.35;
+const IMAGE_HOVER_DELAY = 120;
+const TEXT_PARALLAX_STRENGTH = 0.03;
+const IMAGE_PARALLAX_STRENGTH = 0.15;
+const CENTER_MAGNET_STRENGTH = 0.25;
+const PARALLAX_DAMPING = 0.1;
+const SCROLL_THRESHOLD = 30;
+const SCROLL_COOLDOWN = 100;
+let scrollCooldownActive = false;
+
+const imageMap = {
+    'Pratt Institute': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
+    'art school': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
+    'pirated Adobe software': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'pirated copies of Adobe': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'built my first computer': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'faux website concepts': 'https://i.ibb.co/DHHzHw8G/1-pu-HZ09-ELFPd-Aa-MK0-HAxq-Q.webp',
+    'Craigslist post': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'cover letter': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'sixteen-fifty an hour': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'Turn5': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
+    'Xoxide': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
+    'package design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
+    'catalogue design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
+    'Product Photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
+    'product photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
+    'color match': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'OEM quality': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'photographed thousands': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'web designer': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'banner and display ads': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'email marketing': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'wireframe': 'https://i.ibb.co/NdwrPWfV/1-Na-ZV6rc-Ew-RT55p-R12-BY0jg.webp',
+    'user testing': 'https://i.ibb.co/fG0dXSr0/1-m7-Hfhu-QO4-Ugr1-Vte-Zf6it-A.webp',
+    'Leadnomics': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
+    'payday loan': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'payday loans': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    '95.8%': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'ninety-five-point-eight percent': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'free lunches': 'https://i.ibb.co/27BznHGJ/1-BNs-Ch8k1bclj-KMu1-KN-g.gif',
+    'interactive haiku': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
+    'interactive Haiku': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
+    'One Sixty Over Ninety': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
+    '160/90': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
+    '160over90': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
+    'Interaction Designer': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
+    'Interactive Department': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
+    'lots of nights': 'https://i.ibb.co/SwzHM3CZ/1-o-P6kr-DDq-Pp-Sg-F4-Ag-Fr-WClw.webp',
+    'weekends too': 'https://i.ibb.co/SwzHM3CZ/1-o-P6kr-DDq-Pp-Sg-F4-Ag-Fr-WClw.webp',
+    'grayscale wireframes': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
+    'Kent State': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
+    'mega menus': 'https://i.ibb.co/pBYP6wt8/1-HXIU3nxu-ZGq-Ne-Ef3-Wv-Lf-MQ.webp',
+    'hamburger icon': 'https://i.ibb.co/s9DPSGLM/1-Vf-C4i592d-OFh-Rbeo-C22ikw.webp',
+    'O3 World': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'agile in nature': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'scrum led': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'daily scrums': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
+    'SEI': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
+    'La Colombe': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
+    'Vertex': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
+    'WOVN': 'https://i.ibb.co/mr7gnpTg/1-y-GJCqkzizxa-Uxk3-R5-DCD8g.webp',
+    'Workarea': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'Gidget': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'napkin sketches': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'napkins': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'Five Foot Gorilla': 'https://i.ibb.co/mjt5Myw/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp',
+    'FlightPath': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'emerging from bankruptcy': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'pharmaceutical sector': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'WCAG': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
+    'Merck': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
+    'Cards Against Bad UX': 'https://i.ibb.co/KxyvFKmq/1-P4-Gyqav-HMmzp-A-Ehqy9g-w.webp',
+    'jargon-laden spreadsheets': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
+    'single-sided meetings': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
+    'As a shopper': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'content manager': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'guest user': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'LiveArea': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'UX Manager': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'one-point-two million': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    '$1.2m': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'two-thirty-five per hour': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    '$235/hr': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'Huge': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'single user flow': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'siloed': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'General Nutrition Centers': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'GNC': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'mobile-first navigation': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'Elva': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'Notes': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
+    'mental notes': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
+    'Hypothesis': 'https://i.ibb.co/hFxVPkN9/1-Ex-Xe-Zp-Pz-Cw-C4-QKjx3-Fp-J-Q.webp',
+    'Setting up for success': 'https://i.ibb.co/VWjMBKyJ/1-bd-or-S3kj2g-Ul-Or1-T0cp-Xw.webp',
+    'Roadmap': 'https://i.ibb.co/jkzBy6JF/1-qplrq-W-v-Dn7-Rkr-XIQYYm-Q.webp',
+    'Iteration': 'https://i.ibb.co/0RTCJshv/1-q-GUMUAN-NA1-FY2gm8knong.webp',
+    'Innovation': 'https://i.ibb.co/hF26Bg3H/1-Sl-Zx-RIiu-Ds1k-Q19me-Imf-Q.webp',
+    'Optimization': 'https://i.ibb.co/HT0xKhzF/1-HRsg-XZNL-WJf4-Xj-J-O75-Bg.webp',
+    'Refinement': 'https://i.ibb.co/mC4dJwfG/1-7e7-U6-ZN5-HC-zd-Qzm1t-Sb-Gg.webp',
+    'Gains': 'https://i.ibb.co/Y4BS0p8f/1-LCDr-FFlm-X0-F1-Rasve-Rsrv-A.webp',
+    'Code and Theory': 'https://i.ibb.co/jP8rS95G/1-5g-Mvv7027-cm7r0vm-IDy1-A.webp',
+    'Code & Theory': 'https://i.ibb.co/jP8rS95G/1-5g-Mvv7027-cm7r0vm-IDy1-A.webp',
+    '62nd Floor': 'https://i.ibb.co/k22XR8x5/1-t-Vlq3-Svyk-Yb9-EM5yd-Nlcg-A.webp',
+    'World One Trade Center': 'https://i.ibb.co/k22XR8x5/1-t-Vlq3-Svyk-Yb9-EM5yd-Nlcg-A.webp',
+    'ACD': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'Senior Designer': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'wow factor': 'https://i.ibb.co/h1fn9fxc/1-Iy-n-WY-5d-Nz-Lniq7v-HVg-Iw.webp',
+    'post mortem': 'https://i.ibb.co/h1fn9fxc/1-Iy-n-WY-5d-Nz-Lniq7v-HVg-Iw.webp',
+    'Publicis Sapient': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'Digital Transformation': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'Organizational Spaghetti': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'de facto Team Lead': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
+    'Product Owner': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
+    'company paid lunches': 'https://i.ibb.co/v4q7TbDZ/1-t-Yd-DX2-Ql-VLw-XI7gm3ev-MLw.webp',
+    'exhaustive research': 'https://i.ibb.co/XrpnL50W/1-x-Qoqr-V021-PFk0sxts5-AWAg.webp',
+    'industry research': 'https://i.ibb.co/XrpnL50W/1-x-Qoqr-V021-PFk0sxts5-AWAg.webp',
+    'consistent presence': 'https://i.ibb.co/fdW3K2gp/1-1gjr-Eff-Bio-JYo-EAv-MWHf-KQ.webp',
+    'in-office presence': 'https://i.ibb.co/fdW3K2gp/1-1gjr-Eff-Bio-JYo-EAv-MWHf-KQ.webp',
+    'client workshops': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
+    'Design Systems': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'design systems': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'data paradigm': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'Pershing X': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
+    'BNY Mellon': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
+    'networking': 'https://i.ibb.co/sJkpkV9Q/1-l4jg-O1-4g-Ey-Wy-IBEQZho0g.webp',
+    'RJ45': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    'terminate an RJ45': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    '30–45 seconds': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    'Run cables': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'security systems': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'cable management': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'twist parity': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    'different parts of my brain': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    'sees potential': 'https://i.ibb.co/4Rfyq6Z8/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
+    'someone out there': 'https://i.ibb.co/4Rfyq6Z8/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
+    'mouths to feed': 'https://i.ibb.co/gpr7smN/1-Zs0lu-PIi-C5ly-AOEo2-LLEl-A.webp',
+    'left-handed': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
+    'think different': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
+    'play guitar': 'https://i.ibb.co/MyqYv5cS/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
+    'guitar': 'https://i.ibb.co/MyqYv5cS/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
+    'take photographs': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
+    'photography': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
+    'Wolfgang': 'https://i.ibb.co/tTTgw7Md/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
+    'my dog': 'https://i.ibb.co/tTTgw7Md/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
+    'Bootstrap startup': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'bootstrap startup': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'non-linear': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'career journey': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'A-list brands': 'https://i.ibb.co/840YDJMT/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
+    'global scale': 'https://i.ibb.co/840YDJMT/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp'
+};
+
+const chapters = [
+    { id: 0, title: "Introduction", startText: "Hi. I'm Zack." },
+    { id: 1, title: "Early Years", startText: "I didn't graduate from college." },
+    { id: 2, title: "First Steps", startText: "I built my first computer" },
+    { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
+    { id: 4, title: "Leadnomics", startText: "Okay, so Leadnomics was shifty." },
+    { id: 5, title: "Learning to Code", startText: "From here, I desired to move" },
+    { id: 6, title: "One Sixty Over Ninety", startText: "One Sixty Over Ninety—" },
+    { id: 7, title: "O3 World", startText: "An elevating experience with O3 World" },
+    { id: 8, title: "FlightPath", startText: "Did I mention I co-founded" },
+    { id: 9, title: "LiveArea", startText: "A paradigm shift: From Midtown to Uptown." },
+    { id: 10, title: "Huge", startText: "At Huge, I couldn't tell you" },
+    { id: 11, title: "Elva / GNC", startText: "Heavy lift. Big gains. This is the whey." },
+    { id: 12, title: "Code and Theory", startText: "It's a long way to the top" },
+    { id: 13, title: "Publicis Sapient", startText: "Okay, fine. Huge only wanted me" },
+    { id: 14, title: "The Twist", startText: "Come on, baby. Let's do the twist." },
+    { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
+];
+
+const narrative = `Hi. I'm Zack. [This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart. I think. I make. Will work for work.] This is what being a bootstrap startup looks like. When you're the product. When your career is your only venture capital.
+
+The above image is something akin to how I view my career journey to date. [Before I was a UX Designer, I was a Web Designer. Before I was a web designer, I was a Graphic Designer. Before I was a graphic designer, I was a teenager who could draw well and who had a passion for animation.] What is animation? It is the creation of something in motion, something that requires forethought into the next step while maintaining a frame of reference for that which has occurred.
+
+What is UX? [It is that which is in motion. It is that which necessitates forethought into the next step while maintaining a frame of reference for that which has occurred. Essentially, nothing has changed in terms of my natural sensibilities.] But over the last fifteen-plus years, I've had the benefit of expanding and expounding upon these basic skills in forging a meaningful career in the modern age. A non-linear, but carefully curated and considered career path, from homegrown startups to working with A-list brands at a global scale.
+
+I didn't graduate from college. I couldn't afford it. [Pratt Institute of Art was expensive, and loans or financial aid were simply out of reach, though not as simple as it may seem.] At nineteen years old, there wasn't much that I could afford. So I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station.
+
+At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could bull-expletive with my so-called talent. [I attended Pratt from 2002 to 2003, then again from 2004 to 2005. I had a budding passion for graphic design and considered myself, by my own evaluation, an expert with Photoshop and Illustrator, though one does not make the other.] I pursued studies in 3D Animation and Motion Graphics during my time in school.
+
+I survived foundation year—a callback to the foundations of illustration, color theory, compositional study, and other artistic practices. [I only completed my sophomoric year focusing on 3D Animation. Classes included storytelling, storyboarding, animation, and 3D digital modeling. Now, with that future more or less now foregone, the idea of being a web designer had a certain appeal.] With a rough—daresay organic—start as a graphic designer, I had some work to do.
+
+I built my first computer circa 2005 to '06. I immediately installed pirated copies of Adobe Photoshop and Illustrator. [While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at intensely.] So, without a college degree or any equivalent experience, I started from absolute scratch.
+
+I studied typography by reading books and examining magazines, and generally observing what I saw wherever I were. [I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal—my clandestinely acquired Adobe products.] I began to create faux website concepts to gain an understanding of designing for that medium. As the screenshots may suggest, I had lots to learn.
+
+I also learned the proper etiquette towards finding gainful employment. [All this culminated with an interview and subsequent job offer from Xoxide Incorporated, later turned Turn5 Inc, which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals—Beauty, Automotive, Tech.] I found their company through a Craigslist post in the web slash design category.
+
+I can still pull up my original cover letter, which I just looked at and am considering reusing in my current job search endeavors. [Here, I was brought on as a graphic designer, full-time. You have no idea how happy I was.] I was set to make sixteen-fifty an hour plus full benefits, a 401K, and have my own cubicle. I thought I'd made it.
+
+Alright. Now, where to begin? Circa 2007 through 2011. [Okay, so I've just been brought into the fold with a budding home-grown startup. The company had set up its new HQ at a warehouse office facility in Great Valley, PA, about twenty miles outside of Philly.] It was owned and operated by two brothers, one of which wasn't even old enough to drink at the company holiday party.
+
+I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens. [I think it's easier to list all my roles and functions via bulleted list. Graphic designer for all web properties, including reskin efforts, banner and display ads, and email marketing.] Graphic designer for all print related initiatives, including package design, catalogue design, and large-format printing needs.
+
+Product Photographer and Image Manipulation specialist, covering all manner of product photography. [Specializing in lighting, establishing systematic product photography protocols for visual uniformity at scale, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.] Graphic Designer turned Web Designer, responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning.
+
+The work—AI can probably do much of what I've shared below within minutes, but this was fifteen or so years ago, and thusly everything had to be done manually. [From magazine spreads to comprehensive product catalogs. Not just thousands of parts, but with customization at the heart of what we sold, countless product permutations.] Before your PDP—product detail page—before your printed product catalogue or packaging templates, before your segmented email marketing distributions, before your display ad campaigns, comes your product photography.
+
+This involved comprehensive pre-planning put into any product campaign. [First, we had to coordinate and plan for product shoots, then we had to light it in a way that would allow optimal image manipulation in post production. Then capture multiple frames of reference and various angles.] Then, we had to color match perfectly to mimic OEM quality, even at the alpha-channel level, to ensure our product photography looked consistent through print and digital media alike—RGB, CMYK.
+
+I say we, but for a long while, it was solely myself and eventually another product photographer, shout out to Anthony Caggiano, who owned all aspects of this work. [Collecting gross amounts of overtime working through the weekends. The volume of work eventually necessitated the development of a fully-fledged and funded photography department working in tandem with the installation technicians and the like.] Having passed the torch of photography duties onto a true professional, I was able to focus on email marketing and feature design.
+
+Put simply, working with email and analytical data helped to inform top-level site design changes and influenced the direction we took the mothership. [It was at this point I graduated from graphic designer to web designer. I remember vaguely that the left-rail navigation was more or less baked into the Yahoo Stores platform, and so we were beholden to work around it.] This resulted in features that were often condensed or otherwise forced into place.
+
+I vaguely remember the in-office celebration when that left-rail became optional and thusly quickly removed. [It easily gave us back at least 300 square pixels of above-fold real-estate for feature ideation at every stage of our shopping funnel.] Below are some examples of the wireframe ideation that occurred at this stage for a hypothetical PDP, showing a variety of complex functions.
+
+Beyond just my various design duties was a matter of creating ways of working that benefitted the group, the team. [The company was growing. No longer was it just myself, but an entire team contributing to accrual of design files. This screenshot of server organization and maintenance may have been the impetus of my interest in Information Architecture—aka, sitemaps and content strategy.] In many respects, Turn5 Inc served as my formal education.
+
+I learned first and foremost how to work within a team environment where everyone's role was crucial towards the company's success. [There, I learned the ins and outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs.] And in the latter half of my nearly four years there, served as a web designer focused on user experience—by the books—as applied to a then forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.
+
+Okay, so Leadnomics was shifty. Paradigm shifty, we'll say. [It was a great place to work though. I have lasting friendships with folks I worked with there. Heck, two of them now work at Google.] But our work fed upon the uneducated and disenfranchised in some respects. As the name may suggest, our focus was in lead generation. Our cash cow was in facilitating easy access to high-interest short-term loans, otherwise known as payday loans.
+
+But we had free lunches, regular bonuses, company outings, free snacks, and solid benefits. [Each with our own super thin Apple laptops and the ability to WFH occasionally—circa 2011, FYI.] In short, my job was to make it intuitive and stress-free, daresay pleasant, for one to make catastrophic financial decisions under clandestine duress at a scale in tens of thousands per month.
+
+I had a 95.8% conversion rate with a bounce rate lower than 15% through my form systems. [Meaning, once our visitor clicked into the form funnel, ninety-five-point-eight percent of our users became converted leads. This wasn't magic.] This was the result of introducing Responsive Web Design practices via Twitter's Bootstrap ethos while backed by thoughtful action and solutioning based on analytical data and insights drawn from A/B split-testing of marketing and educational content and UI-UX paradigms.
+
+Also, well-considered and device-friendly form design with efficient validation techniques applied and tested on the daily. [In simple terms, we fashioned a helluva good fishing net. I think working here gave me a true sense of the business world. So much of what we do is driven by necessity and less by what we find ideal.] Tell that to a graphic designer and tell me how that goes.
+
+From here, I desired to move my creative talents into an environment where I was happy to share and expound upon. [There was a period of time between Leadnomics and 160over90 where I was recovering from a catastrophically comminuted clavicle injury.] During my down time, I determined that my best chance at landing an agency job was if I could prove I understood the ins and outs of web design.
+
+So I learned how to code HTML, CSS, and throw in a little JavaScript to make the magic happen. [I did this by concepting an interactive Haiku which communicated in various ways the things I wished to convey. Sometimes the best portfolio piece is the one that shows you can learn anything.] Took a twelve-thousand-dollar pay cut to join One Sixty Over Ninety as an interaction designer in Center City Philadelphia.
+
+One Sixty Over Ninety—my heart rate when I was offered a full-time gig as an Interaction Designer circa 2014 working at a leading design agency at the literal epicenter of Center City, Philadelphia. [Granted, I accepted the job at approximately twelve-thousand less than I was at my previous startup, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160/90 HQ.] I was there to learn. Day. Night. Lots of nights. Weekends too.
+
+Now, let's look at some wireframes. [Here is a wireframe for Kent State's EDU. It's gray, so it's clearly a wireframe prototype. But why does it basically look like a grayscale design?] Well, when waterfall process meets business-minded clients with exceptional aspirations meets unmanaged or unmitigated expectations meets crunch time. Ultimately, it boils down to a confluence of factors that quite often lead to compromises in the design process.
+
+In the case of this wireframe, given budgetary and scheduling constraints, we provided essential education as we socialized our work with the client. [Detailing the nuance of design decisions based on best practices and modern conventions. Enlightening our clients to our use of modern CSS capabilities offering more flexible design solutions. Add CMS knowledge and of course painting a clear picture for the next phase: Visual Design.] In other words, what I hope you glean from the following isn't that I have an acuity for design, or at least the foresight for it, but that I've practiced and trained to the point where best-practices are baked in.
+
+Kent State University had a unique challenge in that its programs and offerings were split across nine different regional campuses. [Each campus had its own directory, its own content, and its own business objectives. We explored baseline by-the-book navigation options.] We explored mega menus and full-screen takeovers. We explored pop-outs, roll-outs, and pondered if the hamburger icon was intuitive enough. Remember, this was circa 2014 to 2016 when these were legitimate questions.
+
+We considered breaking the mold given our proprietary requirements. [Since Kent State was dissimilar from its peers, do we dare seek our own solution? We—I—dared, indeed.] While these conceptual prototypes did not ultimately make it to fruition, they did contribute to conversations that influenced not just design but content strategy. Ultimately, we decided that a refactored content strategy per region was more practical and a more conventional navigation masthead was ideal.
+
+I think it's important to note that at 160over90, we facilitated absolutely zero user testing. [Everything was subjectively driven and emotionally charged. Also, budgets were tight.] I desired to learn these skills in a dedicated agile product-focused environment. My next employment.
+
+An elevating experience with O3 World, a digital product shop based in Fishtown, Philadelphia. [Wireframes at 160over90 fit the workflow at 160over90. Wireframing at O3 World was a different beast which required throwing everything I thought I knew out the the window and reverting to the basics.] Here, it was less about impressing our clients. Here, it was all about working with our clients.
+
+Without the pizazz of beautiful grayscale renders of your soon-to-be colored in homepage, we focused on asking the right questions and getting the right feel with our clients. [We were agile in nature and scrum led. We had daily scrums and weekly sprint schedules. We dealt with client feedback organically and responsively as opposed to reactively.] Clients included Vertex SMB, SEI, La Colombe, and WOVN iOS.
+
+I had mentioned Agile and Scrum. Well, say hello to Gidget, our adjunct project manager and scrum master at Workarea, a proprietary SaaS e-commerce platform. [Here, I served as a Senior Visual and UX Designer. Here, we did wireframes differently. Here, we worked in direct partnership with our ever-ready-to-help developers.] Napkin sketches, low-fi mockups, or just a few messages on Slack were all that was needed.
+
+The work was building out our proprietary SaaS E-commerce Platform which we marketed out in typical agency-style to a number of A-list brands. [Using all insights and analytics towards optimizing our platform and expanding functionality to meet demand.] I don't have any work to show from here. I didn't save any of my napkins.
+
+Did I mention I co-founded a two-person strong design agency that existed for about six months before I dissolved it in favor of gaining bona fide NYC-grade agency experience? [My business partner, while brilliant, was unpredictable to say the least. Anyway, here was an idea for an animated slash interactive logo design. Our Way: Stout. Resolute. Strong, and with good humor.] Sometimes you have to kill your darlings, even when the darling is your own company.
+
+FlightPath presented an intriguing opportunity. [Recently emerging from the brink of bankruptcy, the agency had drastically downsized from a bustling office to a sparse handful of core employees. It wasn't a lucrative endeavor. The pay was passable at best.] But for me, the allure lay in the chance to immerse myself in the New York agency scene and gather invaluable experience to propel my career forward.
+
+Despite its tumultuous journey, FlightPath managed to preserve vital relationships with long-standing clients specifically in the pharmaceutical sector—Merck, Zoetis, Charter, and Goya. [Operating in regulated industries, these clients demanded design solutions that not only adhered to WCAG 2.0 AA or even AAA compliance standards but also underwent rigorous scrutiny and approval from legal and regulatory marketing authorities.] I was let go on the day of my one-year annual review.
+
+I had been making a mere eighty-thousand-dollar salary and had been commuting to and from Philadelphia and New York daily. [I was hoping to ask a modest bump in pay and title adjustment given all that I had contributed in the past year as the sole designer on staff. Nope.] This was somewhat bittersweet. While on one hand I was now out of a job, I had now accomplished exactly what I had set out to do. Put in one year towards elevating my experience and professional output and see where that took me.
+
+A paradigm shift: From Midtown to Uptown. From Individual Contributor to UX Manager. [Cards against bad UX? What? What do you do when you're working with a sophisticated client who has a tremendously complex product line and deep inventory?] Who are accustomed to B2B and B2E operations and dealings, and whom while fluent with their industry acumen were completely unfamiliar with the design process?
+
+What do you do when jargon-laden spreadsheets and single-sided meetings net nothing but frustration with the client to the point where they're considering abandoning the contract? [Enter Cards Against Bad UX. All I did was simplify what we asked. To shift the conversation away from technical jargon and towards user-centric thinking.] By providing different perspectives such as As a shopper, As a content manager, or As a guest user, and pairing it with a simple visual, a card, I was able to help our stakeholders empathize with their end-users and focus on their needs and experiences.
+
+This approach not only catalyzed communication but also encouraged collaboration and problem-solving from both sides of the table. [It allowed our client to see the project from various angles and find common ground, ultimately leading to more effective solutions and preventing frustration or contract abandonment.] Sometimes the best design work is the workshop that prevents the bad design from happening.
+
+At LiveArea I was the UX Manager assigned to contracts exceeding one-point-two million dollars. [My hourly billable rate to the client was something like two-thirty-five per hour. Everything I did had a direct impact on the final deliverable.] I managed multiple projects and pitches as well as junior designers while being the primary client-facing resource. I presented findings. I course-corrected when needed. I moved the machine forward.
+
+At Huge, I couldn't tell you what my billable rate was, but I could say this was the first time I had seen a project with at least twenty different people involved, on just the agency side. [At Huge, I was responsible for exploring a single user flow. There were other designers responsible for exploring other individual user flows.] At no point during my time with Huge did I even know there were other designers on that project. To say we were siloed would be a gross understatement.
+
+Being completely candid, I get it. This was a mere contract position. [Huge hired numerous UX contractors to sign on few weeks or months. It was simply about a little bit of work done without any long-term commitments.] I would be thrilled to take on a more robust contract, but hopefully with a different and more vested manager this time around. Or, may I be the manager?
+
+Heavy lift. Big gains. This is the whey. [Enter Elva Design Group, now just Elva, a boutique design agency based in San Francisco specializing in Shopify e-commerce builds, and I was just resourced to their newest client, General Nutrition Centers, GNC.] I once joked during an interview with Amazon that I never take anything but mental notes. Amazon now thinks I don't take notes. I take notes.
+
+I was responsible for leading discovery and requirements gathering. [GNC Leadership wanted to shake things up, so we fashioned a mobile-first navigation schema with conventional fall-backs and failsafes.] To cope with the scope of work. I've clearly written quite a bit on this subject already.
+
+Please do peruse the slides above at your leisure, but the general gist is that I'm comfortable in diving into any phase of the user experience design process. [Be it in research, be it in discovery, be it through extensive wireframing, or be it in final design. Moreover, I'm comfortable in not being comfortable.] We didn't have the time, infrastructure, or budget to perform exhaustive foolproof design, but rather execute foolhardy decisions in favor of shaking things up as directed by our client's C-Suite leadership.
+
+The result: GNC was able to relaunch their brand and reinvigorate its new or returning consumers' interest and loyalty. [By focusing their efforts on a modernized and optimized online shopping experience, even in lieu of continued shuttering of physical retail locations.] No there isn't a chapter thirteen. I'm from New York. We don't play those games.
+
+It's a long way to the top if you want to rock and roll. [In this chapter I won't delve into the specifics of the project at Code and Theory, but rather focus on the broader context and my experiences during my time there.] Imagine: You've been diligently working towards your goals, making significant strides in your career. From commuting daily between PHI and NYC to transitioning into the New York agency scene.
+
+You had grown from an Individual Contributor to a UX Manager with a six-figure salary. [With each accomplishment you set your sights higher, ultimately landing an interview with Code and Theory. Imagine that.] I interviewed for an ACD, Interactive position and was immediately hired on a freelance basis as a Senior Designer with the intention of fulfilling the ACD responsibilities.
+
+As part of the team working on a project for a top social media brand, I quickly proved my worth and was transitioned to full-time employment. [The project was led by a Directly Responsible Individual, DRI, but whom accepted a Director-level position elsewhere three months into the project.] There were also the departure of several key team members including senior strategists and technologists which placed additional responsibilities on my shoulders.
+
+Requiring me to provide guidance in UX, Strategy, and Development while also serving as a people manager myself with a junior-level associate under my purview. [Speaking candidly, here we had an immeasurable opportunity to influence THE platform for influencers. While good design is the end goal, it shouldn't be the driving force in developing an informational and business-minded content platform at a global scale.] Instead of trying to solve the client's problems, we focused on wow factor and interactive moments.
+
+UX at Code And Theory was essentially decorative. [Besides resourcing hurdles, there were issues spanning practicality and pragmatism, suffice to say.] Despite offering to improve internal education initiatives and providing proactive feedback, submitting a post mortem as requested, I was let go from Code and Theory without explanation. It was a challenging experience but one that taught me valuable lessons about the realities of working in a large agency environment.
+
+Okay, fine. Huge only wanted me for a little bit. Code and Theory wasn't ready for me. [I don't necessarily care to be a boomerang in my career. Now, where can I go that won't be a lateral or backwards step?] Enter Publicis Sapient, a Digital Transformation Company, at 375 Hudson St, New York City.
+
+I was a remote employee but chose to be a consistent in-office presence. [I can tell you that I spent a full year here working in the Financial Services sector serving BNY Mellon—Pershing X Advisory Experience Platform.] Publicis Sapient wasn't without its imperfections either. Suffice to say there were some organizational and operational aspects that could be improved upon, dialogue and communication not with standing.
+
+A term I've coined to describe my experience here would be Organizational Spaghetti. [I became the de facto Team Lead and Product Owner. I led research and discovery efforts. I led client workshops. I led design and prototype development and testing.] I collaborated across multiple concurrent tracks while providing mentorship and guidance to junior and associate designers. Also serving as team lead amongst peers at the senior level.
+
+I successfully negotiated on numerous occasions company-paid lunches for my in-office workshops. [I provided extensive industry research, product heuristic and technical analysis, as well as future-state concept ideation.] I was responsible for organizing client and team workshops in refactoring Pershing X entire data and design paradigm. Yes, I have extensive experience with both Design Systems and style guides. Ask me the difference.
+
+I set my team up for success daily, conducting exhaustive research and socializing of knowledge. [While a remote employee, I still opted to be a consistent presence in the office. Lead by example, being an intellectually invested, creatively charged, hands-on type of leader.] My efforts were directly responsible for securing a contract extension leading into the next fiscal year.
+
+It was directly responsible for influencing the overall direction of the now live product line launched by Pershing X. [That just two years ago was only a thought. This was the most sophisticated work I've done in my career.] And despite putting an incredible effort into it, corporate will do what corporate will do. I was a mere number that was either on the plus or minus side of the red line.
+
+I was Team Lead to two colleagues, one associate, one senior, who were currently pursuing and or completing their Masters degrees. [My academic counterparts. Well, I was laid off or otherwise separated amicably as my exit contract states.] I've faced untold challenges in the time since, many more humbling than I can describe here. But here's what my teammates had to say:
+
+Zack has a deep connection to emotions, imagination, and sensitivity—the quintessential idealist. [His greatest strength is his depth of sensitivity and empathy which allows him to give voice to human connections in a way that works with people on a profound level.] Zack brings fresh perspective to things when I felt in a rut—a great person to work with. Christopher Bayle, ACD UX, Publicis Sapient.
+
+Zack is one of the most talented, hard-working, and knowledgeable individuals I have had the pleasure of working with. [He has truly been excellent, trying to foster communication not only between us but with the whole team, to set them up for success. He always gives his best and more.] I really enjoy working with him and I feel he should be recognized by his tremendous effort and for being such a great team player. Andrés Moros, MPS, Sr. UX Designer, Publicis Sapient.
+
+Come on, baby. Let's do the twist. [In case the headline doesn't make sense, in the world of Low Voltage Data Installation, some terminations require a very specific twist parity, lest you run risk of signal impedance or interference.] Got it? Good. Suffice to say, I've been networking. Pun intended.
+
+I've taken on sub-contractor gigs and learned new hands-on skills. [I can now terminate an RJ45 in 30 to 45 seconds per. I can run cables and install security systems and setup indoor outdoor digital displays. No problem.] You must maintain the twist parity lest you get signal impedance. Behind the scenes, cable management.
+
+My passion for creative output is unrelenting though I'm using different parts of my brain to make due. [I still have my eyes set on elevating my career in a paradigm-changing way. Maybe someone out there sees potential.] Meanwhile, got mouths to feed.
+
+As an aside, I've been keeping up with the latest happenings in the world of Artificial Intelligence. [I am absolutely unequivocally NOT worried about the thinking machines taking over jobs or the world for that matter.] AI will never have the patience required, nor physical dexterity, to run and terminate physical ethernet cables or fiber optic lines. Never. If it isn't clear, this is written in jest.
+
+I truly try not to be the type of person to try to sway your mind one way or another, so I'll refrain from writing any sort of conclusion. [If my photography or music are any indicator, it's that my true talent, my special sauce, is in presenting ideas—yours, mine, theirs, whomever—in a way that uplifts and encourages your imagination.] Put simply, I yearn to make folks wonder and I do this with capable hands.
+
+I'm left-handed. I think different. [I play guitar, take photographs, make people wonder. Meet Wolfgang, my dog. Dog-friendly offices welcome. Remote hybrid preferred.] Sincerest of thanks to anyone who took the time to read through my story. Twenty years of work condensed into twenty minutes of reading. Five minutes if you just skim the photos.`;
+
+const state = {
+    hoveredSentence: null,
+    expandedBrackets: new Set(),
+    mouseX: 0,
+    mouseY: 0,
+    imageTimeout: null,
+    imageActive: false,
+    currentTriggerRect: null,
+    layoutMode: 'layered',
+    currentSentenceIndex: -1,
+    currentChapterIndex: 0,
+    allSentenceElements: [],
+    chapterStartIndices: []
+};
+
+let mouseX = 0;
+let mouseY = 0;
+let currentImageElement = null;
+
+let textParallaxX = 0;
+let textParallaxY = 0;
+let targetTextParallaxX = 0;
+let targetTextParallaxY = 0;
+
+let imageParallaxX = 0;
+let imageParallaxY = 0;
+let targetImageParallaxX = 0;
+let targetImageParallaxY = 0;
+
+const phraseRegexMap = new Map();
+for (const phrase of Object.keys(imageMap)) {
+    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+}
+
+function findChapterStartIndex(chapterId) {
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (!chapter) return 0;
+    
+    const startIndex = narrative.indexOf(chapter.startText);
+    if (startIndex === -1) return 0;
+    
+    // Count sentences before this point
+    const textBeforeChapter = narrative.substring(0, startIndex);
+    const sentencesBefore = textBeforeChapter.split(/[.!?]+\s+/).filter(s => s.trim().length > 0);
+    
+    return sentencesBefore.length;
+}
+
+function getCurrentChapter() {
+    if (state.allSentenceElements.length === 0) return 0;
+    
+    for (let i = chapters.length - 1; i >= 0; i--) {
+        const chapterStartIndex = state.chapterStartIndices[i];
+        if (state.currentSentenceIndex >= chapterStartIndex) {
+            return i;
+        }
+    }
+    return 0;
+}
+
+function parseNarrative(text) {
+    const parts = [];
+    let idCounter = 0;
+    
+    const segments = text.split(/(\[|\])/);
+    
+    let inBracket = false;
+    let bracketId = null;
+    
+    for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        
+        if (segment === '[') {
+            inBracket = true;
+            bracketId = idCounter++;
+            parts.push({
+                type: 'bracket',
+                id: bracketId,
+                content: ''
+            });
+        } else if (segment === ']') {
+            inBracket = false;
+            bracketId = null;
+        } else if (segment.length > 0) {
+            if (inBracket && bracketId !== null) {
+                const bracket = parts.find(p => p.id === bracketId);
+                if (bracket) {
+                    bracket.content = segment.trim();
+                }
+            } else {
+                const sentences = segment.split(/(?<=[.!?])\s+/);
+                sentences.forEach(sentence => {
+                    if (sentence.trim()) {
+                        parts.push({
+                            type: 'sentence',
+                            id: idCounter++,
+                            text: sentence.trim()
+                        });
+                    }
+                });
+            }
+        }
+    }
+    
+    return parts;
+}
+
+function wrapImageTriggers(text) {
+    let wrapped = text;
+    for (const [phrase, url] of Object.entries(imageMap)) {
+        const regex = phraseRegexMap.get(phrase);
+        if (regex) {
+            wrapped = wrapped.replace(regex, `<span class="image-trigger" data-image="${url}">$&</span>`);
+        }
+    }
+    return wrapped;
+}
+
+function preloadImages() {
+    const imageUrls = [...new Set(Object.values(imageMap))];
+    imageUrls.forEach(url => {
+        const img = new Image();
+        img.src = url;
+    });
+}
+
+function showImage(imageUrl, triggerElement) {
+    currentImageElement = triggerElement;
+    state.imageActive = true;
+    state.currentTriggerRect = triggerElement.getBoundingClientRect();
+    
+    const hoverImage = document.getElementById('hoverImage');
+    const hoverImageImg = document.getElementById('hoverImageImg');
+    
+    if (state.imageTimeout) {
+        clearTimeout(state.imageTimeout);
+    }
+    
+    state.imageTimeout = setTimeout(() => {
+        hoverImageImg.onload = () => {
+            hoverImage.classList.add('active');
+        };
+        
+        hoverImageImg.onerror = () => {
+            hoverImage.classList.add('active');
+        };
+        
+        hoverImageImg.src = imageUrl;
+    }, IMAGE_HOVER_DELAY);
+}
+
+function hideImage() {
+    const hoverImage = document.getElementById('hoverImage');
+    clearTimeout(state.imageTimeout);
+    hoverImage.classList.remove('active');
+    state.imageActive = false;
+    currentImageElement = null;
+    state.currentTriggerRect = null;
+}
+
+function handleScroll(event) {
+    if (scrollCooldownActive) return;
+    
+    const scrollDelta = event.deltaY;
+    
+    if (Math.abs(scrollDelta) >= SCROLL_THRESHOLD) {
+        scrollCooldownActive = true;
+        
+        if (scrollDelta > 0) {
+            nextSentence();
+        } else {
+            previousSentence();
+        }
+        
+        setTimeout(() => {
+            scrollCooldownActive = false;
+        }, SCROLL_COOLDOWN);
+    }
+    
+    event.preventDefault();
+}
+
+function nextSentence() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    state.currentSentenceIndex = (state.currentSentenceIndex + 1) % state.allSentenceElements.length;
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function previousSentence() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    state.currentSentenceIndex = (state.currentSentenceIndex - 1 + state.allSentenceElements.length) % state.allSentenceElements.length;
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function highlightSentence(index) {
+    const sentence = state.allSentenceElements[index];
+    if (!sentence) return;
+    
+    state.allSentenceElements.forEach(s => {
+        s.classList.remove('active');
+        s.classList.add('dimmed');
+    });
+    
+    sentence.classList.add('active');
+    sentence.classList.remove('dimmed');
+    
+    updateScrollProgress();
+    updateChapterDropdown();
+    
+    sentence.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+    
+    const imageTrigger = sentence.querySelector('.image-trigger');
+    if (imageTrigger) {
+        const imageUrl = imageTrigger.getAttribute('data-image');
+        if (imageUrl) {
+            showImage(imageUrl, imageTrigger);
+        }
+    } else {
+        hideImage();
+    }
+}
+
+function goToChapter(chapterId) {
+    const startIndex = state.chapterStartIndices[chapterId];
+    if (startIndex !== undefined) {
+        state.currentSentenceIndex = startIndex;
+        highlightSentence(startIndex);
+        closeChapterDropdown();
+    }
+}
+
+function nextChapter() {
+    const currentChapter = getCurrentChapter();
+    if (currentChapter < chapters.length - 1) {
+        goToChapter(currentChapter + 1);
+    }
+}
+
+function previousChapter() {
+    const currentChapter = getCurrentChapter();
+    if (currentChapter > 0) {
+        goToChapter(currentChapter - 1);
+    }
+}
+
+function updateScrollProgress() {
+    const progressBar = document.getElementById('scrollProgressBar');
+    
+    if (!progressBar) return;
+    
+    const total = state.allSentenceElements.length;
+    const current = state.currentSentenceIndex;
+    const progress = ((current + 1) / total) * 100;
+    
+    progressBar.style.height = `${progress}%`;
+}
+
+function pageUp() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    const jumpAmount = 10;
+    state.currentSentenceIndex = Math.max(0, state.currentSentenceIndex - jumpAmount);
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function pageDown() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    const jumpAmount = 10;
+    state.currentSentenceIndex = Math.min(state.allSentenceElements.length - 1, state.currentSentenceIndex + jumpAmount);
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function resetToBeginning() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    state.currentSentenceIndex = 0;
+    highlightSentence(0);
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateParallax() {
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+    
+    const mouseOffsetX = (mouseX - viewportCenterX) / viewportCenterX;
+    const mouseOffsetY = (mouseY - viewportCenterY) / viewportCenterY;
+    
+    targetTextParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
+    targetTextParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
+    
+    if (state.imageActive && state.currentTriggerRect) {
+        const trigger = state.currentTriggerRect;
+        const triggerCenterX = trigger.left + trigger.width / 2;
+        const triggerCenterY = trigger.top + trigger.height / 2;
+        
+        const distToCenterX = (viewportCenterX - triggerCenterX) / viewportCenterX;
+        const distToCenterY = (viewportCenterY - triggerCenterY) / viewportCenterY;
+        
+        const magnetX = distToCenterX * CENTER_MAGNET_STRENGTH * 100;
+        const magnetY = distToCenterY * CENTER_MAGNET_STRENGTH * 100;
+        
+        const parallaxX = mouseOffsetX * 100 * IMAGE_PARALLAX_STRENGTH;
+        const parallaxY = mouseOffsetY * 100 * IMAGE_PARALLAX_STRENGTH;
+        
+        targetImageParallaxX = parallaxX - magnetX;
+        targetImageParallaxY = parallaxY - magnetY;
+    } else {
+        targetImageParallaxX = 0;
+        targetImageParallaxY = 0;
+    }
+    
+    textParallaxX += (targetTextParallaxX - textParallaxX) * PARALLAX_DAMPING;
+    textParallaxY += (targetTextParallaxY - textParallaxY) * PARALLAX_DAMPING;
+    
+    imageParallaxX += (targetImageParallaxX - imageParallaxX) * PARALLAX_DAMPING;
+    imageParallaxY += (targetImageParallaxY - imageParallaxY) * PARALLAX_DAMPING;
+    
+    const textLayer = document.getElementById('textLayer');
+    const imageLayer = document.getElementById('imageLayer');
+    
+    if (textLayer) {
+        textLayer.style.transform = `translate3d(${textParallaxX}px, ${textParallaxY}px, 0)`;
+    }
+    
+    if (imageLayer) {
+        imageLayer.style.transform = `translate3d(${imageParallaxX}px, ${imageParallaxY}px, 0)`;
+    }
+    
+    requestAnimationFrame(updateParallax);
+}
+
+function buildChapterDropdown() {
+    const dropdownList = document.getElementById('chapterDropdownList');
+    dropdownList.innerHTML = '';
+    
+    chapters.forEach(chapter => {
+        const startIndex = state.chapterStartIndices[chapter.id];
+        const endIndex = chapter.id < chapters.length - 1 ? state.chapterStartIndices[chapter.id + 1] : state.allSentenceElements.length;
+        const totalSentences = endIndex - startIndex;
+        
+        const li = document.createElement('li');
+        li.className = 'chapter-item';
+        li.dataset.chapterId = chapter.id;
+        li.innerHTML = `
+            <span class="chapter-item-number">${String(chapter.id + 1).padStart(2, '0')}</span>
+            <span class="chapter-item-title">${chapter.title}</span>
+            <span class="chapter-item-progress">${totalSentences} sentences</span>
+        `;
+        
+        li.addEventListener('click', () => {
+            goToChapter(chapter.id);
+        });
+        
+        dropdownList.appendChild(li);
+    });
+}
+
+function updateChapterDropdown() {
+    const currentChapter = getCurrentChapter();
+    const items = document.querySelectorAll('.chapter-item');
+    
+    items.forEach(item => {
+        const chapterId = parseInt(item.dataset.chapterId);
+        if (chapterId === currentChapter) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function toggleChapterDropdown() {
+    const brand = document.getElementById('brandLogo');
+    const dropdown = document.getElementById('chapterDropdown');
+    
+    brand.classList.toggle('open');
+    dropdown.classList.toggle('open');
+}
+
+function closeChapterDropdown() {
+    const brand = document.getElementById('brandLogo');
+    const dropdown = document.getElementById('chapterDropdown');
+    
+    brand.classList.remove('open');
+    dropdown.classList.remove('open');
+}
+
+function render() {
+    const streamEl = document.getElementById('stream');
+    const parsedContent = parseNarrative(narrative);
+    
+    const fragment = document.createDocumentFragment();
+    state.allSentenceElements = [];
+    
+    let sentenceCount = 0;
+    
+    // Calculate chapter start indices
+    chapters.forEach(chapter => {
+        state.chapterStartIndices[chapter.id] = findChapterStartIndex(chapter.id);
+    });
+    
+    let currentChapterId = 0;
+    
+    parsedContent.forEach(part => {
+        if (part.type === 'sentence') {
+            // Check if this sentence starts a new chapter
+            while (currentChapterId < chapters.length - 1 && 
+                   sentenceCount >= state.chapterStartIndices[currentChapterId + 1]) {
+                currentChapterId++;
+            }
+            
+            // Add chapter break if needed
+            if (sentenceCount > 0 && state.chapterStartIndices.includes(sentenceCount)) {
+                const chapterIndex = state.chapterStartIndices.indexOf(sentenceCount);
+                const chapter = chapters[chapterIndex];
+                if (chapter) {
+                    const chapterBreak = document.createElement('div');
+                    chapterBreak.className = 'chapter-break';
+                    chapterBreak.dataset.chapterId = chapter.id;
+                    chapterBreak.innerHTML = `
+                        <span class="chapter-number">Chapter ${String(chapter.id + 1).padStart(2, '0')}</span>
+                        <span class="chapter-title">${chapter.title}</span>
+                    `;
+                    chapterBreak.addEventListener('click', () => {
+                        goToChapter(chapter.id);
+                    });
+                    fragment.appendChild(chapterBreak);
+                }
+            }
+            
+            const span = document.createElement('span');
+            span.className = 'sentence';
+            span.dataset.sentenceIndex = sentenceCount;
+            span.style.cursor = 'pointer';
+            
+            const wrappedText = wrapImageTriggers(part.text);
+            span.innerHTML = wrappedText + ' ';
+            
+            if (state.hoveredSentence === part.id) {
+                span.classList.add('active');
+            } else if (state.hoveredSentence !== null) {
+                span.classList.add('dimmed');
+            }
+            
+            span.addEventListener('mouseenter', () => {
+                const index = parseInt(span.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => {
+                    if (i === index) {
+                        s.style.opacity = '0.7';
+                    } else {
+                        s.style.opacity = '0.25';
+                    }
+                });
+            }, { passive: true });
+            
+            span.addEventListener('mouseleave', () => {
+                state.allSentenceElements.forEach(s => {
+                    s.style.opacity = '';
+                });
+            }, { passive: true });
+            
+            span.addEventListener('click', () => {
+                const index = parseInt(span.dataset.sentenceIndex);
+                state.currentSentenceIndex = index;
+                highlightSentence(index);
+            });
+            
+            state.allSentenceElements.push(span);
+            sentenceCount++;
+            fragment.appendChild(span);
+        } else if (part.type === 'bracket') {
+            const isExpanded = state.expandedBrackets.has(part.id);
+            
+            const trigger = document.createElement('button');
+            trigger.className = 'bracket-trigger' + (isExpanded ? ' expanded' : '');
+            trigger.textContent = '[' + (isExpanded ? '−' : '+') + ']';
+            
+            trigger.addEventListener('click', () => {
+                if (state.expandedBrackets.has(part.id)) {
+                    state.expandedBrackets.delete(part.id);
+                } else {
+                    state.expandedBrackets.add(part.id);
+                }
+                render();
+            });
+            
+            fragment.appendChild(trigger);
+            
+            if (isExpanded) {
+                const content = document.createElement('span');
+                content.className = 'bracket-content';
+                content.textContent = ' ' + part.content + ' ';
+                fragment.appendChild(content);
+            }
+        }
+    });
+    
+    streamEl.innerHTML = '';
+    streamEl.appendChild(fragment);
+    
+    buildChapterDropdown();
+    attachImageTriggerListeners();
+}
+
+function attachImageTriggerListeners() {
+    const stream = document.getElementById('stream');
+    
+    stream.addEventListener('mouseover', handleImageHover, { passive: true });
+    stream.addEventListener('mouseout', handleImageOut, { passive: true });
+}
+
+function handleImageHover(e) {
+    const trigger = e.target.closest('.image-trigger');
+    if (trigger) {
+        const imageUrl = trigger.getAttribute('data-image');
+        if (imageUrl) {
+            showImage(imageUrl, trigger);
+        }
+    }
+}
+
+function handleImageOut(e) {
+    const trigger = e.target.closest('.image-trigger');
+    if (trigger) {
+        hideImage();
+    }
+}
+
+const cursor = document.getElementById('cursor');
+let cursorX = 0;
+let cursorY = 0;
+let targetX = 0;
+let targetY = 0;
+
+function updateCursor() {
+    cursorX += (targetX - cursorX) * CURSOR_SMOOTHING;
+    cursorY += (targetY - cursorY) * CURSOR_SMOOTHING;
+    
+    cursor.style.left = `${cursorX}px`;
+    cursor.style.top = `${cursorY}px`;
+    
+    requestAnimationFrame(updateCursor);
+}
+
+document.addEventListener('mousemove', (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+}, { passive: true });
+
+document.addEventListener('mouseover', (e) => {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+        cursor.classList.add('hovering');
+        if (e.target.matches('button, a')) {
+            cursor.classList.add('pointer');
+        }
+    }
+});
+
+document.addEventListener('mouseout', (e) => {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+        cursor.classList.remove('hovering');
+        cursor.classList.remove('pointer');
+    }
+});
+
+const curveSlider = document.getElementById('curveSlider');
+curveSlider.addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value);
+    document.documentElement.style.setProperty('--curve-k', value);
+});
+
+const layoutToggle = document.getElementById('layoutToggle');
+const layoutIcon = layoutToggle.querySelector('.layout-icon');
+const brandLogo = document.getElementById('brandLogo');
+
+function updateLayoutIcon() {
+    if (state.layoutMode === 'layered') {
+        layoutIcon.className = 'layout-icon layered';
+    } else {
+        layoutIcon.className = 'layout-icon split';
+    }
+}
+
+brandLogo.addEventListener('click', () => {
+    toggleChapterDropdown();
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('chapterDropdown');
+    const brand = document.getElementById('brandLogo');
+    
+    if (!brand.contains(e.target) && !dropdown.contains(e.target)) {
+        closeChapterDropdown();
+    }
+});
+
+document.getElementById('pageUpBtn').addEventListener('click', () => {
+    pageUp();
+});
+
+document.getElementById('pageDownBtn').addEventListener('click', () => {
+    pageDown();
+});
+
+document.getElementById('prevSentenceBtn').addEventListener('click', () => {
+    previousSentence();
+});
+
+document.getElementById('nextSentenceBtn').addEventListener('click', () => {
+    nextSentence();
+});
+
+document.getElementById('prevChapterBtn').addEventListener('click', () => {
+    previousChapter();
+});
+
+document.getElementById('nextChapterBtn').addEventListener('click', () => {
+    nextChapter();
+});
+
+layoutToggle.addEventListener('click', () => {
+    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
+    
+    document.body.classList.remove('layout-layered', 'layout-split');
+    document.body.classList.add(`layout-${state.layoutMode}`);
+    
+    updateLayoutIcon();
+    
+    document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+    setTimeout(() => {
+        document.body.style.transition = '';
+    }, 500);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    preloadImages();
+    render();
+    updateCursor();
+    updateParallax();
+    
+    document.body.classList.add(`layout-${state.layoutMode}`);
+    updateLayoutIcon();
+    
+    window.addEventListener('wheel', handleScroll, { passive: false });
+    
+    document.addEventListener('keydown', (e) => {
+        switch(e.key) {
+            case 'ArrowDown':
+            case 'j':
+                e.preventDefault();
+                nextSentence();
+                break;
+            case 'ArrowUp':
+            case 'k':
+                e.preventDefault();
+                previousSentence();
+                break;
+            case 'PageDown':
+                e.preventDefault();
+                pageDown();
+                break;
+            case 'PageUp':
+                e.preventDefault();
+                pageUp();
+                break;
+            case '[':
+                e.preventDefault();
+                previousChapter();
+                break;
+            case ']':
+                e.preventDefault();
+                nextChapter();
+                break;
+            case 'l':
+                layoutToggle.click();
+                break;
+            case 'Home':
+                e.preventDefault();
+                resetToBeginning();
+                break;
+            case 'End':
+                e.preventDefault();
+                if (state.allSentenceElements.length > 0) {
+                    state.currentSentenceIndex = state.allSentenceElements.length - 1;
+                    highlightSentence(state.currentSentenceIndex);
+                }
+                break;
+            case 'Escape':
+                e.preventDefault();
+                closeChapterDropdown();
+                break;
+        }
+    });
+    
+    if (state.allSentenceElements.length > 0) {
+        state.currentSentenceIndex = 0;
+        highlightSentence(0);
+    }
+    
+    console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
+    console.log('💡 Navigation: Scroll wheel, Arrow keys (↑/↓, j/k), Page Up/Down');
+    console.log('💡 Chapters: Click logo or press [ / ] to navigate chapters');
+    console.log('💡 Click sentences to activate, hover image triggers to preview');
+    console.log('💡 Press "l" to toggle layout, Home/End to jump');
+    console.log('💡 Twenty years condensed into twenty minutes of reading');
+});
+    </script>
+</body>
+</html>
