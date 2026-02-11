@@ -301,6 +301,12 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
     cursor: none;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -1118,17 +1124,23 @@ body.light-mode .scroll-hint-icon {
         height: 14px;
     }
 
+    /* Mobile: Show chapter navigation, hide page up/down */
     .page-up,
     .page-down {
+        display: none;
+    }
+
+    .prev-chapter,
+    .next-chapter {
         display: flex;
     }
 
-    .page-up {
+    .prev-chapter {
         order: 2;
         margin: 0 2px;
     }
 
-    .page-down {
+    .next-chapter {
         order: 4;
         margin: 0 2px;
     }
@@ -1143,11 +1155,6 @@ body.light-mode .scroll-hint-icon {
         margin-top: 0;
         margin-left: 0;
         order: 5;
-    }
-
-    .prev-chapter,
-    .next-chapter {
-        display: none;
     }
 
     /* Mobile splitview - faded background image */
@@ -1362,100 +1369,101 @@ let scrollCooldownActive = false;
 let spacebarPressed = false;
 
 const imageMap = {
-    'career journey': 'https://i.ibb.co/sqUSgc1xGQxZdQS4L7fSw/bootstrap.png',
-    'bootstrap startup': 'https://i.ibb.co/sqUSgc1xGQxZdQS4L7fSw/bootstrap.png',
-    'non-linear': 'https://i.ibb.co/sqUSgc1xGQxZdQS4L7fSw/bootstrap.png',
-    'Pratt Institute': 'https://i.ibb.co/r2nhMymB/pratt.webp',
-    'art school': 'https://i.ibb.co/r2nhMymB/pratt.webp',
-    'built my first computer': 'https://i.ibb.co/ZpyOMlmzMa0rPlNY3KXA/computer.png',
-    'pirated copies': 'https://i.ibb.co/ZpyOMlmzMa0rPlNY3KXA/computer.png',
-    'studied typography': 'https://i.ibb.co/h9ljVOzzRTIrakgaDSWvQ/books.png',
-    'reading books': 'https://i.ibb.co/h9ljVOzzRTIrakgaDSWvQ/books.png',
-    'examining magazines': 'https://i.ibb.co/h9ljVOzzRTIrakgaDSWvQ/books.png',
-    'faux website': 'https://i.ibb.co/puHZ09ELFPdAaMK0HAxqQ/early-work.png',
-    'Craigslist': 'https://i.ibb.co/lm5BUxr0dDq73bWoi3vy4w/letter.png',
-    'cover letter': 'https://i.ibb.co/lm5BUxr0dDq73bWoi3vy4w/letter.png',
-    'sixteen-fifty': 'https://i.ibb.co/lm5BUxr0dDq73bWoi3vy4w/letter.png',
-    'Turn5': 'https://i.ibb.co/dtGgrSm7amTRi5jQMVeIw/turn5.png',
-    'Xoxide': 'https://i.ibb.co/dtGgrSm7amTRi5jQMVeIw/turn5.png',
-    'package design': 'https://i.ibb.co/dyMNhiXFPWPe9og0dbvQ/catalogs.webp',
-    'catalogue': 'https://i.ibb.co/dyMNhiXFPWPe9og0dbvQ/catalogs.webp',
-    'Product Photographer': 'https://i.ibb.co/FYtVicHKjLDPLW2rcnJ1uA/camera.png',
-    'color match': 'https://i.ibb.co/GFvdywApPELXmtrFbxVug/color-match.png',
-    'OEM quality': 'https://i.ibb.co/GFvdywApPELXmtrFbxVug/color-match.png',
-    'photographed thousands': 'https://i.ibb.co/GFvdywApPELXmtrFbxVug/color-match.png',
-    'web designer': 'https://i.ibb.co/ktnHKT8ZgIADpbeByv2bqg/web-design.png',
-    'banner': 'https://i.ibb.co/ktnHKT8ZgIADpbeByv2bqg/web-design.png',
-    'wireframe': 'https://i.ibb.co/NaZV6rcEwRT55pR12BY0jg/wireframe.png',
-    'user testing': 'https://i.ibb.co/m7HfhuQO4Ugr1VteZf6itA/testing.png',
-    'Leadnomics': 'https://i.ibb.co/6CxwkYwhhn5ZFHINfdpWA/leadnomics.png',
-    'payday loan': 'https://i.ibb.co/HI1bKbZmFYVgs3MyH3wvg/payday.png',
-    '95.8%': 'https://i.ibb.co/HI1bKbZmFYVgs3MyH3wvg/payday.png',
-    'ninety-five': 'https://i.ibb.co/HI1bKbZmFYVgs3MyH3wvg/payday.png',
-    'free lunches': 'https://i.ibb.co/BNsCh8k1bcljKMu1KNg/lunch.gif',
-    'interactive haiku': 'https://i.ibb.co/mnDJgS7abSiPjlzk2BxkTA/haiku.png',
-    'interactive Haiku': 'https://i.ibb.co/mnDJgS7abSiPjlzk2BxkTA/haiku.png',
-    '160/90': 'https://i.ibb.co/aQOvTWfvAwf6m7oyZyGyA/160over90.png',
-    '160over90': 'https://i.ibb.co/aQOvTWfvAwf6m7oyZyGyA/160over90.png',
-    'Interaction Designer': 'https://i.ibb.co/pch6xhEpFoXxliAGbNnr7Q/designer.png',
-    'lots of nights': 'https://i.ibb.co/oP6krDDqPpSgF4AgFrWClw/nights.png',
-    'weekends too': 'https://i.ibb.co/oP6krDDqPpSgF4AgFrWClw/nights.png',
-    'Kent State': 'https://i.ibb.co/CQ4uTkD6MUBWABKwJIZgA/kent-state.png',
-    'mega menus': 'https://i.ibb.co/HXIU3nxuZGqNeEf3WvLfMQ/mega-menu.png',
-    'hamburger': 'https://i.ibb.co/vkU8lZmqnOHgheOsK0qtrw/hamburger.png',
-    'O3 World': 'https://i.ibb.co/TutCePQB0bSCoMfMTWJbQ/o3.png',
-    'agile': 'https://i.ibb.co/TutCePQB0bSCoMfMTWJbQ/o3.png',
-    'scrum': 'https://i.ibb.co/7wEKA8duSccOZwImA6jSQ/scrum.png',
-    'SEI': 'https://i.ibb.co/InHQKs7BIXoY0onfNxnOg/clients.png',
-    'La Colombe': 'https://i.ibb.co/InHQKs7BIXoY0onfNxnOg/clients.png',
-    'Vertex': 'https://i.ibb.co/InHQKs7BIXoY0onfNxnOg/clients.png',
-    'WOVN': 'https://i.ibb.co/yGJCqkzizxaUxk3R5DCD8g/wovn.png',
-    'Workarea': 'https://i.ibb.co/KE8gFA6w4wud1uDArA4YvQ/workarea.png',
-    'Gidget': 'https://i.ibb.co/KE8gFA6w4wud1uDArA4YvQ/workarea.png',
-    'napkin': 'https://i.ibb.co/KE8gFA6w4wud1uDArA4YvQ/workarea.png',
-    'Five Foot Gorilla': 'https://i.ibb.co/lEJetjUt85CTbb24dBTFkA/gorilla.png',
-    'FlightPath': 'https://i.ibb.co/XT2eaL5pv1yb49roJqAoA/flightpath.png',
-    'bankruptcy': 'https://i.ibb.co/XT2eaL5pv1yb49roJqAoA/flightpath.png',
-    'pharmaceutical': 'https://i.ibb.co/XT2eaL5pv1yb49roJqAoA/flightpath.png',
-    'WCAG': 'https://i.ibb.co/9EZTgvxttDXOacHzI9axeQ/wcag.gif',
-    'Merck': 'https://i.ibb.co/9EZTgvxttDXOacHzI9axeQ/wcag.gif',
-    'Cards Against Bad UX': 'https://i.ibb.co/pXU6SpY7MxMKiyfVI976g/cards.gif',
-    'jargon': 'https://i.ibb.co/a9toSr99x6NtE5YC7bGnzw/spreadsheet.png',
-    'As a shopper': 'https://i.ibb.co/GxZ4jdEHO3IWmhxTrDffCA/perspectives.png',
-    'content manager': 'https://i.ibb.co/GxZ4jdEHO3IWmhxTrDffCA/perspectives.png',
-    'LiveArea': 'https://i.ibb.co/mZdgz7yElh7nWKuuS8XZ2g/livearea.png',
-    'UX Manager': 'https://i.ibb.co/mZdgz7yElh7nWKuuS8XZ2g/livearea.png',
-    '$1.2m': 'https://i.ibb.co/mZdgz7yElh7nWKuuS8XZ2g/livearea.png',
-    '$235/hr': 'https://i.ibb.co/mZdgz7yElh7nWKuuS8XZ2g/livearea.png',
-    'Huge': 'https://i.ibb.co/UATKEet6VtcLkA8rYspjFQ/huge.png',
-    'siloed': 'https://i.ibb.co/UATKEet6VtcLkA8rYspjFQ/huge.png',
-    'GNC': 'https://i.ibb.co/ijfhJkgMsBKeSl3rIzi0XQ/gnc.png',
-    'General Nutrition': 'https://i.ibb.co/ijfhJkgMsBKeSl3rIzi0XQ/gnc.png',
-    'mobile-first': 'https://i.ibb.co/ijfhJkgMsBKeSl3rIzi0XQ/gnc.png',
-    'Elva': 'https://i.ibb.co/ijfhJkgMsBKeSl3rIzi0XQ/gnc.png',
-    'mental notes': 'https://i.ibb.co/ExXeZpPzCwC4QKjx3FpJQ/notes.png',
-    'Code and Theory': 'https://i.ibb.co/RTEI5aCcw31fjFzqjBgFEg/code-theory.png',
-    'Code & Theory': 'https://i.ibb.co/RTEI5aCcw31fjFzqjBgFEg/code-theory.png',
-    'wow factor': 'https://i.ibb.co/IynWY5dNzLniq7vHVgIw/cat.png',
-    'Publicis Sapient': 'https://i.ibb.co/OenHCQmGa10wpCzR8o9PtA/publicis.png',
-    'Organizational Spaghetti': 'https://i.ibb.co/OenHCQmGa10wpCzR8o9PtA/publicis.png',
-    'Team Lead': 'https://i.ibb.co/rR74bLkf1oXV3bGDEfTKohUeICCjc1A/leadership.webp',
-    'Pershing X': 'https://i.ibb.co/OenHCQmGa10wpCzR8o9PtA/publicis.png',
-    'BNY Mellon': 'https://i.ibb.co/OenHCQmGa10wpCzR8o9PtA/publicis.png',
-    'Design Systems': 'https://i.ibb.co/gCcmPMoCAMgckq051lwZg/design-system.png',
-    'networking': 'https://i.ibb.co/l4jgO14gEyWyIBEQZho0g/networking.png',
-    'RJ45': 'https://i.ibb.co/bQsX24bQkUtx50Q5jMZNg/rj45.png',
-    'terminate': 'https://i.ibb.co/bQsX24bQkUtx50Q5jMZNg/rj45.png',
-    'cables': 'https://i.ibb.co/PGkVR2sOAfcKk5kkTrnQdw/cables.png',
-    'twist parity': 'https://i.ibb.co/3gnCq0a4KbY8MGJyVKyPA/twist.png',
-    'sees potential': 'https://i.ibb.co/4Rfyq6Z81S3L6fciCRNsvVqPk8NRA/potential.webp',
-    'left-handed': 'https://i.ibb.co/DDw627yH1AKU6rBmxcczM6m1Hxdkg/left-hand.webp',
-    'think different': 'https://i.ibb.co/DDw627yH1AKU6rBmxcczM6m1Hxdkg/left-hand.webp',
-    'guitar': 'https://i.ibb.co/MyqYv5cS1RLgidsiDWtxpfY4y52WLWA/guitar.webp',
-    'photograph': 'https://i.ibb.co/tP1YpWFG1fR6Yh5w77lIvSgR4ldzjTA/photos.webp',
-    'Wolfgang': 'https://i.ibb.co/tTTgw7Md1qzgZhKnCs6abK8CIpE00Q/wolfgang.webp',
-    'dog': 'https://i.ibb.co/tTTgw7Md1qzgZhKnCs6abK8CIpE00Q/wolfgang.webp',
-    'A-list brands': 'https://i.ibb.co/6ftVCi9PiL1q47VskwMbWA/brands.png'
+    'career journey': 'https://i.ibb.co/sqUSgc1/bootstrap.png',
+    'bootstrap startup': 'https://i.ibb.co/sqUSgc1/bootstrap.png',
+    'non-linear': 'https://i.ibb.co/sqUSgc1/bootstrap.png',
+    'Pratt Institute': 'https://i.ibb.co/r2nhMyB/pratt.webp',
+    'art school': 'https://i.ibb.co/r2nhMyB/pratt.webp',
+    'built my first computer': 'https://i.ibb.co/ZpyOMlm/computer.png',
+    'pirated copies': 'https://i.ibb.co/ZpyOMlm/computer.png',
+    'studied typography': 'https://i.ibb.co/h9ljVOz/books.png',
+    'reading books': 'https://i.ibb.co/h9ljVOz/books.png',
+    'examining magazines': 'https://i.ibb.co/h9ljVOz/books.png',
+    'faux website': 'https://i.ibb.co/puHZ09E/early-work.png',
+    'Craigslist': 'https://i.ibb.co/lm5BUxr/letter.png',
+    'cover letter': 'https://i.ibb.co/lm5BUxr/letter.png',
+    'sixteen-fifty': 'https://i.ibb.co/lm5BUxr/letter.png',
+    'Turn5': 'https://i.ibb.co/dtGgrSm/turn5.png',
+    'Xoxide': 'https://i.ibb.co/dtGgrSm/turn5.png',
+    'package design': 'https://i.ibb.co/dyMNhiX/catalogs.webp',
+    'catalogue': 'https://i.ibb.co/dyMNhiX/catalogs.webp',
+    'Product Photographer': 'https://i.ibb.co/FYtVicH/camera.png',
+    'color match': 'https://i.ibb.co/GFvdywA/color-match.png',
+    'OEM quality': 'https://i.ibb.co/GFvdywA/color-match.png',
+    'photographed thousands': 'https://i.ibb.co/GFvdywA/color-match.png',
+    'web designer': 'https://i.ibb.co/ktnHKT8/web-design.png',
+    'banner': 'https://i.ibb.co/ktnHKT8/web-design.png',
+    'wireframe': 'https://i.ibb.co/NaZV6rc/wireframe.png',
+    'user testing': 'https://i.ibb.co/m7HfhuQ/testing.png',
+    'Leadnomics': 'https://i.ibb.co/6CxwkYw/leadnomics.png',
+    'payday loan': 'https://i.ibb.co/HI1bKbZ/payday.png',
+    '95.8%': 'https://i.ibb.co/HI1bKbZ/payday.png',
+    'ninety-five': 'https://i.ibb.co/HI1bKbZ/payday.png',
+    'free lunches': 'https://i.ibb.co/BNsCh8k/lunch.gif',
+    'interactive haiku': 'https://i.ibb.co/mnDJgS7/haiku.png',
+    'interactive Haiku': 'https://i.ibb.co/mnDJgS7/haiku.png',
+    '160/90': 'https://i.ibb.co/aQOvTWf/160over90.png',
+    '160over90': 'https://i.ibb.co/aQOvTWf/160over90.png',
+    'Interaction Designer': 'https://i.ibb.co/pch6xhE/designer.png',
+    'lots of nights': 'https://i.ibb.co/oP6krDD/nights.png',
+    'weekends too': 'https://i.ibb.co/oP6krDD/nights.png',
+    'Kent State': 'https://i.ibb.co/CQ4uTkD/kent-state.png',
+    'mega menus': 'https://i.ibb.co/HXIU3nx/mega-menu.png',
+    'hamburger': 'https://i.ibb.co/vkU8lZm/hamburger.png',
+    'O3 World': 'https://i.ibb.co/TutCePQ/o3.png',
+    'agile': 'https://i.ibb.co/TutCePQ/o3.png',
+    'scrum': 'https://i.ibb.co/7wEKA8d/scrum.png',
+    'SEI': 'https://i.ibb.co/InHQKs7/clients.png',
+    'La Colombe': 'https://i.ibb.co/InHQKs7/clients.png',
+    'Vertex': 'https://i.ibb.co/InHQKs7/clients.png',
+    'WOVN': 'https://i.ibb.co/yGJCqkz/wovn.png',
+    'Workarea': 'https://i.ibb.co/KE8gFA6/workarea.png',
+    'Gidget': 'https://i.ibb.co/KE8gFA6/workarea.png',
+    'napkin': 'https://i.ibb.co/KE8gFA6/workarea.png',
+    'Five Foot Gorilla': 'https://i.ibb.co/lEJetjU/gorilla.png',
+    'FlightPath': 'https://i.ibb.co/XT2eaL5/flightpath.png',
+    'bankruptcy': 'https://i.ibb.co/XT2eaL5/flightpath.png',
+    'pharmaceutical': 'https://i.ibb.co/XT2eaL5/flightpath.png',
+    'WCAG': 'https://i.ibb.co/9EZTgvx/wcag.gif',
+    'Merck': 'https://i.ibb.co/9EZTgvx/wcag.gif',
+    'Cards Against Bad UX': 'https://i.ibb.co/pXU6SpY/cards.gif',
+    'jargon': 'https://i.ibb.co/a9toSr9/spreadsheet.png',
+    'As a shopper': 'https://i.ibb.co/GxZ4jdE/perspectives.png',
+    'content manager': 'https://i.ibb.co/GxZ4jdE/perspectives.png',
+    'LiveArea': 'https://i.ibb.co/mZdgz7y/livearea.png',
+    'UX Manager': 'https://i.ibb.co/mZdgz7y/livearea.png',
+    '$1.2m': 'https://i.ibb.co/mZdgz7y/livearea.png',
+    '$235/hr': 'https://i.ibb.co/mZdgz7y/livearea.png',
+    'Huge': 'https://i.ibb.co/UATKEet/huge.png',
+    'siloed': 'https://i.ibb.co/UATKEet/huge.png',
+    'GNC': 'https://i.ibb.co/ijfhJkg/gnc.png',
+    'General Nutrition': 'https://i.ibb.co/ijfhJkg/gnc.png',
+    'mobile-first': 'https://i.ibb.co/ijfhJkg/gnc.png',
+    'Elva': 'https://i.ibb.co/ijfhJkg/gnc.png',
+    'mental notes': 'https://i.ibb.co/ExXeZpP/notes.png',
+    'Code and Theory': 'https://i.ibb.co/RTEI5aC/code-theory.png',
+    'Code & Theory': 'https://i.ibb.co/RTEI5aC/code-theory.png',
+    'wow factor': 'https://i.ibb.co/IynWY5d/cat.png',
+    'Publicis Sapient': 'https://i.ibb.co/OenHCQm/publicis.png',
+    'Organizational Spaghetti': 'https://i.ibb.co/OenHCQm/publicis.png',
+    'Team Lead': 'https://i.ibb.co/rR74bLk/leadership.webp',
+    'Pershing X': 'https://i.ibb.co/OenHCQm/publicis.png',
+    'BNY Mellon': 'https://i.ibb.co/OenHCQm/publicis.png',
+    'Design Systems': 'https://i.ibb.co/gCcmPMo/design-system.png',
+    'design systems': 'https://i.ibb.co/gCcmPMo/design-system.png',
+    'networking': 'https://i.ibb.co/l4jgO14/networking.png',
+    'RJ45': 'https://i.ibb.co/bQsX24b/rj45.png',
+    'terminate': 'https://i.ibb.co/bQsX24b/rj45.png',
+    'cables': 'https://i.ibb.co/PGkVR2s/cables.png',
+    'twist parity': 'https://i.ibb.co/3gnCq0a/twist.png',
+    'sees potential': 'https://i.ibb.co/4Rfyq6Z/potential.webp',
+    'left-handed': 'https://i.ibb.co/DDw627y/left-hand.webp',
+    'think different': 'https://i.ibb.co/DDw627y/left-hand.webp',
+    'guitar': 'https://i.ibb.co/MyqYv5c/guitar.webp',
+    'photograph': 'https://i.ibb.co/tP1YpWF/photos.webp',
+    'Wolfgang': 'https://i.ibb.co/tTTgw7M/wolfgang.webp',
+    'dog': 'https://i.ibb.co/tTTgw7M/wolfgang.webp',
+    'A-list brands': 'https://i.ibb.co/6ftVCi9/brands.png'
 };
 
 const chapters = [
@@ -1741,12 +1749,28 @@ function showCursorImage(imageUrl) {
         const hoverImage = document.getElementById('hoverImage');
         const hoverImageImg = document.getElementById('hoverImageImg');
         
+        hoverImageImg.onerror = () => {
+            console.warn('Failed to load image:', imageUrl);
+        };
+        
+        hoverImageImg.onload = () => {
+            hoverImage.classList.add('active');
+        };
+        
         hoverImageImg.src = imageUrl;
-        hoverImage.classList.add('active');
+        
+        // Fallback: show image even if loading takes time
+        setTimeout(() => {
+            hoverImage.classList.add('active');
+        }, 100);
     } else if (state.layoutMode === 'fullview') {
         // Desktop fullview: cursor preview
         const cursorImage = document.getElementById('cursorImage');
         const cursor = document.getElementById('cursor');
+        
+        cursorImage.onerror = () => {
+            console.warn('Failed to load image:', imageUrl);
+        };
         
         cursorImage.src = imageUrl;
         cursorImage.classList.add('active');
@@ -1756,8 +1780,20 @@ function showCursorImage(imageUrl) {
         const hoverImage = document.getElementById('hoverImage');
         const hoverImageImg = document.getElementById('hoverImageImg');
         
+        hoverImageImg.onerror = () => {
+            console.warn('Failed to load image:', imageUrl);
+        };
+        
+        hoverImageImg.onload = () => {
+            hoverImage.classList.add('active');
+        };
+        
         hoverImageImg.src = imageUrl;
-        hoverImage.classList.add('active');
+        
+        // Fallback: show image even if loading takes time
+        setTimeout(() => {
+            hoverImage.classList.add('active');
+        }, 100);
     }
 }
 
@@ -2282,7 +2318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('wheel', handleScroll, { passive: false });
     
-    // Touch swipe detection for mobile
+    // Touch swipe detection for mobile - smooth sentence navigation
     let touchStartY = 0;
     let touchStartTime = 0;
     let touchStartX = 0;
@@ -2295,7 +2331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.addEventListener('touchmove', (e) => {
         // Prevent default scroll behavior during swipe
-        if (Math.abs(e.touches[0].clientY - touchStartY) > 50) {
+        if (Math.abs(e.touches[0].clientY - touchStartY) > 30) {
             e.preventDefault();
         }
     }, { passive: false });
@@ -2303,29 +2339,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', (e) => {
         const touchEndY = e.changedTouches[0].clientY;
         const touchEndX = e.changedTouches[0].clientX;
-        const touchEndTime = Date.now();
         
         const deltaY = touchStartY - touchEndY;
         const deltaX = Math.abs(touchStartX - touchEndX);
-        const deltaTime = touchEndTime - touchStartTime;
-        const velocity = Math.abs(deltaY) / deltaTime;
         
         // Only process if it's primarily a vertical swipe
         if (Math.abs(deltaY) > deltaX && Math.abs(deltaY) > 30) {
-            if (velocity > 0.5) {
-                // Fast swipe - page up/down (10 sentences)
-                if (deltaY > 0) {
-                    pageDown();
-                } else {
-                    pageUp();
-                }
+            // Always navigate sentence by sentence
+            if (deltaY > 0) {
+                nextSentence();
             } else {
-                // Slow swipe - next/previous sentence
-                if (deltaY > 0) {
-                    nextSentence();
-                } else {
-                    previousSentence();
-                }
+                previousSentence();
             }
         }
     }, { passive: true });
@@ -2407,9 +2431,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
     console.log('💡 Desktop: Fullview (cursor) / Splitview (right column)');
-    console.log('💡 Mobile: Faded background images, swipe navigation');
-    console.log('💡 Swipe: Slow = sentence, Fast = page (10 sentences)');
-    console.log('💡 Bottom rail: ◀ PgUp ◀ | Progress | ▶ PgDn ▶');
+    console.log('💡 Mobile: Swipe navigation, faded background images');
+    console.log('💡 Mobile bottom rail: ◀ Sentence | ◀◀ Chapter | Progress | Chapter ▶▶ | Sentence ▶');
+    console.log('💡 Keyboard: ↑/↓ (j/k) sentences, [ ] chapters, PgUp/PgDn, L toggle');
 });
     </script>
 </body>
