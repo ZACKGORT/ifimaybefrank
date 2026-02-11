@@ -88,33 +88,72 @@ body.light-mode .cursor-image-preview {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-body.layout-layered .text-layer {
+body.layout-fullview .text-layer {
     width: 95%;
     margin: 0 auto;
     max-width: 1400px;
 }
 
-body.layout-layered .stream {
+body.layout-fullview .stream {
     color: rgba(255, 255, 255, 0.85);
 }
 
-body.light-mode.layout-layered .stream {
+body.light-mode.layout-fullview .stream {
     color: rgba(26, 26, 26, 0.85);
 }
 
-body.layout-split .text-layer {
+body.layout-fullview .cursor-image-preview {
+    display: block;
+}
+
+body.layout-fullview .hover-image {
+    display: none;
+}
+
+body.layout-splitview .text-layer {
     width: 50%;
     margin: 0;
     padding-left: 6vw;
 }
 
-body.layout-split .stream {
+body.layout-splitview .stream {
     color: rgba(255, 255, 255, 0.9);
     font-size: clamp(16px, 2vw, 28px);
 }
 
-body.light-mode.layout-split .stream {
+body.light-mode.layout-splitview .stream {
     color: rgba(26, 26, 26, 0.9);
+}
+
+body.layout-splitview .cursor-image-preview {
+    display: none;
+}
+
+body.layout-splitview .hover-image {
+    display: block;
+    position: fixed;
+    left: 72%;
+    top: 50%;
+    width: 45vw;
+    height: 34vw;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 1;
+}
+
+body.layout-splitview .hover-image.active {
+    opacity: 0.6;
+}
+
+body.layout-splitview .hover-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 .scroll-progress {
@@ -149,7 +188,7 @@ body.light-mode .scroll-progress-bar-container {
     width: 100%;
     background: var(--accent);
     border-radius: 1px;
-    transition: height 0.3s ease;
+    transition: height 0.3s ease, width 0.3s ease;
 }
 
 .nav-button {
@@ -355,12 +394,12 @@ body.light-mode .sentence.active {
 }
 
 .sentence.dimmed {
-    opacity: 0.4;
-    color: rgba(255, 255, 255, 0.5);
+    opacity: 0.65;
+    color: rgba(255, 255, 255, 0.65);
 }
 
 body.light-mode .sentence.dimmed {
-    color: rgba(26, 26, 26, 0.5);
+    color: rgba(26, 26, 26, 0.65);
 }
 
 .chapter-break {
@@ -805,8 +844,8 @@ body.light-mode .layout-button:hover {
     justify-content: space-between;
 }
 
-.layout-icon.layered::before,
-.layout-icon.layered::after {
+.layout-icon.fullview::before,
+.layout-icon.fullview::after {
     content: '';
     display: block;
     width: 100%;
@@ -816,26 +855,26 @@ body.light-mode .layout-button:hover {
     transition: all 0.3s ease;
 }
 
-.layout-icon.layered::after {
+.layout-icon.fullview::after {
     opacity: 0.5;
     margin-top: -4px;
 }
 
-.layout-icon.split::before,
-.layout-icon.split::after {
+.layout-icon.splitview::before,
+.layout-icon.splitview::after {
     content: '';
     display: block;
     border-radius: 1px;
     transition: all 0.3s ease;
 }
 
-.layout-icon.split::before {
+.layout-icon.splitview::before {
     width: 10px;
     height: 100%;
     background: var(--ink-3);
 }
 
-.layout-icon.split::after {
+.layout-icon.splitview::after {
     width: 10px;
     height: 100%;
     background: var(--ink-3);
@@ -905,6 +944,17 @@ body.light-mode #cursor.pointer {
     height: 450px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     z-index: calc(var(--z-cursor) + 1);
+}
+
+.hover-image {
+    display: none;
+}
+
+.image-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
 }
 
 .scroll-hint {
@@ -985,10 +1035,66 @@ body.light-mode .scroll-hint-icon {
         left: -10px;
     }
 
-    body.layout-split .text-layer {
+    body.layout-splitview .text-layer {
         width: 100%;
         padding-left: 6vw;
         padding-right: 6vw;
+    }
+
+    body.layout-splitview .scroll-progress {
+        bottom: 20px;
+        top: auto;
+        transform: none;
+        flex-direction: row;
+        right: 50%;
+        transform: translateX(50%);
+        gap: 12px;
+    }
+
+    body.layout-splitview .scroll-progress-bar-container {
+        width: 100px;
+        height: 2px;
+        order: 2;
+    }
+
+    body.layout-splitview .scroll-progress-bar {
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+
+    body.layout-splitview .prev-sentence {
+        margin-bottom: 0;
+        margin-right: 8px;
+        order: 1;
+    }
+
+    body.layout-splitview .next-sentence {
+        margin-top: 0;
+        margin-left: 8px;
+        order: 3;
+    }
+
+    body.layout-splitview .prev-chapter,
+    body.layout-splitview .next-chapter {
+        display: none;
+    }
+
+    body.layout-splitview .hover-image {
+        position: absolute;
+        left: 50%;
+        top: -180px;
+        transform: translateX(-50%);
+        width: 90vw;
+        height: 67.5vw;
+        max-width: 400px;
+        max-height: 300px;
+    }
+
+    body.layout-splitview .hover-image.active {
+        opacity: 0.85;
     }
 }
 
@@ -1053,7 +1159,7 @@ body.light-mode .scroll-hint-icon {
                     aria-label="Toggle layout mode"
                     title="Switch between layered and split layout"
                 >
-                    <span class="layout-icon layered"></span>
+                    <span class="layout-icon fullview"></span>
                 </button>
             </div>
         </div>
@@ -1099,6 +1205,12 @@ body.light-mode .scroll-hint-icon {
 
     <main class="curved">
         <div class="parallax-container">
+            <div id="imageLayer" class="image-layer">
+                <div id="hoverImage" class="hover-image" role="tooltip" aria-hidden="true">
+                    <img src="" alt="" id="hoverImageImg" loading="lazy">
+                </div>
+            </div>
+            
             <div id="textLayer" class="text-layer">
                 <article class="stream" id="stream" role="article"></article>
             </div>
@@ -1364,7 +1476,7 @@ const state = {
     mouseX: 0,
     mouseY: 0,
     currentImageUrl: null,
-    layoutMode: 'layered',
+    layoutMode: 'fullview',
     currentSentenceIndex: -1,
     currentChapterIndex: 0,
     allSentenceElements: [],
@@ -1487,26 +1599,41 @@ function preloadImages() {
 
 function showCursorImage(imageUrl) {
     state.currentImageUrl = imageUrl;
-    const cursorImage = document.getElementById('cursorImage');
-    const cursor = document.getElementById('cursor');
     
-    cursorImage.src = imageUrl;
-    cursorImage.classList.add('active');
-    cursor.classList.add('has-image');
+    if (state.layoutMode === 'fullview') {
+        const cursorImage = document.getElementById('cursorImage');
+        const cursor = document.getElementById('cursor');
+        
+        cursorImage.src = imageUrl;
+        cursorImage.classList.add('active');
+        cursor.classList.add('has-image');
+    } else if (state.layoutMode === 'splitview') {
+        const hoverImage = document.getElementById('hoverImage');
+        const hoverImageImg = document.getElementById('hoverImageImg');
+        
+        hoverImageImg.src = imageUrl;
+        hoverImage.classList.add('active');
+    }
 }
 
 function hideCursorImage() {
     state.currentImageUrl = null;
-    const cursorImage = document.getElementById('cursorImage');
-    const cursor = document.getElementById('cursor');
     
-    cursorImage.classList.remove('active');
-    cursorImage.classList.remove('enlarged');
-    cursor.classList.remove('has-image');
+    if (state.layoutMode === 'fullview') {
+        const cursorImage = document.getElementById('cursorImage');
+        const cursor = document.getElementById('cursor');
+        
+        cursorImage.classList.remove('active');
+        cursorImage.classList.remove('enlarged');
+        cursor.classList.remove('has-image');
+    } else if (state.layoutMode === 'splitview') {
+        const hoverImage = document.getElementById('hoverImage');
+        hoverImage.classList.remove('active');
+    }
 }
 
 function toggleImageSize() {
-    if (!state.currentImageUrl) return;
+    if (!state.currentImageUrl || state.layoutMode !== 'fullview') return;
     
     const cursorImage = document.getElementById('cursorImage');
     cursorImage.classList.toggle('enlarged');
@@ -1612,7 +1739,17 @@ function updateScrollProgress() {
     const current = state.currentSentenceIndex;
     const progress = ((current + 1) / total) * 100;
     
-    progressBar.style.height = `${progress}%`;
+    // Check if we're in mobile splitview mode
+    const isMobile = window.innerWidth <= 768;
+    const isSplitview = state.layoutMode === 'splitview';
+    
+    if (isMobile && isSplitview) {
+        progressBar.style.width = `${progress}%`;
+        progressBar.style.height = '100%';
+    } else {
+        progressBar.style.height = `${progress}%`;
+        progressBar.style.width = '100%';
+    }
 }
 
 function updateParallax() {
@@ -1888,10 +2025,10 @@ const brandLogo = document.getElementById('brandLogo');
 const themeToggle = document.getElementById('themeToggle');
 
 function updateLayoutIcon() {
-    if (state.layoutMode === 'layered') {
-        layoutIcon.className = 'layout-icon layered';
+    if (state.layoutMode === 'fullview') {
+        layoutIcon.className = 'layout-icon fullview';
     } else {
-        layoutIcon.className = 'layout-icon split';
+        layoutIcon.className = 'layout-icon splitview';
     }
 }
 
@@ -1929,12 +2066,29 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
 });
 
 layoutToggle.addEventListener('click', () => {
-    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
+    // Hide current images before switching
+    hideCursorImage();
     
-    document.body.classList.remove('layout-layered', 'layout-split');
+    state.layoutMode = state.layoutMode === 'fullview' ? 'splitview' : 'fullview';
+    
+    document.body.classList.remove('layout-fullview', 'layout-splitview');
     document.body.classList.add(`layout-${state.layoutMode}`);
     
     updateLayoutIcon();
+    
+    // Re-show image if there's an active sentence with an image trigger
+    if (state.currentSentenceIndex >= 0) {
+        const sentence = state.allSentenceElements[state.currentSentenceIndex];
+        if (sentence) {
+            const imageTrigger = sentence.querySelector('.image-trigger');
+            if (imageTrigger) {
+                const imageUrl = imageTrigger.getAttribute('data-image');
+                if (imageUrl) {
+                    setTimeout(() => showCursorImage(imageUrl), 100);
+                }
+            }
+        }
+    }
     
     document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
     setTimeout(() => {
@@ -1952,6 +2106,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLayoutIcon();
     
     window.addEventListener('wheel', handleScroll, { passive: false });
+    
+    window.addEventListener('resize', () => {
+        updateScrollProgress();
+    });
     
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
@@ -2017,11 +2175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
-    console.log('💡 Navigation: Scroll, Arrow keys (↑/↓, j/k), [ ] for chapters');
-    console.log('💡 Click logo for chapter menu, hover image triggers for preview');
-    console.log('💡 Spacebar to enlarge cursor image, "l" to toggle layout');
-    console.log('💡 Twenty years condensed into twenty minutes of reading');
+    console.log('💡 Fullview: Cursor image preview (spacebar to enlarge)');
+    console.log('💡 Splitview: Image on right side (L key to toggle)');
+    console.log('💡 Navigation: Scroll, ↑/↓ (j/k), [ ] for chapters');
+    console.log('💡 Click logo for chapter menu');
 });
     </script>
 </body>
-</html>           
+</html>
