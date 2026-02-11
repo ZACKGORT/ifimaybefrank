@@ -132,10 +132,13 @@ body.layout-splitview .cursor-image-preview {
 body.layout-splitview .hover-image {
     display: block;
     position: fixed;
-    left: 72%;
+    left: 75%;
     top: 50%;
-    width: 45vw;
-    height: 34vw;
+    transform: translate(-50%, -50%);
+    width: 40vw;
+    height: 30vw;
+    max-width: 700px;
+    max-height: 525px;
     opacity: 0;
     transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     border-radius: 8px;
@@ -145,7 +148,15 @@ body.layout-splitview .hover-image {
 }
 
 body.layout-splitview .hover-image.active {
-    opacity: 0.6;
+    opacity: 0.8;
+}
+
+body.light-mode.layout-splitview .hover-image {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode.layout-splitview .hover-image.active {
+    opacity: 0.9;
 }
 
 body.layout-splitview .hover-image img {
@@ -1013,8 +1024,12 @@ body.light-mode .scroll-hint-icon {
 
 @media (max-width: 768px) {
     .text-layer {
-        padding: 12vh 6vw 20vh;
+        padding: 12vh 6vw 30vh;
         max-width: 95%;
+    }
+    
+    body.layout-fullview .text-layer {
+        padding: 12vh 6vw 30vh;
     }
     
     .stream {
@@ -1035,66 +1050,122 @@ body.light-mode .scroll-hint-icon {
         left: -10px;
     }
 
-    body.layout-splitview .text-layer {
-        width: 100%;
-        padding-left: 6vw;
-        padding-right: 6vw;
-    }
-
-    body.layout-splitview .scroll-progress {
+    /* Universal bottom rail for mobile */
+    .scroll-progress {
+        position: fixed;
         bottom: 20px;
         top: auto;
-        transform: none;
-        flex-direction: row;
         right: 50%;
         transform: translateX(50%);
+        flex-direction: row;
         gap: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 10px 16px;
+        border-radius: 24px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
-    body.layout-splitview .scroll-progress-bar-container {
-        width: 100px;
-        height: 2px;
+    body.light-mode .scroll-progress {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll-progress-bar-container {
+        width: 120px;
+        height: 3px;
         order: 2;
+        background: rgba(255, 255, 255, 0.25);
+        border-radius: 2px;
     }
 
-    body.layout-splitview .scroll-progress-bar {
+    body.light-mode .scroll-progress-bar-container {
+        background: rgba(0, 0, 0, 0.15);
+    }
+
+    .scroll-progress-bar {
         left: 0;
         bottom: 0;
         width: 0;
         height: 100%;
-        transition: width 0.3s ease;
+        border-radius: 2px;
     }
 
-    body.layout-splitview .prev-sentence {
+    .nav-button {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .nav-button svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .prev-sentence {
         margin-bottom: 0;
         margin-right: 8px;
         order: 1;
     }
 
-    body.layout-splitview .next-sentence {
+    .next-sentence {
         margin-top: 0;
         margin-left: 8px;
         order: 3;
     }
 
-    body.layout-splitview .prev-chapter,
-    body.layout-splitview .next-chapter {
+    .prev-chapter,
+    .next-chapter {
         display: none;
+    }
+
+    body.layout-splitview .text-layer {
+        width: 100%;
+        padding-left: 6vw;
+        padding-right: 6vw;
+        padding-bottom: 35vh;
+    }
+
+    body.layout-splitview .sentence {
+        position: static;
+    }
+
+    body.layout-splitview .sentence.active {
+        position: relative;
+        display: inline-block;
+        padding-top: 0;
+        margin-top: 220px;
+        margin-bottom: 40px;
+    }
+
+    body.layout-splitview .sentence.active:first-of-type {
+        margin-top: 40px;
     }
 
     body.layout-splitview .hover-image {
         position: absolute;
         left: 50%;
-        top: -180px;
+        bottom: calc(100% + 25px);
         transform: translateX(-50%);
-        width: 90vw;
-        height: 67.5vw;
-        max-width: 400px;
-        max-height: 300px;
+        width: 78vw;
+        height: 58.5vw;
+        max-width: 350px;
+        max-height: 262.5px;
+        margin: 0;
+        top: auto;
+        right: auto;
+        border-radius: 6px;
     }
 
     body.layout-splitview .hover-image.active {
-        opacity: 0.85;
+        opacity: 0.95;
+    }
+
+    body.light-mode.layout-splitview .hover-image.active {
+        opacity: 1;
     }
 }
 
@@ -1200,7 +1271,7 @@ body.light-mode .scroll-hint-icon {
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll to navigate · Spacebar to enlarge</span>
+        <span class="scroll-hint-text">Scroll · Spacebar to enlarge · Mobile: Bottom rail</span>
     </div>
 
     <main class="curved">
@@ -1628,7 +1699,14 @@ function hideCursorImage() {
         cursor.classList.remove('has-image');
     } else if (state.layoutMode === 'splitview') {
         const hoverImage = document.getElementById('hoverImage');
+        const imageLayer = document.getElementById('imageLayer');
+        
         hoverImage.classList.remove('active');
+        
+        // Move hover image back to image layer if it was moved
+        if (hoverImage.parentElement !== imageLayer) {
+            imageLayer.appendChild(hoverImage);
+        }
     }
 }
 
@@ -1679,9 +1757,17 @@ function highlightSentence(index) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
     
+    // Clean up any previously positioned images
+    const hoverImage = document.getElementById('hoverImage');
+    const imageLayer = document.getElementById('imageLayer');
+    
     state.allSentenceElements.forEach(s => {
         s.classList.remove('active');
         s.classList.add('dimmed');
+        // Remove hover image from previous sentence if it exists
+        if (hoverImage && s.contains(hoverImage)) {
+            imageLayer.appendChild(hoverImage);
+        }
     });
     
     sentence.classList.add('active');
@@ -1701,6 +1787,15 @@ function highlightSentence(index) {
         const imageUrl = imageTrigger.getAttribute('data-image');
         if (imageUrl) {
             showCursorImage(imageUrl);
+            
+            // Position image above sentence in mobile splitview
+            if (state.layoutMode === 'splitview' && window.innerWidth <= 768) {
+                setTimeout(() => {
+                    if (hoverImage && !sentence.contains(hoverImage)) {
+                        sentence.appendChild(hoverImage);
+                    }
+                }, 100);
+            }
         }
     } else {
         hideCursorImage();
@@ -1739,11 +1834,10 @@ function updateScrollProgress() {
     const current = state.currentSentenceIndex;
     const progress = ((current + 1) / total) * 100;
     
-    // Check if we're in mobile splitview mode
+    // Check if we're in mobile mode (bottom rail is always horizontal on mobile)
     const isMobile = window.innerWidth <= 768;
-    const isSplitview = state.layoutMode === 'splitview';
     
-    if (isMobile && isSplitview) {
+    if (isMobile) {
         progressBar.style.width = `${progress}%`;
         progressBar.style.height = '100%';
     } else {
@@ -2069,6 +2163,13 @@ layoutToggle.addEventListener('click', () => {
     // Hide current images before switching
     hideCursorImage();
     
+    // Move hover image back to image layer before switching
+    const hoverImage = document.getElementById('hoverImage');
+    const imageLayer = document.getElementById('imageLayer');
+    if (hoverImage.parentElement !== imageLayer) {
+        imageLayer.appendChild(hoverImage);
+    }
+    
     state.layoutMode = state.layoutMode === 'fullview' ? 'splitview' : 'fullview';
     
     document.body.classList.remove('layout-fullview', 'layout-splitview');
@@ -2084,7 +2185,18 @@ layoutToggle.addEventListener('click', () => {
             if (imageTrigger) {
                 const imageUrl = imageTrigger.getAttribute('data-image');
                 if (imageUrl) {
-                    setTimeout(() => showCursorImage(imageUrl), 100);
+                    setTimeout(() => {
+                        showCursorImage(imageUrl);
+                        
+                        // Re-position for mobile splitview if needed
+                        if (state.layoutMode === 'splitview' && window.innerWidth <= 768) {
+                            setTimeout(() => {
+                                if (!sentence.contains(hoverImage)) {
+                                    sentence.appendChild(hoverImage);
+                                }
+                            }, 50);
+                        }
+                    }, 100);
                 }
             }
         }
@@ -2109,6 +2221,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('resize', () => {
         updateScrollProgress();
+        
+        // Reposition hover image if in splitview
+        if (state.layoutMode === 'splitview' && state.currentImageUrl) {
+            const hoverImage = document.getElementById('hoverImage');
+            const imageLayer = document.getElementById('imageLayer');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Move to active sentence on mobile
+                const activeSentence = state.allSentenceElements[state.currentSentenceIndex];
+                if (activeSentence && !activeSentence.contains(hoverImage)) {
+                    activeSentence.appendChild(hoverImage);
+                }
+            } else {
+                // Move back to image layer on desktop
+                if (hoverImage.parentElement !== imageLayer) {
+                    imageLayer.appendChild(hoverImage);
+                }
+            }
+        }
     });
     
     document.addEventListener('keydown', (e) => {
@@ -2176,9 +2308,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
     console.log('💡 Fullview: Cursor image preview (spacebar to enlarge)');
-    console.log('💡 Splitview: Image on right side (L key to toggle)');
-    console.log('💡 Navigation: Scroll, ↑/↓ (j/k), [ ] for chapters');
-    console.log('💡 Click logo for chapter menu');
+    console.log('💡 Splitview: Desktop - centered right column | Mobile - above sentence');
+    console.log('💡 Mobile: Bottom navigation rail (all modes)');
+    console.log('💡 Navigation: Scroll, ↑/↓ (j/k), [ ] chapters, L toggle layout');
 });
     </script>
 </body>
