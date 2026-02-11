@@ -244,20 +244,31 @@ body.light-mode .nav-button:hover {
     fill: currentColor;
 }
 
-.prev-sentence {
-    margin-bottom: 8px;
-}
+/* Desktop navigation positioning */
+@media (min-width: 769px) {
+    .page-up {
+        margin-bottom: 10px;
+    }
 
-.next-sentence {
-    margin-top: 8px;
-}
+    .page-down {
+        margin-top: 10px;
+    }
 
-.prev-chapter {
-    margin-bottom: 5px;
-}
+    .prev-sentence {
+        margin-bottom: 8px;
+    }
 
-.next-chapter {
-    margin-top: 5px;
+    .next-sentence {
+        margin-top: 8px;
+    }
+
+    .prev-chapter {
+        margin-bottom: 5px;
+    }
+
+    .next-chapter {
+        margin-top: 5px;
+    }
 }
 
 *,
@@ -1033,7 +1044,9 @@ body.light-mode .scroll-hint-icon {
     }
     
     .stream {
-        font-size: clamp(16px, 4vw, 28px);
+        font-size: clamp(18px, 5vw, 24px);
+        line-height: 1.9;
+        letter-spacing: -0.005em;
     }
 
     .curve-control {
@@ -1058,26 +1071,26 @@ body.light-mode .scroll-hint-icon {
         right: 50%;
         transform: translateX(50%);
         flex-direction: row;
-        gap: 12px;
-        background: rgba(0, 0, 0, 0.6);
-        padding: 10px 16px;
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 14px;
         border-radius: 24px;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
     body.light-mode .scroll-progress {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .scroll-progress-bar-container {
-        width: 120px;
+        width: 100px;
         height: 3px;
-        order: 2;
+        order: 3;
         background: rgba(255, 255, 255, 0.25);
         border-radius: 2px;
     }
@@ -1097,7 +1110,7 @@ body.light-mode .scroll-hint-icon {
     .nav-button {
         width: 32px;
         height: 32px;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .nav-button svg {
@@ -1105,16 +1118,31 @@ body.light-mode .scroll-hint-icon {
         height: 14px;
     }
 
+    .page-up,
+    .page-down {
+        display: flex;
+    }
+
+    .page-up {
+        order: 2;
+        margin: 0 2px;
+    }
+
+    .page-down {
+        order: 4;
+        margin: 0 2px;
+    }
+
     .prev-sentence {
         margin-bottom: 0;
-        margin-right: 8px;
+        margin-right: 0;
         order: 1;
     }
 
     .next-sentence {
         margin-top: 0;
-        margin-left: 8px;
-        order: 3;
+        margin-left: 0;
+        order: 5;
     }
 
     .prev-chapter,
@@ -1122,11 +1150,12 @@ body.light-mode .scroll-hint-icon {
         display: none;
     }
 
+    /* Mobile splitview - faded background image */
     body.layout-splitview .text-layer {
         width: 100%;
         padding-left: 6vw;
         padding-right: 6vw;
-        padding-bottom: 35vh;
+        padding-bottom: 30vh;
     }
 
     body.layout-splitview .sentence {
@@ -1135,37 +1164,60 @@ body.light-mode .scroll-hint-icon {
 
     body.layout-splitview .sentence.active {
         position: relative;
-        display: inline-block;
-        padding-top: 0;
-        margin-top: 220px;
-        margin-bottom: 40px;
-    }
-
-    body.layout-splitview .sentence.active:first-of-type {
-        margin-top: 40px;
     }
 
     body.layout-splitview .hover-image {
-        position: absolute;
+        position: fixed;
         left: 50%;
-        bottom: calc(100% + 25px);
-        transform: translateX(-50%);
-        width: 78vw;
-        height: 58.5vw;
-        max-width: 350px;
-        max-height: 262.5px;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        height: 67.5vw;
+        max-width: 500px;
+        max-height: 375px;
         margin: 0;
-        top: auto;
-        right: auto;
-        border-radius: 6px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        z-index: 0;
     }
 
     body.layout-splitview .hover-image.active {
-        opacity: 0.95;
+        opacity: 0.25;
     }
 
     body.light-mode.layout-splitview .hover-image.active {
-        opacity: 1;
+        opacity: 0.2;
+    }
+
+    /* Fullview mobile - faded background image */
+    body.layout-fullview .cursor-image-preview {
+        display: none;
+    }
+
+    body.layout-fullview .hover-image {
+        display: block;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        height: 67.5vw;
+        max-width: 500px;
+        max-height: 375px;
+        margin: 0;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        z-index: 0;
+    }
+
+    body.layout-fullview .hover-image.active {
+        opacity: 0.25;
+    }
+
+    body.light-mode.layout-fullview .hover-image.active {
+        opacity: 0.2;
     }
 }
 
@@ -1252,9 +1304,21 @@ body.light-mode .scroll-hint-icon {
             </svg>
         </button>
         
+        <button class="nav-button page-up" id="pageUpBtn" title="Page Up (10 sentences back)" aria-label="Page Up">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41zM7.41 8.59L12 4l4.59 4.59L18 7.17 12 1.17 6 7.17l1.41 1.42z"/>
+            </svg>
+        </button>
+        
         <div class="scroll-progress-bar-container">
             <div class="scroll-progress-bar" id="scrollProgressBar"></div>
         </div>
+        
+        <button class="nav-button page-down" id="pageDownBtn" title="Page Down (10 sentences forward)" aria-label="Page Down">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41zM7.41 15.41L12 20l4.59-4.59L18 16.83 12 22.83 6 16.83l1.41-1.42z"/>
+            </svg>
+        </button>
         
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1271,7 +1335,7 @@ body.light-mode .scroll-hint-icon {
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll · Spacebar to enlarge · Mobile: Bottom rail</span>
+        <span class="scroll-hint-text">Scroll · Swipe · Spacebar to enlarge</span>
     </div>
 
     <main class="curved">
@@ -1670,8 +1734,17 @@ function preloadImages() {
 
 function showCursorImage(imageUrl) {
     state.currentImageUrl = imageUrl;
+    const isMobile = window.innerWidth <= 768;
     
-    if (state.layoutMode === 'fullview') {
+    if (isMobile) {
+        // Mobile: always use faded background image (hover-image)
+        const hoverImage = document.getElementById('hoverImage');
+        const hoverImageImg = document.getElementById('hoverImageImg');
+        
+        hoverImageImg.src = imageUrl;
+        hoverImage.classList.add('active');
+    } else if (state.layoutMode === 'fullview') {
+        // Desktop fullview: cursor preview
         const cursorImage = document.getElementById('cursorImage');
         const cursor = document.getElementById('cursor');
         
@@ -1679,6 +1752,7 @@ function showCursorImage(imageUrl) {
         cursorImage.classList.add('active');
         cursor.classList.add('has-image');
     } else if (state.layoutMode === 'splitview') {
+        // Desktop splitview: fixed right side
         const hoverImage = document.getElementById('hoverImage');
         const hoverImageImg = document.getElementById('hoverImageImg');
         
@@ -1689,8 +1763,14 @@ function showCursorImage(imageUrl) {
 
 function hideCursorImage() {
     state.currentImageUrl = null;
+    const isMobile = window.innerWidth <= 768;
     
-    if (state.layoutMode === 'fullview') {
+    if (isMobile) {
+        // Mobile: hide faded background
+        const hoverImage = document.getElementById('hoverImage');
+        hoverImage.classList.remove('active');
+    } else if (state.layoutMode === 'fullview') {
+        // Desktop fullview: hide cursor preview
         const cursorImage = document.getElementById('cursorImage');
         const cursor = document.getElementById('cursor');
         
@@ -1698,15 +1778,9 @@ function hideCursorImage() {
         cursorImage.classList.remove('enlarged');
         cursor.classList.remove('has-image');
     } else if (state.layoutMode === 'splitview') {
+        // Desktop splitview: hide right side image
         const hoverImage = document.getElementById('hoverImage');
-        const imageLayer = document.getElementById('imageLayer');
-        
         hoverImage.classList.remove('active');
-        
-        // Move hover image back to image layer if it was moved
-        if (hoverImage.parentElement !== imageLayer) {
-            imageLayer.appendChild(hoverImage);
-        }
     }
 }
 
@@ -1757,17 +1831,9 @@ function highlightSentence(index) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
     
-    // Clean up any previously positioned images
-    const hoverImage = document.getElementById('hoverImage');
-    const imageLayer = document.getElementById('imageLayer');
-    
     state.allSentenceElements.forEach(s => {
         s.classList.remove('active');
         s.classList.add('dimmed');
-        // Remove hover image from previous sentence if it exists
-        if (hoverImage && s.contains(hoverImage)) {
-            imageLayer.appendChild(hoverImage);
-        }
     });
     
     sentence.classList.add('active');
@@ -1787,15 +1853,6 @@ function highlightSentence(index) {
         const imageUrl = imageTrigger.getAttribute('data-image');
         if (imageUrl) {
             showCursorImage(imageUrl);
-            
-            // Position image above sentence in mobile splitview
-            if (state.layoutMode === 'splitview' && window.innerWidth <= 768) {
-                setTimeout(() => {
-                    if (hoverImage && !sentence.contains(hoverImage)) {
-                        sentence.appendChild(hoverImage);
-                    }
-                }, 100);
-            }
         }
     } else {
         hideCursorImage();
@@ -1823,6 +1880,22 @@ function previousChapter() {
     if (currentChapter > 0) {
         goToChapter(currentChapter - 1);
     }
+}
+
+function pageUp() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    const jumpAmount = 10;
+    state.currentSentenceIndex = Math.max(0, state.currentSentenceIndex - jumpAmount);
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function pageDown() {
+    if (state.allSentenceElements.length === 0) return;
+    
+    const jumpAmount = 10;
+    state.currentSentenceIndex = Math.min(state.allSentenceElements.length - 1, state.currentSentenceIndex + jumpAmount);
+    highlightSentence(state.currentSentenceIndex);
 }
 
 function updateScrollProgress() {
@@ -2151,6 +2224,14 @@ document.getElementById('nextSentenceBtn').addEventListener('click', () => {
     nextSentence();
 });
 
+document.getElementById('pageUpBtn').addEventListener('click', () => {
+    pageUp();
+});
+
+document.getElementById('pageDownBtn').addEventListener('click', () => {
+    pageDown();
+});
+
 document.getElementById('prevChapterBtn').addEventListener('click', () => {
     previousChapter();
 });
@@ -2162,13 +2243,6 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
 layoutToggle.addEventListener('click', () => {
     // Hide current images before switching
     hideCursorImage();
-    
-    // Move hover image back to image layer before switching
-    const hoverImage = document.getElementById('hoverImage');
-    const imageLayer = document.getElementById('imageLayer');
-    if (hoverImage.parentElement !== imageLayer) {
-        imageLayer.appendChild(hoverImage);
-    }
     
     state.layoutMode = state.layoutMode === 'fullview' ? 'splitview' : 'fullview';
     
@@ -2185,18 +2259,7 @@ layoutToggle.addEventListener('click', () => {
             if (imageTrigger) {
                 const imageUrl = imageTrigger.getAttribute('data-image');
                 if (imageUrl) {
-                    setTimeout(() => {
-                        showCursorImage(imageUrl);
-                        
-                        // Re-position for mobile splitview if needed
-                        if (state.layoutMode === 'splitview' && window.innerWidth <= 768) {
-                            setTimeout(() => {
-                                if (!sentence.contains(hoverImage)) {
-                                    sentence.appendChild(hoverImage);
-                                }
-                            }, 50);
-                        }
-                    }, 100);
+                    setTimeout(() => showCursorImage(imageUrl), 100);
                 }
             }
         }
@@ -2219,28 +2282,56 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('wheel', handleScroll, { passive: false });
     
-    window.addEventListener('resize', () => {
-        updateScrollProgress();
+    // Touch swipe detection for mobile
+    let touchStartY = 0;
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        touchStartTime = Date.now();
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        // Prevent default scroll behavior during swipe
+        if (Math.abs(e.touches[0].clientY - touchStartY) > 50) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', (e) => {
+        const touchEndY = e.changedTouches[0].clientY;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndTime = Date.now();
         
-        // Reposition hover image if in splitview
-        if (state.layoutMode === 'splitview' && state.currentImageUrl) {
-            const hoverImage = document.getElementById('hoverImage');
-            const imageLayer = document.getElementById('imageLayer');
-            const isMobile = window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // Move to active sentence on mobile
-                const activeSentence = state.allSentenceElements[state.currentSentenceIndex];
-                if (activeSentence && !activeSentence.contains(hoverImage)) {
-                    activeSentence.appendChild(hoverImage);
+        const deltaY = touchStartY - touchEndY;
+        const deltaX = Math.abs(touchStartX - touchEndX);
+        const deltaTime = touchEndTime - touchStartTime;
+        const velocity = Math.abs(deltaY) / deltaTime;
+        
+        // Only process if it's primarily a vertical swipe
+        if (Math.abs(deltaY) > deltaX && Math.abs(deltaY) > 30) {
+            if (velocity > 0.5) {
+                // Fast swipe - page up/down (10 sentences)
+                if (deltaY > 0) {
+                    pageDown();
+                } else {
+                    pageUp();
                 }
             } else {
-                // Move back to image layer on desktop
-                if (hoverImage.parentElement !== imageLayer) {
-                    imageLayer.appendChild(hoverImage);
+                // Slow swipe - next/previous sentence
+                if (deltaY > 0) {
+                    nextSentence();
+                } else {
+                    previousSentence();
                 }
             }
         }
+    }, { passive: true });
+    
+    window.addEventListener('resize', () => {
+        updateScrollProgress();
     });
     
     document.addEventListener('keydown', (e) => {
@@ -2262,6 +2353,14 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'k':
                 e.preventDefault();
                 previousSentence();
+                break;
+            case 'PageDown':
+                e.preventDefault();
+                pageDown();
+                break;
+            case 'PageUp':
+                e.preventDefault();
+                pageUp();
                 break;
             case '[':
                 e.preventDefault();
@@ -2307,10 +2406,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
-    console.log('💡 Fullview: Cursor image preview (spacebar to enlarge)');
-    console.log('💡 Splitview: Desktop - centered right column | Mobile - above sentence');
-    console.log('💡 Mobile: Bottom navigation rail (all modes)');
-    console.log('💡 Navigation: Scroll, ↑/↓ (j/k), [ ] chapters, L toggle layout');
+    console.log('💡 Desktop: Fullview (cursor) / Splitview (right column)');
+    console.log('💡 Mobile: Faded background images, swipe navigation');
+    console.log('💡 Swipe: Slow = sentence, Fast = page (10 sentences)');
+    console.log('💡 Bottom rail: ◀ PgUp ◀ | Progress | ▶ PgDn ▶');
 });
     </script>
 </body>
