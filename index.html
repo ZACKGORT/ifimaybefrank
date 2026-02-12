@@ -285,132 +285,6 @@ body.cursor-preview-mode #cursorImage {
     gap: 8px;
 }
 
-/* Joystick Fob UI */
-.joystick-fob {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.joystick-container {
-    position: relative;
-    width: 120px;
-    height: 120px;
-}
-
-.joystick-base {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    transition: all 0.2s ease;
-}
-
-.joystick-base.active {
-    background: rgba(218, 165, 32, 0.08);
-    border-color: rgba(218, 165, 32, 0.3);
-    box-shadow: 0 0 30px rgba(218, 165, 32, 0.2);
-}
-
-.joystick-knob {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    transition: transform 0.1s ease-out, background 0.2s ease, border-color 0.2s ease;
-    cursor: grab;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-}
-
-.joystick-knob:active {
-    cursor: grabbing;
-}
-
-.joystick-knob.active {
-    background: rgba(218, 165, 32, 0.15);
-    border-color: var(--accent);
-    box-shadow: 0 4px 20px rgba(218, 165, 32, 0.3);
-}
-
-.joystick-knob.chapter-mode {
-    background: rgba(218, 165, 32, 0.3);
-    border-color: var(--accent);
-    box-shadow: 0 0 30px rgba(218, 165, 32, 0.5);
-    animation: joystickPulse 0.5s ease-in-out infinite;
-}
-
-@keyframes joystickPulse {
-    0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.15);
-    }
-}
-
-.joystick-indicator {
-    position: absolute;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.joystick-indicator.up {
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.joystick-indicator.down {
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.joystick-indicator.active {
-    color: var(--accent);
-    opacity: 1;
-    font-weight: 700;
-}
-
-.joystick-mode-indicator {
-    text-align: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    min-width: 80px;
-}
-
-.joystick-mode-indicator.sentence-mode {
-    color: var(--ink-2);
-}
-
-.joystick-mode-indicator.chapter-mode {
-    color: var(--accent);
-    background: rgba(218, 165, 32, 0.1);
-    border: 1px solid rgba(218, 165, 32, 0.2);
-}
-
 .mobile-nav-button {
     width: 44px;
     height: 44px;
@@ -579,7 +453,7 @@ body::after {
     position: relative;
     z-index: 10;
     padding: 15vh 8vw 25vh;
-    max-width: 85%;
+    max-width: 99%;
     margin: 0 auto;
     transform-style: preserve-3d;
     will-change: transform;
@@ -1285,6 +1159,7 @@ body::after {
 }
     </style>
 
+
 </head>
 <body>
     <div id="cursor" aria-hidden="true"></div>
@@ -1309,20 +1184,32 @@ body::after {
         </div>
     </div>
     
-    <!-- Mobile Bottom Rail - Joystick Navigation -->
+    <!-- Mobile Bottom Rail - Navigation -->
     <div class="mobile-bottom-rail" aria-label="Mobile navigation">
         <div class="mobile-nav-container">
-            <div class="joystick-fob">
-                <div class="joystick-mode-indicator sentence-mode" id="joystickModeIndicator">
-                    Sentence
-                </div>
-                <div class="joystick-container" id="joystickContainer">
-                    <div class="joystick-base" id="joystickBase"></div>
-                    <div class="joystick-knob" id="joystickKnob" role="slider" aria-label="Navigation joystick" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0"></div>
-                    <div class="joystick-indicator up" id="joystickIndicatorUp">▲</div>
-                    <div class="joystick-indicator down" id="joystickIndicatorDown">▼</div>
-                </div>
+            <button class="mobile-nav-button" id="mobilePrevChapterBtn" title="Previous Chapter" aria-label="Previous Chapter">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-button" id="mobilePrevSentenceBtn" title="Previous Sentence" aria-label="Previous Sentence">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                </svg>
+            </button>
+            <div class="mobile-progress-bar">
+                <div class="mobile-progress-fill" id="mobileProgressFill"></div>
             </div>
+            <button class="mobile-nav-button" id="mobileNextSentenceBtn" title="Next Sentence" aria-label="Next Sentence">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+                </svg>
+            </button>
+            <button class="mobile-nav-button" id="mobileNextChapterBtn" title="Next Chapter" aria-label="Next Chapter">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                </svg>
+            </button>
         </div>
     </div>
     
@@ -1463,20 +1350,6 @@ let touchStartTime = 0;
 let touchLastY = 0;
 let touchLastTime = 0;
 let isTouchScrolling = false;
-
-// Joystick variables
-const JOYSTICK_BASE_SIZE = 120;
-const JOYSTICK_KNOB_SIZE = 50;
-const JOYSTICK_MAX_PULL = 35; // Maximum pixels the knob can move
-const JOYSTICK_SENTENCE_THRESHOLD = 15; // Pixels to trigger sentence navigation
-const JOYSTICK_CHAPTER_THRESHOLD = 28; // Pixels to trigger chapter navigation
-let joystickActive = false;
-let joystickDirection = 0; // -1 for up, 1 for down, 0 for center
-let joystickMode = 'sentence'; // 'sentence' or 'chapter'
-let joystickPullDistance = 0;
-let joystickAnimationFrame = null;
-let joystickBaseCenterX = 0;
-let joystickBaseCenterY = 0;
 
 const imageMap = {
     'Pratt Institute': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
@@ -1624,7 +1497,7 @@ const imageMap = {
 };
 
 const chapters = [
-    { id: 0, title: "Introduction", startText: "Hi. I'm Zack." },
+    { id: 0, title: "Introduction", startText: "Most portfolios treat." },
     { id: 1, title: "Early Years", startText: "I didn't graduate from college." },
     { id: 2, title: "First Steps", startText: "I built my first computer" },
     { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
@@ -1642,9 +1515,9 @@ const chapters = [
     { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
 ];
 
-const narrative = `Hi. I'm Zack. [This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart. I think. I make. Will work for work.] This is what being a bootstrap startup looks like. When you're the product. When your career is your only venture capital.
+const narrative = `[This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart.] Most portfolios treat "the work" as the hero. But, what if "the story" is the true hero.  
 
-The above image is something akin to how I view my career journey to date. [Before I was a UX Designer, I was a Web Designer. Before I was a web designer, I was a Graphic Designer. Before I was a graphic designer, I was a teenager who could draw well and who had a passion for animation.] What is animation? It is the creation of something in motion, something that requires forethought into the next step while maintaining a frame of reference for that which has occurred.
+The above image is something akin to how I view my career journey to date. [Before I was a UX Designer, I was a Web Designer. Before I was a web designer, I was a Graphic Designer. Before I was a graphic designer, I was a teenager who could draw well and who had a passion for animation.]
 
 What is UX? [It is that which is in motion. It is that which necessitates forethought into the next step while maintaining a frame of reference for that which has occurred. Essentially, nothing has changed in terms of my natural sensibilities.] But over the last fifteen-plus years, I've had the benefit of expanding and expounding upon these basic skills in forging a meaningful career in the modern age. A non-linear, but carefully curated and considered career path, from homegrown startups to working with A-list brands at a global scale.
 
@@ -2095,176 +1968,6 @@ function handleTouchEnd(e) {
     
     // Reset touch state
     isTouchScrolling = false;
-}
-
-// Joystick functionality
-function initJoystick() {
-    const container = document.getElementById('joystickContainer');
-    const knob = document.getElementById('joystickKnob');
-    const base = document.getElementById('joystickBase');
-    const indicatorUp = document.getElementById('joystickIndicatorUp');
-    const indicatorDown = document.getElementById('joystickIndicatorDown');
-    const modeIndicator = document.getElementById('joystickModeIndicator');
-    
-    if (!container || !knob) return;
-    
-    // Calculate base center
-    const rect = container.getBoundingClientRect();
-    joystickBaseCenterX = rect.left + rect.width / 2;
-    joystickBaseCenterY = rect.top + rect.height / 2;
-    
-    // Touch start
-    knob.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        joystickActive = true;
-        joystickDirection = 0;
-        joystickPullDistance = 0;
-        joystickMode = 'sentence';
-        
-        base.classList.add('active');
-        knob.classList.add('active');
-        knob.classList.remove('chapter-mode');
-        modeIndicator.classList.remove('chapter-mode');
-        modeIndicator.classList.add('sentence-mode');
-        modeIndicator.textContent = 'Sentence';
-        
-        indicatorUp.classList.remove('active');
-        indicatorDown.classList.remove('active');
-        
-        // Recalculate center
-        const containerRect = container.getBoundingClientRect();
-        joystickBaseCenterX = containerRect.left + containerRect.width / 2;
-        joystickBaseCenterY = containerRect.top + containerRect.height / 2;
-    }, { passive: false });
-    
-    // Touch move
-    knob.addEventListener('touchmove', (e) => {
-        if (!joystickActive) return;
-        e.preventDefault();
-        
-        const touch = e.touches[0];
-        const deltaX = touch.clientX - joystickBaseCenterX;
-        const deltaY = touch.clientY - joystickBaseCenterY;
-        
-        // Calculate pull distance (only vertical movement)
-        const pullDistance = Math.max(-JOYSTICK_MAX_PULL, Math.min(JOYSTICK_MAX_PULL, deltaY));
-        joystickPullDistance = pullDistance;
-        
-        // Determine direction
-        if (pullDistance < -5) {
-            joystickDirection = -1; // Up
-        } else if (pullDistance > 5) {
-            joystickDirection = 1; // Down
-        } else {
-            joystickDirection = 0; // Center
-        }
-        
-        // Update knob position
-        knob.style.transform = `translate(calc(-50% + ${0}px), calc(-50% + ${pullDistance}px))`;
-        
-        // Update mode based on pull distance
-        const absPull = Math.abs(pullDistance);
-        if (absPull >= JOYSTICK_CHAPTER_THRESHOLD) {
-            if (joystickMode !== 'chapter') {
-                joystickMode = 'chapter';
-                knob.classList.add('chapter-mode');
-                modeIndicator.classList.remove('sentence-mode');
-                modeIndicator.classList.add('chapter-mode');
-                modeIndicator.textContent = 'Chapter';
-            }
-        } else {
-            if (joystickMode !== 'sentence') {
-                joystickMode = 'sentence';
-                knob.classList.remove('chapter-mode');
-                modeIndicator.classList.remove('chapter-mode');
-                modeIndicator.classList.add('sentence-mode');
-                modeIndicator.textContent = 'Sentence';
-            }
-        }
-        
-        // Update indicators
-        indicatorUp.classList.toggle('active', joystickDirection === -1);
-        indicatorDown.classList.toggle('active', joystickDirection === 1);
-        
-    }, { passive: false });
-    
-    // Touch end
-    knob.addEventListener('touchend', (e) => {
-        if (!joystickActive) return;
-        e.preventDefault();
-        
-        joystickActive = false;
-        base.classList.remove('active');
-        knob.classList.remove('active', 'chapter-mode');
-        indicatorUp.classList.remove('active');
-        indicatorDown.classList.remove('active');
-        
-        // Perform navigation based on mode and direction
-        if (joystickDirection !== 0 && !scrollCooldownActive) {
-            const absPull = Math.abs(joystickPullDistance);
-            
-            if (absPull >= JOYSTICK_CHAPTER_THRESHOLD && joystickMode === 'chapter') {
-                // Chapter navigation
-                scrollCooldownActive = true;
-                if (joystickDirection === -1) {
-                    nextChapter();
-                } else {
-                    previousChapter();
-                }
-                setTimeout(() => {
-                    scrollCooldownActive = false;
-                }, SCROLL_COOLDOWN);
-            } else if (absPull >= JOYSTICK_SENTENCE_THRESHOLD && joystickMode === 'sentence') {
-                // Sentence navigation
-                scrollCooldownActive = true;
-                if (joystickDirection === -1) {
-                    nextSentence();
-                } else {
-                    previousSentence();
-                }
-                setTimeout(() => {
-                    scrollCooldownActive = false;
-                }, SCROLL_COOLDOWN);
-            }
-        }
-        
-        // Reset knob position
-        joystickPullDistance = 0;
-        joystickDirection = 0;
-        knob.style.transform = 'translate(-50%, -50%)';
-        
-        // Reset mode indicator
-        setTimeout(() => {
-            if (!joystickActive) {
-                modeIndicator.classList.remove('chapter-mode');
-                modeIndicator.classList.add('sentence-mode');
-                modeIndicator.textContent = 'Sentence';
-            }
-        }, 300);
-    }, { passive: false });
-    
-    // Touch cancel
-    knob.addEventListener('touchcancel', (e) => {
-        if (!joystickActive) return;
-        
-        joystickActive = false;
-        base.classList.remove('active');
-        knob.classList.remove('active', 'chapter-mode');
-        indicatorUp.classList.remove('active');
-        indicatorDown.classList.remove('active');
-        
-        joystickPullDistance = 0;
-        joystickDirection = 0;
-        knob.style.transform = 'translate(-50%, -50%)';
-        
-        setTimeout(() => {
-            if (!joystickActive) {
-                modeIndicator.classList.remove('chapter-mode');
-                modeIndicator.classList.add('sentence-mode');
-                modeIndicator.textContent = 'Sentence';
-            }
-        }, 300);
-    });
 }
 
 function nextSentence() {
@@ -2732,7 +2435,22 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
     nextChapter();
 });
 
-// Mobile navigation - now handled by joystick
+// Mobile navigation buttons
+document.getElementById('mobilePrevSentenceBtn').addEventListener('click', () => {
+    previousSentence();
+});
+
+document.getElementById('mobileNextSentenceBtn').addEventListener('click', () => {
+    nextSentence();
+});
+
+document.getElementById('mobilePrevChapterBtn').addEventListener('click', () => {
+    previousChapter();
+});
+
+document.getElementById('mobileNextChapterBtn').addEventListener('click', () => {
+    nextChapter();
+});
 
 document.getElementById('previewToggle').addEventListener('click', () => {
     togglePreviewMode();
@@ -2768,11 +2486,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    
-    // Initialize joystick on mobile
-    if (window.innerWidth <= 768) {
-        initJoystick();
-    }
     
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
@@ -2854,7 +2567,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('💡 In CUR mode: Press Space to enlarge image');
     console.log('💡 Click sentences to activate, hover image triggers to preview');
     console.log('💡 Press "l" to toggle layout, Home/End to jump');
-    console.log('💡 Mobile Joystick: Drag up/down for sentences, pull further for chapters');
     console.log('💡 Mobile: Swipe with velocity for faster navigation');
 });
     </script>
