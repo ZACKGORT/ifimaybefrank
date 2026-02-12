@@ -28,7 +28,8 @@
     --z-blur: 150;
     --z-vig: 151;
     --z-ui: 220;
-    --z-dropdown: 230;
+    --z-overlay: 300;
+    --z-dropdown: 350;
     --z-mobile-left-rail: 210;
     --z-mobile-bottom-rail: 220;
     --z-rotate-warning: 9999;
@@ -189,6 +190,24 @@ body.cursor-preview-mode #cursorImage {
     margin-top: 5px;
 }
 
+/* Landscape Right Rail (Hidden by default) */
+.mobile-right-rail {
+    display: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: var(--z-ui);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .mobile-left-rail {
     display: none;
     position: fixed;
@@ -281,6 +300,13 @@ body.cursor-preview-mode #cursorImage {
     gap: 12px;
     max-width: 500px;
     margin: 0 auto;
+    width: 100%;
+}
+
+/* Vertical container for Right Rail */
+.mobile-right-rail .mobile-nav-container {
+    flex-direction: column;
+    height: auto;
 }
 
 .mobile-nav-group {
@@ -332,6 +358,27 @@ body.cursor-preview-mode #cursorImage {
     align-items: center;
     gap: 6px;
     padding: 0 12px;
+}
+
+/* Vertical progress for Right Rail */
+.mobile-right-rail .mobile-progress-container {
+    height: 100px;
+    width: 100%;
+    flex: 0 0 auto;
+    justify-content: center;
+}
+
+.mobile-right-rail .mobile-progress-bar {
+    width: 4px;
+    height: 80px;
+}
+
+.mobile-right-rail .mobile-progress-fill {
+    width: 100%;
+    height: 0%; /* JS will set height instead of width */
+    bottom: 0;
+    top: auto;
+    transition: height 0.3s ease;
 }
 
 .mobile-progress-text {
@@ -696,6 +743,19 @@ body::after {
     pointer-events: auto;
 }
 
+.header-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: auto;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .brand {
     font-family: 'Space Mono', monospace;
     font-size: 11px;
@@ -1003,6 +1063,143 @@ body::after {
     opacity: 0.5;
 }
 
+.grid-toggle-btn {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 8px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--ink);
+}
+
+.grid-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Image Grid Overlay */
+.image-grid-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: rgba(5, 5, 5, 0.96);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+}
+
+.image-grid-overlay.open {
+    display: flex;
+    opacity: 1;
+}
+
+.grid-content {
+    padding: 100px 5vw;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.grid-chapter-section {
+    margin-bottom: 60px;
+}
+
+.grid-chapter-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    opacity: 0.7;
+}
+
+.grid-images-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.grid-image-item {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    background: #111;
+}
+
+.grid-image-item:hover {
+    transform: scale(1.02);
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+.grid-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.grid-image-item:hover img {
+    opacity: 0.4;
+    filter: blur(2px);
+}
+
+.grid-image-caption {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.grid-image-item:hover .grid-image-caption {
+    opacity: 1;
+}
+
+.caption-text {
+    color: #fff;
+    text-shadow: 0 0 20px rgba(218, 165, 32, 0.3);
+    background: rgba(0, 0, 0, 0.85);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Crimson Text', serif;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+
 #cursor {
     position: fixed;
     width: 20px;
@@ -1152,8 +1349,11 @@ body::after {
     }
     
     .mobile-bottom-rail {
-        display: flex;
-        padding: 6px 20px;
+        display: none; /* Removed bottom rail */
+    }
+
+    .mobile-right-rail {
+        display: flex; /* Show right rail instead */
     }
     
     .mobile-nav-button {
@@ -1224,7 +1424,7 @@ body::after {
     }
 
     .preview-toggle {
-        display: none;
+        /* display: none; Removed to show on mobile if space permits or just rely on desktop */
     }
 
     body.layout-split .text-layer {
@@ -1275,6 +1475,11 @@ body::after {
             <path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/>
         </svg>
         <p>Please rotate your device to landscape for Split View.</p>
+    </div>
+
+    <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
+        <div class="grid-content" id="gridContent">
+            </div>
     </div>
 
     <div id="cursor" aria-hidden="true"></div>
@@ -1328,6 +1533,34 @@ body::after {
             </div>
         </div>
     </div>
+
+    <div class="mobile-right-rail" aria-label="Mobile navigation landscape">
+        <div class="mobile-nav-container">
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button" id="landPrevBtn" 
+                        title="Previous Sentence" aria-label="Previous Sentence">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+                        </svg>
+                </button>
+            </div>
+            
+            <div class="mobile-progress-container">
+                <div class="mobile-progress-bar">
+                    <div class="mobile-progress-fill" id="landProgressFill"></div>
+                </div>
+            </div>
+            
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button" id="landNextBtn" 
+                        title="Next Sentence" aria-label="Next Sentence">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                </button>
+            </div>
+        </div>
+    </div>
     
     <header class="header">
         <div class="brand-container">
@@ -1343,39 +1576,51 @@ body::after {
                 </ul>
             </div>
         </div>
-        <div class="preview-toggle">
-            <button 
-                id="previewToggle" 
-                class="preview-button"
-                aria-label="Toggle image preview mode"
-                title="Switch between background and cursor preview (P)"
-            >
-                <span>🖼️</span>
-                <span id="previewModeText">BG</span>
+
+        <div class="header-center">
+            <button class="grid-toggle-btn" id="gridToggleBtn" aria-label="Toggle Image Grid">
+                <span>Display</span>
+                <span style="font-size: 1.2em;">▦</span>
             </button>
         </div>
-        <div class="curve-control">
-            <label for="curveSlider">Lens</label>
-            <input 
-                type="range" 
-                class="curve-slider" 
-                id="curveSlider"
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value="1"
-                aria-label="Adjust lens curvature effect"
-            >
-        </div>
-        <div class="layout-toggle">
-            <button 
-                id="layoutToggle" 
-                class="layout-button"
-                aria-label="Toggle layout mode"
-                title="Switch between layered and split layout"
-            >
-                <span class="layout-icon layered"></span>
-            </button>
+
+        <div class="header-right">
+            <div class="curve-control">
+                <label for="curveSlider">Lens</label>
+                <input 
+                    type="range" 
+                    class="curve-slider" 
+                    id="curveSlider"
+                    min="0" 
+                    max="1" 
+                    step="0.01" 
+                    value="1"
+                    aria-label="Adjust lens curvature effect"
+                >
+            </div>
+            
+            <div class="preview-toggle">
+                <button 
+                    id="previewToggle" 
+                    class="preview-button"
+                    aria-label="Toggle image preview mode"
+                    title="Switch between background and cursor preview (P)"
+                >
+                    <span>🖼️</span>
+                    <span id="previewModeText">BG</span>
+                </button>
+            </div>
+            
+            <div class="layout-toggle">
+                <button 
+                    id="layoutToggle" 
+                    class="layout-button"
+                    aria-label="Toggle layout mode"
+                    title="Switch between layered and split layout"
+                >
+                    <span class="layout-icon layered"></span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -1391,7 +1636,7 @@ body::after {
         
         <button class="nav-button page-up" id="pageUpBtn" title="Page Up (move 10 sentences back)" aria-label="Page Up">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4l-8 8h16l-8-8zm0 4l8 8H4l8-8zm0 4l8 8H4l8-8z"/>
+                <path d="M12 4l-8 8h16l-8-8zm0 4l8 8H4l8-8zm0 4l8 8H4l8-8zm0 4l8 8H4l8-8z"/>
             </svg>
         </button>
         
@@ -1784,7 +2029,8 @@ const state = {
     currentChapterIndex: 0,
     allSentenceElements: [],
     chapterStartIndices: [],
-    previewMode: 'background'
+    previewMode: 'background',
+    gridImages: []
 };
 
 let mouseX = 0;
@@ -2129,6 +2375,7 @@ function updateScrollProgress() {
     const progressBar = document.getElementById('scrollProgressBar');
     const mobileProgressFill = document.getElementById('mobileProgressFill');
     const mobileProgressText = document.getElementById('mobileProgressText');
+    const landProgressFill = document.getElementById('landProgressFill');
     
     const total = state.allSentenceElements.length;
     const current = state.currentSentenceIndex + 1;
@@ -2140,6 +2387,10 @@ function updateScrollProgress() {
     
     if (mobileProgressFill) {
         mobileProgressFill.style.width = `${progress}%`;
+    }
+    
+    if (landProgressFill) {
+        landProgressFill.style.height = `${progress}%`;
     }
     
     if (mobileProgressText) {
@@ -2279,29 +2530,95 @@ function closeChapterDropdown() {
     dropdown.classList.remove('open');
 }
 
+/* Image Grid Logic */
+function toggleImageGrid() {
+    const overlay = document.getElementById('imageGridOverlay');
+    const btn = document.getElementById('gridToggleBtn');
+    
+    if (overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        btn.querySelector('span:last-child').textContent = '▦';
+    } else {
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden'; // Lock scroll
+        btn.querySelector('span:last-child').textContent = '✕';
+        buildImageGrid();
+    }
+}
+
+function buildImageGrid() {
+    const content = document.getElementById('gridContent');
+    content.innerHTML = '';
+    
+    // Group images by chapter
+    const imagesByChapter = {};
+    
+    state.gridImages.forEach(imgData => {
+        if (!imagesByChapter[imgData.chapterId]) {
+            imagesByChapter[imgData.chapterId] = [];
+        }
+        imagesByChapter[imgData.chapterId].push(imgData);
+    });
+    
+    chapters.forEach(chapter => {
+        if (imagesByChapter[chapter.id] && imagesByChapter[chapter.id].length > 0) {
+            const section = document.createElement('div');
+            section.className = 'grid-chapter-section';
+            
+            const title = document.createElement('div');
+            title.className = 'grid-chapter-title';
+            title.textContent = `Chapter ${String(chapter.id + 1).padStart(2, '0')} · ${chapter.title}`;
+            section.appendChild(title);
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid-images-container';
+            
+            imagesByChapter[chapter.id].forEach(imgData => {
+                const item = document.createElement('div');
+                item.className = 'grid-image-item';
+                item.innerHTML = `
+                    <img src="${imgData.url}" loading="lazy" alt="Grid preview">
+                    <div class="grid-image-caption">
+                        <span class="caption-text">${imgData.text}</span>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    toggleImageGrid(); // Close grid
+                    state.currentSentenceIndex = imgData.index;
+                    highlightSentence(imgData.index);
+                });
+                
+                grid.appendChild(item);
+            });
+            
+            section.appendChild(grid);
+            content.appendChild(section);
+        }
+    });
+}
+
 function render() {
     const streamEl = document.getElementById('stream');
     const parsedContent = parseNarrative(narrative);
     
     const fragment = document.createDocumentFragment();
     state.allSentenceElements = [];
+    state.gridImages = []; // Reset grid images
     
     let sentenceCount = 0;
     
     // Reset chapter start indices
     state.chapterStartIndices = new Array(chapters.length).fill(0);
     let nextChapterIndex = 0;
+    let currentActiveChapter = 0;
 
     parsedContent.forEach(part => {
-        // Check for chapter start regardless of type (sentence or bracket)
-        // This ensures the header appears BEFORE the content (sentence or bracket)
+        // Check for chapter start
         if (nextChapterIndex < chapters.length) {
             const nextChapter = chapters[nextChapterIndex];
             const textContent = part.type === 'sentence' ? part.text : part.content;
-            
-            // Clean text for comparison (handle potential leading spaces/brackets in raw text)
-            // The startText might be "I didn't..." but the bracket content is "[I didn't...]"
-            // Or the startText is inside the bracket content.
             
             if (textContent.includes(nextChapter.startText.replace(/^\[/, ''))) {
                 state.chapterStartIndices[nextChapter.id] = sentenceCount;
@@ -2318,6 +2635,7 @@ function render() {
                 });
                 fragment.appendChild(chapterBreak);
                 
+                currentActiveChapter = nextChapter.id;
                 nextChapterIndex++;
             }
         }
@@ -2328,6 +2646,19 @@ function render() {
             span.dataset.sentenceIndex = sentenceCount;
             span.style.cursor = 'pointer';
             
+            // Check for image trigger to populate grid data
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({
+                        index: sentenceCount,
+                        text: part.text,
+                        url: url,
+                        chapterId: currentActiveChapter
+                    });
+                    break; // Only capture first image match per sentence
+                }
+            }
+
             const wrappedText = wrapImageTriggers(part.text);
             span.innerHTML = wrappedText + ' ';
             
@@ -2451,16 +2782,16 @@ document.addEventListener('mousemove', (e) => {
 }, { passive: true });
 
 document.addEventListener('mouseover', (e) => {
-    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
         cursor.classList.add('hovering');
-        if (e.target.matches('button, a')) {
+        if (e.target.matches('button, a, .grid-image-item')) {
             cursor.classList.add('pointer');
         }
     }
 });
 
 document.addEventListener('mouseout', (e) => {
-    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
         cursor.classList.remove('hovering');
         cursor.classList.remove('pointer');
     }
@@ -2536,8 +2867,22 @@ document.getElementById('mobileNextSentenceBtn').addEventListener('click', () =>
     nextSentence();
 });
 
+// Landscape buttons
+document.getElementById('landPrevBtn').addEventListener('click', () => {
+    previousSentence();
+});
+
+document.getElementById('landNextBtn').addEventListener('click', () => {
+    nextSentence();
+});
+
+
 document.getElementById('previewToggle').addEventListener('click', () => {
     togglePreviewMode();
+});
+
+document.getElementById('gridToggleBtn').addEventListener('click', () => {
+    toggleImageGrid();
 });
 
 layoutToggle.addEventListener('click', () => {
@@ -2627,6 +2972,8 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'Escape':
                 e.preventDefault();
                 closeChapterDropdown();
+                const overlay = document.getElementById('imageGridOverlay');
+                if(overlay.classList.contains('open')) toggleImageGrid();
                 break;
         }
     });
