@@ -31,6 +31,7 @@
     --z-dropdown: 230;
     --z-mobile-left-rail: 210;
     --z-mobile-bottom-rail: 220;
+    --z-rotate-warning: 9999;
     --bracket-color: #8b6f47;
     --bracket-hover: #daa520;
     --bracket-bg: rgba(218, 165, 32, 0.04);
@@ -1064,6 +1065,44 @@ body::after {
     color: var(--ink-3);
 }
 
+.rotate-warning {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-rotate-warning);
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(10px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: var(--accent);
+}
+
+.rotate-warning svg {
+    width: 48px;
+    height: 48px;
+    fill: currentColor;
+    margin-bottom: 20px;
+    animation: rotateIcon 2s infinite ease-in-out;
+}
+
+.rotate-warning p {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    max-width: 300px;
+    line-height: 1.6;
+}
+
+@keyframes rotateIcon {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-90deg); }
+    75% { transform: rotate(-90deg); }
+    100% { transform: rotate(0deg); }
+}
+
 @keyframes bounce {
     0%, 100% {
         transform: rotate(45deg) translateY(0);
@@ -1079,6 +1118,68 @@ body::after {
     }
     20%, 80% {
         opacity: 1;
+    }
+}
+
+/* Force Rotate Warning when Split Mode + Portrait */
+@media (orientation: portrait) {
+    body.layout-split .rotate-warning {
+        display: flex;
+    }
+}
+
+/* Mobile Landscape Optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+    .scroll-progress {
+        display: none;
+    }
+    
+    .mobile-left-rail {
+        display: flex;
+        padding: 10px 4px;
+    }
+    
+    .mobile-curve-slider {
+        width: 80px;
+    }
+    
+    .mobile-curve-slider-container {
+        height: 80px;
+    }
+    
+    .curve-control {
+        display: none;
+    }
+    
+    .mobile-bottom-rail {
+        display: flex;
+        padding: 6px 20px;
+    }
+    
+    .mobile-nav-button {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .mobile-progress-text {
+        font-size: 9px;
+    }
+    
+    .scroll-hint {
+        display: none;
+    }
+    
+    .text-layer {
+        padding: 10vh 8vw 20vh;
+        max-width: 90%;
+    }
+    
+    .header {
+        padding: 10px 20px;
+    }
+    
+    .stream {
+        font-size: clamp(16px, 3vw, 24px);
     }
 }
 
@@ -1169,6 +1270,13 @@ body::after {
 
 </head>
 <body>
+    <div class="rotate-warning">
+        <svg viewBox="0 0 24 24">
+            <path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/>
+        </svg>
+        <p>Please rotate your device to landscape for Split View.</p>
+    </div>
+
     <div id="cursor" aria-hidden="true"></div>
     <img id="cursorImage" alt="Preview" aria-hidden="true">
     
@@ -1348,7 +1456,7 @@ const SCROLL_COOLDOWN = 100;
 let scrollCooldownActive = false;
 let spacebarPressed = false;
 
-// Touch scrolling variables - simple flick + long-press
+// Touch scrolling variables
 let touchStartY = 0;
 let touchStartTime = 0;
 let isLongPress = false;
@@ -1697,19 +1805,6 @@ const phraseRegexMap = new Map();
 for (const phrase of Object.keys(imageMap)) {
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
-}
-
-function findChapterStartIndex(chapterId) {
-    const chapter = chapters.find(c => c.id === chapterId);
-    if (!chapter) return 0;
-    
-    const startIndex = narrative.indexOf(chapter.startText);
-    if (startIndex === -1) return 0;
-    
-    const textBeforeChapter = narrative.substring(0, startIndex);
-    const sentencesBefore = textBeforeChapter.split(/[.!?]+\s+/).filter(s => s.trim().length > 0);
-    
-    return sentencesBefore.length;
 }
 
 function getCurrentChapter() {
@@ -2193,37 +2288,41 @@ function render() {
     
     let sentenceCount = 0;
     
-    chapters.forEach(chapter => {
-        state.chapterStartIndices[chapter.id] = findChapterStartIndex(chapter.id);
-    });
-    
-    let currentChapterId = 0;
-    
+    // Reset chapter start indices
+    state.chapterStartIndices = new Array(chapters.length).fill(0);
+    let nextChapterIndex = 0;
+
     parsedContent.forEach(part => {
+        // Check for chapter start regardless of type (sentence or bracket)
+        // This ensures the header appears BEFORE the content (sentence or bracket)
+        if (nextChapterIndex < chapters.length) {
+            const nextChapter = chapters[nextChapterIndex];
+            const textContent = part.type === 'sentence' ? part.text : part.content;
+            
+            // Clean text for comparison (handle potential leading spaces/brackets in raw text)
+            // The startText might be "I didn't..." but the bracket content is "[I didn't...]"
+            // Or the startText is inside the bracket content.
+            
+            if (textContent.includes(nextChapter.startText.replace(/^\[/, ''))) {
+                state.chapterStartIndices[nextChapter.id] = sentenceCount;
+                
+                const chapterBreak = document.createElement('div');
+                chapterBreak.className = 'chapter-break';
+                chapterBreak.dataset.chapterId = nextChapter.id;
+                chapterBreak.innerHTML = `
+                    <span class="chapter-number">Chapter ${String(nextChapter.id + 1).padStart(2, '0')}</span>
+                    <span class="chapter-title">${nextChapter.title}</span>
+                `;
+                chapterBreak.addEventListener('click', () => {
+                    goToChapter(nextChapter.id);
+                });
+                fragment.appendChild(chapterBreak);
+                
+                nextChapterIndex++;
+            }
+        }
+
         if (part.type === 'sentence') {
-            while (currentChapterId < chapters.length - 1 && 
-                   sentenceCount >= state.chapterStartIndices[currentChapterId + 1]) {
-                currentChapterId++;
-            }
-            
-            if (sentenceCount > 0 && state.chapterStartIndices.includes(sentenceCount)) {
-                const chapterIndex = state.chapterStartIndices.indexOf(sentenceCount);
-                const chapter = chapters[chapterIndex];
-                if (chapter) {
-                    const chapterBreak = document.createElement('div');
-                    chapterBreak.className = 'chapter-break';
-                    chapterBreak.dataset.chapterId = chapter.id;
-                    chapterBreak.innerHTML = `
-                        <span class="chapter-number">Chapter ${String(chapter.id + 1).padStart(2, '0')}</span>
-                        <span class="chapter-title">${chapter.title}</span>
-                    `;
-                    chapterBreak.addEventListener('click', () => {
-                        goToChapter(chapter.id);
-                    });
-                    fragment.appendChild(chapterBreak);
-                }
-            }
-            
             const span = document.createElement('span');
             span.className = 'sentence';
             span.dataset.sentenceIndex = sentenceCount;
