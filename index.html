@@ -40,7 +40,6 @@
     --center-magnet-strength: 0.25;
 }
 
-/* Prevent pull-to-refresh on mobile */
 html, body {
     overscroll-behavior: none;
     touch-action: pan-y;
@@ -81,7 +80,6 @@ body.layout-split .hover-image {
     height: 34vw;
 }
 
-/* Background mode (default) */
 body:not(.cursor-preview-mode) .hover-image {
     display: block;
 }
@@ -90,7 +88,6 @@ body:not(.cursor-preview-mode) #cursorImage {
     display: none !important;
 }
 
-/* Cursor preview mode */
 body.cursor-preview-mode .hover-image {
     display: none !important;
 }
@@ -191,7 +188,6 @@ body.cursor-preview-mode #cursorImage {
     margin-top: 5px;
 }
 
-/* Mobile left rail for lens */
 .mobile-left-rail {
     display: none;
     position: fixed;
@@ -262,7 +258,6 @@ body.cursor-preview-mode #cursorImage {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Mobile bottom rail */
 .mobile-bottom-rail {
     display: none;
     position: fixed;
@@ -280,18 +275,27 @@ body.cursor-preview-mode #cursorImage {
 
 .mobile-nav-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.mobile-nav-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .mobile-nav-button {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--ink-2);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--accent);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -301,49 +305,61 @@ body.cursor-preview-mode #cursorImage {
     -webkit-tap-highlight-color: transparent;
 }
 
-.mobile-nav-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent);
-    color: var(--accent);
-}
-
 .mobile-nav-button:active {
-    transform: scale(0.95);
-    background: rgba(218, 165, 32, 0.1);
+    transform: scale(0.92);
+    background: rgba(218, 165, 32, 0.15);
 }
 
 .mobile-nav-button svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     fill: currentColor;
 }
 
-.mobile-nav-button.primary {
-    background: rgba(218, 165, 32, 0.1);
-    border-color: rgba(218, 165, 32, 0.3);
-    color: var(--accent);
+.mobile-nav-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mobile-progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+}
+
+.mobile-progress-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-2);
+    letter-spacing: 0.05em;
 }
 
 .mobile-progress-bar {
-    width: 2px;
-    height: 40px;
+    width: 100%;
+    height: 4px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 1px;
+    border-radius: 2px;
     position: relative;
-    margin: 0 4px;
+    overflow: hidden;
 }
 
 .mobile-progress-fill {
     position: absolute;
-    bottom: 0;
     left: 0;
-    width: 100%;
+    top: 0;
+    height: 100%;
     background: var(--accent);
-    border-radius: 1px;
-    transition: height 0.3s ease;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
 }
 
-/* Fade text when image is active */
 body.image-active .sentence:not(.active) {
     opacity: 0.1;
     color: rgba(255, 255, 255, 0.3);
@@ -1067,32 +1083,26 @@ body::after {
 }
 
 @media (max-width: 768px) {
-    /* Hide desktop navigation */
     .scroll-progress {
         display: none;
     }
     
-    /* Show mobile left rail (Lens) */
     .mobile-left-rail {
         display: flex;
     }
     
-    /* Hide desktop curve control */
     .curve-control {
         display: none;
     }
     
-    /* Show mobile bottom rail */
     .mobile-bottom-rail {
         display: flex;
     }
     
-    /* Hide scroll hint on mobile */
     .scroll-hint {
         display: none;
     }
     
-    /* Add padding to bottom for mobile nav */
     .text-layer {
         padding: 12vh 6vw 20vh 50px;
         max-width: 95%;
@@ -1131,12 +1141,10 @@ body::after {
         transform: translate(-50%, -50%) scale(0.95);
     }
     
-    /* Hide custom cursor on mobile */
     #cursor {
         display: none;
     }
     
-    /* Enable native tap highlighting */
     * {
         -webkit-tap-highlight-color: rgba(218, 165, 32, 0.2);
     }
@@ -1159,13 +1167,11 @@ body::after {
 }
     </style>
 
-
 </head>
 <body>
     <div id="cursor" aria-hidden="true"></div>
     <img id="cursorImage" alt="Preview" aria-hidden="true">
     
-    <!-- Mobile Left Rail - Lens Control -->
     <div class="mobile-left-rail" aria-hidden="true">
         <div class="mobile-lens-control">
             <span class="mobile-lens-label">Lens</span>
@@ -1184,32 +1190,34 @@ body::after {
         </div>
     </div>
     
-    <!-- Mobile Bottom Rail - Navigation -->
     <div class="mobile-bottom-rail" aria-label="Mobile navigation">
         <div class="mobile-nav-container">
-            <button class="mobile-nav-button" id="mobilePrevChapterBtn" title="Previous Chapter" aria-label="Previous Chapter">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z"/>
-                </svg>
-            </button>
-            <button class="mobile-nav-button" id="mobilePrevSentenceBtn" title="Previous Sentence" aria-label="Previous Sentence">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                </svg>
-            </button>
-            <div class="mobile-progress-bar">
-                <div class="mobile-progress-fill" id="mobileProgressFill"></div>
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button" id="mobilePrevSentenceBtn" 
+                        title="Previous Sentence" aria-label="Previous Sentence">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+                        </svg>
+                </button>
+                <span class="mobile-nav-label">Previous</span>
             </div>
-            <button class="mobile-nav-button" id="mobileNextSentenceBtn" title="Next Sentence" aria-label="Next Sentence">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
-                </svg>
-            </button>
-            <button class="mobile-nav-button" id="mobileNextChapterBtn" title="Next Chapter" aria-label="Next Chapter">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                </svg>
-            </button>
+            
+            <div class="mobile-progress-container">
+                <span class="mobile-progress-text" id="mobileProgressText">0 / 0</span>
+                <div class="mobile-progress-bar">
+                    <div class="mobile-progress-fill" id="mobileProgressFill"></div>
+                </div>
+            </div>
+            
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button" id="mobileNextSentenceBtn" 
+                        title="Next Sentence" aria-label="Next Sentence">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                        </svg>
+                </button>
+                <span class="mobile-nav-label">Next</span>
+            </div>
         </div>
     </div>
     
@@ -1224,7 +1232,6 @@ body::after {
                     <h3>Chapters</h3>
                 </div>
                 <ul class="chapter-dropdown-list" id="chapterDropdownList">
-                    <!-- Chapters will be dynamically inserted here -->
                 </ul>
             </div>
         </div>
@@ -1282,7 +1289,7 @@ body::after {
         
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
             </svg>
         </button>
         
@@ -1292,7 +1299,7 @@ body::after {
         
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
             </svg>
         </button>
         
@@ -1311,7 +1318,7 @@ body::after {
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll · Press P to toggle preview · Space to enlarge</span>
+        <span class="scroll-hint-text">Scroll · Press P · Long-press to free scroll</span>
     </div>
 
     <main class="curved">
@@ -1338,18 +1345,17 @@ const CENTER_MAGNET_STRENGTH = 0.25;
 const PARALLAX_DAMPING = 0.1;
 const SCROLL_THRESHOLD = 30;
 const SCROLL_COOLDOWN = 100;
-const TOUCH_VELOCITY_THRESHOLD = 0.3;
-const TOUCH_MIN_VELOCITY = 0.05;
-const TOUCH_MAX_SENTENCES = 5;
 let scrollCooldownActive = false;
 let spacebarPressed = false;
 
-// Touch scrolling variables
+// Touch scrolling variables - simple flick + long-press
 let touchStartY = 0;
 let touchStartTime = 0;
-let touchLastY = 0;
-let touchLastTime = 0;
-let isTouchScrolling = false;
+let isLongPress = false;
+let longPressTimer = null;
+let touchMoved = false;
+const LONG_PRESS_DURATION = 500;
+const FLICK_THRESHOLD = 50;
 
 const imageMap = {
     'Pratt Institute': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
@@ -1497,7 +1503,7 @@ const imageMap = {
 };
 
 const chapters = [
-    { id: 0, title: "Introduction", startText: "Most portfolios treat." },
+    { id: 0, title: "Introduction", startText: "[This article is not written" },
     { id: 1, title: "Early Years", startText: "I didn't graduate from college." },
     { id: 2, title: "First Steps", startText: "I built my first computer" },
     { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
@@ -1654,6 +1660,8 @@ As an aside, I've been keeping up with the latest happenings in the world of Art
 I truly try not to be the type of person to try to sway your mind one way or another, so I'll refrain from writing any sort of conclusion. [If my photography or music are any indicator, it's that my true talent, my special sauce, is in presenting ideas—yours, mine, theirs, whomever—in a way that uplifts and encourages your imagination.] Put simply, I yearn to make folks wonder and I do this with capable hands.
 
 I'm left-handed. I think different. [I play guitar, take photographs, make people wonder. Meet Wolfgang, my dog. Dog-friendly offices welcome. Remote hybrid preferred.] Sincerest of thanks to anyone who took the time to read through my story. Twenty years of work condensed into twenty minutes of reading. Five minutes if you just skim the photos.`;
+
+
 
 const state = {
     hoveredSentence: null,
@@ -1813,7 +1821,6 @@ function showImage(imageUrl, triggerElement) {
     state.imageActive = true;
     state.currentTriggerRect = triggerElement.getBoundingClientRect();
     
-    // Add image-active class to body for text fading
     document.body.classList.add('image-active');
     
     if (state.previewMode === 'cursor') {
@@ -1856,7 +1863,6 @@ function hideImage() {
     cursorImage.classList.remove('enlarged');
     cursor.classList.remove('has-image');
     
-    // Remove image-active class from body
     document.body.classList.remove('image-active');
     
     state.imageActive = false;
@@ -1893,81 +1899,67 @@ function handleScroll(event) {
     event.preventDefault();
 }
 
-// Touch event handlers for velocity-sensitive scrolling
 function handleTouchStart(e) {
     touchStartY = e.touches[0].clientY;
     touchStartTime = Date.now();
-    touchLastY = touchStartY;
-    touchLastTime = touchStartTime;
-    isTouchScrolling = false;
+    touchMoved = false;
+    
+    longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        document.body.style.overflow = 'auto';
+        const textLayer = document.querySelector('.text-layer');
+        if (textLayer) {
+            textLayer.style.overflow = 'visible';
+        }
+    }, LONG_PRESS_DURATION);
 }
 
 function handleTouchMove(e) {
-    if (!isTouchScrolling) {
-        const deltaY = e.touches[0].clientY - touchLastY;
-        const deltaTime = Date.now() - touchLastTime;
-        
-        // Check if we've moved enough to start scrolling
-        if (Math.abs(deltaY) > 10) {
-            isTouchScrolling = true;
-        }
-        
-        touchLastY = e.touches[0].clientY;
-        touchLastTime = Date.now();
+    touchMoved = true;
+    
+    if (isLongPress) {
+        return;
     }
+    
+    e.preventDefault();
 }
 
 function handleTouchEnd(e) {
-    if (!isTouchScrolling || scrollCooldownActive) {
-        // Reset touch state
-        isTouchScrolling = false;
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+    
+    if (isLongPress) {
+        isLongPress = false;
+        document.body.style.overflow = 'hidden';
+        const textLayer = document.querySelector('.text-layer');
+        if (textLayer) {
+            textLayer.style.overflow = 'visible';
+        }
+        return;
+    }
+    
+    if (!touchMoved || scrollCooldownActive) {
         return;
     }
     
     const touchEndY = e.changedTouches[0].clientY;
-    const touchEndTime = Date.now();
+    const deltaY = touchStartY - touchEndY;
     
-    const totalDeltaY = touchStartY - touchEndY;
-    const totalDeltaT = touchEndTime - touchStartTime;
-    
-    // Calculate velocity in pixels per millisecond
-    const velocity = totalDeltaY / totalDeltaT;
-    
-    // Calculate how many sentences to skip based on velocity
-    let sentencesToSkip = 0;
-    
-    if (Math.abs(velocity) > TOUCH_VELOCITY_THRESHOLD) {
-        // High velocity - skip multiple sentences
-        const normalizedVelocity = Math.min(Math.abs(velocity), 2.0);
-        sentencesToSkip = Math.floor(
-            1 + (normalizedVelocity - TOUCH_VELOCITY_THRESHOLD) * TOUCH_MAX_SENTENCES
-        );
-    } else if (Math.abs(velocity) > TOUCH_MIN_VELOCITY) {
-        // Low velocity - skip one sentence
-        sentencesToSkip = 1;
-    }
-    
-    // Apply the scroll
-    if (sentencesToSkip > 0) {
+    if (Math.abs(deltaY) > FLICK_THRESHOLD) {
         scrollCooldownActive = true;
         
-        const direction = velocity > 0 ? -1 : 1; // negative for up (next), positive for down (prev)
-        
-        for (let i = 0; i < sentencesToSkip; i++) {
-            if (direction < 0) {
-                nextSentence();
-            } else {
-                previousSentence();
-            }
+        if (deltaY > 0) {
+            nextSentence();
+        } else {
+            previousSentence();
         }
         
         setTimeout(() => {
             scrollCooldownActive = false;
         }, SCROLL_COOLDOWN);
     }
-    
-    // Reset touch state
-    isTouchScrolling = false;
 }
 
 function nextSentence() {
@@ -2041,19 +2033,22 @@ function previousChapter() {
 function updateScrollProgress() {
     const progressBar = document.getElementById('scrollProgressBar');
     const mobileProgressFill = document.getElementById('mobileProgressFill');
-    
-    if (!progressBar && !mobileProgressFill) return;
+    const mobileProgressText = document.getElementById('mobileProgressText');
     
     const total = state.allSentenceElements.length;
-    const current = state.currentSentenceIndex;
-    const progress = ((current + 1) / total) * 100;
+    const current = state.currentSentenceIndex + 1;
+    const progress = (current / total) * 100;
     
     if (progressBar) {
         progressBar.style.height = `${progress}%`;
     }
     
     if (mobileProgressFill) {
-        mobileProgressFill.style.height = `${progress}%`;
+        mobileProgressFill.style.width = `${progress}%`;
+    }
+    
+    if (mobileProgressText) {
+        mobileProgressText.textContent = `${current} / ${total}`;
     }
 }
 
@@ -2410,7 +2405,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Desktop navigation buttons
 document.getElementById('pageUpBtn').addEventListener('click', () => {
     pageUp();
 });
@@ -2435,21 +2429,12 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
     nextChapter();
 });
 
-// Mobile navigation buttons
 document.getElementById('mobilePrevSentenceBtn').addEventListener('click', () => {
     previousSentence();
 });
 
 document.getElementById('mobileNextSentenceBtn').addEventListener('click', () => {
     nextSentence();
-});
-
-document.getElementById('mobilePrevChapterBtn').addEventListener('click', () => {
-    previousChapter();
-});
-
-document.getElementById('mobileNextChapterBtn').addEventListener('click', () => {
-    nextChapter();
 });
 
 document.getElementById('previewToggle').addEventListener('click', () => {
@@ -2479,12 +2464,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add(`layout-${state.layoutMode}`);
     updateLayoutIcon();
     
-    // Wheel scroll for desktop
     window.addEventListener('wheel', handleScroll, { passive: false });
     
-    // Touch events for velocity-sensitive scrolling on mobile
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
     
     document.addEventListener('keydown', (e) => {
@@ -2561,13 +2544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
-    console.log('💡 Navigation: Scroll wheel, Arrow keys (↑/↓, j/k), Page Up/Down');
-    console.log('💡 Chapters: Click logo or press [ / ] to navigate chapters');
-    console.log('💡 Preview Mode: Press P or click 🖼️ button to toggle BG/CUR mode');
-    console.log('💡 In CUR mode: Press Space to enlarge image');
-    console.log('💡 Click sentences to activate, hover image triggers to preview');
-    console.log('💡 Press "l" to toggle layout, Home/End to jump');
-    console.log('💡 Mobile: Swipe with velocity for faster navigation');
+    console.log('💡 Mobile: Flick to navigate, long-press for free scroll');
 });
     </script>
 </body>
