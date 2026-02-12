@@ -27,11 +27,11 @@
     --z-grain: 149;
     --z-blur: 150;
     --z-vig: 151;
-    --z-ui: 400; /* Updated: Higher than overlay */
-    --z-overlay: 300;
-    --z-dropdown: 450; /* Updated: Highest */
-    --z-rail: 400; /* Updated: Higher than overlay */
-    --z-mobile-bottom-rail: 400; /* Updated: Higher than overlay */
+    --z-ui: 400; /* Rail controls sit above overlay */
+    --z-overlay: 300; /* Grid overlay */
+    --z-dropdown: 450;
+    --z-rail: 400;
+    --z-mobile-bottom-rail: 400;
     --z-rotate-warning: 9999;
     --bracket-color: #8b6f47;
     --bracket-hover: #daa520;
@@ -175,6 +175,13 @@ body.cursor-preview-mode #cursorImage {
     pointer-events: auto;
     display: flex;
     align-items: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.left-rail.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) translateX(-20px);
 }
 
 .lens-control-container {
@@ -1171,7 +1178,7 @@ body::after {
     <div id="cursor" aria-hidden="true"></div>
     <img id="cursorImage" alt="Preview" aria-hidden="true">
     
-    <div class="left-rail" aria-hidden="true">
+    <div class="left-rail" id="leftRail" aria-hidden="true">
         <div class="lens-control-container">
             <span class="lens-label">Lens</span>
             <div class="lens-slider-wrapper">
@@ -1217,14 +1224,6 @@ body::after {
                 </button>
                 <span class="mobile-nav-label">Next</span>
             </div>
-
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button mini" id="mobileGridToggle" 
-                        title="Toggle Grid" aria-label="Toggle Grid">
-                        <span style="font-size: 1.2em;">▦</span>
-                </button>
-                <span class="mobile-nav-label">View</span>
-            </div>
         </div>
     </div>
 
@@ -1251,13 +1250,6 @@ body::after {
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                         </svg>
-                </button>
-            </div>
-
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button mini" id="landGridToggle" 
-                        title="Toggle Grid" aria-label="Toggle Grid">
-                        <span style="font-size: 1.2em;">▦</span>
                 </button>
             </div>
         </div>
@@ -2195,11 +2187,13 @@ function closeChapterDropdown() {
 /* Image Grid Logic */
 function toggleImageGrid() {
     const overlay = document.getElementById('imageGridOverlay');
-    const btns = document.querySelectorAll('.grid-toggle-btn, #mobileGridToggle, #landGridToggle');
+    const btns = document.querySelectorAll('.grid-toggle-btn');
+    const leftRail = document.getElementById('leftRail');
     
     if (overlay.classList.contains('open')) {
         overlay.classList.remove('open');
         document.body.style.overflow = '';
+        if (leftRail) leftRail.classList.remove('hidden');
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
             icon.textContent = '▦';
@@ -2207,6 +2201,7 @@ function toggleImageGrid() {
     } else {
         overlay.classList.add('open');
         document.body.style.overflow = 'hidden'; // Lock scroll
+        if (leftRail) leftRail.classList.add('hidden');
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
             icon.textContent = '✕';
@@ -2529,14 +2524,6 @@ document.getElementById('previewToggle').addEventListener('click', () => {
 });
 
 document.getElementById('gridToggleBtn').addEventListener('click', () => {
-    toggleImageGrid();
-});
-
-document.getElementById('mobileGridToggle').addEventListener('click', () => {
-    toggleImageGrid();
-});
-
-document.getElementById('landGridToggle').addEventListener('click', () => {
     toggleImageGrid();
 });
 
