@@ -29,7 +29,6 @@
     --z-vig: 151;
     --z-ui: 220;
     --z-dropdown: 230;
-    --z-cursor: 9999;
     --bracket-color: #8b6f47;
     --bracket-hover: #daa520;
     --bracket-bg: rgba(218, 165, 32, 0.04);
@@ -39,132 +38,57 @@
     --center-magnet-strength: 0.25;
 }
 
-body.light-mode {
-    --bg-color: #f5f5f0;
-    --ink: #1a1a1a;
-    --ink-2: #4a4a4a;
-    --ink-3: #707070;
-    --accent: #b8860b;
-    --bracket-color: #8b6f47;
-    --bracket-hover: #b8860b;
-}
-
-body.light-mode .vignette {
-    background: radial-gradient(120% 90% at 50% 50%, #fff0 var(--vig-inner), rgb(245 245 240 / 0.35) var(--vig-mid), rgb(245 245 240 / 0.65) var(--vig-outer));
-}
-
-body.light-mode::after {
-    opacity: 0.03;
-}
-
-body.light-mode .sentence.active {
-    background: rgba(255, 255, 255, 0.85);
-    text-shadow: 0 0 20px rgba(184, 134, 11, 0.2);
-}
-
-body.light-mode .chapter-dropdown {
-    background: rgba(245, 245, 240, 0.95);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-body.light-mode .chapter-dropdown-header {
-    border-bottom-color: rgba(0, 0, 0, 0.08);
-}
-
-body.light-mode .chapter-item:hover {
-    background: rgba(184, 134, 11, 0.08);
-}
-
-body.light-mode .chapter-item.active {
-    background: rgba(184, 134, 11, 0.12);
-}
-
-body.light-mode #cursor {
-    border-color: rgba(0, 0, 0, 0.5);
-    mix-blend-mode: normal;
-}
-
-body.light-mode .cursor-image-preview {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
-}
-
-body.layout-fullview .text-layer {
+body.layout-layered .text-layer {
     width: 95%;
     margin: 0 auto;
     max-width: 1400px;
 }
 
-body.layout-fullview .stream {
+body.layout-layered .stream {
     color: rgba(255, 255, 255, 0.85);
 }
 
-body.light-mode.layout-fullview .stream {
-    color: rgba(26, 26, 26, 0.85);
+body.layout-layered .hover-image {
+    position: absolute;
+    left: 50%;
+    top: 50%;
 }
 
-body.layout-fullview .cursor-image-preview {
-    display: block;
-}
-
-body.layout-fullview .hover-image {
-    display: none;
-}
-
-body.layout-splitview .text-layer {
+body.layout-split .text-layer {
     width: 50%;
     margin: 0;
     padding-left: 6vw;
 }
 
-body.layout-splitview .stream {
+body.layout-split .stream {
     color: rgba(255, 255, 255, 0.9);
     font-size: clamp(16px, 2vw, 28px);
 }
 
-body.light-mode.layout-splitview .stream {
-    color: rgba(26, 26, 26, 0.9);
-}
-
-body.layout-splitview .cursor-image-preview {
-    display: none;
-}
-
-body.layout-splitview .hover-image {
-    display: block;
+body.layout-split .hover-image {
     position: fixed;
-    left: 75%;
+    left: 72%;
     top: 50%;
-    transform: translate(-50%, -50%);
-    width: 40vw;
-    height: 30vw;
-    max-width: 700px;
-    max-height: 525px;
-    opacity: 0;
-    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
-    z-index: 1;
+    width: 45vw;
+    height: 34vw;
 }
 
-body.layout-splitview .hover-image.active {
-    opacity: 0.8;
-}
-
-body.light-mode.layout-splitview .hover-image {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-}
-
-body.light-mode.layout-splitview .hover-image.active {
-    opacity: 0.9;
-}
-
-body.layout-splitview .hover-image img {
+/* Background mode (default) */
+body:not(.cursor-preview-mode) .hover-image {
     display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
+}
+
+body:not(.cursor-preview-mode) #cursorImage {
+    display: none !important;
+}
+
+/* Cursor preview mode */
+body.cursor-preview-mode .hover-image {
+    display: none !important;
+}
+
+body.cursor-preview-mode #cursorImage {
+    display: block !important;
 }
 
 .scroll-progress {
@@ -188,10 +112,6 @@ body.layout-splitview .hover-image img {
     position: relative;
 }
 
-body.light-mode .scroll-progress-bar-container {
-    background: rgba(0, 0, 0, 0.1);
-}
-
 .scroll-progress-bar {
     position: absolute;
     bottom: 0;
@@ -199,7 +119,7 @@ body.light-mode .scroll-progress-bar-container {
     width: 100%;
     background: var(--accent);
     border-radius: 1px;
-    transition: height 0.3s ease, width 0.3s ease;
+    transition: height 0.3s ease;
 }
 
 .nav-button {
@@ -218,20 +138,11 @@ body.light-mode .scroll-progress-bar-container {
     pointer-events: auto;
 }
 
-body.light-mode .nav-button {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
 .nav-button:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent);
     color: var(--accent);
     transform: scale(1.1);
-}
-
-body.light-mode .nav-button:hover {
-    background: rgba(0, 0, 0, 0.1);
 }
 
 .nav-button:active {
@@ -244,31 +155,32 @@ body.light-mode .nav-button:hover {
     fill: currentColor;
 }
 
-/* Desktop navigation positioning */
-@media (min-width: 769px) {
-    .page-up {
-        margin-bottom: 10px;
-    }
+.page-up {
+    margin-bottom: 10px;
+}
 
-    .page-down {
-        margin-top: 10px;
-    }
+.page-down {
+    margin-top: 10px;
+}
 
-    .prev-sentence {
-        margin-bottom: 8px;
-    }
+.prev-sentence {
+    margin-bottom: 8px;
+}
 
-    .next-sentence {
-        margin-top: 8px;
-    }
+.next-sentence {
+    margin-top: 8px;
+}
 
-    .prev-chapter {
-        margin-bottom: 5px;
-    }
+.chapter-nav {
+    margin-bottom: 10px;
+}
 
-    .next-chapter {
-        margin-top: 5px;
-    }
+.prev-chapter {
+    margin-bottom: 5px;
+}
+
+.next-chapter {
+    margin-top: 5px;
 }
 
 *,
@@ -280,10 +192,6 @@ body.light-mode .nav-button:hover {
 html {
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
-}
-
-body.light-mode {
-    color-scheme: light;
 }
 
 body,
@@ -301,14 +209,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     cursor: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body::-webkit-scrollbar {
@@ -323,11 +224,6 @@ body {
 ::selection {
     background: rgba(218, 165, 32, 0.25);
     color: #fff;
-}
-
-body.light-mode ::selection {
-    background: rgba(184, 134, 11, 0.25);
-    color: #1a1a1a;
 }
 
 .edge-blur {
@@ -348,7 +244,6 @@ body.light-mode ::selection {
     z-index: var(--z-vig);
     background: radial-gradient(120% 90% at 50% 50%, #fff0 var(--vig-inner), rgb(0 0 0 / 0.55) var(--vig-mid), rgb(0 0 0 / 0.9) var(--vig-outer));
     opacity: calc(var(--vig-opacity) * var(--curve-k));
-    transition: background 0.3s ease;
 }
 
 body::after {
@@ -360,7 +255,6 @@ body::after {
     opacity: 0.08;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
     background-size: 120px 120px;
-    transition: opacity 0.3s ease;
 }
 
 .curved {
@@ -390,13 +284,22 @@ body::after {
     transition: transform 0.1s linear;
 }
 
+.image-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
 .stream {
     font-size: clamp(18px, 2.5vw, 32px);
     line-height: 1.8;
     letter-spacing: -0.01em;
     max-width: 100%;
     color: rgba(255, 255, 255, 0.85);
-    transition: color 0.3s ease;
 }
 
 .sentence {
@@ -417,17 +320,9 @@ body::after {
     border-radius: 2px;
 }
 
-body.light-mode .sentence.active {
-    color: #1a1a1a;
-}
-
 .sentence.dimmed {
-    opacity: 0.65;
-    color: rgba(255, 255, 255, 0.65);
-}
-
-body.light-mode .sentence.dimmed {
-    color: rgba(26, 26, 26, 0.65);
+    opacity: 0.4;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .chapter-break {
@@ -508,10 +403,6 @@ body.light-mode .sentence.dimmed {
     animation: bracketFadeIn 0.3s ease-out;
 }
 
-body.light-mode .bracket-content {
-    color: rgba(74, 74, 74, 0.8);
-}
-
 @keyframes bracketFadeIn {
     from {
         opacity: 0;
@@ -536,6 +427,62 @@ body.light-mode .bracket-content {
     color: var(--accent);
     border-bottom-style: solid;
     opacity: 1;
+}
+
+.hover-image {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.1s linear;
+    width: 1400px;
+    height: 1050px;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%) scale(0.95);
+    filter: brightness(0.9) contrast(1.05);
+    will-change: transform, opacity;
+    left: 50%;
+    top: 50%;
+}
+
+.hover-image.active {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.hover-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+#cursorImage {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    width: 400px;
+    height: 300px;
+    object-fit: cover;
+    display: none;
+}
+
+#cursorImage.active {
+    opacity: 1;
+}
+
+#cursorImage.enlarged {
+    width: 600px;
+    height: 450px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .header {
@@ -574,19 +521,10 @@ body.light-mode .bracket-content {
     gap: 8px;
 }
 
-body.light-mode .brand {
-    background: rgba(0, 0, 0, 0.015);
-    border-color: rgba(0, 0, 0, 0.06);
-}
-
 .brand:hover {
     background: rgba(255, 255, 255, 0.04);
     color: var(--ink);
     border-color: var(--accent);
-}
-
-body.light-mode .brand:hover {
-    background: rgba(0, 0, 0, 0.04);
 }
 
 .brand:active {
@@ -659,17 +597,9 @@ body.light-mode .brand:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
-body.light-mode .chapter-dropdown-list::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
-}
-
 .chapter-dropdown-list::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 2px;
-}
-
-body.light-mode .chapter-dropdown-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
 }
 
 .chapter-item {
@@ -718,51 +648,6 @@ body.light-mode .chapter-dropdown-list::-webkit-scrollbar-thumb {
     border-radius: 2px;
 }
 
-body.light-mode .chapter-item-progress {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    pointer-events: auto;
-}
-
-.theme-toggle {
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 8px 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ink-3);
-    font-size: 16px;
-}
-
-body.light-mode .theme-toggle {
-    background: rgba(0, 0, 0, 0.015);
-    border-color: rgba(0, 0, 0, 0.06);
-}
-
-.theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.12);
-    color: var(--accent);
-}
-
-body.light-mode .theme-toggle:hover {
-    background: rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 0, 0, 0.12);
-}
-
-.theme-toggle:active {
-    transform: scale(0.95);
-}
-
 .curve-control {
     pointer-events: auto;
     display: flex;
@@ -777,11 +662,6 @@ body.light-mode .theme-toggle:hover {
     border-radius: 3px;
 }
 
-body.light-mode .curve-control {
-    background: rgba(0, 0, 0, 0.015);
-    border-color: rgba(0, 0, 0, 0.06);
-}
-
 .curve-slider {
     width: 70px;
     height: 2px;
@@ -791,10 +671,6 @@ body.light-mode .curve-control {
     -webkit-appearance: none;
     cursor: pointer;
     outline: none;
-}
-
-body.light-mode .curve-slider {
-    background: rgba(0, 0, 0, 0.12);
 }
 
 .curve-slider::-webkit-slider-thumb {
@@ -828,6 +704,40 @@ body.light-mode .curve-slider {
     transform: scale(1.15);
 }
 
+.preview-toggle {
+    pointer-events: auto;
+}
+
+.preview-button {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 8px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-3);
+    gap: 6px;
+}
+
+.preview-button:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.preview-button:active {
+    transform: scale(0.95);
+}
+
+.preview-button.active {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 .layout-toggle {
     pointer-events: auto;
 }
@@ -844,19 +754,9 @@ body.light-mode .curve-slider {
     justify-content: center;
 }
 
-body.light-mode .layout-button {
-    background: rgba(0, 0, 0, 0.015);
-    border-color: rgba(0, 0, 0, 0.06);
-}
-
 .layout-button:hover {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.12);
-}
-
-body.light-mode .layout-button:hover {
-    background: rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 0, 0, 0.12);
 }
 
 .layout-button:active {
@@ -872,8 +772,8 @@ body.light-mode .layout-button:hover {
     justify-content: space-between;
 }
 
-.layout-icon.fullview::before,
-.layout-icon.fullview::after {
+.layout-icon.layered::before,
+.layout-icon.layered::after {
     content: '';
     display: block;
     width: 100%;
@@ -883,26 +783,26 @@ body.light-mode .layout-button:hover {
     transition: all 0.3s ease;
 }
 
-.layout-icon.fullview::after {
+.layout-icon.layered::after {
     opacity: 0.5;
     margin-top: -4px;
 }
 
-.layout-icon.splitview::before,
-.layout-icon.splitview::after {
+.layout-icon.split::before,
+.layout-icon.split::after {
     content: '';
     display: block;
     border-radius: 1px;
     transition: all 0.3s ease;
 }
 
-.layout-icon.splitview::before {
+.layout-icon.split::before {
     width: 10px;
     height: 100%;
     background: var(--ink-3);
 }
 
-.layout-icon.splitview::after {
+.layout-icon.split::after {
     width: 10px;
     height: 100%;
     background: var(--ink-3);
@@ -917,11 +817,10 @@ body.light-mode .layout-button:hover {
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     pointer-events: none;
-    z-index: var(--z-cursor);
+    z-index: 9999;
     transform: translate(-50%, -50%);
-    transition: width 0.25s, height 0.25s, opacity 0.25s;
+    transition: width 0.25s, height 0.25s, background-color 0.25s, border-color 0.25s, opacity 0.25s;
     mix-blend-mode: difference;
-    opacity: 1;
 }
 
 #cursor.hovering {
@@ -931,58 +830,14 @@ body.light-mode .layout-button:hover {
     border-color: var(--accent);
 }
 
-body.light-mode #cursor.hovering {
-    background-color: rgba(0, 0, 0, 0.08);
-}
-
 #cursor.pointer {
     width: 14px;
     height: 14px;
     background-color: rgba(255, 255, 255, 0.7);
 }
 
-body.light-mode #cursor.pointer {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
 #cursor.has-image {
     opacity: 0;
-}
-
-.cursor-image-preview {
-    position: fixed;
-    pointer-events: none;
-    z-index: var(--z-cursor);
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    width: 25%;
-    height: 25%;
-    object-fit: cover;
-}
-
-.cursor-image-preview.active {
-    opacity: 1;
-}
-
-.cursor-image-preview.enlarged {
-    width: 600px;
-    height: 450px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    z-index: calc(var(--z-cursor) + 1);
-}
-
-.hover-image {
-    display: none;
-}
-
-.image-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 5;
-    pointer-events: none;
 }
 
 .scroll-hint {
@@ -1007,10 +862,6 @@ body.light-mode #cursor.pointer {
     border-bottom: 2px solid rgba(255, 255, 255, 0.4);
     transform: rotate(45deg);
     animation: bounce 1.5s ease-in-out infinite;
-}
-
-body.light-mode .scroll-hint-icon {
-    border-color: rgba(0, 0, 0, 0.4);
 }
 
 .scroll-hint-text {
@@ -1041,18 +892,17 @@ body.light-mode .scroll-hint-icon {
 
 @media (max-width: 768px) {
     .text-layer {
-        padding: 12vh 6vw 30vh;
+        padding: 12vh 6vw 20vh;
         max-width: 95%;
     }
     
-    body.layout-fullview .text-layer {
-        padding: 12vh 6vw 30vh;
-    }
-    
     .stream {
-        font-size: clamp(18px, 5vw, 24px);
-        line-height: 1.9;
-        letter-spacing: -0.005em;
+        font-size: clamp(16px, 4vw, 28px);
+    }
+
+    .hover-image {
+        width: 800px;
+        height: 600px;
     }
 
     .curve-control {
@@ -1069,162 +919,23 @@ body.light-mode .scroll-hint-icon {
         left: -10px;
     }
 
-    /* Universal bottom rail for mobile */
-    .scroll-progress {
-        position: fixed;
-        bottom: 20px;
-        top: auto;
-        right: 50%;
-        transform: translateX(50%);
-        flex-direction: row;
-        gap: 8px;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 10px 14px;
-        border-radius: 24px;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    body.light-mode .scroll-progress {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .scroll-progress-bar-container {
-        width: 100px;
-        height: 3px;
-        order: 3;
-        background: rgba(255, 255, 255, 0.25);
-        border-radius: 2px;
-    }
-
-    body.light-mode .scroll-progress-bar-container {
-        background: rgba(0, 0, 0, 0.15);
-    }
-
-    .scroll-progress-bar {
-        left: 0;
-        bottom: 0;
-        width: 0;
-        height: 100%;
-        border-radius: 2px;
-    }
-
-    .nav-button {
-        width: 32px;
-        height: 32px;
-        font-size: 11px;
-    }
-
-    .nav-button svg {
-        width: 14px;
-        height: 14px;
-    }
-
-    /* Mobile: Show chapter navigation, hide page up/down */
-    .page-up,
-    .page-down {
+    .preview-toggle {
         display: none;
     }
 
-    .prev-chapter,
-    .next-chapter {
-        display: flex;
-    }
-
-    .prev-chapter {
-        order: 2;
-        margin: 0 2px;
-    }
-
-    .next-chapter {
-        order: 4;
-        margin: 0 2px;
-    }
-
-    .prev-sentence {
-        margin-bottom: 0;
-        margin-right: 0;
-        order: 1;
-    }
-
-    .next-sentence {
-        margin-top: 0;
-        margin-left: 0;
-        order: 5;
-    }
-
-    /* Mobile splitview - faded background image */
-    body.layout-splitview .text-layer {
+    body.layout-split .text-layer {
         width: 100%;
         padding-left: 6vw;
         padding-right: 6vw;
-        padding-bottom: 30vh;
     }
 
-    body.layout-splitview .sentence {
-        position: static;
-    }
-
-    body.layout-splitview .sentence.active {
-        position: relative;
-    }
-
-    body.layout-splitview .hover-image {
-        position: fixed;
+    body.layout-split .hover-image {
+        position: absolute;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%);
-        width: 90vw;
-        height: 67.5vw;
-        max-width: 500px;
-        max-height: 375px;
-        margin: 0;
-        border-radius: 8px;
-        opacity: 0;
-        transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-        z-index: 0;
-    }
-
-    body.layout-splitview .hover-image.active {
-        opacity: 0.25;
-    }
-
-    body.light-mode.layout-splitview .hover-image.active {
-        opacity: 0.2;
-    }
-
-    /* Fullview mobile - faded background image */
-    body.layout-fullview .cursor-image-preview {
-        display: none;
-    }
-
-    body.layout-fullview .hover-image {
-        display: block;
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 90vw;
-        height: 67.5vw;
-        max-width: 500px;
-        max-height: 375px;
-        margin: 0;
-        border-radius: 8px;
-        opacity: 0;
-        transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-        z-index: 0;
-    }
-
-    body.layout-fullview .hover-image.active {
-        opacity: 0.25;
-    }
-
-    body.light-mode.layout-fullview .hover-image.active {
-        opacity: 0.2;
+        width: 800px;
+        height: 600px;
+        transform: translate(-50%, -50%) scale(0.95);
     }
 }
 
@@ -1240,15 +951,16 @@ body.light-mode .scroll-hint-icon {
     }
 }
     </style>
+
 </head>
 <body>
     <div id="cursor" aria-hidden="true"></div>
-    <img class="cursor-image-preview" id="cursorImage" alt="Preview" aria-hidden="true">
+    <img id="cursorImage" alt="Preview" aria-hidden="true">
     
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span id="currentChapterText">Zack Gort · Bootstrap</span>
+                <span>Zack Gort · Bootstrap</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -1260,38 +972,39 @@ body.light-mode .scroll-hint-icon {
                 </ul>
             </div>
         </div>
-        <div class="header-controls">
+        <div class="preview-toggle">
             <button 
-                id="themeToggle" 
-                class="theme-toggle"
-                aria-label="Toggle light/dark mode"
-                title="Toggle theme"
+                id="previewToggle" 
+                class="preview-button"
+                aria-label="Toggle image preview mode"
+                title="Switch between background and cursor preview (P)"
             >
-                ☀️
+                <span>🖼️</span>
+                <span id="previewModeText">BG</span>
             </button>
-            <div class="curve-control">
-                <label for="curveSlider">Lens</label>
-                <input 
-                    type="range" 
-                    class="curve-slider" 
-                    id="curveSlider"
-                    min="0" 
-                    max="1" 
-                    step="0.01" 
-                    value="1"
-                    aria-label="Adjust lens curvature effect"
-                >
-            </div>
-            <div class="layout-toggle">
-                <button 
-                    id="layoutToggle" 
-                    class="layout-button"
-                    aria-label="Toggle layout mode"
-                    title="Switch between layered and split layout"
-                >
-                    <span class="layout-icon fullview"></span>
-                </button>
-            </div>
+        </div>
+        <div class="curve-control">
+            <label for="curveSlider">Lens</label>
+            <input 
+                type="range" 
+                class="curve-slider" 
+                id="curveSlider"
+                min="0" 
+                max="1" 
+                step="0.01" 
+                value="1"
+                aria-label="Adjust lens curvature effect"
+            >
+        </div>
+        <div class="layout-toggle">
+            <button 
+                id="layoutToggle" 
+                class="layout-button"
+                aria-label="Toggle layout mode"
+                title="Switch between layered and split layout"
+            >
+                <span class="layout-icon layered"></span>
+            </button>
         </div>
     </header>
 
@@ -1305,15 +1018,15 @@ body.light-mode .scroll-hint-icon {
             </svg>
         </button>
         
-        <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
+        <button class="nav-button page-up" id="pageUpBtn" title="Page Up (move 10 sentences back)" aria-label="Page Up">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                <path d="M12 4l-8 8h16l-8-8zm0 4l8 8H4l8-8zm0 4l8 8H4l8-8z"/>
             </svg>
         </button>
         
-        <button class="nav-button page-up" id="pageUpBtn" title="Page Up (10 sentences back)" aria-label="Page Up">
+        <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41zM7.41 8.59L12 4l4.59 4.59L18 7.17 12 1.17 6 7.17l1.41 1.42z"/>
+                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
             </svg>
         </button>
         
@@ -1321,15 +1034,15 @@ body.light-mode .scroll-hint-icon {
             <div class="scroll-progress-bar" id="scrollProgressBar"></div>
         </div>
         
-        <button class="nav-button page-down" id="pageDownBtn" title="Page Down (10 sentences forward)" aria-label="Page Down">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41zM7.41 15.41L12 20l4.59-4.59L18 16.83 12 22.83 6 16.83l1.41-1.42z"/>
-            </svg>
-        </button>
-        
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+            </svg>
+        </button>
+        
+        <button class="nav-button page-down" id="pageDownBtn" title="Page Down (move 10 sentences forward)" aria-label="Page Down">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 20l8-8H4l8 8zm0-4l-8-8h16l-8 8zm0-4l-8-8h16l-8 8z"/>
             </svg>
         </button>
         
@@ -1342,7 +1055,7 @@ body.light-mode .scroll-hint-icon {
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll · Swipe · Spacebar to enlarge</span>
+        <span class="scroll-hint-text">Scroll · Press P to toggle preview · Space to enlarge</span>
     </div>
 
     <main class="curved">
@@ -1360,8 +1073,12 @@ body.light-mode .scroll-hint-icon {
     </main>
 
     <script>
+const TAIL_LENGTH = 12;
 const CURSOR_SMOOTHING = 0.35;
+const IMAGE_HOVER_DELAY = 120;
 const TEXT_PARALLAX_STRENGTH = 0.03;
+const IMAGE_PARALLAX_STRENGTH = 0.15;
+const CENTER_MAGNET_STRENGTH = 0.25;
 const PARALLAX_DAMPING = 0.1;
 const SCROLL_THRESHOLD = 30;
 const SCROLL_COOLDOWN = 100;
@@ -1369,204 +1086,167 @@ let scrollCooldownActive = false;
 let spacebarPressed = false;
 
 const imageMap = {
-    'career journey': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
-    'bootstrap startup': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
-    'bootstrap': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
-    'non-linear': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
-    'twenty years': 'https://i.ibb.co/Lzv7Zf7Z/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
-    'two decades': 'https://i.ibb.co/Lzv7Zf7Z/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
     'Pratt Institute': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
     'art school': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
-    'stop-out': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
+    'pirated Adobe software': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'pirated copies of Adobe': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'built my first computer': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
-    'pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
-    'autodidact': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
-    'self-taught': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
-    'faux website': 'https://i.ibb.co/DHHzHw8G/1-pu-HZ09-ELFPd-Aa-MK0-HAxq-Q.webp',
-    'portfolio': 'https://i.ibb.co/fdxZdwwC/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp',
-    'Craigslist': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'faux website concepts': 'https://i.ibb.co/DHHzHw8G/1-pu-HZ09-ELFPd-Aa-MK0-HAxq-Q.webp',
+    'Craigslist post': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
     'cover letter': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
-    'sixteen-fifty': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
-    'first job': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'sixteen-fifty an hour': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
     'Turn5': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
     'Xoxide': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
-    'e-commerce': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
     'package design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
-    'catalogue': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
-    'print design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
+    'catalogue design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
     'Product Photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
-    'photography': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
+    'product photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
     'color match': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
     'OEM quality': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
     'photographed thousands': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
     'web designer': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
-    'banner': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'banner and display ads': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'email marketing': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
     'wireframe': 'https://i.ibb.co/NdwrPWfV/1-Na-ZV6rc-Ew-RT55p-R12-BY0jg.webp',
-    'wireframes': 'https://i.ibb.co/NdwrPWfV/1-Na-ZV6rc-Ew-RT55p-R12-BY0jg.webp',
     'user testing': 'https://i.ibb.co/fG0dXSr0/1-m7-Hfhu-QO4-Ugr1-Vte-Zf6it-A.webp',
-    'usability': 'https://i.ibb.co/fG0dXSr0/1-m7-Hfhu-QO4-Ugr1-Vte-Zf6it-A.webp',
     'Leadnomics': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
-    'lead generation': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
     'payday loan': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'payday loans': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
     '95.8%': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
-    'ninety-five': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
-    'conversion rate': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
-    'data-driven': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'ninety-five-point-eight percent': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
     'free lunches': 'https://i.ibb.co/27BznHGJ/1-BNs-Ch8k1bclj-KMu1-KN-g.gif',
     'interactive haiku': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
     'interactive Haiku': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
-    'side project': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
+    'One Sixty Over Ninety': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
     '160/90': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
     '160over90': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
-    'agency life': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
     'Interaction Designer': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
-    'title change': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
+    'Interactive Department': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
     'lots of nights': 'https://i.ibb.co/SwzHM3CZ/1-o-P6kr-DDq-Pp-Sg-F4-Ag-Fr-WClw.webp',
     'weekends too': 'https://i.ibb.co/SwzHM3CZ/1-o-P6kr-DDq-Pp-Sg-F4-Ag-Fr-WClw.webp',
-    'hustle': 'https://i.ibb.co/SwzHM3CZ/1-o-P6kr-DDq-Pp-Sg-F4-Ag-Fr-WClw.webp',
+    'grayscale wireframes': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
     'Kent State': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
-    'university': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
     'mega menus': 'https://i.ibb.co/pBYP6wt8/1-HXIU3nxu-ZGq-Ne-Ef3-Wv-Lf-MQ.webp',
-    'navigation': 'https://i.ibb.co/pBYP6wt8/1-HXIU3nxu-ZGq-Ne-Ef3-Wv-Lf-MQ.webp',
-    'hamburger': 'https://i.ibb.co/SzM25Fb/1-vk-U8l-Zmqn-OHghe-Os-K0qtrw.webp',
-    'mobile menu': 'https://i.ibb.co/SzM25Fb/1-vk-U8l-Zmqn-OHghe-Os-K0qtrw.webp',
-    'O3 World': 'https://i.ibb.co/Dg9fM8q8/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
-    'agile': 'https://i.ibb.co/Dg9fM8q8/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
-    'startup': 'https://i.ibb.co/Dg9fM8q8/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
-    'scrum': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
-    'sprint': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
+    'hamburger icon': 'https://i.ibb.co/s9DPSGLM/1-Vf-C4i592d-OFh-Rbeo-C22ikw.webp',
+    'O3 World': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'agile in nature': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'scrum led': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'daily scrums': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
     'SEI': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
     'La Colombe': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
     'Vertex': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
-    'clients': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
     'WOVN': 'https://i.ibb.co/mr7gnpTg/1-y-GJCqkzizxa-Uxk3-R5-DCD8g.webp',
     'Workarea': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
     'Gidget': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
-    'napkin': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
-    'sketching': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'napkin sketches': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'napkins': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
     'Five Foot Gorilla': 'https://i.ibb.co/mjt5Myw/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp',
-    'dissolved': 'https://i.ibb.co/mjt5Myw/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp',
     'FlightPath': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
-    'bankruptcy': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
-    'pharmaceutical': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
-    'commute': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'emerging from bankruptcy': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'pharmaceutical sector': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
     'WCAG': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
-    'accessibility': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
     'Merck': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
-    'Cards Against Bad UX': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
-    'perspective': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
-    'saved the contract': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
-    'jargon': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
-    'spreadsheet': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
+    'Cards Against Bad UX': 'https://i.ibb.co/KxyvFKmq/1-P4-Gyqav-HMmzp-A-Ehqy9g-w.webp',
+    'jargon-laden spreadsheets': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
+    'single-sided meetings': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
     'As a shopper': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
     'content manager': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
-    'perspectives': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
-    'LiveArea': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
-    'UX Manager': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
-    'manager': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
-    '$1.2m': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
-    '$235/hr': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
-    'Huge': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
-    'siloed': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
-    'big agency': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
-    'GNC': 'https://i.ibb.co/k2RKBRgM/1-ijfh-Jkg-Ms-BKe-Sl3r-Izi0-XQ.webp',
-    'General Nutrition': 'https://i.ibb.co/k2RKBRgM/1-ijfh-Jkg-Ms-BKe-Sl3r-Izi0-XQ.webp',
-    'mobile-first': 'https://i.ibb.co/k2RKBRgM/1-ijfh-Jkg-Ms-BKe-Sl3r-Izi0-XQ.webp',
-    'Elva': 'https://i.ibb.co/k2RKBRgM/1-ijfh-Jkg-Ms-BKe-Sl3r-Izi0-XQ.webp',
-    'responsive': 'https://i.ibb.co/k2RKBRgM/1-ijfh-Jkg-Ms-BKe-Sl3r-Izi0-XQ.webp',
-    'mental notes': 'https://i.ibb.co/hFxVPkN9/1-Ex-Xe-Zp-Pz-Cw-C4-QKjx3-Fp-J-Q.webp',
-    'documentation': 'https://i.ibb.co/hFxVPkN9/1-Ex-Xe-Zp-Pz-Cw-C4-QKjx3-Fp-J-Q.webp',
-    'Code and Theory': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
-    'Code & Theory': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
-    'six figures': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
+    'guest user': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'LiveArea': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'UX Manager': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'one-point-two million': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    '$1.2m': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'two-thirty-five per hour': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    '$235/hr': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'Huge': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'single user flow': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'siloed': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'General Nutrition Centers': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'GNC': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'mobile-first navigation': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'Elva': 'https://i.ibb.co/JwN6TKCH/1-HZ-r-YXa4q-YKau-P1q-Et-K3-LQ.webp',
+    'Notes': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
+    'mental notes': 'https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp',
+    'Hypothesis': 'https://i.ibb.co/hFxVPkN9/1-Ex-Xe-Zp-Pz-Cw-C4-QKjx3-Fp-J-Q.webp',
+    'Setting up for success': 'https://i.ibb.co/VWjMBKyJ/1-bd-or-S3kj2g-Ul-Or1-T0cp-Xw.webp',
+    'Roadmap': 'https://i.ibb.co/jkzBy6JF/1-qplrq-W-v-Dn7-Rkr-XIQYYm-Q.webp',
+    'Iteration': 'https://i.ibb.co/0RTCJshv/1-q-GUMUAN-NA1-FY2gm8knong.webp',
+    'Innovation': 'https://i.ibb.co/hF26Bg3H/1-Sl-Zx-RIiu-Ds1k-Q19me-Imf-Q.webp',
+    'Optimization': 'https://i.ibb.co/HT0xKhzF/1-HRsg-XZNL-WJf4-Xj-J-O75-Bg.webp',
+    'Refinement': 'https://i.ibb.co/mC4dJwfG/1-7e7-U6-ZN5-HC-zd-Qzm1t-Sb-Gg.webp',
+    'Gains': 'https://i.ibb.co/Y4BS0p8f/1-LCDr-FFlm-X0-F1-Rasve-Rsrv-A.webp',
+    'Code and Theory': 'https://i.ibb.co/jP8rS95G/1-5g-Mvv7027-cm7r0vm-IDy1-A.webp',
+    'Code & Theory': 'https://i.ibb.co/jP8rS95G/1-5g-Mvv7027-cm7r0vm-IDy1-A.webp',
+    '62nd Floor': 'https://i.ibb.co/k22XR8x5/1-t-Vlq3-Svyk-Yb9-EM5yd-Nlcg-A.webp',
+    'World One Trade Center': 'https://i.ibb.co/k22XR8x5/1-t-Vlq3-Svyk-Yb9-EM5yd-Nlcg-A.webp',
+    'ACD': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'Senior Designer': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
     'wow factor': 'https://i.ibb.co/h1fn9fxc/1-Iy-n-WY-5d-Nz-Lniq7v-HVg-Iw.webp',
-    'design flair': 'https://i.ibb.co/h1fn9fxc/1-Iy-n-WY-5d-Nz-Lniq7v-HVg-Iw.webp',
-    'Publicis Sapient': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
-    'Organizational Spaghetti': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
-    'enterprise': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
-    'Team Lead': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
-    'leadership': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
-    'Pershing X': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
-    'BNY Mellon': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
-    'financial services': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
+    'post mortem': 'https://i.ibb.co/h1fn9fxc/1-Iy-n-WY-5d-Nz-Lniq7v-HVg-Iw.webp',
+    'Publicis Sapient': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'Digital Transformation': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'Organizational Spaghetti': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    'de facto Team Lead': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
+    'Product Owner': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
+    'company paid lunches': 'https://i.ibb.co/v4q7TbDZ/1-t-Yd-DX2-Ql-VLw-XI7gm3ev-MLw.webp',
+    'exhaustive research': 'https://i.ibb.co/XrpnL50W/1-x-Qoqr-V021-PFk0sxts5-AWAg.webp',
+    'industry research': 'https://i.ibb.co/XrpnL50W/1-x-Qoqr-V021-PFk0sxts5-AWAg.webp',
+    'consistent presence': 'https://i.ibb.co/fdW3K2gp/1-1gjr-Eff-Bio-JYo-EAv-MWHf-KQ.webp',
+    'in-office presence': 'https://i.ibb.co/fdW3K2gp/1-1gjr-Eff-Bio-JYo-EAv-MWHf-KQ.webp',
+    'client workshops': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
     'Design Systems': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
     'design systems': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
-    'component library': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'data paradigm': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'Pershing X': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
+    'BNY Mellon': 'https://i.ibb.co/B2V4Skt5/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp',
     'networking': 'https://i.ibb.co/sJkpkV9Q/1-l4jg-O1-4g-Ey-Wy-IBEQZho0g.webp',
-    'network engineer': 'https://i.ibb.co/sJkpkV9Q/1-l4jg-O1-4g-Ey-Wy-IBEQZho0g.webp',
     'RJ45': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
-    'terminate': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
-    'connector': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
-    'cables': 'https://i.ibb.co/kVY9RP9G/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
-    'ethernet': 'https://i.ibb.co/kVY9RP9G/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
-    'twist parity': 'https://i.ibb.co/rKfZp3zd/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
-    'wiring': 'https://i.ibb.co/rKfZp3zd/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
-    'sees potential': 'https://i.ibb.co/wNHr74q9/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
-    'imagination': 'https://i.ibb.co/wNHr74q9/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
-    'left-handed': 'https://i.ibb.co/wZM1y94B/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
-    'think different': 'https://i.ibb.co/wZM1y94B/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
-    'differently': 'https://i.ibb.co/wZM1y94B/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
-    'guitar': 'https://i.ibb.co/WpvwCpBL/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
-    'musician': 'https://i.ibb.co/WpvwCpBL/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
-    'photograph': 'https://i.ibb.co/G3BNR4gg/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
-    'photographer': 'https://i.ibb.co/G3BNR4gg/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
-    'Wolfgang': 'https://i.ibb.co/wrMpH50b/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
-    'dog': 'https://i.ibb.co/wrMpH50b/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
-    'dog-friendly': 'https://i.ibb.co/wrMpH50b/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
-    'A-list brands': 'https://i.ibb.co/Lzv7Zf7Z/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
-    'experience': 'https://i.ibb.co/Lzv7Zf7Z/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
-    'journey': 'https://i.ibb.co/hFJdHfwM/1-R9y-Bt9f-Sy-Eoa56p77-Ncpq-A.webp',
-    'path': 'https://i.ibb.co/PG1MrDLt/1-DUp-Jk-Ot-Zacr-Xz-Febgk5rt-Q.webp',
-    'design thinking': 'https://i.ibb.co/CpXb2bJC/1-Zs0lu-PIi-C5ly-AOEo2-LLEl-A.webp',
-    'process': 'https://i.ibb.co/CpXb2bJC/1-Zs0lu-PIi-C5ly-AOEo2-LLEl-A.webp',
-    'collaboration': 'https://i.ibb.co/6JVrbvJs/1-s-J-p-N8t-Bwws-Hq1-Xc-DSLLw.webp',
-    'teamwork': 'https://i.ibb.co/6JVrbvJs/1-s-J-p-N8t-Bwws-Hq1-Xc-DSLLw.webp',
-    'craft': 'https://i.ibb.co/xtycG8Qd/1-Bl-Rk8m-WPs-Ivsfb-Zkdz-SI1-A.webp',
-    'attention to detail': 'https://i.ibb.co/xtycG8Qd/1-Bl-Rk8m-WPs-Ivsfb-Zkdz-SI1-A.webp',
-    'user research': 'https://i.ibb.co/p6zhtskg/1-k-SDc-GT46-VQM6-Kk25-SPr-Acg.webp',
-    'research': 'https://i.ibb.co/p6zhtskg/1-k-SDc-GT46-VQM6-Kk25-SPr-Acg.webp',
-    'prototyping': 'https://i.ibb.co/wh7CDDfH/1-i-P-y0-X1-Wq-N9-WLw-Y-w-ev-Q.webp',
-    'prototype': 'https://i.ibb.co/wh7CDDfH/1-i-P-y0-X1-Wq-N9-WLw-Y-w-ev-Q.webp',
-    'iteration': 'https://i.ibb.co/gM1MGYjr/1-KF8-S3mj-G-Lyygkt-Gk-M10-Kg.webp',
-    'iterate': 'https://i.ibb.co/gM1MGYjr/1-KF8-S3mj-G-Lyygkt-Gk-M10-Kg.webp',
-    'problem solving': 'https://i.ibb.co/zHLkNrCf/1-0-T6e-A3-F2-Px-NA1g-lm-Di-JPQ.webp',
-    'solution': 'https://i.ibb.co/zHLkNrCf/1-0-T6e-A3-F2-Px-NA1g-lm-Di-JPQ.webp',
-    'creativity': 'https://i.ibb.co/7tQY6TzY/1-f-QX6x7l-VSHT4-XJxp-Apk-Bfg.webp',
-    'creative': 'https://i.ibb.co/7tQY6TzY/1-f-QX6x7l-VSHT4-XJxp-Apk-Bfg.webp',
-    'innovation': 'https://i.ibb.co/Mkr6n2P7/1-O3ydbl-RDwhoq24nxc-OKolw.webp',
-    'innovative': 'https://i.ibb.co/Mkr6n2P7/1-O3ydbl-RDwhoq24nxc-OKolw.webp',
-    'resilience': 'https://i.ibb.co/pspR553/1-Fpw92-LFkht-WU0e-Fu-RAKq-Vg.webp',
-    'perseverance': 'https://i.ibb.co/pspR553/1-Fpw92-LFkht-WU0e-Fu-RAKq-Vg.webp',
-    'growth': 'https://i.ibb.co/39NN8mXZ/1-5-DVxga-Uzqa1f74-WJ8cah-A.webp',
-    'learning': 'https://i.ibb.co/39NN8mXZ/1-5-DVxga-Uzqa1f74-WJ8cah-A.webp',
-    'evolution': 'https://i.ibb.co/HDYgkTGp/1-8-MRtb-Qf-WZ-o-Pv-EYL1u-Ah-Q.webp',
-    'transformation': 'https://i.ibb.co/HDYgkTGp/1-8-MRtb-Qf-WZ-o-Pv-EYL1u-Ah-Q.webp',
-    'waterfall': 'https://i.ibb.co/Pz6RPFF3/1-wpxr-Wb-Gxc-Rcz-ENp-Psy-CJhg.gif',
-    'methodology': 'https://i.ibb.co/Pz6RPFF3/1-wpxr-Wb-Gxc-Rcz-ENp-Psy-CJhg.gif'
+    'terminate an RJ45': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    '30–45 seconds': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    'Run cables': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'security systems': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'cable management': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'twist parity': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    'different parts of my brain': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    'sees potential': 'https://i.ibb.co/4Rfyq6Z8/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
+    'someone out there': 'https://i.ibb.co/4Rfyq6Z8/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
+    'mouths to feed': 'https://i.ibb.co/gpr7smN/1-Zs0lu-PIi-C5ly-AOEo2-LLEl-A.webp',
+    'left-handed': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
+    'think different': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
+    'play guitar': 'https://i.ibb.co/MyqYv5cS/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
+    'guitar': 'https://i.ibb.co/MyqYv5cS/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
+    'take photographs': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
+    'photography': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
+    'Wolfgang': 'https://i.ibb.co/tTTgw7Md/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
+    'my dog': 'https://i.ibb.co/tTTgw7Md/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
+    'Bootstrap startup': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'bootstrap startup': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'non-linear': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'career journey': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'A-list brands': 'https://i.ibb.co/840YDJMT/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
+    'global scale': 'https://i.ibb.co/840YDJMT/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp'
 };
 
-
 const chapters = [
-    { id: 0, title: "Hi, I'm Zack", startText: "Hi. I'm Zack." },
-    { id: 1, title: "The Impetus", startText: "The above image is something akin" },
-    { id: 2, title: "Art School 'Stop-out'", startText: "I didn't graduate from college." },
-    { id: 3, title: "Doings of an Autodidact", startText: "I built my first computer" },
-    { id: 4, title: "Found On Road Designing", startText: "Alright. Now, where to begin?" },
-    { id: 5, title: "Design by Data", startText: "Okay, so Leadnomics was shifty." },
-    { id: 6, title: "Enter #AgencyLife", startText: "From here, I desired to move" },
-    { id: 7, title: "Becoming a Bona Fide UX Designer", startText: "An elevating experience with O3 World" },
-    { id: 8, title: "From Ozone to Warm Workarea", startText: "I had mentioned Agile and Scrum." },
-    { id: 9, title: "PHI to NYC to Change Paradigms", startText: "Did I mention I co-founded" },
-    { id: 10, title: "Cards Against Bad UX", startText: "A paradigm shift: From Midtown" },
-    { id: 11, title: "Small Cog in HUGE Wheel", startText: "At Huge, I couldn't tell you" },
-    { id: 12, title: "Heavy Lift Big Gains This is the Whey", startText: "Heavy lift. Big gains." },
-    { id: 13, title: "Long Way to the Top", startText: "It's a long way to the top" },
-    { id: 14, title: "SeizeTheSpace BonCourage", startText: "Okay, fine. Huge only wanted me" },
-    { id: 15, title: "Do the Twist!", startText: "Come on, baby. Let's do the twist." },
-    { id: 16, title: "Reason & Resolution", startText: "As an aside, I've been keeping up" }
+    { id: 0, title: "Introduction", startText: "Hi. I'm Zack." },
+    { id: 1, title: "Early Years", startText: "I didn't graduate from college." },
+    { id: 2, title: "First Steps", startText: "I built my first computer" },
+    { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
+    { id: 4, title: "Leadnomics", startText: "Okay, so Leadnomics was shifty." },
+    { id: 5, title: "Learning to Code", startText: "From here, I desired to move" },
+    { id: 6, title: "One Sixty Over Ninety", startText: "One Sixty Over Ninety—" },
+    { id: 7, title: "O3 World", startText: "An elevating experience with O3 World" },
+    { id: 8, title: "FlightPath", startText: "Did I mention I co-founded" },
+    { id: 9, title: "LiveArea", startText: "A paradigm shift: From Midtown to Uptown." },
+    { id: 10, title: "Huge", startText: "At Huge, I couldn't tell you" },
+    { id: 11, title: "Elva / GNC", startText: "Heavy lift. Big gains. This is the whey." },
+    { id: 12, title: "Code and Theory", startText: "It's a long way to the top" },
+    { id: 13, title: "Publicis Sapient", startText: "Okay, fine. Huge only wanted me" },
+    { id: 14, title: "The Twist", startText: "Come on, baby. Let's do the twist." },
+    { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
 ];
 
 const narrative = `Hi. I'm Zack. [This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart. I think. I make. Will work for work.] This is what being a bootstrap startup looks like. When you're the product. When your career is your only venture capital.
@@ -1621,7 +1301,19 @@ From here, I desired to move my creative talents into an environment where I was
 
 So I learned how to code HTML, CSS, and throw in a little JavaScript to make the magic happen. [I did this by concepting an interactive Haiku which communicated in various ways the things I wished to convey. Sometimes the best portfolio piece is the one that shows you can learn anything.] Took a twelve-thousand-dollar pay cut to join One Sixty Over Ninety as an interaction designer in Center City Philadelphia.
 
-An elevating experience with O3 World, a digital product shop based in Fishtown, Philadelphia. [Wireframes at 160over90 fit the workflow at 160over90. Wireframing at O3 World was a different beast which required throwing everything I thought I knew out the window and reverting to the basics.] Here, it was less about impressing our clients. Here, it was all about working with our clients.
+One Sixty Over Ninety—my heart rate when I was offered a full-time gig as an Interaction Designer circa 2014 working at a leading design agency at the literal epicenter of Center City, Philadelphia. [Granted, I accepted the job at approximately twelve-thousand less than I was at my previous startup, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160/90 HQ.] I was there to learn. Day. Night. Lots of nights. Weekends too.
+
+Now, let's look at some wireframes. [Here is a wireframe for Kent State's EDU. It's gray, so it's clearly a wireframe prototype. But why does it basically look like a grayscale design?] Well, when waterfall process meets business-minded clients with exceptional aspirations meets unmanaged or unmitigated expectations meets crunch time. Ultimately, it boils down to a confluence of factors that quite often lead to compromises in the design process.
+
+In the case of this wireframe, given budgetary and scheduling constraints, we provided essential education as we socialized our work with the client. [Detailing the nuance of design decisions based on best practices and modern conventions. Enlightening our clients to our use of modern CSS capabilities offering more flexible design solutions. Add CMS knowledge and of course painting a clear picture for the next phase: Visual Design.] In other words, what I hope you glean from the following isn't that I have an acuity for design, or at least the foresight for it, but that I've practiced and trained to the point where best-practices are baked in.
+
+Kent State University had a unique challenge in that its programs and offerings were split across nine different regional campuses. [Each campus had its own directory, its own content, and its own business objectives. We explored baseline by-the-book navigation options.] We explored mega menus and full-screen takeovers. We explored pop-outs, roll-outs, and pondered if the hamburger icon was intuitive enough. Remember, this was circa 2014 to 2016 when these were legitimate questions.
+
+We considered breaking the mold given our proprietary requirements. [Since Kent State was dissimilar from its peers, do we dare seek our own solution? We—I—dared, indeed.] While these conceptual prototypes did not ultimately make it to fruition, they did contribute to conversations that influenced not just design but content strategy. Ultimately, we decided that a refactored content strategy per region was more practical and a more conventional navigation masthead was ideal.
+
+I think it's important to note that at 160over90, we facilitated absolutely zero user testing. [Everything was subjectively driven and emotionally charged. Also, budgets were tight.] I desired to learn these skills in a dedicated agile product-focused environment. My next employment.
+
+An elevating experience with O3 World, a digital product shop based in Fishtown, Philadelphia. [Wireframes at 160over90 fit the workflow at 160over90. Wireframing at O3 World was a different beast which required throwing everything I thought I knew out the the window and reverting to the basics.] Here, it was less about impressing our clients. Here, it was all about working with our clients.
 
 Without the pizazz of beautiful grayscale renders of your soon-to-be colored in homepage, we focused on asking the right questions and getting the right feel with our clients. [We were agile in nature and scrum led. We had daily scrums and weekly sprint schedules. We dealt with client feedback organically and responsively as opposed to reactively.] Clients included Vertex SMB, SEI, La Colombe, and WOVN iOS.
 
@@ -1669,7 +1361,7 @@ UX at Code And Theory was essentially decorative. [Besides resourcing hurdles, t
 
 Okay, fine. Huge only wanted me for a little bit. Code and Theory wasn't ready for me. [I don't necessarily care to be a boomerang in my career. Now, where can I go that won't be a lateral or backwards step?] Enter Publicis Sapient, a Digital Transformation Company, at 375 Hudson St, New York City.
 
-I was a remote employee but chose to be a consistent in-office presence. [I can tell you that I spent a full year here working in the Financial Services sector serving BNY Mellon—Pershing X Advisory Experience Platform.] Publicis Sapient wasn't without its imperfections either. Suffice to say there were some organizational and operational aspects that could be improved upon, dialogue and communication not withstanding.
+I was a remote employee but chose to be a consistent in-office presence. [I can tell you that I spent a full year here working in the Financial Services sector serving BNY Mellon—Pershing X Advisory Experience Platform.] Publicis Sapient wasn't without its imperfections either. Suffice to say there were some organizational and operational aspects that could be improved upon, dialogue and communication not with standing.
 
 A term I've coined to describe my experience here would be Organizational Spaghetti. [I became the de facto Team Lead and Product Owner. I led research and discovery efforts. I led client workshops. I led design and prototype development and testing.] I collaborated across multiple concurrent tracks while providing mentorship and guidance to junior and associate designers. Also serving as team lead amongst peers at the senior level.
 
@@ -1698,25 +1390,34 @@ I truly try not to be the type of person to try to sway your mind one way or ano
 I'm left-handed. I think different. [I play guitar, take photographs, make people wonder. Meet Wolfgang, my dog. Dog-friendly offices welcome. Remote hybrid preferred.] Sincerest of thanks to anyone who took the time to read through my story. Twenty years of work condensed into twenty minutes of reading. Five minutes if you just skim the photos.`;
 
 const state = {
+    hoveredSentence: null,
     expandedBrackets: new Set(),
     mouseX: 0,
     mouseY: 0,
-    currentImageUrl: null,
-    layoutMode: 'fullview',
+    imageTimeout: null,
+    imageActive: false,
+    currentTriggerRect: null,
+    layoutMode: 'layered',
     currentSentenceIndex: -1,
     currentChapterIndex: 0,
     allSentenceElements: [],
     chapterStartIndices: [],
-    lightMode: false
+    previewMode: 'background'
 };
 
 let mouseX = 0;
 let mouseY = 0;
+let currentImageElement = null;
 
 let textParallaxX = 0;
 let textParallaxY = 0;
 let targetTextParallaxX = 0;
 let targetTextParallaxY = 0;
+
+let imageParallaxX = 0;
+let imageParallaxY = 0;
+let targetImageParallaxX = 0;
+let targetImageParallaxY = 0;
 
 const phraseRegexMap = new Map();
 for (const phrase of Object.keys(imageMap)) {
@@ -1747,14 +1448,6 @@ function getCurrentChapter() {
         }
     }
     return 0;
-}
-
-function updateCurrentChapterDisplay() {
-    const currentChapter = getCurrentChapter();
-    const chapterText = document.getElementById('currentChapterText');
-    if (chapterText && chapters[currentChapter]) {
-        chapterText.textContent = `Ch. ${currentChapter + 1}: ${chapters[currentChapter].title}`;
-    }
 }
 
 function parseNarrative(text) {
@@ -1823,88 +1516,84 @@ function preloadImages() {
     });
 }
 
-function showCursorImage(imageUrl) {
-    state.currentImageUrl = imageUrl;
-    const isMobile = window.innerWidth <= 768;
+function togglePreviewMode() {
+    state.previewMode = state.previewMode === 'background' ? 'cursor' : 'background';
     
-    if (isMobile) {
-        // Mobile: always use faded background image (hover-image)
-        const hoverImage = document.getElementById('hoverImage');
-        const hoverImageImg = document.getElementById('hoverImageImg');
-        
-        hoverImageImg.onerror = () => {
-            console.warn('Failed to load image:', imageUrl);
-        };
-        
-        hoverImageImg.onload = () => {
-            hoverImage.classList.add('active');
-        };
-        
-        hoverImageImg.src = imageUrl;
-        
-        // Fallback: show image even if loading takes time
+    const previewModeText = document.getElementById('previewModeText');
+    const previewButton = document.getElementById('previewToggle');
+    const body = document.body;
+    
+    if (state.previewMode === 'cursor') {
+        body.classList.add('cursor-preview-mode');
+        previewModeText.textContent = 'CUR';
+        previewButton.classList.add('active');
+    } else {
+        body.classList.remove('cursor-preview-mode');
+        previewModeText.textContent = 'BG';
+        previewButton.classList.remove('active');
+    }
+    
+    const currentUrl = state.imageActive ? document.getElementById('hoverImageImg').src : null;
+    if (currentUrl && currentImageElement) {
+        hideImage();
         setTimeout(() => {
-            hoverImage.classList.add('active');
-        }, 100);
-    } else if (state.layoutMode === 'fullview') {
-        // Desktop fullview: cursor preview
+            showImage(currentUrl, currentImageElement);
+        }, 50);
+    }
+}
+
+function showImage(imageUrl, triggerElement) {
+    currentImageElement = triggerElement;
+    state.imageActive = true;
+    state.currentTriggerRect = triggerElement.getBoundingClientRect();
+    
+    if (state.previewMode === 'cursor') {
         const cursorImage = document.getElementById('cursorImage');
         const cursor = document.getElementById('cursor');
-        
-        cursorImage.onerror = () => {
-            console.warn('Failed to load image:', imageUrl);
-        };
         
         cursorImage.src = imageUrl;
         cursorImage.classList.add('active');
         cursor.classList.add('has-image');
-    } else if (state.layoutMode === 'splitview') {
-        // Desktop splitview: fixed right side
+    } else {
         const hoverImage = document.getElementById('hoverImage');
         const hoverImageImg = document.getElementById('hoverImageImg');
         
-        hoverImageImg.onerror = () => {
-            console.warn('Failed to load image:', imageUrl);
-        };
+        if (state.imageTimeout) {
+            clearTimeout(state.imageTimeout);
+        }
         
-        hoverImageImg.onload = () => {
-            hoverImage.classList.add('active');
-        };
-        
-        hoverImageImg.src = imageUrl;
-        
-        // Fallback: show image even if loading takes time
-        setTimeout(() => {
-            hoverImage.classList.add('active');
-        }, 100);
+        state.imageTimeout = setTimeout(() => {
+            hoverImageImg.onload = () => {
+                hoverImage.classList.add('active');
+            };
+            
+            hoverImageImg.onerror = () => {
+                hoverImage.classList.add('active');
+            };
+            
+            hoverImageImg.src = imageUrl;
+        }, IMAGE_HOVER_DELAY);
     }
 }
 
-function hideCursorImage() {
-    state.currentImageUrl = null;
-    const isMobile = window.innerWidth <= 768;
+function hideImage() {
+    const hoverImage = document.getElementById('hoverImage');
+    const cursorImage = document.getElementById('cursorImage');
+    const cursor = document.getElementById('cursor');
     
-    if (isMobile) {
-        // Mobile: hide faded background
-        const hoverImage = document.getElementById('hoverImage');
-        hoverImage.classList.remove('active');
-    } else if (state.layoutMode === 'fullview') {
-        // Desktop fullview: hide cursor preview
-        const cursorImage = document.getElementById('cursorImage');
-        const cursor = document.getElementById('cursor');
-        
-        cursorImage.classList.remove('active');
-        cursorImage.classList.remove('enlarged');
-        cursor.classList.remove('has-image');
-    } else if (state.layoutMode === 'splitview') {
-        // Desktop splitview: hide right side image
-        const hoverImage = document.getElementById('hoverImage');
-        hoverImage.classList.remove('active');
-    }
+    clearTimeout(state.imageTimeout);
+    hoverImage.classList.remove('active');
+    cursorImage.classList.remove('active');
+    cursorImage.classList.remove('enlarged');
+    cursor.classList.remove('has-image');
+    
+    state.imageActive = false;
+    currentImageElement = null;
+    state.currentTriggerRect = null;
 }
 
 function toggleImageSize() {
-    if (!state.currentImageUrl || state.layoutMode !== 'fullview') return;
+    if (!state.imageActive || state.previewMode !== 'cursor') return;
     
     const cursorImage = document.getElementById('cursorImage');
     cursorImage.classList.toggle('enlarged');
@@ -1960,7 +1649,6 @@ function highlightSentence(index) {
     
     updateScrollProgress();
     updateChapterDropdown();
-    updateCurrentChapterDisplay();
     
     sentence.scrollIntoView({
         behavior: 'smooth',
@@ -1971,10 +1659,10 @@ function highlightSentence(index) {
     if (imageTrigger) {
         const imageUrl = imageTrigger.getAttribute('data-image');
         if (imageUrl) {
-            showCursorImage(imageUrl);
+            showImage(imageUrl, imageTrigger);
         }
     } else {
-        hideCursorImage();
+        hideImage();
     }
 }
 
@@ -2001,6 +1689,18 @@ function previousChapter() {
     }
 }
 
+function updateScrollProgress() {
+    const progressBar = document.getElementById('scrollProgressBar');
+    
+    if (!progressBar) return;
+    
+    const total = state.allSentenceElements.length;
+    const current = state.currentSentenceIndex;
+    const progress = ((current + 1) / total) * 100;
+    
+    progressBar.style.height = `${progress}%`;
+}
+
 function pageUp() {
     if (state.allSentenceElements.length === 0) return;
     
@@ -2017,25 +1717,13 @@ function pageDown() {
     highlightSentence(state.currentSentenceIndex);
 }
 
-function updateScrollProgress() {
-    const progressBar = document.getElementById('scrollProgressBar');
+function resetToBeginning() {
+    if (state.allSentenceElements.length === 0) return;
     
-    if (!progressBar) return;
+    state.currentSentenceIndex = 0;
+    highlightSentence(0);
     
-    const total = state.allSentenceElements.length;
-    const current = state.currentSentenceIndex;
-    const progress = ((current + 1) / total) * 100;
-    
-    // Check if we're in mobile mode (bottom rail is always horizontal on mobile)
-    const isMobile = window.innerWidth <= 768;
-    
-    if (isMobile) {
-        progressBar.style.width = `${progress}%`;
-        progressBar.style.height = '100%';
-    } else {
-        progressBar.style.height = `${progress}%`;
-        progressBar.style.width = '100%';
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updateParallax() {
@@ -2048,13 +1736,42 @@ function updateParallax() {
     targetTextParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
     targetTextParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
     
+    if (state.imageActive && state.currentTriggerRect) {
+        const trigger = state.currentTriggerRect;
+        const triggerCenterX = trigger.left + trigger.width / 2;
+        const triggerCenterY = trigger.top + trigger.height / 2;
+        
+        const distToCenterX = (viewportCenterX - triggerCenterX) / viewportCenterX;
+        const distToCenterY = (viewportCenterY - triggerCenterY) / viewportCenterY;
+        
+        const magnetX = distToCenterX * CENTER_MAGNET_STRENGTH * 100;
+        const magnetY = distToCenterY * CENTER_MAGNET_STRENGTH * 100;
+        
+        const parallaxX = mouseOffsetX * 100 * IMAGE_PARALLAX_STRENGTH;
+        const parallaxY = mouseOffsetY * 100 * IMAGE_PARALLAX_STRENGTH;
+        
+        targetImageParallaxX = parallaxX - magnetX;
+        targetImageParallaxY = parallaxY - magnetY;
+    } else {
+        targetImageParallaxX = 0;
+        targetImageParallaxY = 0;
+    }
+    
     textParallaxX += (targetTextParallaxX - textParallaxX) * PARALLAX_DAMPING;
     textParallaxY += (targetTextParallaxY - textParallaxY) * PARALLAX_DAMPING;
     
+    imageParallaxX += (targetImageParallaxX - imageParallaxX) * PARALLAX_DAMPING;
+    imageParallaxY += (targetImageParallaxY - imageParallaxY) * PARALLAX_DAMPING;
+    
     const textLayer = document.getElementById('textLayer');
+    const imageLayer = document.getElementById('imageLayer');
     
     if (textLayer) {
         textLayer.style.transform = `translate3d(${textParallaxX}px, ${textParallaxY}px, 0)`;
+    }
+    
+    if (imageLayer) {
+        imageLayer.style.transform = `translate3d(${imageParallaxX}px, ${imageParallaxY}px, 0)`;
     }
     
     requestAnimationFrame(updateParallax);
@@ -2075,7 +1792,7 @@ function buildChapterDropdown() {
         li.innerHTML = `
             <span class="chapter-item-number">${String(chapter.id + 1).padStart(2, '0')}</span>
             <span class="chapter-item-title">${chapter.title}</span>
-            <span class="chapter-item-progress">${totalSentences}</span>
+            <span class="chapter-item-progress">${totalSentences} sentences</span>
         `;
         
         li.addEventListener('click', () => {
@@ -2114,14 +1831,6 @@ function closeChapterDropdown() {
     
     brand.classList.remove('open');
     dropdown.classList.remove('open');
-}
-
-function toggleTheme() {
-    state.lightMode = !state.lightMode;
-    document.body.classList.toggle('light-mode');
-    
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.textContent = state.lightMode ? '🌙' : '☀️';
 }
 
 function render() {
@@ -2171,6 +1880,12 @@ function render() {
             
             const wrappedText = wrapImageTriggers(part.text);
             span.innerHTML = wrappedText + ' ';
+            
+            if (state.hoveredSentence === part.id) {
+                span.classList.add('active');
+            } else if (state.hoveredSentence !== null) {
+                span.classList.add('dimmed');
+            }
             
             span.addEventListener('mouseenter', () => {
                 const index = parseInt(span.dataset.sentenceIndex);
@@ -2244,15 +1959,15 @@ function handleImageHover(e) {
     if (trigger) {
         const imageUrl = trigger.getAttribute('data-image');
         if (imageUrl) {
-            showCursorImage(imageUrl);
+            showImage(imageUrl, trigger);
         }
     }
 }
 
 function handleImageOut(e) {
     const trigger = e.target.closest('.image-trigger');
-    if (trigger && !e.relatedTarget?.closest('.image-trigger')) {
-        hideCursorImage();
+    if (trigger) {
+        hideImage();
     }
 }
 
@@ -2270,8 +1985,10 @@ function updateCursor() {
     cursor.style.left = `${cursorX}px`;
     cursor.style.top = `${cursorY}px`;
     
-    cursorImage.style.left = `${cursorX}px`;
-    cursorImage.style.top = `${cursorY}px`;
+    if (cursorImage) {
+        cursorImage.style.left = `${cursorX}px`;
+        cursorImage.style.top = `${cursorY}px`;
+    }
     
     requestAnimationFrame(updateCursor);
 }
@@ -2284,7 +2001,7 @@ document.addEventListener('mousemove', (e) => {
 }, { passive: true });
 
 document.addEventListener('mouseover', (e) => {
-    if (e.target.matches('a, button, .bracket-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
         cursor.classList.add('hovering');
         if (e.target.matches('button, a')) {
             cursor.classList.add('pointer');
@@ -2293,7 +2010,7 @@ document.addEventListener('mouseover', (e) => {
 });
 
 document.addEventListener('mouseout', (e) => {
-    if (e.target.matches('a, button, .bracket-trigger, input[type="range"], .chapter-break, .chapter-item')) {
+    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item')) {
         cursor.classList.remove('hovering');
         cursor.classList.remove('pointer');
     }
@@ -2308,22 +2025,17 @@ curveSlider.addEventListener('input', (e) => {
 const layoutToggle = document.getElementById('layoutToggle');
 const layoutIcon = layoutToggle.querySelector('.layout-icon');
 const brandLogo = document.getElementById('brandLogo');
-const themeToggle = document.getElementById('themeToggle');
 
 function updateLayoutIcon() {
-    if (state.layoutMode === 'fullview') {
-        layoutIcon.className = 'layout-icon fullview';
+    if (state.layoutMode === 'layered') {
+        layoutIcon.className = 'layout-icon layered';
     } else {
-        layoutIcon.className = 'layout-icon splitview';
+        layoutIcon.className = 'layout-icon split';
     }
 }
 
 brandLogo.addEventListener('click', () => {
     toggleChapterDropdown();
-});
-
-themeToggle.addEventListener('click', () => {
-    toggleTheme();
 });
 
 document.addEventListener('click', (e) => {
@@ -2335,20 +2047,20 @@ document.addEventListener('click', (e) => {
     }
 });
 
-document.getElementById('prevSentenceBtn').addEventListener('click', () => {
-    previousSentence();
-});
-
-document.getElementById('nextSentenceBtn').addEventListener('click', () => {
-    nextSentence();
-});
-
 document.getElementById('pageUpBtn').addEventListener('click', () => {
     pageUp();
 });
 
 document.getElementById('pageDownBtn').addEventListener('click', () => {
     pageDown();
+});
+
+document.getElementById('prevSentenceBtn').addEventListener('click', () => {
+    previousSentence();
+});
+
+document.getElementById('nextSentenceBtn').addEventListener('click', () => {
+    nextSentence();
 });
 
 document.getElementById('prevChapterBtn').addEventListener('click', () => {
@@ -2359,30 +2071,17 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
     nextChapter();
 });
 
+document.getElementById('previewToggle').addEventListener('click', () => {
+    togglePreviewMode();
+});
+
 layoutToggle.addEventListener('click', () => {
-    // Hide current images before switching
-    hideCursorImage();
+    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     
-    state.layoutMode = state.layoutMode === 'fullview' ? 'splitview' : 'fullview';
-    
-    document.body.classList.remove('layout-fullview', 'layout-splitview');
+    document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
     
     updateLayoutIcon();
-    
-    // Re-show image if there's an active sentence with an image trigger
-    if (state.currentSentenceIndex >= 0) {
-        const sentence = state.allSentenceElements[state.currentSentenceIndex];
-        if (sentence) {
-            const imageTrigger = sentence.querySelector('.image-trigger');
-            if (imageTrigger) {
-                const imageUrl = imageTrigger.getAttribute('data-image');
-                if (imageUrl) {
-                    setTimeout(() => showCursorImage(imageUrl), 100);
-                }
-            }
-        }
-    }
     
     document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
     setTimeout(() => {
@@ -2401,46 +2100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.addEventListener('wheel', handleScroll, { passive: false });
     
-    // Touch swipe detection for mobile - smooth sentence navigation
-    let touchStartY = 0;
-    let touchStartTime = 0;
-    let touchStartX = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-        touchStartTime = Date.now();
-    }, { passive: true });
-    
-    document.addEventListener('touchmove', (e) => {
-        // Prevent default scroll behavior during swipe
-        if (Math.abs(e.touches[0].clientY - touchStartY) > 30) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    document.addEventListener('touchend', (e) => {
-        const touchEndY = e.changedTouches[0].clientY;
-        const touchEndX = e.changedTouches[0].clientX;
-        
-        const deltaY = touchStartY - touchEndY;
-        const deltaX = Math.abs(touchStartX - touchEndX);
-        
-        // Only process if it's primarily a vertical swipe
-        if (Math.abs(deltaY) > deltaX && Math.abs(deltaY) > 30) {
-            // Always navigate sentence by sentence
-            if (deltaY > 0) {
-                nextSentence();
-            } else {
-                previousSentence();
-            }
-        }
-    }, { passive: true });
-    
-    window.addEventListener('resize', () => {
-        updateScrollProgress();
-    });
-    
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
             e.preventDefault();
@@ -2448,6 +2107,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleImageSize();
                 spacebarPressed = true;
             }
+        }
+        
+        if (e.key === 'p' || e.key === 'P') {
+            e.preventDefault();
+            togglePreviewMode();
         }
         
         switch(e.key) {
@@ -2482,10 +2146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'Home':
                 e.preventDefault();
-                if (state.allSentenceElements.length > 0) {
-                    state.currentSentenceIndex = 0;
-                    highlightSentence(0);
-                }
+                resetToBeginning();
                 break;
             case 'End':
                 e.preventDefault();
@@ -2513,10 +2174,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     console.log('✓ Twenty Years of Bootstrap Design · Zack Gort');
-    console.log('💡 Desktop: Fullview (cursor) / Splitview (right column)');
-    console.log('💡 Mobile: Swipe navigation, faded background images');
-    console.log('💡 Mobile bottom rail: ◀ Sentence | ◀◀ Chapter | Progress | Chapter ▶▶ | Sentence ▶');
-    console.log('💡 Keyboard: ↑/↓ (j/k) sentences, [ ] chapters, PgUp/PgDn, L toggle');
+    console.log('💡 Navigation: Scroll wheel, Arrow keys (↑/↓, j/k), Page Up/Down');
+    console.log('💡 Chapters: Click logo or press [ / ] to navigate chapters');
+    console.log('💡 Preview Mode: Press P or click 🖼️ button to toggle BG/CUR mode');
+    console.log('💡 In CUR mode: Press Space to enlarge image');
+    console.log('💡 Click sentences to activate, hover image triggers to preview');
+    console.log('💡 Press "l" to toggle layout, Home/End to jump');
 });
     </script>
 </body>
