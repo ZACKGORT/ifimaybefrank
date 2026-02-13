@@ -743,6 +743,9 @@ body::after {
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: var(--z-dropdown);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .chapter-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
@@ -751,6 +754,7 @@ body::after {
     padding: 12px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     margin-bottom: 8px;
+    flex-shrink: 0;
 }
 
 .chapter-dropdown-header h3 {
@@ -764,11 +768,12 @@ body::after {
 }
 
 .chapter-dropdown-list {
-    max-height: 60vh;
     overflow-y: auto;
     padding: 0;
     margin: 0;
     list-style: none;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .chapter-dropdown-list::-webkit-scrollbar { width: 4px; }
@@ -889,7 +894,15 @@ body::after {
 }
 
 .image-grid-overlay.open { display: flex; opacity: 1; }
-.grid-content { padding: 100px 5vw; max-width: 1600px; margin: 0 auto; width: 100%; }
+.grid-content { 
+    padding: 100px 5vw; 
+    max-width: 1600px; 
+    margin: 0 auto; 
+    width: 100%; 
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
 .grid-chapter-section { margin-bottom: 60px; }
 
 .grid-chapter-title {
@@ -1086,6 +1099,9 @@ body::after {
     .text-layer { padding: 10vh 8vw 20vh; max-width: 90%; }
     .header { padding: 10px 20px; }
     .stream { font-size: clamp(16px, 3vw, 24px); }
+    
+    /* Disable Preview Toggle in Landscape */
+    .preview-toggle { display: none; }
 }
 
 @media (max-width: 768px) {
@@ -1097,6 +1113,17 @@ body::after {
     .stream { font-size: clamp(16px, 4vw, 28px); }
     .hover-image { width: 800px; height: 600px; }
     .chapter-dropdown { min-width: 240px; left: -10px; }
+    
+    /* Mobile Grid Overrides */
+    .grid-images-container {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .grid-content {
+        padding: 100px 10vw; /* Increased padding for safe scroll area */
+    }
+
     body.layout-split .text-layer { width: 100%; padding-left: 50px; padding-right: 20px; }
     body.layout-split .hover-image {
         position: absolute;
@@ -1115,75 +1142,6 @@ body::after {
     .edge-blur { backdrop-filter: none; -webkit-backdrop-filter: none; }
     * { animation: none !important; transition: none !important; }
 }
-
-/* Scroll lock when dropdown open */
-body.no-scroll {
-    overflow: hidden !important;
-}
-
-/* Grid edge scroll zones */
-.grid-scroll-zone {
-    position: fixed;
-    z-index: calc(var(--z-overlay) + 1);
-    pointer-events: auto;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.grid-scroll-zone.active {
-    opacity: 0.1;
-    background: var(--accent);
-}
-
-.grid-scroll-zone.top {
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    cursor: n-resize;
-}
-
-.grid-scroll-zone.bottom {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    cursor: s-resize;
-}
-
-/* Grid content parallax support */
-.grid-content { 
-    padding: 100px 5vw; 
-    max-width: 1600px; 
-    margin: 0 auto; 
-    width: 100%; 
-    transform-style: preserve-3d;
-    will-change: transform;
-    transition: transform 0.1s linear;
-}
-
-/* Hide preview toggle in landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-    .preview-toggle {
-        display: none !important;
-    }
-    
-    body {
-        cursor: none !important;
-    }
-    
-    body.cursor-preview-mode .hover-image {
-        display: block !important;
-    }
-    
-    body.cursor-preview-mode #cursorImage {
-        display: none !important;
-    }
-    
-    body:not(.cursor-preview-mode) .hover-image {
-        display: block !important;
-    }
-}
     </style>
 
 </head>
@@ -1196,9 +1154,6 @@ body.no-scroll {
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
-        <div class="grid-scroll-zone top" id="gridScrollTop"></div>
-        <div class="grid-scroll-zone bottom" id="gridScrollBottom"></div>
-        
         <div class="grid-content" id="gridContent">
             </div>
     </div>
@@ -1407,13 +1362,6 @@ const CENTER_MAGNET_STRENGTH = 0.25;
 const PARALLAX_DAMPING = 0.1;
 const SCROLL_THRESHOLD = 30;
 const SCROLL_COOLDOWN = 100;
-
-// NEW: Grid and Landscape Constants
-const GRID_SCROLL_SPEED = 15;
-const GRID_EDGE_ZONE_HEIGHT = 80;
-let isInLandscape = false;
-let gridScrollInterval = null;
-
 let scrollCooldownActive = false;
 let spacebarPressed = false;
 
@@ -1762,31 +1710,10 @@ let imageParallaxY = 0;
 let targetImageParallaxX = 0;
 let targetImageParallaxY = 0;
 
-// NEW: Grid Parallax Variables
-let gridParallaxX = 0;
-let gridParallaxY = 0;
-let targetGridParallaxX = 0;
-let targetGridParallaxY = 0;
-
 const phraseRegexMap = new Map();
 for (const phrase of Object.keys(imageMap)) {
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
-}
-
-function checkLandscape() {
-    const wasLandscape = isInLandscape;
-    isInLandscape = window.matchMedia('(max-height: 500px) and (orientation: landscape)').matches;
-    
-    // If switching to landscape, force background mode
-    if (isInLandscape && !wasLandscape) {
-        state.previewMode = 'background';
-        document.body.classList.remove('cursor-preview-mode');
-        const previewModeText = document.getElementById('previewModeText');
-        const previewButton = document.getElementById('previewToggle');
-        if (previewModeText) previewModeText.textContent = 'BG';
-        if (previewButton) previewButton.classList.remove('active');
-    }
 }
 
 function getCurrentChapter() {
@@ -1868,10 +1795,12 @@ function preloadImages() {
 }
 
 function togglePreviewMode() {
-    // NEW: Don't allow toggle in landscape
-    if (isInLandscape) return;
-
-    state.previewMode = state.previewMode === 'background' ? 'cursor' : 'background';
+    // Force reset if we are in landscape mode
+    if (window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches) {
+        state.previewMode = 'background';
+    } else {
+        state.previewMode = state.previewMode === 'background' ? 'cursor' : 'background';
+    }
     
     const previewModeText = document.getElementById('previewModeText');
     const previewButton = document.getElementById('previewToggle');
@@ -1957,8 +1886,21 @@ function toggleImageSize() {
     cursorImage.classList.toggle('enlarged');
 }
 
+function isDropdownOpen() {
+    return document.getElementById('chapterDropdown').classList.contains('open');
+}
+
 function handleScroll(event) {
     if (scrollCooldownActive) return;
+    
+    // Check if dropdown is open. If so, only prevent defaults if we aren't hovering it
+    if (isDropdownOpen()) {
+        const dropdown = document.getElementById('chapterDropdown');
+        if (!dropdown.contains(event.target)) {
+             event.preventDefault();
+        }
+        return; 
+    }
     
     const scrollDelta = event.deltaY;
     
@@ -2001,6 +1943,15 @@ function handleTouchMove(e) {
         return;
     }
     
+    if (isDropdownOpen()) {
+         // Allow touch move within dropdown, disable elsewhere
+         const dropdown = document.getElementById('chapterDropdown');
+         if (!dropdown.contains(e.target)) {
+             e.preventDefault();
+         }
+         return;
+    }
+    
     e.preventDefault();
 }
 
@@ -2020,7 +1971,7 @@ function handleTouchEnd(e) {
         return;
     }
     
-    if (!touchMoved || scrollCooldownActive) {
+    if (!touchMoved || scrollCooldownActive || isDropdownOpen()) {
         return;
     }
     
@@ -2068,9 +2019,6 @@ function highlightSentence(index) {
     sentence.classList.add('active');
     sentence.classList.remove('dimmed');
     
-    // NEW: Update chapter tracking for dropdown sync
-    state.currentChapterIndex = getCurrentChapter();
-
     updateScrollProgress();
     updateChapterDropdown(); // Sync chapter dropdown with current position
     
@@ -2156,11 +2104,9 @@ function updateParallax() {
     const mouseOffsetX = (mouseX - viewportCenterX) / viewportCenterX;
     const mouseOffsetY = (mouseY - viewportCenterY) / viewportCenterY;
     
-    // Text parallax
     targetTextParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
     targetTextParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
     
-    // Image parallax
     if (state.imageActive && state.currentTriggerRect) {
         const trigger = state.currentTriggerRect;
         const triggerCenterX = trigger.left + trigger.width / 2;
@@ -2182,24 +2128,15 @@ function updateParallax() {
         targetImageParallaxY = 0;
     }
     
-    // NEW: Grid parallax
-    targetGridParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
-    targetGridParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
-    
-    // Smooth transitions
     textParallaxX += (targetTextParallaxX - textParallaxX) * PARALLAX_DAMPING;
     textParallaxY += (targetTextParallaxY - textParallaxY) * PARALLAX_DAMPING;
     
     imageParallaxX += (targetImageParallaxX - imageParallaxX) * PARALLAX_DAMPING;
     imageParallaxY += (targetImageParallaxY - imageParallaxY) * PARALLAX_DAMPING;
     
-    gridParallaxX += (targetGridParallaxX - gridParallaxX) * PARALLAX_DAMPING;
-    gridParallaxY += (targetGridParallaxY - gridParallaxY) * PARALLAX_DAMPING;
-    
-    // Apply transforms
     const textLayer = document.getElementById('textLayer');
     const imageLayer = document.getElementById('imageLayer');
-    const gridContent = document.getElementById('gridContent');
+    const gridOverlay = document.getElementById('gridContent');
     
     if (textLayer) {
         textLayer.style.transform = `translate3d(${textParallaxX}px, ${textParallaxY}px, 0)`;
@@ -2209,8 +2146,10 @@ function updateParallax() {
         imageLayer.style.transform = `translate3d(${imageParallaxX}px, ${imageParallaxY}px, 0)`;
     }
     
-    if (gridContent) {
-        gridContent.style.transform = `translate3d(${gridParallaxX}px, ${gridParallaxY}px, 0)`;
+    // Apply Parallax to Grid Content
+    if (gridOverlay) {
+        // We use a stronger effect for the grid overlay to give it some float
+        gridOverlay.style.transform = `translate3d(${imageParallaxX * 0.5}px, ${imageParallaxY * 0.5}px, 0)`;
     }
     
     requestAnimationFrame(updateParallax);
@@ -2245,12 +2184,16 @@ function buildChapterDropdown() {
 function updateChapterDropdown() {
     const currentChapter = getCurrentChapter();
     const items = document.querySelectorAll('.chapter-item');
+    const dropdownList = document.querySelector('.chapter-dropdown-list');
     
     items.forEach(item => {
         const chapterId = parseInt(item.dataset.chapterId);
         if (chapterId === currentChapter) {
             item.classList.add('active');
-            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // Scroll item into view within the dropdown container if it is open
+             if (document.getElementById('chapterDropdown').classList.contains('open')) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+             }
         } else {
             item.classList.remove('active');
         }
@@ -2263,9 +2206,6 @@ function toggleChapterDropdown() {
     
     brand.classList.toggle('open');
     dropdown.classList.toggle('open');
-    
-    // NEW: Lock/unlock page scroll when dropdown is open
-    document.body.classList.toggle('no-scroll', dropdown.classList.contains('open'));
     
     if (dropdown.classList.contains('open')) {
         updateChapterDropdown();
@@ -2351,48 +2291,6 @@ function buildImageGrid() {
             section.appendChild(grid);
             content.appendChild(section);
         }
-    });
-}
-
-function setupGridScrollZones() {
-    const topZone = document.getElementById('gridScrollTop');
-    const bottomZone = document.getElementById('gridScrollBottom');
-    const overlay = document.getElementById('imageGridOverlay');
-    
-    let scrollInterval = null;
-    
-    function startScroll(direction) {
-        if (scrollInterval) return;
-        scrollInterval = setInterval(() => {
-            overlay.scrollTop += direction * GRID_SCROLL_SPEED;
-        }, 16);
-    }
-    
-    function stopScroll() {
-        if (scrollInterval) {
-            clearInterval(scrollInterval);
-            scrollInterval = null;
-        }
-    }
-    
-    topZone.addEventListener('mouseenter', () => {
-        topZone.classList.add('active');
-        startScroll(-1);
-    });
-    
-    topZone.addEventListener('mouseleave', () => {
-        topZone.classList.remove('active');
-        stopScroll();
-    });
-    
-    bottomZone.addEventListener('mouseenter', () => {
-        bottomZone.classList.add('active');
-        startScroll(1);
-    });
-    
-    bottomZone.addEventListener('mouseleave', () => {
-        bottomZone.classList.remove('active');
-        stopScroll();
     });
 }
 
@@ -2690,14 +2588,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCursor();
     updateParallax();
     
-    // NEW: Initialize grid scroll zones and landscape detection
-    setupGridScrollZones();
-    checkLandscape();
-    window.addEventListener('resize', checkLandscape);
-    window.addEventListener('orientationchange', checkLandscape);
-    
     document.body.classList.add(`layout-${state.layoutMode}`);
     updateLayoutIcon();
+    
+    // Check initial orientation for landscape
+    if (window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches) {
+        state.previewMode = 'background';
+    }
     
     window.addEventListener('wheel', handleScroll, { passive: false });
     
