@@ -541,6 +541,64 @@ body::-webkit-scrollbar { display: none; }
 body { -ms-overflow-style: none; scrollbar-width: none; }
 ::selection { background: rgba(218, 165, 32, 0.25); color: #fff; }
 
+/* Free-scroll mode visual feedback */
+body.free-scroll-mode {
+    overflow: auto !important;
+}
+
+body.free-scroll-mode .vignette {
+    opacity: calc(var(--vig-opacity) * 0.3);
+    transition: opacity 0.3s ease;
+}
+
+body.free-scroll-mode .edge-blur {
+    backdrop-filter: blur(calc(var(--edge-blur) * 0.5));
+    -webkit-backdrop-filter: blur(calc(var(--edge-blur) * 0.5));
+    transition: backdrop-filter 0.3s ease;
+}
+
+body.free-scroll-mode .sentence:not(.active) {
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+
+body.free-scroll-mode .sentence.active {
+    opacity: 1;
+    transition: opacity 0.15s ease;
+}
+
+/* Free-scroll activation pulse */
+@keyframes scroll-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.02);
+        opacity: 1;
+    }
+}
+
+body.free-scroll-mode::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 60px;
+    background: var(--accent);
+    opacity: 0.4;
+    border-radius: 2px;
+    z-index: calc(var(--z-ui) + 1);
+    pointer-events: none;
+    animation: scroll-pulse 1.5s ease-in-out infinite;
+}
+
+body.theme-newspaper.free-scroll-mode::before {
+    background: var(--accent);
+}
+
 .edge-blur {
     position: fixed;
     inset: 0;
@@ -1008,91 +1066,64 @@ body::after {
 
 .image-grid-overlay.open { display: flex; opacity: 1; }
 
-.grid-close-btn {
+/* Invisible close hotspots */
+.close-hotspot {
     position: fixed;
-    top: 30px;
-    right: 30px;
-    z-index: calc(var(--z-overlay) + 1);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: var(--ink-2);
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-}
-
-.grid-close-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: var(--accent);
-    color: var(--accent);
-    transform: scale(1.1);
-}
-
-.grid-close-btn:active {
-    transform: scale(0.95);
-}
-
-body.theme-newspaper .grid-close-btn {
-    background: rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.15);
-}
-
-body.theme-newspaper .grid-close-btn:hover {
-    background: rgba(139, 69, 19, 0.1);
-}
-
-.split-close-btn {
-    position: fixed;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: var(--z-ui);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: var(--ink-2);
-    font-size: 20px;
-    cursor: pointer;
+    top: 0;
+    right: 0;
+    width: 25vw;
+    height: 25vh;
+    min-width: 150px;
+    min-height: 150px;
+    z-index: calc(var(--z-overlay) + 10);
+    cursor: none;
     display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
     pointer-events: auto;
 }
 
-body.layout-split .split-close-btn {
-    display: flex;
+.grid-close-hotspot {
+    z-index: calc(var(--z-overlay) + 10);
 }
 
-.split-close-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+.image-grid-overlay.open ~ .grid-close-hotspot {
+    display: block;
+}
+
+.split-close-hotspot {
+    z-index: calc(var(--z-ui) + 10);
+}
+
+body.layout-split .split-close-hotspot {
+    display: block;
+}
+
+/* Cursor X state */
+#cursor.close-mode {
+    width: 60px;
+    height: 60px;
     border-color: var(--accent);
+    background: rgba(218, 165, 32, 0.15);
+}
+
+#cursor.close-mode::before {
+    content: '✕';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: bold;
     color: var(--accent);
-    transform: translateX(-50%) scale(1.1);
+    line-height: 1;
 }
 
-.split-close-btn:active {
-    transform: translateX(-50%) scale(0.99);
+body.theme-newspaper #cursor.close-mode {
+    border-color: var(--accent);
+    background: rgba(139, 69, 19, 0.15);
 }
 
-body.theme-newspaper .split-close-btn {
-    background: rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.15);
-}
-
-body.theme-newspaper .split-close-btn:hover {
-    background: rgba(139, 69, 19, 0.1);
-    transform: translateX(-50%) scale(1.1);
+body.theme-newspaper #cursor.close-mode::before {
+    color: var(--accent);
 }
 
 .grid-content { 
@@ -1347,7 +1378,9 @@ body.theme-newspaper .split-close-btn:hover {
 
 </head>
 <body>
-    <button class="split-close-btn" id="splitCloseBtn" aria-label="Exit split view (X or Esc)">✕</button>
+    <!-- Invisible close hotspots -->
+    <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
+    <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     
     <div class="rotate-warning">
         <svg viewBox="0 0 24 24">
@@ -1357,7 +1390,6 @@ body.theme-newspaper .split-close-btn:hover {
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
-        <button class="grid-close-btn" id="gridCloseBtn" aria-label="Close grid (X or Esc)">✕</button>
         <div class="grid-content" id="gridContent">
             </div>
     </div>
@@ -1367,7 +1399,7 @@ body.theme-newspaper .split-close-btn:hover {
     
     <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
-            <span class="lens-label">Designer</span>
+            <span class="lens-label">Accessibility</span>
             <div class="lens-slider-wrapper">
                 <input 
                     type="range" 
@@ -1380,7 +1412,6 @@ body.theme-newspaper .split-close-btn:hover {
                     aria-label="Adjust accessibility: left for larger text and less effects, right for artistic styling"
                 >
             </div>
-            <span class="lens-label">Client</span>            
         </div>
     </div>
     
@@ -1457,7 +1488,7 @@ body.theme-newspaper .split-close-btn:hover {
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>If I May Be Frank · Intro</span>
+                <span>Chapter · Navigation</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -1741,12 +1772,13 @@ const chapters = [
 
 const narrative = `
      
-    The year is 2026, and folks still need to be told to scroll. But alas, to what avail? To wander into the void, guided by colorful abstractions that are born from whim or from whimsey. To aimlessly interact with that which disinterests you, or worst yet, offends you with boredom. As if born to a shark and left omissively to eat, or be meat [I wrote this, not AI, just fyi] global scale. [This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, "from the heart"]
+    The year is 2026, and folks still need to be told to scroll. But alas, to what avail? To wander into the void, guided by colorful abstractions that are born from whim or from whimsey. To aimlessly interact with that which disinterests you, or is of no interest to you. This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, "from the heart". A non-linear, but carefully curated and considered career path, from homegrown startups to working with A-list brands at a global scale. What follows is fifteen-plus years of thinking, making, and evolving.
     
-    [I didn't graduate from college.] Convention? Or Convection? Are we cooked? Dead-ass. Bet. ROFL?
+    [I didn't graduate from college.] I couldn't afford it. Pratt Institute was expensive, and loans or financial aid were simply out of reach—though not as simple as it may seem. At nineteen years old, there wasn't much that I could afford, so I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station. At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could ['bull'-expletive] with my so-called talent. But I had a budding passion for graphic design. What's in my head? A head-first approach. Headless, sans ego.
 
     [I built my first computer circa 2005 to '06.] I immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at, intensely. I studied typography—reading books, examining magazines, and generally observing what I saw wherever I were. I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal. I began to create faux website concepts to gain an understanding of designing for that medium. I also learned the proper etiquette towards finding gainful employment. All this culminated with an interview from a Craigslist post. I can still pull up my original cover letter. Here, I was brought on as a graphic designer, full-time. You have no idea how happy I was. I was set to make sixteen-fifty an hour, plus full benefits, a 401K, and have my own cubicle.
 
+    [Alright. Now, where to begin?] I'd just been brought into the fold with a budding home-grown startup. Turn5 had set up its new HQ at a warehouse office facility in Great Valley, PA—about twenty miles outside of Philly—owned and operated by two brothers; one of which wasn't even old enough to drink at the company holiday party. I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR. I became graphic designer for all web properties, graphic designer for all print initiatives including package design and catalogue design, Product Photographer specializing in lighting and establishing systematic protocols for visual uniformity at scale. We photographed thousands of parts, with customization at the heart of what we sold—countless product permutations. We had to color match perfectly to mimic OEM quality, ensuring our product photography looked consistent through print and digital media alike. Having passed the torch of photography duties onto a true professional, I was able to focus on email marketing and feature design. Working with analytical data helped to inform top-level site design changes. It was at this point, I graduated from graphic designer to web designer.
 
     [Okay, so Leadnomics was shifty.] Paradigm shifty, we'll say. It was a great place to work though—I have lasting friendships with folks I worked with there. Our work fed upon the uneducated and disenfranchised, in some respects. Our focus was in lead generation. Our cash cow was in facilitating easy access to payday loans. But we had free lunches, regular bonuses, company outings. In short, my job was to make it intuitive and stress free—daresay pleasant—for one to make catastrophic financial decisions at a scale in tens of thousands per month. I had a ninety-five-point-eight percent conversion rate with a bounce rate lower than 15%. This wasn't magic. This was the result of introducing Responsive Web Design practices via Twitter's Bootstrap ethos, while backed by thoughtful action and solutioning based on analytical data and insights drawn from user testing and A/B split-testing. We fashioned a helluva good fishing net.
 
@@ -2026,18 +2058,100 @@ function handleTouchStart(e) {
     
     longPressTimer = setTimeout(() => {
         isLongPress = true;
+        document.body.classList.add('free-scroll-mode');
         document.body.style.overflow = 'auto';
         const textLayer = document.querySelector('.text-layer');
         if (textLayer) {
             textLayer.style.overflow = 'visible';
         }
+        
+        // Start tracking scroll position for sentence detection
+        startScrollTracking();
     }, LONG_PRESS_DURATION);
+}
+
+let scrollTrackingInterval = null;
+let lastScrollY = 0;
+let scrollStopTimer = null;
+
+function startScrollTracking() {
+    // Visual feedback that free-scroll mode is active
+    const stream = document.getElementById('stream');
+    if (stream) {
+        stream.style.transition = 'opacity 0.3s ease';
+    }
+    
+    // Track scroll position frequently
+    scrollTrackingInterval = setInterval(() => {
+        if (isLongPress) {
+            highlightSentenceAtViewportCenter();
+        }
+    }, 100);
+}
+
+function stopScrollTracking() {
+    if (scrollTrackingInterval) {
+        clearInterval(scrollTrackingInterval);
+        scrollTrackingInterval = null;
+    }
+}
+
+function highlightSentenceAtViewportCenter() {
+    const viewportCenterY = window.innerHeight / 2;
+    let closestSentence = null;
+    let closestDistance = Infinity;
+    
+    state.allSentenceElements.forEach((sentence, index) => {
+        const rect = sentence.getBoundingClientRect();
+        const sentenceCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(sentenceCenterY - viewportCenterY);
+        
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestSentence = index;
+        }
+    });
+    
+    if (closestSentence !== null && closestSentence !== state.currentSentenceIndex) {
+        // Temporarily highlight without full activation
+        state.allSentenceElements.forEach(s => s.classList.remove('active'));
+        state.allSentenceElements[closestSentence].classList.add('active');
+        state.currentSentenceIndex = closestSentence;
+    }
+}
+
+function activateSentenceAtViewportCenter() {
+    const viewportCenterY = window.innerHeight / 2;
+    let closestSentence = null;
+    let closestDistance = Infinity;
+    
+    state.allSentenceElements.forEach((sentence, index) => {
+        const rect = sentence.getBoundingClientRect();
+        const sentenceCenterY = rect.top + rect.height / 2;
+        const distance = Math.abs(sentenceCenterY - viewportCenterY);
+        
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestSentence = index;
+        }
+    });
+    
+    if (closestSentence !== null) {
+        state.currentSentenceIndex = closestSentence;
+        highlightSentence(closestSentence);
+    }
 }
 
 function handleTouchMove(e) {
     touchMoved = true;
     
     if (isLongPress) {
+        // Allow free scrolling - clear any pending "stop" timer
+        if (scrollStopTimer) {
+            clearTimeout(scrollStopTimer);
+            scrollStopTimer = null;
+        }
+        lastScrollY = window.scrollY;
         return;
     }
     
@@ -2066,11 +2180,18 @@ function handleTouchEnd(e) {
     
     if (isLongPress) {
         isLongPress = false;
+        document.body.classList.remove('free-scroll-mode');
         document.body.style.overflow = 'hidden';
         const textLayer = document.querySelector('.text-layer');
         if (textLayer) {
             textLayer.style.overflow = 'visible';
         }
+        
+        stopScrollTracking();
+        
+        // Activate the sentence at the center after user stops
+        activateSentenceAtViewportCenter();
+        
         return;
     }
     
@@ -2719,16 +2840,38 @@ document.getElementById('gridToggleBtn').addEventListener('click', () => {
     toggleImageGrid();
 });
 
-document.getElementById('gridCloseBtn').addEventListener('click', () => {
-    toggleImageGrid();
+// Hotspot close handlers
+const gridCloseHotspot = document.getElementById('gridCloseHotspot');
+const splitCloseHotspot = document.getElementById('splitCloseHotspot');
+
+gridCloseHotspot.addEventListener('mouseenter', () => {
+    cursor.classList.add('close-mode');
 });
 
-document.getElementById('splitCloseBtn').addEventListener('click', () => {
+gridCloseHotspot.addEventListener('mouseleave', () => {
+    cursor.classList.remove('close-mode');
+});
+
+gridCloseHotspot.addEventListener('click', () => {
+    toggleImageGrid();
+    cursor.classList.remove('close-mode');
+});
+
+splitCloseHotspot.addEventListener('mouseenter', () => {
+    cursor.classList.add('close-mode');
+});
+
+splitCloseHotspot.addEventListener('mouseleave', () => {
+    cursor.classList.remove('close-mode');
+});
+
+splitCloseHotspot.addEventListener('click', () => {
     if (state.layoutMode === 'split') {
         state.layoutMode = 'layered';
         document.body.classList.remove('layout-split');
         document.body.classList.add('layout-layered');
         updateLayoutIcon();
+        cursor.classList.remove('close-mode');
     }
 });
 
@@ -2846,12 +2989,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const overlay = document.getElementById('imageGridOverlay');
                 if(overlay.classList.contains('open')) {
                     toggleImageGrid();
+                    cursor.classList.remove('close-mode');
                 } else if (state.layoutMode === 'split') {
                     // Revert to default layered view
                     state.layoutMode = 'layered';
                     document.body.classList.remove('layout-split');
                     document.body.classList.add('layout-layered');
                     updateLayoutIcon();
+                    cursor.classList.remove('close-mode');
                 }
                 break;
         }
