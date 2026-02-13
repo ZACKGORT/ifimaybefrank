@@ -27,11 +27,11 @@
     --z-grain: 149;
     --z-blur: 150;
     --z-vig: 151;
-    --z-ui: 400; /* Rail controls sit above overlay */
-    --z-overlay: 300; /* Grid overlay */
-    --z-dropdown: 450;
-    --z-rail: 400;
-    --z-mobile-bottom-rail: 400;
+    --z-ui: 220;
+    --z-overlay: 300;
+    --z-dropdown: 350;
+    --z-rail: 210;
+    --z-mobile-bottom-rail: 220;
     --z-rotate-warning: 9999;
     --bracket-color: #8b6f47;
     --bracket-hover: #daa520;
@@ -175,13 +175,6 @@ body.cursor-preview-mode #cursorImage {
     pointer-events: auto;
     display: flex;
     align-items: center;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.left-rail.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) translateX(-20px);
 }
 
 .lens-control-container {
@@ -1116,48 +1109,80 @@ body::after {
     #cursor { display: none; }
     * { -webkit-tap-highlight-color: rgba(218, 165, 32, 0.2); }
     .nav-button { -webkit-tap-highlight-color: rgba(218, 165, 32, 0.3); }
-
-    /* Mobile 4-Up Grid Layout */
-    .grid-images-container {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 4px;
-    }
-
-    .grid-content {
-        padding: 80px 12px 100px;
-    }
-
-    .grid-image-item {
-        aspect-ratio: 1; /* Square thumbnails */
-        border-width: 0.5px;
-        border-radius: 4px;
-    }
-
-    /* Hide captions on mobile for cleaner view */
-    .grid-image-caption {
-        display: none !important;
-    }
-
-    .grid-chapter-title {
-        font-size: 10px;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        position: sticky;
-        top: 0;
-        background: rgba(5,5,5,0.95);
-        z-index: 10;
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .grid-chapter-section {
-        margin-bottom: 20px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .edge-blur { backdrop-filter: none; -webkit-backdrop-filter: none; }
     * { animation: none !important; transition: none !important; }
+}
+
+/* Scroll lock when dropdown open */
+body.no-scroll {
+    overflow: hidden !important;
+}
+
+/* Grid edge scroll zones */
+.grid-scroll-zone {
+    position: fixed;
+    z-index: calc(var(--z-overlay) + 1);
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.grid-scroll-zone.active {
+    opacity: 0.1;
+    background: var(--accent);
+}
+
+.grid-scroll-zone.top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    cursor: n-resize;
+}
+
+.grid-scroll-zone.bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    cursor: s-resize;
+}
+
+/* Grid content parallax support */
+.grid-content { 
+    padding: 100px 5vw; 
+    max-width: 1600px; 
+    margin: 0 auto; 
+    width: 100%; 
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 0.1s linear;
+}
+
+/* Hide preview toggle in landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+    .preview-toggle {
+        display: none !important;
+    }
+    
+    body {
+        cursor: none !important;
+    }
+    
+    body.cursor-preview-mode .hover-image {
+        display: block !important;
+    }
+    
+    body.cursor-preview-mode #cursorImage {
+        display: none !important;
+    }
+    
+    body:not(.cursor-preview-mode) .hover-image {
+        display: block !important;
+    }
 }
     </style>
 
@@ -1171,6 +1196,9 @@ body::after {
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
+        <div class="grid-scroll-zone top" id="gridScrollTop"></div>
+        <div class="grid-scroll-zone bottom" id="gridScrollBottom"></div>
+        
         <div class="grid-content" id="gridContent">
             </div>
     </div>
@@ -1178,7 +1206,7 @@ body::after {
     <div id="cursor" aria-hidden="true"></div>
     <img id="cursorImage" alt="Preview" aria-hidden="true">
     
-    <div class="left-rail" id="leftRail" aria-hidden="true">
+    <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
             <span class="lens-label">Lens</span>
             <div class="lens-slider-wrapper">
@@ -1224,6 +1252,14 @@ body::after {
                 </button>
                 <span class="mobile-nav-label">Next</span>
             </div>
+
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button mini" id="mobileGridToggle" 
+                        title="Toggle Grid" aria-label="Toggle Grid">
+                        <span style="font-size: 1.2em;">▦</span>
+                </button>
+                <span class="mobile-nav-label">View</span>
+            </div>
         </div>
     </div>
 
@@ -1250,6 +1286,13 @@ body::after {
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
                         </svg>
+                </button>
+            </div>
+
+            <div class="mobile-nav-group">
+                <button class="mobile-nav-button mini" id="landGridToggle" 
+                        title="Toggle Grid" aria-label="Toggle Grid">
+                        <span style="font-size: 1.2em;">▦</span>
                 </button>
             </div>
         </div>
@@ -1364,6 +1407,13 @@ const CENTER_MAGNET_STRENGTH = 0.25;
 const PARALLAX_DAMPING = 0.1;
 const SCROLL_THRESHOLD = 30;
 const SCROLL_COOLDOWN = 100;
+
+// NEW: Grid and Landscape Constants
+const GRID_SCROLL_SPEED = 15;
+const GRID_EDGE_ZONE_HEIGHT = 80;
+let isInLandscape = false;
+let gridScrollInterval = null;
+
 let scrollCooldownActive = false;
 let spacebarPressed = false;
 
@@ -1712,10 +1762,31 @@ let imageParallaxY = 0;
 let targetImageParallaxX = 0;
 let targetImageParallaxY = 0;
 
+// NEW: Grid Parallax Variables
+let gridParallaxX = 0;
+let gridParallaxY = 0;
+let targetGridParallaxX = 0;
+let targetGridParallaxY = 0;
+
 const phraseRegexMap = new Map();
 for (const phrase of Object.keys(imageMap)) {
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+}
+
+function checkLandscape() {
+    const wasLandscape = isInLandscape;
+    isInLandscape = window.matchMedia('(max-height: 500px) and (orientation: landscape)').matches;
+    
+    // If switching to landscape, force background mode
+    if (isInLandscape && !wasLandscape) {
+        state.previewMode = 'background';
+        document.body.classList.remove('cursor-preview-mode');
+        const previewModeText = document.getElementById('previewModeText');
+        const previewButton = document.getElementById('previewToggle');
+        if (previewModeText) previewModeText.textContent = 'BG';
+        if (previewButton) previewButton.classList.remove('active');
+    }
 }
 
 function getCurrentChapter() {
@@ -1797,6 +1868,9 @@ function preloadImages() {
 }
 
 function togglePreviewMode() {
+    // NEW: Don't allow toggle in landscape
+    if (isInLandscape) return;
+
     state.previewMode = state.previewMode === 'background' ? 'cursor' : 'background';
     
     const previewModeText = document.getElementById('previewModeText');
@@ -1994,6 +2068,9 @@ function highlightSentence(index) {
     sentence.classList.add('active');
     sentence.classList.remove('dimmed');
     
+    // NEW: Update chapter tracking for dropdown sync
+    state.currentChapterIndex = getCurrentChapter();
+
     updateScrollProgress();
     updateChapterDropdown(); // Sync chapter dropdown with current position
     
@@ -2079,9 +2156,11 @@ function updateParallax() {
     const mouseOffsetX = (mouseX - viewportCenterX) / viewportCenterX;
     const mouseOffsetY = (mouseY - viewportCenterY) / viewportCenterY;
     
+    // Text parallax
     targetTextParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
     targetTextParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
     
+    // Image parallax
     if (state.imageActive && state.currentTriggerRect) {
         const trigger = state.currentTriggerRect;
         const triggerCenterX = trigger.left + trigger.width / 2;
@@ -2103,14 +2182,24 @@ function updateParallax() {
         targetImageParallaxY = 0;
     }
     
+    // NEW: Grid parallax
+    targetGridParallaxX = mouseOffsetX * 20 * TEXT_PARALLAX_STRENGTH;
+    targetGridParallaxY = mouseOffsetY * 20 * TEXT_PARALLAX_STRENGTH;
+    
+    // Smooth transitions
     textParallaxX += (targetTextParallaxX - textParallaxX) * PARALLAX_DAMPING;
     textParallaxY += (targetTextParallaxY - textParallaxY) * PARALLAX_DAMPING;
     
     imageParallaxX += (targetImageParallaxX - imageParallaxX) * PARALLAX_DAMPING;
     imageParallaxY += (targetImageParallaxY - imageParallaxY) * PARALLAX_DAMPING;
     
+    gridParallaxX += (targetGridParallaxX - gridParallaxX) * PARALLAX_DAMPING;
+    gridParallaxY += (targetGridParallaxY - gridParallaxY) * PARALLAX_DAMPING;
+    
+    // Apply transforms
     const textLayer = document.getElementById('textLayer');
     const imageLayer = document.getElementById('imageLayer');
+    const gridContent = document.getElementById('gridContent');
     
     if (textLayer) {
         textLayer.style.transform = `translate3d(${textParallaxX}px, ${textParallaxY}px, 0)`;
@@ -2118,6 +2207,10 @@ function updateParallax() {
     
     if (imageLayer) {
         imageLayer.style.transform = `translate3d(${imageParallaxX}px, ${imageParallaxY}px, 0)`;
+    }
+    
+    if (gridContent) {
+        gridContent.style.transform = `translate3d(${gridParallaxX}px, ${gridParallaxY}px, 0)`;
     }
     
     requestAnimationFrame(updateParallax);
@@ -2171,6 +2264,9 @@ function toggleChapterDropdown() {
     brand.classList.toggle('open');
     dropdown.classList.toggle('open');
     
+    // NEW: Lock/unlock page scroll when dropdown is open
+    document.body.classList.toggle('no-scroll', dropdown.classList.contains('open'));
+    
     if (dropdown.classList.contains('open')) {
         updateChapterDropdown();
     }
@@ -2187,13 +2283,11 @@ function closeChapterDropdown() {
 /* Image Grid Logic */
 function toggleImageGrid() {
     const overlay = document.getElementById('imageGridOverlay');
-    const btns = document.querySelectorAll('.grid-toggle-btn');
-    const leftRail = document.getElementById('leftRail');
+    const btns = document.querySelectorAll('.grid-toggle-btn, #mobileGridToggle, #landGridToggle');
     
     if (overlay.classList.contains('open')) {
         overlay.classList.remove('open');
         document.body.style.overflow = '';
-        if (leftRail) leftRail.classList.remove('hidden');
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
             icon.textContent = '▦';
@@ -2201,7 +2295,6 @@ function toggleImageGrid() {
     } else {
         overlay.classList.add('open');
         document.body.style.overflow = 'hidden'; // Lock scroll
-        if (leftRail) leftRail.classList.add('hidden');
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
             icon.textContent = '✕';
@@ -2258,6 +2351,48 @@ function buildImageGrid() {
             section.appendChild(grid);
             content.appendChild(section);
         }
+    });
+}
+
+function setupGridScrollZones() {
+    const topZone = document.getElementById('gridScrollTop');
+    const bottomZone = document.getElementById('gridScrollBottom');
+    const overlay = document.getElementById('imageGridOverlay');
+    
+    let scrollInterval = null;
+    
+    function startScroll(direction) {
+        if (scrollInterval) return;
+        scrollInterval = setInterval(() => {
+            overlay.scrollTop += direction * GRID_SCROLL_SPEED;
+        }, 16);
+    }
+    
+    function stopScroll() {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    }
+    
+    topZone.addEventListener('mouseenter', () => {
+        topZone.classList.add('active');
+        startScroll(-1);
+    });
+    
+    topZone.addEventListener('mouseleave', () => {
+        topZone.classList.remove('active');
+        stopScroll();
+    });
+    
+    bottomZone.addEventListener('mouseenter', () => {
+        bottomZone.classList.add('active');
+        startScroll(1);
+    });
+    
+    bottomZone.addEventListener('mouseleave', () => {
+        bottomZone.classList.remove('active');
+        stopScroll();
     });
 }
 
@@ -2527,6 +2662,14 @@ document.getElementById('gridToggleBtn').addEventListener('click', () => {
     toggleImageGrid();
 });
 
+document.getElementById('mobileGridToggle').addEventListener('click', () => {
+    toggleImageGrid();
+});
+
+document.getElementById('landGridToggle').addEventListener('click', () => {
+    toggleImageGrid();
+});
+
 layoutToggle.addEventListener('click', () => {
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     
@@ -2546,6 +2689,12 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
     updateCursor();
     updateParallax();
+    
+    // NEW: Initialize grid scroll zones and landscape detection
+    setupGridScrollZones();
+    checkLandscape();
+    window.addEventListener('resize', checkLandscape);
+    window.addEventListener('orientationchange', checkLandscape);
     
     document.body.classList.add(`layout-${state.layoutMode}`);
     updateLayoutIcon();
