@@ -1890,6 +1890,11 @@ function isDropdownOpen() {
     return document.getElementById('chapterDropdown').classList.contains('open');
 }
 
+function isGridOpen() {
+    const grid = document.getElementById('imageGridOverlay');
+    return grid && grid.classList.contains('open');
+}
+
 function handleScroll(event) {
     if (scrollCooldownActive) return;
     
@@ -1900,6 +1905,11 @@ function handleScroll(event) {
              event.preventDefault();
         }
         return; 
+    }
+
+    if (isGridOpen()) {
+        // Allow native scrolling inside grid
+        return;
     }
     
     const scrollDelta = event.deltaY;
@@ -1951,6 +1961,11 @@ function handleTouchMove(e) {
          }
          return;
     }
+
+    if (isGridOpen()) {
+        // Allow native touch scrolling inside grid
+        return; 
+    }
     
     e.preventDefault();
 }
@@ -1972,6 +1987,11 @@ function handleTouchEnd(e) {
     }
     
     if (!touchMoved || scrollCooldownActive || isDropdownOpen()) {
+        return;
+    }
+
+    if (isGridOpen()) {
+        // Do not trigger swipe logic when grid is open
         return;
     }
     
