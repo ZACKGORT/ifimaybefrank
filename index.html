@@ -258,6 +258,7 @@ body.cursor-preview-mode #cursorImage {
     justify-content: center;
     gap: 20px;
     border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 0;
 }
 
 .mobile-bottom-rail {
@@ -287,7 +288,17 @@ body.cursor-preview-mode #cursorImage {
 
 .mobile-right-rail .mobile-nav-container {
     flex-direction: column;
-    height: auto;
+    height: 100%;
+    justify-content: space-between;
+}
+
+/* Nav Groups in Right Rail */
+.mobile-right-rail .rail-top-group,
+.mobile-right-rail .rail-bottom-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
 }
 
 .mobile-nav-group {
@@ -348,15 +359,17 @@ body.cursor-preview-mode #cursorImage {
 
 /* Vertical progress for Right Rail */
 .mobile-right-rail .mobile-progress-container {
-    height: 100px;
+    height: 100%;
     width: 100%;
-    flex: 0 0 auto;
+    flex: 1;
     justify-content: center;
+    padding: 20px 0;
 }
 
 .mobile-right-rail .mobile-progress-bar {
     width: 4px;
-    height: 80px;
+    height: 100%;
+    max-height: 200px;
 }
 
 .mobile-right-rail .mobile-progress-fill {
@@ -1207,48 +1220,44 @@ body::after {
                 </button>
                 <span class="mobile-nav-label">Next</span>
             </div>
-
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button mini" id="mobileGridToggle" 
-                        title="Toggle Grid" aria-label="Toggle Grid">
-                        <span style="font-size: 1.2em;">▦</span>
-                </button>
-                <span class="mobile-nav-label">View</span>
-            </div>
         </div>
     </div>
 
     <div class="mobile-right-rail" aria-label="Mobile navigation landscape">
         <div class="mobile-nav-container">
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button" id="landPrevBtn" 
-                        title="Previous Sentence" aria-label="Previous Sentence">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
-                        </svg>
-                </button>
+            <div class="rail-top-group">
+                <div class="mobile-nav-group">
+                    <button class="mobile-nav-button mini" id="landGridToggle" 
+                            title="Toggle Grid" aria-label="Toggle Grid">
+                            <span style="font-size: 1.2em;">▦</span>
+                    </button>
+                </div>
             </div>
-            
+
             <div class="mobile-progress-container">
                 <div class="mobile-progress-bar">
                     <div class="mobile-progress-fill" id="landProgressFill"></div>
                 </div>
             </div>
             
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button" id="landNextBtn" 
-                        title="Next Sentence" aria-label="Next Sentence">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-                        </svg>
-                </button>
-            </div>
+            <div class="rail-bottom-group">
+                <div class="mobile-nav-group">
+                    <button class="mobile-nav-button" id="landPrevBtn" 
+                            title="Previous Sentence" aria-label="Previous Sentence">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/>
+                            </svg>
+                    </button>
+                </div>
 
-            <div class="mobile-nav-group">
-                <button class="mobile-nav-button mini" id="landGridToggle" 
-                        title="Toggle Grid" aria-label="Toggle Grid">
-                        <span style="font-size: 1.2em;">▦</span>
-                </button>
+                <div class="mobile-nav-group">
+                    <button class="mobile-nav-button" id="landNextBtn" 
+                            title="Next Sentence" aria-label="Next Sentence">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                            </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1539,145 +1548,39 @@ const chapters = [
     { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
 ];
 
-const narrative = `[This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart.] Most portfolios treat "the work" as the hero. But, what if "the story" is the true hero.  
+const narrative = `
+    [This article is not written with any assistance of AI, but rather instead with genuine earnest—daresay, from the heart.] Placeholder for introduction content. The story begins here, setting the stage for a twenty-year journey through design and technology.
+    
+    [I didn't graduate from college.] Placeholder for early years content. Working odd jobs, discovering passion for art and design, and the initial struggles of finding a path without a traditional degree.
 
-The above image is something akin to how I view my career journey to date. [Before I was a UX Designer, I was a Web Designer. Before I was a web designer, I was a Graphic Designer. Before I was a graphic designer, I was a teenager who could draw well and who had a passion for animation.]
+    [I built my first computer circa 2005 to '06.] Placeholder for first steps content. Learning technical skills, installing software, and teaching myself the basics of digital creation from scratch.
 
-What is UX? [It is that which is in motion. It is that which necessitates forethought into the next step while maintaining a frame of reference for that which has occurred. Essentially, nothing has changed in terms of my natural sensibilities.] But over the last fifteen-plus years, I've had the benefit of expanding and expounding upon these basic skills in forging a meaningful career in the modern age. A non-linear, but carefully curated and considered career path, from homegrown startups to working with A-list brands at a global scale.
+    [Alright. Now, where to begin?] Placeholder for Turn5 / Xoxide content. Joining a startup, wearing many hats from graphic design to product photography, and learning the ropes of e-commerce.
 
-I didn't graduate from college. I couldn't afford it. [Pratt Institute of Art was expensive, and loans or financial aid were simply out of reach, though not as simple as it may seem.] At nineteen years old, there wasn't much that I could afford. So I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station.
+    [Okay, so Leadnomics was shifty.] Placeholder for Leadnomics content. navigating the world of lead generation, high conversion rates, and the ethical considerations of design in certain industries.
 
-At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could bull-expletive with my so-called talent. [I attended Pratt from 2002 to 2003, then again from 2004 to 2005. I had a budding passion for graphic design and considered myself, by my own evaluation, an expert with Photoshop and Illustrator, though one does not make the other.] I pursued studies in 3D Animation and Motion Graphics during my time in school.
+    [From here, I desired to move my creative talents into an environment where I was happy to share and expound upon.] Placeholder for learning to code content. Recovering from injury, building a portfolio with interactive elements, and transitioning into interaction design.
 
-I survived foundation year—a callback to the foundations of illustration, color theory, compositional study, and other artistic practices. [I only completed my sophomoric year focusing on 3D Animation. Classes included storytelling, storyboarding, animation, and 3D digital modeling. Now, with that future more or less now foregone, the idea of being a web designer had a certain appeal.] With a rough—daresay organic—start as a graphic designer, I had some work to do.
+    [One Sixty Over Ninety—] Placeholder for One Sixty Over Ninety content. Working at a design agency, dealing with client expectations, creating wireframes, and learning the agency life.
 
-I built my first computer circa 2005 to '06. I immediately installed pirated copies of Adobe Photoshop and Illustrator. [While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at intensely.] So, without a college degree or any equivalent experience, I started from absolute scratch.
+    [An elevating experience with O3 World] Placeholder for O3 World content. Agile methodologies, scrum leadership, and a more product-focused approach to design and development.
 
-I studied typography by reading books and examining magazines, and generally observing what I saw wherever I were. [I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal—my clandestinely acquired Adobe products.] I began to create faux website concepts to gain an understanding of designing for that medium. As the screenshots may suggest, I had lots to learn.
+    [Did I mention I co-founded a two-person strong design agency] Placeholder for FlightPath content. Brief entrepreneurial stint followed by joining a New York agency, working with pharmaceutical clients, and handling regulatory constraints.
 
-I also learned the proper etiquette towards finding gainful employment. [All this culminated with an interview and subsequent job offer from Xoxide Incorporated, later turned Turn5 Inc, which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals—Beauty, Automotive, Tech.] I found their company through a Craigslist post in the web slash design category.
+    [A paradigm shift: From Midtown to Uptown.] Placeholder for LiveArea content. Moving to UX Management, handling large contracts, and introducing user-centric workshops like 'Cards Against Bad UX'.
 
-I can still pull up my original cover letter, which I just looked at and am considering reusing in my current job search endeavors. [Here, I was brought on as a graphic designer, full-time. You have no idea how happy I was.] I was set to make sixteen-fifty an hour plus full benefits, a 401K, and have my own cubicle. I thought I'd made it.
+    [At Huge, I couldn't tell you what my billable rate was] Placeholder for Huge content. Experience in a large global agency, working on specific user flows, and dealing with siloed teams.
 
-Alright. Now, where to begin? Circa 2007 through 2011. [Okay, so I've just been brought into the fold with a budding home-grown startup. The company had set up its new HQ at a warehouse office facility in Great Valley, PA, about twenty miles outside of Philly.] It was owned and operated by two brothers, one of which wasn't even old enough to drink at the company holiday party.
+    [Heavy lift. Big gains. This is the whey.] Placeholder for Elva / GNC content. Leading discovery for a major retail brand, implementing mobile-first navigation, and revitalizing an online presence.
 
-I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens. [I think it's easier to list all my roles and functions via bulleted list. Graphic designer for all web properties, including reskin efforts, banner and display ads, and email marketing.] Graphic designer for all print related initiatives, including package design, catalogue design, and large-format printing needs.
+    [It's a long way to the top if you want to rock and roll.] Placeholder for Code and Theory content. Working on a major social media platform, balancing 'wow factor' with usability, and navigating complex team dynamics.
 
-Product Photographer and Image Manipulation specialist, covering all manner of product photography. [Specializing in lighting, establishing systematic product photography protocols for visual uniformity at scale, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.] Graphic Designer turned Web Designer, responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning.
+    [Okay, fine. Huge only wanted me for a little bit.] Placeholder for Publicis Sapient content. Digital transformation in financial services, leading teams, and navigating organizational challenges while delivering sophisticated product work.
 
-The work—AI can probably do much of what I've shared below within minutes, but this was fifteen or so years ago, and thusly everything had to be done manually. [From magazine spreads to comprehensive product catalogs. Not just thousands of parts, but with customization at the heart of what we sold, countless product permutations.] Before your PDP—product detail page—before your printed product catalogue or packaging templates, before your segmented email marketing distributions, before your display ad campaigns, comes your product photography.
+    [Come on, baby. Let's do the twist.] Placeholder for the twist content. A shift in perspective, learning physical networking skills, and finding parallels between cabling and design systems.
 
-This involved comprehensive pre-planning put into any product campaign. [First, we had to coordinate and plan for product shoots, then we had to light it in a way that would allow optimal image manipulation in post production. Then capture multiple frames of reference and various angles.] Then, we had to color match perfectly to mimic OEM quality, even at the alpha-channel level, to ensure our product photography looked consistent through print and digital media alike—RGB, CMYK.
-
-I say we, but for a long while, it was solely myself and eventually another product photographer, shout out to Anthony Caggiano, who owned all aspects of this work. [Collecting gross amounts of overtime working through the weekends. The volume of work eventually necessitated the development of a fully-fledged and funded photography department working in tandem with the installation technicians and the like.] Having passed the torch of photography duties onto a true professional, I was able to focus on email marketing and feature design.
-
-Put simply, working with email and analytical data helped to inform top-level site design changes and influenced the direction we took the mothership. [It was at this point I graduated from graphic designer to web designer. I remember vaguely that the left-rail navigation was more or less baked into the Yahoo Stores platform, and so we were beholden to work around it.] This resulted in features that were often condensed or otherwise forced into place.
-
-I vaguely remember the in-office celebration when that left-rail became optional and thusly quickly removed. [It easily gave us back at least 300 square pixels of above-fold real-estate for feature ideation at every stage of our shopping funnel.] Below are some examples of the wireframe ideation that occurred at this stage for a hypothetical PDP, showing a variety of complex functions.
-
-Beyond just my various design duties was a matter of creating ways of working that benefitted the group, the team. [The company was growing. No longer was it just myself, but an entire team contributing to accrual of design files. This screenshot of server organization and maintenance may have been the impetus of my interest in Information Architecture—aka, sitemaps and content strategy.] In many respects, Turn5 Inc served as my formal education.
-
-I learned first and foremost how to work within a team environment where everyone's role was crucial towards the company's success. [There, I learned the ins and outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs.] And in the latter half of my nearly four years there, served as a web designer focused on user experience—by the books—as applied to a then forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.
-
-Okay, so Leadnomics was shifty. Paradigm shifty, we'll say. [It was a great place to work though. I have lasting friendships with folks I worked with there. Heck, two of them now work at Google.] But our work fed upon the uneducated and disenfranchised in some respects. As the name may suggest, our focus was in lead generation. Our cash cow was in facilitating easy access to high-interest short-term loans, otherwise known as payday loans.
-
-But we had free lunches, regular bonuses, company outings, free snacks, and solid benefits. [Each with our own super thin Apple laptops and the ability to WFH occasionally—circa 2011, FYI.] In short, my job was to make it intuitive and stress-free, daresay pleasant, for one to make catastrophic financial decisions under clandestine duress at a scale in tens of thousands per month.
-
-I had a 95.8% conversion rate with a bounce rate lower than 15% through my form systems. [Meaning, once our visitor clicked into the form funnel, ninety-five-point-eight percent of our users became converted leads. This wasn't magic.] This was the result of introducing Responsive Web Design practices via Twitter's Bootstrap ethos while backed by thoughtful action and solutioning based on analytical data and insights drawn from A/B split-testing of marketing and educational content and UI-UX paradigms.
-
-Also, well-considered and device-friendly form design with efficient validation techniques applied and tested on the daily. [In simple terms, we fashioned a helluva good fishing net. I think working here gave me a true sense of the business world. So much of what we do is driven by necessity and less by what we find ideal.] Tell that to a graphic designer and tell me how that goes.
-
-From here, I desired to move my creative talents into an environment where I was happy to share and expound upon. [There was a period of time between Leadnomics and 160over90 where I was recovering from a catastrophically comminuted clavicle injury.] During my down time, I determined that my best chance at landing an agency job was if I could prove I understood the ins and outs of web design.
-
-So I learned how to code HTML, CSS, and throw in a little JavaScript to make the magic happen. [I did this by concepting an interactive Haiku which communicated in various ways the things I wished to convey. Sometimes the best portfolio piece is the one that shows you can learn anything.] Took a twelve-thousand-dollar pay cut to join One Sixty Over Ninety as an interaction designer in Center City Philadelphia.
-
-One Sixty Over Ninety—my heart rate when I was offered a full-time gig as an Interaction Designer circa 2014 working at a leading design agency at the literal epicenter of Center City, Philadelphia. [Granted, I accepted the job at approximately twelve-thousand less than I was at my previous startup, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160/90 HQ.] I was there to learn. Day. Night. Lots of nights. Weekends too.
-
-Now, let's look at some wireframes. [Here is a wireframe for Kent State's EDU. It's gray, so it's clearly a wireframe prototype. But why does it basically look like a grayscale design?] Well, when waterfall process meets business-minded clients with exceptional aspirations meets unmanaged or unmitigated expectations meets crunch time. Ultimately, it boils down to a confluence of factors that quite often lead to compromises in the design process.
-
-In the case of this wireframe, given budgetary and scheduling constraints, we provided essential education as we socialized our work with the client. [Detailing the nuance of design decisions based on best practices and modern conventions. Enlightening our clients to our use of modern CSS capabilities offering more flexible design solutions. Add CMS knowledge and of course painting a clear picture for the next phase: Visual Design.] In other words, what I hope you glean from the following isn't that I have an acuity for design, or at least the foresight for it, but that I've practiced and trained to the point where best-practices are baked in.
-
-Kent State University had a unique challenge in that its programs and offerings were split across nine different regional campuses. [Each campus had its own directory, its own content, and its own business objectives. We explored baseline by-the-book navigation options.] We explored mega menus and full-screen takeovers. We explored pop-outs, roll-outs, and pondered if the hamburger icon was intuitive enough. Remember, this was circa 2014 to 2016 when these were legitimate questions.
-
-We considered breaking the mold given our proprietary requirements. [Since Kent State was dissimilar from its peers, do we dare seek our own solution? We—I—dared, indeed.] While these conceptual prototypes did not ultimately make it to fruition, they did contribute to conversations that influenced not just design but content strategy. Ultimately, we decided that a refactored content strategy per region was more practical and a more conventional navigation masthead was ideal.
-
-I think it's important to note that at 160over90, we facilitated absolutely zero user testing. [Everything was subjectively driven and emotionally charged. Also, budgets were tight.] I desired to learn these skills in a dedicated agile product-focused environment. My next employment.
-
-An elevating experience with O3 World, a digital product shop based in Fishtown, Philadelphia. [Wireframes at 160over90 fit the workflow at 160over90. Wireframing at O3 World was a different beast which required throwing everything I thought I knew out the the window and reverting to the basics.] Here, it was less about impressing our clients. Here, it was all about working with our clients.
-
-Without the pizazz of beautiful grayscale renders of your soon-to-be colored in homepage, we focused on asking the right questions and getting the right feel with our clients. [We were agile in nature and scrum led. We had daily scrums and weekly sprint schedules. We dealt with client feedback organically and responsively as opposed to reactively.] Clients included Vertex SMB, SEI, La Colombe, and WOVN iOS.
-
-I had mentioned Agile and Scrum. Well, say hello to Gidget, our adjunct project manager and scrum master at Workarea, a proprietary SaaS e-commerce platform. [Here, I served as a Senior Visual and UX Designer. Here, we did wireframes differently. Here, we worked in direct partnership with our ever-ready-to-help developers.] Napkin sketches, low-fi mockups, or just a few messages on Slack were all that was needed.
-
-The work was building out our proprietary SaaS E-commerce Platform which we marketed out in typical agency-style to a number of A-list brands. [Using all insights and analytics towards optimizing our platform and expanding functionality to meet demand.] I don't have any work to show from here. I didn't save any of my napkins.
-
-Did I mention I co-founded a two-person strong design agency that existed for about six months before I dissolved it in favor of gaining bona fide NYC-grade agency experience? [My business partner, while brilliant, was unpredictable to say the least. Anyway, here was an idea for an animated slash interactive logo design. Our Way: Stout. Resolute. Strong, and with good humor.] Sometimes you have to kill your darlings, even when the darling is your own company.
-
-FlightPath presented an intriguing opportunity. [Recently emerging from the brink of bankruptcy, the agency had drastically downsized from a bustling office to a sparse handful of core employees. It wasn't a lucrative endeavor. The pay was passable at best.] But for me, the allure lay in the chance to immerse myself in the New York agency scene and gather invaluable experience to propel my career forward.
-
-Despite its tumultuous journey, FlightPath managed to preserve vital relationships with long-standing clients specifically in the pharmaceutical sector—Merck, Zoetis, Charter, and Goya. [Operating in regulated industries, these clients demanded design solutions that not only adhered to WCAG 2.0 AA or even AAA compliance standards but also underwent rigorous scrutiny and approval from legal and regulatory marketing authorities.] I was let go on the day of my one-year annual review.
-
-I had been making a mere eighty-thousand-dollar salary and had been commuting to and from Philadelphia and New York daily. [I was hoping to ask a modest bump in pay and title adjustment given all that I had contributed in the past year as the sole designer on staff. Nope.] This was somewhat bittersweet. While on one hand I was now out of a job, I had now accomplished exactly what I had set out to do. Put in one year towards elevating my experience and professional output and see where that took me.
-
-A paradigm shift: From Midtown to Uptown. From Individual Contributor to UX Manager. [Cards against bad UX? What? What do you do when you're working with a sophisticated client who has a tremendously complex product line and deep inventory?] Who are accustomed to B2B and B2E operations and dealings, and whom while fluent with their industry acumen were completely unfamiliar with the design process?
-
-What do you do when jargon-laden spreadsheets and single-sided meetings net nothing but frustration with the client to the point where they're considering abandoning the contract? [Enter Cards Against Bad UX. All I did was simplify what we asked. To shift the conversation away from technical jargon and towards user-centric thinking.] By providing different perspectives such as As a shopper, As a content manager, or As a guest user, and pairing it with a simple visual, a card, I was able to help our stakeholders empathize with their end-users and focus on their needs and experiences.
-
-This approach not only catalyzed communication but also encouraged collaboration and problem-solving from both sides of the table. [It allowed our client to see the project from various angles and find common ground, ultimately leading to more effective solutions and preventing frustration or contract abandonment.] Sometimes the best design work is the workshop that prevents the bad design from happening.
-
-At LiveArea I was the UX Manager assigned to contracts exceeding one-point-two million dollars. [My hourly billable rate to the client was something like two-thirty-five per hour. Everything I did had a direct impact on the final deliverable.] I managed multiple projects and pitches as well as junior designers while being the primary client-facing resource. I presented findings. I course-corrected when needed. I moved the machine forward.
-
-At Huge, I couldn't tell you what my billable rate was, but I could say this was the first time I had seen a project with at least twenty different people involved, on just the agency side. [At Huge, I was responsible for exploring a single user flow. There were other designers responsible for exploring other individual user flows.] At no point during my time with Huge did I even know there were other designers on that project. To say we were siloed would be a gross understatement.
-
-Being completely candid, I get it. This was a mere contract position. [Huge hired numerous UX contractors to sign on few weeks or months. It was simply about a little bit of work done without any long-term commitments.] I would be thrilled to take on a more robust contract, but hopefully with a different and more vested manager this time around. Or, may I be the manager?
-
-Heavy lift. Big gains. This is the whey. [Enter Elva Design Group, now just Elva, a boutique design agency based in San Francisco specializing in Shopify e-commerce builds, and I was just resourced to their newest client, General Nutrition Centers, GNC.] I once joked during an interview with Amazon that I never take anything but mental notes. Amazon now thinks I don't take notes. I take notes.
-
-I was responsible for leading discovery and requirements gathering. [GNC Leadership wanted to shake things up, so we fashioned a mobile-first navigation schema with conventional fall-backs and failsafes.] To cope with the scope of work. I've clearly written quite a bit on this subject already.
-
-Please do peruse the slides above at your leisure, but the general gist is that I'm comfortable in diving into any phase of the user experience design process. [Be it in research, be it in discovery, be it through extensive wireframing, or be it in final design. Moreover, I'm comfortable in not being comfortable.] We didn't have the time, infrastructure, or budget to perform exhaustive foolproof design, but rather execute foolhardy decisions in favor of shaking things up as directed by our client's C-Suite leadership.
-
-The result: GNC was able to relaunch their brand and reinvigorate its new or returning consumers' interest and loyalty. [By focusing their efforts on a modernized and optimized online shopping experience, even in lieu of continued shuttering of physical retail locations.] No there isn't a chapter thirteen. I'm from New York. We don't play those games.
-
-It's a long way to the top if you want to rock and roll. [In this chapter I won't delve into the specifics of the project at Code and Theory, but rather focus on the broader context and my experiences during my time there.] Imagine: You've been diligently working towards your goals, making significant strides in your career. From commuting daily between PHI and NYC to transitioning into the New York agency scene.
-
-You had grown from an Individual Contributor to a UX Manager with a six-figure salary. [With each accomplishment you set your sights higher, ultimately landing an interview with Code and Theory. Imagine that.] I interviewed for an ACD, Interactive position and was immediately hired on a freelance basis as a Senior Designer with the intention of fulfilling the ACD responsibilities.
-
-As part of the team working on a project for a top social media brand, I quickly proved my worth and was transitioned to full-time employment. [The project was led by a Directly Responsible Individual, DRI, but whom accepted a Director-level position elsewhere three months into the project.] There were also the departure of several key team members including senior strategists and technologists which placed additional responsibilities on my shoulders.
-
-Requiring me to provide guidance in UX, Strategy, and Development while also serving as a people manager myself with a junior-level associate under my purview. [Speaking candidly, here we had an immeasurable opportunity to influence THE platform for influencers. While good design is the end goal, it shouldn't be the driving force in developing an informational and business-minded content platform at a global scale.] Instead of trying to solve the client's problems, we focused on wow factor and interactive moments.
-
-UX at Code And Theory was essentially decorative. [Besides resourcing hurdles, there were issues spanning practicality and pragmatism, suffice to say.] Despite offering to improve internal education initiatives and providing proactive feedback, submitting a post mortem as requested, I was let go from Code and Theory without explanation. It was a challenging experience but one that taught me valuable lessons about the realities of working in a large agency environment.
-
-Okay, fine. Huge only wanted me for a little bit. Code and Theory wasn't ready for me. [I don't necessarily care to be a boomerang in my career. Now, where can I go that won't be a lateral or backwards step?] Enter Publicis Sapient, a Digital Transformation Company, at 375 Hudson St, New York City.
-
-I was a remote employee but chose to be a consistent in-office presence. [I can tell you that I spent a full year here working in the Financial Services sector serving BNY Mellon—Pershing X Advisory Experience Platform.] Publicis Sapient wasn't without its imperfections either. Suffice to say there were some organizational and operational aspects that could be improved upon, dialogue and communication not with standing.
-
-A term I've coined to describe my experience here would be Organizational Spaghetti. [I became the de facto Team Lead and Product Owner. I led research and discovery efforts. I led client workshops. I led design and prototype development and testing.] I collaborated across multiple concurrent tracks while providing mentorship and guidance to junior and associate designers. Also serving as team lead amongst peers at the senior level.
-
-I successfully negotiated on numerous occasions company-paid lunches for my in-office workshops. [I provided extensive industry research, product heuristic and technical analysis, as well as future-state concept ideation.] I was responsible for organizing client and team workshops in refactoring Pershing X entire data and design paradigm. Yes, I have extensive experience with both Design Systems and style guides. Ask me the difference.
-
-I set my team up for success daily, conducting exhaustive research and socializing of knowledge. [While a remote employee, I still opted to be a consistent presence in the office. Lead by example, being an intellectually invested, creatively charged, hands-on type of leader.] My efforts were directly responsible for securing a contract extension leading into the next fiscal year.
-
-It was directly responsible for influencing the overall direction of the now live product line launched by Pershing X. [That just two years ago was only a thought. This was the most sophisticated work I've done in my career.] And despite putting an incredible effort into it, corporate will do what corporate will do. I was a mere number that was either on the plus or minus side of the red line.
-
-I was Team Lead to two colleagues, one associate, one senior, who were currently pursuing and or completing their Masters degrees. [My academic counterparts. Well, I was laid off or otherwise separated amicably as my exit contract states.] I've faced untold challenges in the time since, many more humbling than I can describe here. But here's what my teammates had to say:
-
-Zack has a deep connection to emotions, imagination, and sensitivity—the quintessential idealist. [His greatest strength is his depth of sensitivity and empathy which allows him to give voice to human connections in a way that works with people on a profound level.] Zack brings fresh perspective to things when I felt in a rut—a great person to work with. Christopher Bayle, ACD UX, Publicis Sapient.
-
-Zack is one of the most talented, hard-working, and knowledgeable individuals I have had the pleasure of working with. [He has truly been excellent, trying to foster communication not only between us but with the whole team, to set them up for success. He always gives his best and more.] I really enjoy working with him and I feel he should be recognized by his tremendous effort and for being such a great team player. Andrés Moros, MPS, Sr. UX Designer, Publicis Sapient.
-
-Come on, baby. Let's do the twist. [In case the headline doesn't make sense, in the world of Low Voltage Data Installation, some terminations require a very specific twist parity, lest you run risk of signal impedance or interference.] Got it? Good. Suffice to say, I've been networking. Pun intended.
-
-I've taken on sub-contractor gigs and learned new hands-on skills. [I can now terminate an RJ45 in 30 to 45 seconds per. I can run cables and install security systems and setup indoor outdoor digital displays. No problem.] You must maintain the twist parity lest you get signal impedance. Behind the scenes, cable management.
-
-My passion for creative output is unrelenting though I'm using different parts of my brain to make due. [I still have my eyes set on elevating my career in a paradigm-changing way. Maybe someone out there sees potential.] Meanwhile, got mouths to feed.
-
-As an aside, I've been keeping up with the latest happenings in the world of Artificial Intelligence. [I am absolutely unequivocally NOT worried about the thinking machines taking over jobs or the world for that matter.] AI will never have the patience required, nor physical dexterity, to run and terminate physical ethernet cables or fiber optic lines. Never. If it isn't clear, this is written in jest.
-
-I truly try not to be the type of person to try to sway your mind one way or another, so I'll refrain from writing any sort of conclusion. [If my photography or music are any indicator, it's that my true talent, my special sauce, is in presenting ideas—yours, mine, theirs, whomever—in a way that uplifts and encourages your imagination.] Put simply, I yearn to make folks wonder and I do this with capable hands.
-
-I'm left-handed. I think different. [I play guitar, take photographs, make people wonder. Meet Wolfgang, my dog. Dog-friendly offices welcome. Remote hybrid preferred.] Sincerest of thanks to anyone who took the time to read through my story. Twenty years of work condensed into twenty minutes of reading. Five minutes if you just skim the photos.`;
+    [As an aside, I've been keeping up with the latest happenings in the world of Artificial Intelligence.] Placeholder for conclusion content. Reflections on the future of design, the role of AI, and the enduring value of human creativity and connection.
+`;
 
 const state = {
     hoveredSentence: null,
@@ -2580,9 +2483,7 @@ document.getElementById('gridToggleBtn').addEventListener('click', () => {
     toggleImageGrid();
 });
 
-document.getElementById('mobileGridToggle').addEventListener('click', () => {
-    toggleImageGrid();
-});
+// Removed bottom rail grid toggle listener as the element was removed
 
 document.getElementById('landGridToggle').addEventListener('click', () => {
     toggleImageGrid();
