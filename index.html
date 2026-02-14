@@ -535,68 +535,107 @@ body {
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     cursor: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 body::-webkit-scrollbar { display: none; }
 body { -ms-overflow-style: none; scrollbar-width: none; }
 ::selection { background: rgba(218, 165, 32, 0.25); color: #fff; }
 
-/* Free-scroll mode visual feedback */
-body.free-scroll-mode {
-    overflow: auto !important;
-}
-
-body.free-scroll-mode .vignette {
-    opacity: calc(var(--vig-opacity) * 0.3);
-    transition: opacity 0.3s ease;
-}
-
-body.free-scroll-mode .edge-blur {
-    backdrop-filter: blur(calc(var(--edge-blur) * 0.5));
-    -webkit-backdrop-filter: blur(calc(var(--edge-blur) * 0.5));
-    transition: backdrop-filter 0.3s ease;
-}
-
-body.free-scroll-mode .sentence:not(.active) {
-    opacity: 0.5;
-    transition: opacity 0.15s ease;
-}
-
-body.free-scroll-mode .sentence.active {
-    opacity: 1;
-    transition: opacity 0.15s ease;
-}
-
-/* Free-scroll activation pulse */
-@keyframes scroll-pulse {
-    0%, 100% { 
-        transform: scale(1);
-        opacity: 0.8;
-    }
-    50% { 
-        transform: scale(1.02);
-        opacity: 1;
-    }
-}
-
-body.free-scroll-mode::before {
-    content: '';
+/* Custom Context Menu */
+.context-menu {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 4px;
-    height: 60px;
-    background: var(--accent);
-    opacity: 0.4;
-    border-radius: 2px;
-    z-index: calc(var(--z-ui) + 1);
+    z-index: calc(var(--z-overlay) + 100);
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    opacity: 0;
+    transform: scale(0.95);
     pointer-events: none;
-    animation: scroll-pulse 1.5s ease-in-out infinite;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
-body.theme-newspaper.free-scroll-mode::before {
-    background: var(--accent);
+.context-menu.open {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: var(--ink-2);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.context-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--accent);
+}
+
+.context-menu-item:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.context-menu-item.context-menu-info {
+    cursor: default;
+    opacity: 0.5;
+    font-size: 11px;
+    padding: 8px 16px;
+}
+
+.context-menu-item.context-menu-info:hover {
+    background: transparent;
+    color: var(--ink-2);
+}
+
+.ctx-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 6px 8px;
+}
+
+/* Newspaper theme context menu */
+body.theme-newspaper .context-menu {
+    background: rgba(245, 241, 232, 0.98);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-newspaper .context-menu-item {
+    color: var(--ink-2);
+}
+
+body.theme-newspaper .context-menu-item:hover {
+    background: rgba(139, 69, 19, 0.08);
+    color: var(--accent);
+}
+
+body.theme-newspaper .context-menu-item:active {
+    background: rgba(139, 69, 19, 0.15);
+}
+
+body.theme-newspaper .context-menu-divider {
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .edge-blur {
@@ -1378,6 +1417,32 @@ body.theme-newspaper #cursor.close-mode::before {
 
 </head>
 <body>
+    <!-- Custom context menu -->
+    <div class="context-menu" id="contextMenu" aria-hidden="true">
+        <div class="context-menu-item" id="ctxCopyLink">
+            <span class="ctx-icon">🔗</span>
+            <span>Copy Link</span>
+        </div>
+        <div class="context-menu-item" id="ctxShare">
+            <span class="ctx-icon">↗</span>
+            <span>Share</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="ctxResetProgress">
+            <span class="ctx-icon">↻</span>
+            <span>Reset to Beginning</span>
+        </div>
+        <div class="context-menu-item" id="ctxToggleTheme">
+            <span class="ctx-icon" id="ctxThemeIcon">☀️</span>
+            <span id="ctxThemeText">Light Theme</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item context-menu-info">
+            <span class="ctx-icon">ℹ️</span>
+            <span>IFIMAYBEFRANK</span>
+        </div>
+    </div>
+    
     <!-- Invisible close hotspots -->
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1598,6 +1663,7 @@ let spacebarPressed = false;
 
 // Touch variables
 let touchStartY = 0;
+let touchStartX = 0;
 let touchStartTime = 0;
 let isLongPress = false;
 let longPressTimer = null;
@@ -2053,105 +2119,28 @@ function handleScroll(event) {
 
 function handleTouchStart(e) {
     touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
     touchStartTime = Date.now();
     touchMoved = false;
     
     longPressTimer = setTimeout(() => {
         isLongPress = true;
-        document.body.classList.add('free-scroll-mode');
-        document.body.style.overflow = 'auto';
-        const textLayer = document.querySelector('.text-layer');
-        if (textLayer) {
-            textLayer.style.overflow = 'visible';
-        }
         
-        // Start tracking scroll position for sentence detection
-        startScrollTracking();
+        // Show context menu on long-press
+        showContextMenu(touchStartX, touchStartY);
+        
+        // Optional: Haptic feedback if available
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
     }, LONG_PRESS_DURATION);
-}
-
-let scrollTrackingInterval = null;
-let lastScrollY = 0;
-let scrollStopTimer = null;
-
-function startScrollTracking() {
-    // Visual feedback that free-scroll mode is active
-    const stream = document.getElementById('stream');
-    if (stream) {
-        stream.style.transition = 'opacity 0.3s ease';
-    }
-    
-    // Track scroll position frequently
-    scrollTrackingInterval = setInterval(() => {
-        if (isLongPress) {
-            highlightSentenceAtViewportCenter();
-        }
-    }, 100);
-}
-
-function stopScrollTracking() {
-    if (scrollTrackingInterval) {
-        clearInterval(scrollTrackingInterval);
-        scrollTrackingInterval = null;
-    }
-}
-
-function highlightSentenceAtViewportCenter() {
-    const viewportCenterY = window.innerHeight / 2;
-    let closestSentence = null;
-    let closestDistance = Infinity;
-    
-    state.allSentenceElements.forEach((sentence, index) => {
-        const rect = sentence.getBoundingClientRect();
-        const sentenceCenterY = rect.top + rect.height / 2;
-        const distance = Math.abs(sentenceCenterY - viewportCenterY);
-        
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestSentence = index;
-        }
-    });
-    
-    if (closestSentence !== null && closestSentence !== state.currentSentenceIndex) {
-        // Temporarily highlight without full activation
-        state.allSentenceElements.forEach(s => s.classList.remove('active'));
-        state.allSentenceElements[closestSentence].classList.add('active');
-        state.currentSentenceIndex = closestSentence;
-    }
-}
-
-function activateSentenceAtViewportCenter() {
-    const viewportCenterY = window.innerHeight / 2;
-    let closestSentence = null;
-    let closestDistance = Infinity;
-    
-    state.allSentenceElements.forEach((sentence, index) => {
-        const rect = sentence.getBoundingClientRect();
-        const sentenceCenterY = rect.top + rect.height / 2;
-        const distance = Math.abs(sentenceCenterY - viewportCenterY);
-        
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestSentence = index;
-        }
-    });
-    
-    if (closestSentence !== null) {
-        state.currentSentenceIndex = closestSentence;
-        highlightSentence(closestSentence);
-    }
 }
 
 function handleTouchMove(e) {
     touchMoved = true;
     
     if (isLongPress) {
-        // Allow free scrolling - clear any pending "stop" timer
-        if (scrollStopTimer) {
-            clearTimeout(scrollStopTimer);
-            scrollStopTimer = null;
-        }
-        lastScrollY = window.scrollY;
+        // Cancel long press if user moves during hold
         return;
     }
     
@@ -2180,18 +2169,7 @@ function handleTouchEnd(e) {
     
     if (isLongPress) {
         isLongPress = false;
-        document.body.classList.remove('free-scroll-mode');
-        document.body.style.overflow = 'hidden';
-        const textLayer = document.querySelector('.text-layer');
-        if (textLayer) {
-            textLayer.style.overflow = 'visible';
-        }
-        
-        stopScrollTracking();
-        
-        // Activate the sentence at the center after user stops
-        activateSentenceAtViewportCenter();
-        
+        // Context menu is already showing, just reset state
         return;
     }
     
@@ -2827,6 +2805,99 @@ setupLongPress('mobilePrevSentenceBtn', previousChapter);
 setupLongPress('mobileNextSentenceBtn', nextChapter);
 setupLongPress('landPrevBtn', previousChapter);
 setupLongPress('landNextBtn', nextChapter);
+
+// Context Menu Functionality
+const contextMenu = document.getElementById('contextMenu');
+let contextMenuTimer = null;
+
+function showContextMenu(x, y) {
+    contextMenu.style.left = x + 'px';
+    contextMenu.style.top = y + 'px';
+    contextMenu.classList.add('open');
+    contextMenu.setAttribute('aria-hidden', 'false');
+    
+    // Update theme toggle text
+    const themeText = document.getElementById('ctxThemeText');
+    const themeIcon = document.getElementById('ctxThemeIcon');
+    if (document.body.classList.contains('theme-newspaper')) {
+        themeText.textContent = 'Dark Theme';
+        themeIcon.textContent = '🌙';
+    } else {
+        themeText.textContent = 'Light Theme';
+        themeIcon.textContent = '☀️';
+    }
+    
+    // Adjust position if menu goes off-screen
+    setTimeout(() => {
+        const rect = contextMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        }
+        if (rect.bottom > window.innerHeight) {
+            contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
+        }
+    }, 0);
+}
+
+function hideContextMenu() {
+    contextMenu.classList.remove('open');
+    contextMenu.setAttribute('aria-hidden', 'true');
+}
+
+// Desktop: Right-click
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY);
+});
+
+// Close context menu on click outside
+document.addEventListener('click', (e) => {
+    if (!contextMenu.contains(e.target)) {
+        hideContextMenu();
+    }
+});
+
+// Context menu actions
+document.getElementById('ctxCopyLink').addEventListener('click', () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        const item = document.getElementById('ctxCopyLink');
+        const originalText = item.querySelector('span:last-child').textContent;
+        item.querySelector('span:last-child').textContent = 'Copied!';
+        setTimeout(() => {
+            item.querySelector('span:last-child').textContent = originalText;
+        }, 1500);
+    });
+    setTimeout(hideContextMenu, 1500);
+});
+
+document.getElementById('ctxShare').addEventListener('click', async () => {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'IFIMAYBEFRANK',
+                text: 'Check out this interactive story',
+                url: window.location.href
+            });
+        } catch (err) {
+            console.log('Share cancelled');
+        }
+    } else {
+        // Fallback to copy link
+        document.getElementById('ctxCopyLink').click();
+    }
+    hideContextMenu();
+});
+
+document.getElementById('ctxResetProgress').addEventListener('click', () => {
+    resetToBeginning();
+    hideContextMenu();
+});
+
+document.getElementById('ctxToggleTheme').addEventListener('click', () => {
+    themeToggle.click();
+    hideContextMenu();
+});
 
 document.getElementById('landPrevBtn').addEventListener('click', () => {
     previousSentence();
