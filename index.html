@@ -1845,14 +1845,27 @@ body.theme-newspaper #cursor.close-mode::before {
     </main>
 
     <script>
-// Touch device detection
-const isTouchDevice = () => {
-    return (('ontouchstart' in window) ||
-           (navigator.maxTouchPoints > 0) ||
-           (navigator.msMaxTouchPoints > 0));
+// Touch device detection - improved to handle trackpads correctly
+let isTouch = false;
+let lastInteractionWasTouch = false;
+
+// Detect actual touch usage (not just capability)
+const updateInputMode = () => {
+    // Check if last interaction was a real touch event
+    return lastInteractionWasTouch;
 };
 
-const isTouch = isTouchDevice();
+// Listen for actual touch events to confirm touch usage
+window.addEventListener('touchstart', () => {
+    lastInteractionWasTouch = true;
+    isTouch = true;
+}, { once: false, passive: true });
+
+// Listen for mouse events to confirm mouse/trackpad usage
+window.addEventListener('mousedown', () => {
+    lastInteractionWasTouch = false;
+    isTouch = false;
+}, { once: false, passive: true });
 
 // Logic Constants
 const TAIL_LENGTH = 12;
@@ -2998,9 +3011,14 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
     let localLongPressTimer = null;
     let startX = 0;
     let startY = 0;
+    let wasTouchInteraction = false;
     
-    // Touch handlers for mobile
+    // Touch handlers for actual touch devices
     const startPress = (e) => {
+        wasTouchInteraction = true;
+        lastInteractionWasTouch = true;
+        isTouch = true;
+        
         e.preventDefault();
         e.stopPropagation(); // Prevent global long-press handler
         longPressActivated = false;
@@ -3043,6 +3061,12 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
         if (!longPressActivated) {
             normalAction();
         }
+        
+        // Reset after a delay
+        setTimeout(() => {
+            longPressActivated = false;
+            wasTouchInteraction = false;
+        }, 100);
     };
     
     const cancelPress = () => {
@@ -3051,6 +3075,7 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
             localLongPressTimer = null;
         }
         longPressActivated = false;
+        wasTouchInteraction = false;
     };
     
     // Add touch event listeners
@@ -3059,14 +3084,21 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
     button.addEventListener('touchend', endPress, { passive: false });
     button.addEventListener('touchcancel', cancelPress, { passive: false });
     
-    // Add click handler for desktop (mouse/trackpad)
-    // On desktop, regular click = next/prev sentence, no long-press needed
-    if (!isTouch) {
-        button.addEventListener('click', (e) => {
+    // ALWAYS add click handler for mouse/trackpad
+    // This ensures buttons work with trackpads on Chromebooks
+    button.addEventListener('click', (e) => {
+        // Only respond to click if this wasn't a touch interaction
+        if (!wasTouchInteraction) {
             e.preventDefault();
             normalAction();
-        });
-    }
+        }
+    });
+    
+    // Track mouse interactions
+    button.addEventListener('mousedown', () => {
+        lastInteractionWasTouch = false;
+        isTouch = false;
+    });
 }
 
 // Context Menu Functionality
@@ -3110,21 +3142,27 @@ function hideContextMenu() {
     contextMenu.setAttribute('aria-hidden', 'true');
 }
 
-// Desktop: Right-click context menu (only on non-touch devices)
-if (!isTouch) {
-    document.addEventListener('contextmenu', (e) => {
+// Desktop: Right-click context menu (always available for mouse/trackpad)
+document.addEventListener('contextmenu', (e) => {
+    // Only prevent default and show menu if using mouse/trackpad
+    // or if explicitly right-clicking on touch device
+    if (!lastInteractionWasTouch) {
         e.preventDefault();
         showContextMenu(e.clientX, e.clientY);
-    });
-}
+    }
+});
 
-// Touch: Long-press context menu (except on rail buttons)
+// Touch: Long-press context menu (ONLY on actual touch events, not trackpad)
 let globalLongPressTimer = null;
 let globalLongPressActive = false;
 let globalTouchStartX = 0;
 let globalTouchStartY = 0;
 
 document.addEventListener('touchstart', (e) => {
+    // Confirm this is a touch interaction
+    lastInteractionWasTouch = true;
+    isTouch = true;
+    
     // Don't show context menu if touching rail buttons
     const target = e.target.closest('button');
     const isRailButton = target && (
@@ -3463,16 +3501,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Setup mobile bottom rail buttons (must be inside DOMContentLoaded)
     // Touch devices: tap = next/prev sentence, long-press = next/prev chapter
-    // Desktop/mouse: click = next/prev sentence (no long-press needed for chapters, use keyboard or nav)
+    // Desktop/mouse/trackpad: click = next/prev sentence
     setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
     setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
     setupLongPress('landPrevBtn', previousSentence, previousChapter);
     setupLongPress('landNextBtn', nextSentence, nextChapter);
     
     console.log('✓ IFIMAYBEFRANK');
-    console.log(`Input mode: ${isTouch ? 'Touch' : 'Mouse/Trackpad'}`);
-    console.log(`Context menu: ${isTouch ? 'Long-press anywhere' : 'Right-click'}`);
-    console.log(`Rail buttons: ${isTouch ? 'Tap=sentence, Long-press=chapter' : 'Click=sentence'}`);
+    console.log('Input mode: Dynamic detection enabled');
+    console.log('- Trackpad/Mouse: Click buttons, Right-click for menu');
+    console.log('- Touch: Tap buttons (long-press for chapters), Long-press anywhere for menu');
 });
     </script>
 </body>
