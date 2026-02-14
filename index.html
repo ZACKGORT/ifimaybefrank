@@ -3018,12 +3018,6 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
     button.addEventListener('touchcancel', cancelPress);
 }
 
-// Setup mobile bottom rail buttons
-setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
-setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
-setupLongPress('landPrevBtn', previousSentence, previousChapter);
-setupLongPress('landNextBtn', nextSentence, nextChapter);
-
 // Context Menu Functionality
 const contextMenu = document.getElementById('contextMenu');
 let contextMenuTimer = null;
@@ -3356,6 +3350,12 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentSentenceIndex = 0;
         highlightSentence(0);
     }
+    
+    // Setup mobile bottom rail buttons (must be inside DOMContentLoaded)
+    setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
+    setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
+    setupLongPress('landPrevBtn', previousSentence, previousChapter);
+    setupLongPress('landNextBtn', nextSentence, nextChapter);
     
     console.log('✓ IFIMAYBEFRANK');
 });
