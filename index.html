@@ -170,7 +170,7 @@ body.theme-academic .sentence.active {
 }
 
 body.theme-academic .sentence.dimmed {
-    opacity: 0.66;
+    opacity: 0.4;
     color: #333333;
 }
 
@@ -272,7 +272,7 @@ body.theme-newspaper .sentence.active {
 }
 
 body.theme-newspaper .sentence.dimmed {
-    opacity: 0.66;
+    opacity: 0.35;
     color: #333333;
 }
 
@@ -904,7 +904,7 @@ body::after {
 }
 
 .sentence.dimmed {
-    opacity: 0.66;
+    opacity: 0.4;
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -1743,7 +1743,7 @@ body.theme-newspaper #cursor.close-mode::before {
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>If I May Be Frank</span>
+                <span>Chapter · Navigation</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -2313,26 +2313,12 @@ function handleTouchStart(e) {
     touchStartTime = Date.now();
     touchMoved = false;
     
-    longPressTimer = setTimeout(() => {
-        isLongPress = true;
-        
-        // Show context menu on long-press
-        showContextMenu(touchStartX, touchStartY);
-        
-        // Optional: Haptic feedback if available
-        if (navigator.vibrate) {
-            navigator.vibrate(50);
-        }
-    }, LONG_PRESS_DURATION);
+    // Long-press disabled - was too sensitive and interfered with scrolling
+    // Context menu now only available via double right-click on desktop
 }
 
 function handleTouchMove(e) {
     touchMoved = true;
-    
-    if (isLongPress) {
-        // Cancel long press if user moves during hold
-        return;
-    }
     
     if (isDropdownOpen()) {
          // Allow touch move within dropdown, disable elsewhere
@@ -2352,16 +2338,7 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
-    if (longPressTimer) {
-        clearTimeout(longPressTimer);
-        longPressTimer = null;
-    }
-    
-    if (isLongPress) {
-        isLongPress = false;
-        // Context menu is already showing, just reset state
-        return;
-    }
+    // Long-press disabled for context menu
     
     if (!touchMoved || scrollCooldownActive || isDropdownOpen()) {
         return;
@@ -3050,10 +3027,80 @@ function hideContextMenu() {
     contextMenu.setAttribute('aria-hidden', 'true');
 }
 
-// Desktop: Right-click
+// Desktop: Double right-click for context menu (with movement detection)
+let lastRightClick = 0;
+let lastRightClickX = 0;
+let lastRightClickY = 0;
+let hintTimeout = null;
+const DOUBLE_CLICK_DELAY = 400; // milliseconds
+const MOVEMENT_THRESHOLD = 10; // pixels - if cursor moves more than this, likely scrolling
+
+function showRightClickHint(x, y) {
+    // Create temporary hint element
+    const hint = document.createElement('div');
+    hint.style.position = 'fixed';
+    hint.style.left = x + 'px';
+    hint.style.top = (y - 30) + 'px';
+    hint.style.background = 'rgba(0, 0, 0, 0.8)';
+    hint.style.color = 'var(--accent)';
+    hint.style.padding = '4px 10px';
+    hint.style.borderRadius = '4px';
+    hint.style.fontSize = '11px';
+    hint.style.fontFamily = "'Space Mono', monospace";
+    hint.style.pointerEvents = 'none';
+    hint.style.zIndex = '99999';
+    hint.style.opacity = '0';
+    hint.style.transition = 'opacity 0.15s ease';
+    hint.textContent = 'Right-click again';
+    hint.id = 'rightClickHint';
+    
+    document.body.appendChild(hint);
+    
+    // Fade in
+    setTimeout(() => hint.style.opacity = '1', 10);
+    
+    // Auto-remove after delay
+    hintTimeout = setTimeout(() => {
+        hint.style.opacity = '0';
+        setTimeout(() => hint.remove(), 150);
+    }, DOUBLE_CLICK_DELAY);
+}
+
+function removeRightClickHint() {
+    const hint = document.getElementById('rightClickHint');
+    if (hint) {
+        hint.style.opacity = '0';
+        setTimeout(() => hint.remove(), 150);
+    }
+    if (hintTimeout) {
+        clearTimeout(hintTimeout);
+        hintTimeout = null;
+    }
+}
+
 document.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    showContextMenu(e.clientX, e.clientY);
+    
+    const now = Date.now();
+    const timeSinceLastClick = now - lastRightClick;
+    const distanceMoved = Math.sqrt(
+        Math.pow(e.clientX - lastRightClickX, 2) + 
+        Math.pow(e.clientY - lastRightClickY, 2)
+    );
+    
+    if (timeSinceLastClick < DOUBLE_CLICK_DELAY && distanceMoved < MOVEMENT_THRESHOLD) {
+        // Double right-click detected with minimal movement
+        removeRightClickHint();
+        showContextMenu(e.clientX, e.clientY);
+        lastRightClick = 0; // Reset
+    } else {
+        // First right-click or too much movement, show hint
+        removeRightClickHint();
+        showRightClickHint(e.clientX, e.clientY);
+        lastRightClick = now;
+        lastRightClickX = e.clientX;
+        lastRightClickY = e.clientY;
+    }
 });
 
 // Close context menu on click outside
