@@ -2971,43 +2971,58 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
     nextChapter();
 });
 
-document.getElementById('mobilePrevSentenceBtn').addEventListener('click', () => {
-    previousSentence();
-});
-
-document.getElementById('mobileNextSentenceBtn').addEventListener('click', () => {
-    nextSentence();
-});
-
-// Long-press handlers for mobile buttons to jump to chapters
-function setupLongPress(buttonId, action) {
+// Long-press handlers for mobile buttons
+// Single tap = next/previous sentence
+// Long press (500ms) = next/previous chapter
+function setupLongPress(buttonId, normalAction, longPressAction) {
     const button = document.getElementById(buttonId);
+    let longPressActivated = false;
+    let localLongPressTimer = null;
     
     const startPress = (e) => {
         e.preventDefault();
-        isLongPress = false;
-        longPressTimer = setTimeout(() => {
-            isLongPress = true;
-            action();
+        longPressActivated = false;
+        localLongPressTimer = setTimeout(() => {
+            longPressActivated = true;
+            longPressAction();
+            
+            // Optional: Haptic feedback on long press
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         }, 500); // 500ms for long press
     };
     
-    const endPress = () => {
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
+    const endPress = (e) => {
+        if (localLongPressTimer) {
+            clearTimeout(localLongPressTimer);
+            localLongPressTimer = null;
         }
+        
+        // Only trigger normal action if long press wasn't activated
+        if (!longPressActivated) {
+            normalAction();
+        }
+    };
+    
+    const cancelPress = () => {
+        if (localLongPressTimer) {
+            clearTimeout(localLongPressTimer);
+            localLongPressTimer = null;
+        }
+        longPressActivated = false;
     };
     
     button.addEventListener('touchstart', startPress, { passive: false });
     button.addEventListener('touchend', endPress);
-    button.addEventListener('touchcancel', endPress);
+    button.addEventListener('touchcancel', cancelPress);
 }
 
-setupLongPress('mobilePrevSentenceBtn', previousChapter);
-setupLongPress('mobileNextSentenceBtn', nextChapter);
-setupLongPress('landPrevBtn', previousChapter);
-setupLongPress('landNextBtn', nextChapter);
+// Setup mobile bottom rail buttons
+setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
+setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
+setupLongPress('landPrevBtn', previousSentence, previousChapter);
+setupLongPress('landNextBtn', nextSentence, nextChapter);
 
 // Context Menu Functionality
 const contextMenu = document.getElementById('contextMenu');
