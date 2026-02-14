@@ -42,6 +42,246 @@
     --center-magnet-strength: 0.25;
 }
 
+/* Newspaper/Ink Light Theme */
+body.theme-newspaper {
+    --bg-color: #faf8f3;
+    --ink: #000000;
+    --ink-2: #1a1a1a;
+    --ink-3: #2a2a2a;
+    --accent: #8b4513;
+    --vig-opacity: 0.12;
+    --bracket-color: #5d4e37;
+    --bracket-hover: #8b4513;
+    --bracket-bg: rgba(139, 69, 19, 0.03);
+}
+
+/* Academic Theme - Maximum Legibility & Accessibility */
+body.theme-academic {
+    --bg-color: #ffffff;
+    --ink: #000000;
+    --ink-2: #1a1a1a;
+    --ink-3: #333333;
+    --accent: #0066cc;
+    --vig-opacity: 0;
+    --edge-blur: 0px;
+    --bracket-color: #004080;
+    --bracket-hover: #0066cc;
+    --bracket-bg: rgba(0, 102, 204, 0.05);
+}
+
+body.theme-newspaper .scroll-progress-bar-container {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.theme-newspaper .nav-button,
+body.theme-newspaper .lens-control-container,
+body.theme-newspaper .mobile-bottom-rail,
+body.theme-newspaper .mobile-right-rail {
+    background: rgba(245, 241, 232, 0.95);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.theme-newspaper .nav-button:hover {
+    background: rgba(139, 69, 19, 0.08);
+}
+
+body.theme-newspaper .stream {
+    color: var(--ink) !important;
+}
+
+body.theme-newspaper .grain {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjkiIG51bU9jdGF2ZXM9IjQiLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=');
+    opacity: 0.3;
+}
+
+body.theme-newspaper .chapter-dropdown {
+    background: rgba(245, 241, 232, 0.98);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-newspaper .chapter-item:hover {
+    background: rgba(139, 69, 19, 0.06);
+}
+
+/* Academic Theme UI Styles */
+body.theme-academic .scroll-progress-bar-container {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-academic .nav-button,
+body.theme-academic .lens-control-container,
+body.theme-academic .mobile-bottom-rail,
+body.theme-academic .mobile-right-rail {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .nav-button:hover {
+    background: rgba(0, 102, 204, 0.08);
+}
+
+body.theme-academic .lens-slider {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .stream {
+    color: var(--ink) !important;
+    line-height: 1.9; /* Increased line height for readability */
+}
+
+body.theme-academic .grain {
+    display: none; /* No grain texture for academic clarity */
+}
+
+body.theme-academic .vignette {
+    display: none; /* No vignette for maximum readability */
+}
+
+body.theme-academic .edge-blur {
+    display: none; /* No edge blur for academic clarity */
+}
+
+body.theme-academic .chapter-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-academic .chapter-item:hover {
+    background: rgba(0, 102, 204, 0.08);
+}
+
+body.theme-academic .sentence {
+    color: #000000;
+}
+
+body.theme-academic .sentence:hover {
+    color: #000000;
+    background: rgba(0, 102, 204, 0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+body.theme-academic .sentence.active {
+    color: #ffffff;
+    background: #0066cc;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-shadow: none;
+}
+
+body.theme-academic .sentence.dimmed {
+    opacity: 0.4;
+    color: #333333;
+}
+
+body.theme-academic .chapter-break {
+    border-top-color: rgba(0, 102, 204, 0.3);
+    border-bottom-color: rgba(0, 102, 204, 0.3);
+    color: var(--accent);
+}
+
+body.theme-academic .image-grid-overlay {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+body.theme-academic .grid-chapter-title {
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .grid-image-item {
+    border-color: rgba(0, 0, 0, 0.2);
+    background: #f5f5f5;
+}
+
+body.theme-academic .grid-image-item:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+}
+
+body.theme-academic .accessibility-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .accessibility-btn:hover {
+    background: rgba(0, 102, 204, 0.1);
+}
+
+body.theme-academic .level-indicator {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .level-indicator.active {
+    background: var(--accent);
+}
+
+body.theme-academic .context-menu {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-academic .context-menu-item {
+    color: var(--ink-2);
+}
+
+body.theme-academic .context-menu-item:hover {
+    background: rgba(0, 102, 204, 0.08);
+    color: var(--accent);
+}
+
+body.theme-academic .context-menu-item:active {
+    background: rgba(0, 102, 204, 0.15);
+}
+
+body.theme-academic .context-menu-divider {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-newspaper .grid-chapter-title {
+    border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+body.theme-newspaper .grid-image-item {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: #e8e4d8;
+}
+
+body.theme-newspaper .grid-image-item:hover {
+    border-color: var(--accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+body.theme-newspaper .sentence {
+    color: #000000;
+}
+
+body.theme-newspaper .sentence:hover {
+    color: #000000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2px 6px;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.theme-newspaper .sentence.active {
+    color: #ffffff;
+    background: #000000;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-shadow: none;
+}
+
+body.theme-newspaper .sentence.dimmed {
+    opacity: 0.35;
+    color: #333333;
+}
+
+body.theme-newspaper .chapter-break {
+    border-top-color: rgba(139, 69, 19, 0.25);
+    border-bottom-color: rgba(139, 69, 19, 0.25);
+    color: var(--accent);
+}
+
 html, body {
     overscroll-behavior: none;
     touch-action: pan-y;
@@ -201,45 +441,76 @@ body.cursor-preview-mode #cursorImage {
     transform: rotate(180deg);
 }
 
-.lens-slider-wrapper {
-    width: 8px;
-    height: 140px;
+.accessibility-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.accessibility-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--ink-2);
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
 }
 
-.lens-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 140px;
-    height: 6px;
+.accessibility-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    outline: none;
-    transform: rotate(-90deg);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
-.lens-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    background: var(--accent);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(0,0,0,0.5);
+.accessibility-btn:active {
+    transform: scale(0.9);
 }
 
-.lens-slider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
+.accessibility-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.accessibility-level {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.level-indicator {
+    width: 16px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    transition: background 0.2s ease;
+}
+
+.level-indicator.active {
     background: var(--accent);
-    border-radius: 50%;
-    cursor: pointer;
-    border: 1px solid rgba(0,0,0,0.5);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+body.theme-newspaper .accessibility-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-newspaper .accessibility-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+}
+
+body.theme-newspaper .level-indicator {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-newspaper .level-indicator.active {
+    background: var(--accent);
 }
 
 /* Mobile Rails */
@@ -430,17 +701,113 @@ body {
     background: var(--bg-color);
     color: var(--ink);
     font: 18px/1.8 'Crimson Text', Georgia, serif;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     cursor: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 body::-webkit-scrollbar { display: none; }
 body { -ms-overflow-style: none; scrollbar-width: none; }
 ::selection { background: rgba(218, 165, 32, 0.25); color: #fff; }
+
+/* Custom Context Menu */
+.context-menu {
+    position: fixed;
+    z-index: calc(var(--z-overlay) + 100);
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    opacity: 0;
+    transform: scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.context-menu.open {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: var(--ink-2);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.context-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--accent);
+}
+
+.context-menu-item:active {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.context-menu-item.context-menu-info {
+    cursor: default;
+    opacity: 0.5;
+    font-size: 11px;
+    padding: 8px 16px;
+}
+
+.context-menu-item.context-menu-info:hover {
+    background: transparent;
+    color: var(--ink-2);
+}
+
+.ctx-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.context-menu-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 6px 8px;
+}
+
+/* Newspaper theme context menu */
+body.theme-newspaper .context-menu {
+    background: rgba(245, 241, 232, 0.98);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-newspaper .context-menu-item {
+    color: var(--ink-2);
+}
+
+body.theme-newspaper .context-menu-item:hover {
+    background: rgba(139, 69, 19, 0.08);
+    color: var(--accent);
+}
+
+body.theme-newspaper .context-menu-item:active {
+    background: rgba(139, 69, 19, 0.15);
+}
+
+body.theme-newspaper .context-menu-divider {
+    background: rgba(0, 0, 0, 0.1);
+}
 
 .edge-blur {
     position: fixed;
@@ -474,9 +841,8 @@ body::after {
 }
 
 .curved {
-    position: absolute;
+    position: fixed;
     inset: 0;
-    min-height: 100vh;
     transform-style: preserve-3d;
     transform: perspective(1000px) translateZ(calc(-200px * var(--curve-k))) scale(calc(1 + var(--curve-k) * 0.06));
     will-change: transform;
@@ -486,8 +852,8 @@ body::after {
 .parallax-container {
     position: relative;
     width: 100%;
-    min-height: 100vh;
-    overflow: visible;
+    height: 100%;
+    overflow: hidden;
 }
 
 .text-layer {
@@ -499,7 +865,6 @@ body::after {
     transform-style: preserve-3d;
     will-change: transform;
     transition: transform 0.1s linear;
-    min-height: 100vh;
 }
 
 .image-layer {
@@ -834,9 +1199,9 @@ body::after {
     border-radius: 2px;
 }
 
-.preview-toggle, .layout-toggle { pointer-events: auto; }
+.preview-toggle, .layout-toggle, .theme-toggle { pointer-events: auto; }
 
-.preview-button, .layout-button, .grid-toggle-btn {
+.preview-button, .layout-button, .grid-toggle-btn, .theme-button {
     background: rgba(255, 255, 255, 0.015);
     border: 1px solid rgba(255, 255, 255, 0.06);
     padding: 8px 12px;
@@ -853,12 +1218,12 @@ body::after {
     pointer-events: auto;
 }
 
-.preview-button:hover, .layout-button:hover, .grid-toggle-btn:hover {
+.preview-button:hover, .layout-button:hover, .grid-toggle-btn:hover, .theme-button:hover {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.12);
 }
 
-.preview-button:active, .layout-button:active, .grid-toggle-btn:active { transform: scale(0.95); }
+.preview-button:active, .layout-button:active, .grid-toggle-btn:active, .theme-button:active { transform: scale(0.95); }
 .preview-button.active { border-color: var(--accent); color: var(--accent); }
 
 .layout-icon {
@@ -910,6 +1275,78 @@ body::after {
 }
 
 .image-grid-overlay.open { display: flex; opacity: 1; }
+
+/* Invisible close hotspots */
+.close-hotspot {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 25vw;
+    height: 25vh;
+    min-width: 150px;
+    min-height: 150px;
+    z-index: calc(var(--z-overlay) + 10);
+    cursor: none;
+    display: none;
+    pointer-events: auto;
+}
+
+.grid-close-hotspot {
+    z-index: calc(var(--z-overlay) + 10);
+    display: none; /* Hidden by default */
+}
+
+/* Show grid hotspot when grid overlay is open - set via JS */
+body.grid-open .grid-close-hotspot {
+    display: block;
+}
+
+.split-close-hotspot {
+    z-index: calc(var(--z-ui) + 10);
+    display: none !important; /* Never show for split-view mode itself */
+}
+
+.rotate-close-hotspot {
+    z-index: calc(var(--z-rotate-warning) + 1);
+    display: none; /* Hidden by default */
+}
+
+/* Show rotate hotspot only when rotate warning overlay is visible */
+@media (orientation: portrait) {
+    body.layout-split .rotate-close-hotspot {
+        display: block; /* Show when rotate warning is displayed */
+    }
+}
+
+/* Cursor X state */
+#cursor.close-mode {
+    width: 60px;
+    height: 60px;
+    border-color: var(--accent);
+    background: rgba(218, 165, 32, 0.15);
+}
+
+#cursor.close-mode::before {
+    content: '✕';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    font-weight: bold;
+    color: var(--accent);
+    line-height: 1;
+}
+
+body.theme-newspaper #cursor.close-mode {
+    border-color: var(--accent);
+    background: rgba(139, 69, 19, 0.15);
+}
+
+body.theme-newspaper #cursor.close-mode::before {
+    color: var(--accent);
+}
+
 .grid-content { 
     padding: 100px 5vw; 
     max-width: 1600px; 
@@ -1098,15 +1535,19 @@ body::after {
 
 /* Force Rotate Warning when Split Mode + Portrait */
 @media (orientation: portrait) {
-    body.layout-split .rotate-warning { display: flex; }
+    body.layout-split .rotate-warning { 
+        display: flex; 
+    }
+}
+
+.rotate-warning.visible {
+    display: flex;
 }
 
 /* Mobile Landscape Optimization */
 @media (max-height: 500px) and (orientation: landscape) {
     .scroll-progress { display: none; }
     .left-rail { display: flex; padding: 10px 4px; }
-    .lens-slider { width: 80px; }
-    .lens-slider-wrapper { height: 80px; }
     .mobile-bottom-rail { display: none; }
     .mobile-right-rail { display: flex; }
     .mobile-nav-button { width: 36px; height: 36px; }
@@ -1162,6 +1603,37 @@ body::after {
 
 </head>
 <body>
+    <!-- Custom context menu -->
+    <div class="context-menu" id="contextMenu" aria-hidden="true">
+        <div class="context-menu-item" id="ctxCopyLink">
+            <span class="ctx-icon">🔗</span>
+            <span>Copy Link</span>
+        </div>
+        <div class="context-menu-item" id="ctxShare">
+            <span class="ctx-icon">↗</span>
+            <span>Share</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="ctxResetProgress">
+            <span class="ctx-icon">↻</span>
+            <span>Reset to Beginning</span>
+        </div>
+        <div class="context-menu-item" id="ctxToggleTheme">
+            <span class="ctx-icon" id="ctxThemeIcon">☀️</span>
+            <span id="ctxThemeText">Light Theme</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item context-menu-info">
+            <span class="ctx-icon">ℹ️</span>
+            <span>IFIMAYBEFRANK</span>
+        </div>
+    </div>
+    
+    <!-- Invisible close hotspots -->
+    <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
+    <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
+    <div class="close-hotspot rotate-close-hotspot" id="rotateCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
+    
     <div class="rotate-warning">
         <svg viewBox="0 0 24 24">
             <path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/>
@@ -1179,18 +1651,26 @@ body::after {
     
     <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
-            <span class="lens-label">Lens</span>
-            <div class="lens-slider-wrapper">
-                <input 
-                    type="range" 
-                    class="lens-slider" 
-                    id="lensSlider"
-                    min="0" 
-                    max="1" 
-                    step="0.01" 
-                    value="1"
-                    aria-label="Adjust lens curvature effect"
-                >
+            <span class="lens-label">Accessibility</span>
+            <div class="accessibility-controls">
+                <button class="accessibility-btn" id="accessibilityIncrease" aria-label="Increase accessibility (larger text, fewer effects)" title="Increase">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </button>
+                <div class="accessibility-level" id="accessibilityLevel">
+                    <div class="level-indicator"></div>
+                    <div class="level-indicator"></div>
+                    <div class="level-indicator active"></div>
+                    <div class="level-indicator"></div>
+                    <div class="level-indicator"></div>
+                </div>
+                <button class="accessibility-btn" id="accessibilityDecrease" aria-label="Decrease accessibility (smaller text, more effects)" title="Decrease">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -1229,12 +1709,7 @@ body::after {
     <div class="mobile-right-rail" aria-label="Mobile navigation landscape">
         <div class="mobile-nav-container">
             <div class="rail-top-group">
-                <div class="mobile-nav-group">
-                    <button class="mobile-nav-button mini" id="landGridToggle" 
-                            title="Toggle Grid" aria-label="Toggle Grid">
-                            <span style="font-size: 1.2em;">▦</span>
-                    </button>
-                </div>
+                <!-- Grid toggle removed from landscape view -->
             </div>
 
             <div class="mobile-progress-container">
@@ -1268,7 +1743,7 @@ body::after {
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>Chapter · Navigation</span>
+                <span>If I May Be Frank</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -1286,18 +1761,6 @@ body::after {
                 <span style="font-size: 1.2em;">▦</span>
             </button>
             
-            <div class="preview-toggle">
-                <button 
-                    id="previewToggle" 
-                    class="preview-button"
-                    aria-label="Toggle image preview mode"
-                    title="Switch between background and cursor preview (P)"
-                >
-                    <span>🖼️</span>
-                    <span id="previewModeText">BG</span>
-                </button>
-            </div>
-            
             <div class="layout-toggle">
                 <button 
                     id="layoutToggle" 
@@ -1306,6 +1769,17 @@ body::after {
                     title="Switch between layered and split layout"
                 >
                     <span class="layout-icon layered"></span>
+                </button>
+            </div>
+            
+            <div class="theme-toggle">
+                <button 
+                    id="themeToggle" 
+                    class="theme-button"
+                    aria-label="Toggle theme"
+                    title="Switch between dark and newspaper theme (T)"
+                >
+                    <span class="theme-icon">☀️</span>
                 </button>
             </div>
         </div>
@@ -1379,6 +1853,7 @@ let spacebarPressed = false;
 
 // Touch variables
 let touchStartY = 0;
+let touchStartX = 0;
 let touchStartTime = 0;
 let isLongPress = false;
 let longPressTimer = null;
@@ -1709,18 +2184,12 @@ function togglePreviewMode() {
         state.previewMode = state.previewMode === 'background' ? 'cursor' : 'background';
     }
     
-    const previewModeText = document.getElementById('previewModeText');
-    const previewButton = document.getElementById('previewToggle');
     const body = document.body;
     
     if (state.previewMode === 'cursor') {
         body.classList.add('cursor-preview-mode');
-        previewModeText.textContent = 'CUR';
-        previewButton.classList.add('active');
     } else {
         body.classList.remove('cursor-preview-mode');
-        previewModeText.textContent = 'BG';
-        previewButton.classList.remove('active');
     }
     
     const currentUrl = state.imageActive ? document.getElementById('hoverImageImg').src : null;
@@ -1819,19 +2288,6 @@ function handleScroll(event) {
         return;
     }
     
-    // Check if cursor is over the text column
-    const textLayer = document.getElementById('textLayer');
-    const textRect = textLayer.getBoundingClientRect();
-    const cursorX = event.clientX || mouseX;
-    
-    const isOverTextColumn = cursorX >= textRect.left && cursorX <= textRect.right;
-    
-    // If cursor is outside text column, allow free scrolling
-    if (!isOverTextColumn) {
-        return; // Don't prevent default, allow native scroll
-    }
-    
-    // Inside text column: sentence-by-sentence navigation
     const scrollDelta = event.deltaY;
     
     if (Math.abs(scrollDelta) >= SCROLL_THRESHOLD) {
@@ -1853,15 +2309,19 @@ function handleScroll(event) {
 
 function handleTouchStart(e) {
     touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
     touchStartTime = Date.now();
     touchMoved = false;
     
     longPressTimer = setTimeout(() => {
         isLongPress = true;
-        document.body.style.overflow = 'auto';
-        const textLayer = document.querySelector('.text-layer');
-        if (textLayer) {
-            textLayer.style.overflow = 'visible';
+        
+        // Show context menu on long-press
+        showContextMenu(touchStartX, touchStartY);
+        
+        // Optional: Haptic feedback if available
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
         }
     }, LONG_PRESS_DURATION);
 }
@@ -1870,6 +2330,7 @@ function handleTouchMove(e) {
     touchMoved = true;
     
     if (isLongPress) {
+        // Cancel long press if user moves during hold
         return;
     }
     
@@ -1898,11 +2359,7 @@ function handleTouchEnd(e) {
     
     if (isLongPress) {
         isLongPress = false;
-        document.body.style.overflow = 'hidden';
-        const textLayer = document.querySelector('.text-layer');
-        if (textLayer) {
-            textLayer.style.overflow = 'visible';
-        }
+        // Context menu is already showing, just reset state
         return;
     }
     
@@ -1962,8 +2419,10 @@ function highlightSentence(index) {
     updateScrollProgress();
     updateChapterDropdown(); // Sync chapter dropdown with current position
     
-    // Don't scroll the page - just keep the sentence highlighted
-    // The user can scroll freely on the sides if they want to reposition
+    sentence.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
     
     const imageTrigger = sentence.querySelector('.image-trigger');
     if (imageTrigger) {
@@ -1973,54 +2432,6 @@ function highlightSentence(index) {
         }
     } else {
         hideImage();
-    }
-}
-
-function updateActiveSentenceFromScroll() {
-    // Find which sentence is closest to the center of the viewport
-    const viewportCenter = window.innerHeight / 2;
-    let closestSentence = null;
-    let closestDistance = Infinity;
-    let closestIndex = -1;
-    
-    state.allSentenceElements.forEach((sentence, index) => {
-        const rect = sentence.getBoundingClientRect();
-        const sentenceCenter = rect.top + (rect.height / 2);
-        const distance = Math.abs(sentenceCenter - viewportCenter);
-        
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestSentence = sentence;
-            closestIndex = index;
-        }
-    });
-    
-    // Update the active sentence if we found one
-    if (closestIndex !== -1 && closestIndex !== state.currentSentenceIndex) {
-        state.currentSentenceIndex = closestIndex;
-        
-        // Update highlights without scrolling
-        state.allSentenceElements.forEach(s => {
-            s.classList.remove('active');
-            s.classList.add('dimmed');
-        });
-        
-        closestSentence.classList.add('active');
-        closestSentence.classList.remove('dimmed');
-        
-        updateScrollProgress();
-        updateChapterDropdown();
-        
-        // Update image if the sentence has one
-        const imageTrigger = closestSentence.querySelector('.image-trigger');
-        if (imageTrigger) {
-            const imageUrl = imageTrigger.getAttribute('data-image');
-            if (imageUrl) {
-                showImage(imageUrl, imageTrigger);
-            }
-        } else {
-            hideImage();
-        }
     }
 }
 
@@ -2213,6 +2624,7 @@ function toggleImageGrid() {
     
     if (overlay.classList.contains('open')) {
         overlay.classList.remove('open');
+        document.body.classList.remove('grid-open'); // Remove hotspot trigger
         document.body.style.overflow = '';
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
@@ -2220,6 +2632,7 @@ function toggleImageGrid() {
         });
     } else {
         overlay.classList.add('open');
+        document.body.classList.add('grid-open'); // Add hotspot trigger
         document.body.style.overflow = 'hidden'; // Lock scroll
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
@@ -2475,36 +2888,72 @@ document.addEventListener('mouseout', (e) => {
     }
 });
 
-const lensSlider = document.getElementById('lensSlider');
-lensSlider.addEventListener('input', (e) => {
-    const value = parseFloat(e.target.value);
-    document.documentElement.style.setProperty('--curve-k', value);
-});
+// Accessibility controls (5 levels)
+let accessibilityLevel = 2; // Start at middle (0.5)
+const accessibilityLevels = [0, 0.25, 0.5, 0.75, 1];
+const increaseBtn = document.getElementById('accessibilityIncrease');
+const decreaseBtn = document.getElementById('accessibilityDecrease');
 
-const layoutToggle = document.getElementById('layoutToggle');
-const layoutIcon = layoutToggle.querySelector('.layout-icon');
-const brandLogo = document.getElementById('brandLogo');
-
-function updateLayoutIcon() {
-    if (state.layoutMode === 'layered') {
-        layoutIcon.className = 'layout-icon layered';
-    } else {
-        layoutIcon.className = 'layout-icon split';
-    }
+function applyAccessibilityLevel(level) {
+    const value = accessibilityLevels[level];
+    
+    // Map value (0 to 1) to accessibility settings
+    // 0 = Maximum accessibility (large text, minimal effects)
+    // 0.5 = Default (current settings)
+    // 1 = Maximum artistic (smaller text, full effects)
+    
+    // Font size: 1.3x at 0, 1.0x at 0.5, 0.85x at 1
+    const fontScale = 1.3 - (value * 0.9);
+    
+    // Curve effect: 0 at 0, 1.5 at 0.5, 3 at 1
+    const curveK = value * 3;
+    
+    // Vignette opacity: 0 at 0, 0.85 at 0.5, 1.2 at 1
+    const vigOpacity = Math.min(value * 2.4, 1.2);
+    
+    // Edge blur: 0px at 0, 10px at 0.5, 20px at 1
+    const edgeBlur = value * 20;
+    
+    // Apply the values
+    document.documentElement.style.setProperty('--curve-k', curveK);
+    document.documentElement.style.setProperty('--vig-opacity', vigOpacity);
+    document.documentElement.style.setProperty('--edge-blur', edgeBlur + 'px');
+    document.documentElement.style.setProperty('--font-scale', fontScale);
+    
+    // Apply font scaling to body
+    document.body.style.fontSize = (fontScale * 100) + '%';
+    
+    // Update visual indicators
+    updateAccessibilityIndicators(level);
 }
 
-brandLogo.addEventListener('click', () => {
-    toggleChapterDropdown();
-});
+function updateAccessibilityIndicators(level) {
+    const indicators = document.querySelectorAll('.level-indicator');
+    indicators.forEach((indicator, index) => {
+        if (index === level) {
+            indicator.classList.add('active');
+        } else {
+            indicator.classList.remove('active');
+        }
+    });
+}
 
-document.addEventListener('click', (e) => {
-    const dropdown = document.getElementById('chapterDropdown');
-    const brand = document.getElementById('brandLogo');
-    
-    if (!brand.contains(e.target) && !dropdown.contains(e.target)) {
-        closeChapterDropdown();
+increaseBtn.addEventListener('click', () => {
+    if (accessibilityLevel > 0) {
+        accessibilityLevel--;
+        applyAccessibilityLevel(accessibilityLevel);
     }
 });
+
+decreaseBtn.addEventListener('click', () => {
+    if (accessibilityLevel < accessibilityLevels.length - 1) {
+        accessibilityLevel++;
+        applyAccessibilityLevel(accessibilityLevel);
+    }
+});
+
+// Initialize at default level
+applyAccessibilityLevel(accessibilityLevel);
 
 document.getElementById('prevSentenceBtn').addEventListener('click', () => {
     previousSentence();
@@ -2530,6 +2979,132 @@ document.getElementById('mobileNextSentenceBtn').addEventListener('click', () =>
     nextSentence();
 });
 
+// Long-press handlers for mobile buttons to jump to chapters
+function setupLongPress(buttonId, action) {
+    const button = document.getElementById(buttonId);
+    
+    const startPress = (e) => {
+        e.preventDefault();
+        isLongPress = false;
+        longPressTimer = setTimeout(() => {
+            isLongPress = true;
+            action();
+        }, 500); // 500ms for long press
+    };
+    
+    const endPress = () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    };
+    
+    button.addEventListener('touchstart', startPress, { passive: false });
+    button.addEventListener('touchend', endPress);
+    button.addEventListener('touchcancel', endPress);
+}
+
+setupLongPress('mobilePrevSentenceBtn', previousChapter);
+setupLongPress('mobileNextSentenceBtn', nextChapter);
+setupLongPress('landPrevBtn', previousChapter);
+setupLongPress('landNextBtn', nextChapter);
+
+// Context Menu Functionality
+const contextMenu = document.getElementById('contextMenu');
+let contextMenuTimer = null;
+
+function showContextMenu(x, y) {
+    contextMenu.style.left = x + 'px';
+    contextMenu.style.top = y + 'px';
+    contextMenu.classList.add('open');
+    contextMenu.setAttribute('aria-hidden', 'false');
+    
+    // Update theme toggle text
+    const themeText = document.getElementById('ctxThemeText');
+    const themeIcon = document.getElementById('ctxThemeIcon');
+    if (document.body.classList.contains('theme-academic')) {
+        themeText.textContent = 'Dark Theme';
+        themeIcon.textContent = '🌙';
+    } else if (document.body.classList.contains('theme-newspaper')) {
+        themeText.textContent = 'Academic Theme';
+        themeIcon.textContent = '📖';
+    } else {
+        themeText.textContent = 'Newspaper Theme';
+        themeIcon.textContent = '☀️';
+    }
+    
+    // Adjust position if menu goes off-screen
+    setTimeout(() => {
+        const rect = contextMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        }
+        if (rect.bottom > window.innerHeight) {
+            contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
+        }
+    }, 0);
+}
+
+function hideContextMenu() {
+    contextMenu.classList.remove('open');
+    contextMenu.setAttribute('aria-hidden', 'true');
+}
+
+// Desktop: Right-click
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY);
+});
+
+// Close context menu on click outside
+document.addEventListener('click', (e) => {
+    if (!contextMenu.contains(e.target)) {
+        hideContextMenu();
+    }
+});
+
+// Context menu actions
+document.getElementById('ctxCopyLink').addEventListener('click', () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+        const item = document.getElementById('ctxCopyLink');
+        const originalText = item.querySelector('span:last-child').textContent;
+        item.querySelector('span:last-child').textContent = 'Copied!';
+        setTimeout(() => {
+            item.querySelector('span:last-child').textContent = originalText;
+        }, 1500);
+    });
+    setTimeout(hideContextMenu, 1500);
+});
+
+document.getElementById('ctxShare').addEventListener('click', async () => {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'IFIMAYBEFRANK',
+                text: 'Check out this interactive story',
+                url: window.location.href
+            });
+        } catch (err) {
+            console.log('Share cancelled');
+        }
+    } else {
+        // Fallback to copy link
+        document.getElementById('ctxCopyLink').click();
+    }
+    hideContextMenu();
+});
+
+document.getElementById('ctxResetProgress').addEventListener('click', () => {
+    resetToBeginning();
+    hideContextMenu();
+});
+
+document.getElementById('ctxToggleTheme').addEventListener('click', () => {
+    window.toggleTheme();
+    hideContextMenu();
+});
+
 document.getElementById('landPrevBtn').addEventListener('click', () => {
     previousSentence();
 });
@@ -2538,82 +3113,49 @@ document.getElementById('landNextBtn').addEventListener('click', () => {
     nextSentence();
 });
 
-// Mobile button long-press for chapter navigation
-function setupMobileButtonLongPress(buttonId, sentenceAction, chapterAction) {
-    const button = document.getElementById(buttonId);
-    let buttonLongPressTimer = null;
-    let buttonIsLongPress = false;
-    
-    button.addEventListener('touchstart', (e) => {
-        e.stopPropagation(); // Prevent global touch handler
-        buttonIsLongPress = false;
-        buttonLongPressTimer = setTimeout(() => {
-            buttonIsLongPress = true;
-            chapterAction();
-            // Optional: haptic feedback
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-        }, 500);
-    }, { passive: true });
-    
-    button.addEventListener('touchend', (e) => {
-        e.stopPropagation(); // Prevent global touch handler
-        if (buttonLongPressTimer) {
-            clearTimeout(buttonLongPressTimer);
-            buttonLongPressTimer = null;
-        }
-        
-        if (!buttonIsLongPress) {
-            // Short tap - execute sentence action
-            sentenceAction();
-        }
-        
-        buttonIsLongPress = false;
-    }, { passive: true });
-    
-    button.addEventListener('touchcancel', (e) => {
-        if (buttonLongPressTimer) {
-            clearTimeout(buttonLongPressTimer);
-            buttonLongPressTimer = null;
-        }
-        buttonIsLongPress = false;
-    }, { passive: true });
-}
-
-// Setup all mobile buttons with long-press
-setupMobileButtonLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
-setupMobileButtonLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
-setupMobileButtonLongPress('landPrevBtn', previousSentence, previousChapter);
-setupMobileButtonLongPress('landNextBtn', nextSentence, nextChapter);
-
-document.getElementById('previewToggle').addEventListener('click', () => {
-    togglePreviewMode();
-});
-
 document.getElementById('gridToggleBtn').addEventListener('click', () => {
     toggleImageGrid();
 });
 
-// Removed bottom rail grid toggle listener as the element was removed
+// Hotspot close handlers
+const gridCloseHotspot = document.getElementById('gridCloseHotspot');
+const rotateCloseHotspot = document.getElementById('rotateCloseHotspot');
 
-document.getElementById('landGridToggle').addEventListener('click', () => {
+gridCloseHotspot.addEventListener('mouseenter', () => {
+    cursor.classList.add('close-mode');
+});
+
+gridCloseHotspot.addEventListener('mouseleave', () => {
+    cursor.classList.remove('close-mode');
+});
+
+gridCloseHotspot.addEventListener('click', () => {
     toggleImageGrid();
+    cursor.classList.remove('close-mode');
 });
 
-layoutToggle.addEventListener('click', () => {
-    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
-    
-    document.body.classList.remove('layout-layered', 'layout-split');
-    document.body.classList.add(`layout-${state.layoutMode}`);
-    
-    updateLayoutIcon();
-    
-    document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-    setTimeout(() => {
-        document.body.style.transition = '';
-    }, 500);
+// Rotate warning close hotspot (for the overlay, not split-view itself)
+rotateCloseHotspot.addEventListener('mouseenter', () => {
+    cursor.classList.add('close-mode');
 });
+
+rotateCloseHotspot.addEventListener('mouseleave', () => {
+    cursor.classList.remove('close-mode');
+});
+
+rotateCloseHotspot.addEventListener('click', () => {
+    // Close rotate warning by rotating device or use Escape key
+    // Since the warning auto-shows/hides based on orientation,
+    // clicking just dismisses the current instance
+    const rotateWarning = document.querySelector('.rotate-warning');
+    if (rotateWarning) {
+        rotateWarning.style.display = 'none';
+        cursor.classList.remove('close-mode');
+    }
+});
+
+// Removed bottom rail grid toggle listener as the element was removed
+// Removed landscape grid toggle as well
 
 document.addEventListener('DOMContentLoaded', () => {
     preloadImages();
@@ -2622,7 +3164,89 @@ document.addEventListener('DOMContentLoaded', () => {
     updateParallax();
     
     document.body.classList.add(`layout-${state.layoutMode}`);
+    
+    // Setup layout toggle
+    const layoutToggle = document.getElementById('layoutToggle');
+    const layoutIcon = layoutToggle.querySelector('.layout-icon');
+    
+    function updateLayoutIcon() {
+        if (state.layoutMode === 'layered') {
+            layoutIcon.className = 'layout-icon layered';
+        } else {
+            layoutIcon.className = 'layout-icon split';
+        }
+    }
+    
     updateLayoutIcon();
+    
+    // Global layout toggle function
+    window.toggleLayout = function() {
+        state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
+        
+        document.body.classList.remove('layout-layered', 'layout-split');
+        document.body.classList.add(`layout-${state.layoutMode}`);
+        
+        updateLayoutIcon();
+        
+        document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 500);
+    };
+    
+    layoutToggle.addEventListener('click', () => {
+        window.toggleLayout();
+    });
+    
+    // Setup theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+    
+    function updateThemeIcon() {
+        if (document.body.classList.contains('theme-academic')) {
+            themeIcon.textContent = '🌙';
+        } else if (document.body.classList.contains('theme-newspaper')) {
+            themeIcon.textContent = '📖';
+        } else {
+            themeIcon.textContent = '☀️';
+        }
+    }
+    
+    // Global theme toggle function - cycles through dark → newspaper → academic
+    window.toggleTheme = function() {
+        if (document.body.classList.contains('theme-academic')) {
+            // Academic → Dark
+            document.body.classList.remove('theme-academic');
+        } else if (document.body.classList.contains('theme-newspaper')) {
+            // Newspaper → Academic
+            document.body.classList.remove('theme-newspaper');
+            document.body.classList.add('theme-academic');
+        } else {
+            // Dark → Newspaper
+            document.body.classList.add('theme-newspaper');
+        }
+        updateThemeIcon();
+    };
+    
+    themeToggle.addEventListener('click', () => {
+        window.toggleTheme();
+    });
+    
+    // Setup brand logo and chapter dropdown
+    const brandLogo = document.getElementById('brandLogo');
+    
+    brandLogo.addEventListener('click', () => {
+        toggleChapterDropdown();
+    });
+    
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('chapterDropdown');
+        const brand = document.getElementById('brandLogo');
+        
+        if (!brand.contains(e.target) && !dropdown.contains(e.target)) {
+            closeChapterDropdown();
+        }
+    });
     
     // Check initial orientation for landscape
     if (window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches) {
@@ -2630,20 +3254,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     window.addEventListener('wheel', handleScroll, { passive: false });
-    
-    // Track scroll position to update active sentence during free scrolling
-    let scrollUpdateTimeout = null;
-    window.addEventListener('scroll', () => {
-        // Clear existing timeout
-        if (scrollUpdateTimeout) {
-            clearTimeout(scrollUpdateTimeout);
-        }
-        
-        // Debounce the scroll update
-        scrollUpdateTimeout = setTimeout(() => {
-            updateActiveSentenceFromScroll();
-        }, 100);
-    }, { passive: true });
     
     window.addEventListener('touchstart', handleTouchStart, { passive: false });
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -2656,11 +3266,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleImageSize();
                 spacebarPressed = true;
             }
-        }
-        
-        if (e.key === 'p' || e.key === 'P') {
-            e.preventDefault();
-            togglePreviewMode();
         }
         
         switch(e.key) {
@@ -2683,7 +3288,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextChapter();
                 break;
             case 'l':
-                layoutToggle.click();
+                window.toggleLayout();
+                break;
+            case 't':
+            case 'T':
+                window.toggleTheme();
                 break;
             case 'Home':
                 e.preventDefault();
@@ -2697,10 +3306,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 'Escape':
+            case 'x':
+            case 'X':
                 e.preventDefault();
                 closeChapterDropdown();
                 const overlay = document.getElementById('imageGridOverlay');
-                if(overlay.classList.contains('open')) toggleImageGrid();
+                const rotateWarning = document.querySelector('.rotate-warning');
+                
+                if(overlay.classList.contains('open')) {
+                    toggleImageGrid();
+                    cursor.classList.remove('close-mode');
+                } else if (rotateWarning && rotateWarning.style.display === 'flex') {
+                    rotateWarning.style.display = 'none';
+                    cursor.classList.remove('close-mode');
+                } else if (state.layoutMode === 'split') {
+                    // Revert to default layered view
+                    state.layoutMode = 'layered';
+                    document.body.classList.remove('layout-split');
+                    document.body.classList.add('layout-layered');
+                    updateLayoutIcon();
+                    cursor.classList.remove('close-mode');
+                }
                 break;
         }
     });
