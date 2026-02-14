@@ -44,15 +44,29 @@
 
 /* Newspaper/Ink Light Theme */
 body.theme-newspaper {
-    --bg-color: #f5f1e8;
+    --bg-color: #faf8f3;
     --ink: #000000;
     --ink-2: #1a1a1a;
-    --ink-3: #333333;
+    --ink-3: #2a2a2a;
     --accent: #8b4513;
-    --vig-opacity: 0.15;
+    --vig-opacity: 0.12;
     --bracket-color: #5d4e37;
     --bracket-hover: #8b4513;
     --bracket-bg: rgba(139, 69, 19, 0.03);
+}
+
+/* Academic Theme - Maximum Legibility & Accessibility */
+body.theme-academic {
+    --bg-color: #ffffff;
+    --ink: #000000;
+    --ink-2: #1a1a1a;
+    --ink-3: #333333;
+    --accent: #0066cc;
+    --vig-opacity: 0;
+    --edge-blur: 0px;
+    --bracket-color: #004080;
+    --bracket-hover: #0066cc;
+    --bracket-bg: rgba(0, 102, 204, 0.05);
 }
 
 body.theme-newspaper .scroll-progress-bar-container {
@@ -89,8 +103,138 @@ body.theme-newspaper .chapter-item:hover {
     background: rgba(139, 69, 19, 0.06);
 }
 
-body.theme-newspaper .image-grid-overlay {
-    background: rgba(245, 241, 232, 0.98);
+/* Academic Theme UI Styles */
+body.theme-academic .scroll-progress-bar-container {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-academic .nav-button,
+body.theme-academic .lens-control-container,
+body.theme-academic .mobile-bottom-rail,
+body.theme-academic .mobile-right-rail {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .nav-button:hover {
+    background: rgba(0, 102, 204, 0.08);
+}
+
+body.theme-academic .lens-slider {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .stream {
+    color: var(--ink) !important;
+    line-height: 1.9; /* Increased line height for readability */
+}
+
+body.theme-academic .grain {
+    display: none; /* No grain texture for academic clarity */
+}
+
+body.theme-academic .vignette {
+    display: none; /* No vignette for maximum readability */
+}
+
+body.theme-academic .edge-blur {
+    display: none; /* No edge blur for academic clarity */
+}
+
+body.theme-academic .chapter-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-academic .chapter-item:hover {
+    background: rgba(0, 102, 204, 0.08);
+}
+
+body.theme-academic .sentence {
+    color: #000000;
+}
+
+body.theme-academic .sentence:hover {
+    color: #000000;
+    background: rgba(0, 102, 204, 0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+}
+
+body.theme-academic .sentence.active {
+    color: #ffffff;
+    background: #0066cc;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-shadow: none;
+}
+
+body.theme-academic .sentence.dimmed {
+    opacity: 0.4;
+    color: #333333;
+}
+
+body.theme-academic .chapter-break {
+    border-top-color: rgba(0, 102, 204, 0.3);
+    border-bottom-color: rgba(0, 102, 204, 0.3);
+    color: var(--accent);
+}
+
+body.theme-academic .image-grid-overlay {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+body.theme-academic .grid-chapter-title {
+    border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .grid-image-item {
+    border-color: rgba(0, 0, 0, 0.2);
+    background: #f5f5f5;
+}
+
+body.theme-academic .grid-image-item:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+}
+
+body.theme-academic .accessibility-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .accessibility-btn:hover {
+    background: rgba(0, 102, 204, 0.1);
+}
+
+body.theme-academic .level-indicator {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+body.theme-academic .level-indicator.active {
+    background: var(--accent);
+}
+
+body.theme-academic .context-menu {
+    background: rgba(255, 255, 255, 0.98);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.theme-academic .context-menu-item {
+    color: var(--ink-2);
+}
+
+body.theme-academic .context-menu-item:hover {
+    background: rgba(0, 102, 204, 0.08);
+    color: var(--accent);
+}
+
+body.theme-academic .context-menu-item:active {
+    background: rgba(0, 102, 204, 0.15);
+}
+
+body.theme-academic .context-menu-divider {
+    background: rgba(0, 0, 0, 0.15);
 }
 
 body.theme-newspaper .grid-chapter-title {
@@ -2878,11 +3022,14 @@ function showContextMenu(x, y) {
     // Update theme toggle text
     const themeText = document.getElementById('ctxThemeText');
     const themeIcon = document.getElementById('ctxThemeIcon');
-    if (document.body.classList.contains('theme-newspaper')) {
+    if (document.body.classList.contains('theme-academic')) {
         themeText.textContent = 'Dark Theme';
         themeIcon.textContent = '🌙';
+    } else if (document.body.classList.contains('theme-newspaper')) {
+        themeText.textContent = 'Academic Theme';
+        themeIcon.textContent = '📖';
     } else {
-        themeText.textContent = 'Light Theme';
+        themeText.textContent = 'Newspaper Theme';
         themeIcon.textContent = '☀️';
     }
     
@@ -3056,16 +3203,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeIcon = themeToggle.querySelector('.theme-icon');
     
     function updateThemeIcon() {
-        if (document.body.classList.contains('theme-newspaper')) {
+        if (document.body.classList.contains('theme-academic')) {
             themeIcon.textContent = '🌙';
+        } else if (document.body.classList.contains('theme-newspaper')) {
+            themeIcon.textContent = '📖';
         } else {
             themeIcon.textContent = '☀️';
         }
     }
     
-    // Global theme toggle function
+    // Global theme toggle function - cycles through dark → newspaper → academic
     window.toggleTheme = function() {
-        document.body.classList.toggle('theme-newspaper');
+        if (document.body.classList.contains('theme-academic')) {
+            // Academic → Dark
+            document.body.classList.remove('theme-academic');
+        } else if (document.body.classList.contains('theme-newspaper')) {
+            // Newspaper → Academic
+            document.body.classList.remove('theme-newspaper');
+            document.body.classList.add('theme-academic');
+        } else {
+            // Dark → Newspaper
+            document.body.classList.add('theme-newspaper');
+        }
         updateThemeIcon();
     };
     
