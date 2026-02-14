@@ -385,6 +385,10 @@ body.cursor-preview-mode #cursorImage {
     justify-content: center;
     font-size: 14px;
     pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .nav-button:hover {
@@ -593,6 +597,9 @@ body.theme-newspaper .level-indicator.active {
     justify-content: center;
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
 }
 
 .mobile-nav-button:active {
@@ -1838,6 +1845,15 @@ body.theme-newspaper #cursor.close-mode::before {
     </main>
 
     <script>
+// Touch device detection
+const isTouchDevice = () => {
+    return (('ontouchstart' in window) ||
+           (navigator.maxTouchPoints > 0) ||
+           (navigator.msMaxTouchPoints > 0));
+};
+
+const isTouch = isTouchDevice();
+
 // Logic Constants
 const TAIL_LENGTH = 12;
 const CURSOR_SMOOTHING = 0.35;
@@ -2976,21 +2992,45 @@ document.getElementById('nextChapterBtn').addEventListener('click', () => {
 // Long press (500ms) = next/previous chapter
 function setupLongPress(buttonId, normalAction, longPressAction) {
     const button = document.getElementById(buttonId);
+    if (!button) return;
+    
     let longPressActivated = false;
     let localLongPressTimer = null;
+    let startX = 0;
+    let startY = 0;
     
+    // Touch handlers for mobile
     const startPress = (e) => {
         e.preventDefault();
+        e.stopPropagation(); // Prevent global long-press handler
         longPressActivated = false;
+        
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        
         localLongPressTimer = setTimeout(() => {
             longPressActivated = true;
             longPressAction();
             
-            // Optional: Haptic feedback on long press
+            // Haptic feedback on long press
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
         }, 500); // 500ms for long press
+    };
+    
+    const movePress = (e) => {
+        // Cancel long press if finger moves too much
+        if (localLongPressTimer) {
+            const moveX = Math.abs(e.touches[0].clientX - startX);
+            const moveY = Math.abs(e.touches[0].clientY - startY);
+            
+            if (moveX > 10 || moveY > 10) {
+                clearTimeout(localLongPressTimer);
+                localLongPressTimer = null;
+                longPressActivated = false;
+            }
+        }
     };
     
     const endPress = (e) => {
@@ -3013,9 +3053,20 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
         longPressActivated = false;
     };
     
+    // Add touch event listeners
     button.addEventListener('touchstart', startPress, { passive: false });
-    button.addEventListener('touchend', endPress);
-    button.addEventListener('touchcancel', cancelPress);
+    button.addEventListener('touchmove', movePress, { passive: false });
+    button.addEventListener('touchend', endPress, { passive: false });
+    button.addEventListener('touchcancel', cancelPress, { passive: false });
+    
+    // Add click handler for desktop (mouse/trackpad)
+    // On desktop, regular click = next/prev sentence, no long-press needed
+    if (!isTouch) {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            normalAction();
+        });
+    }
 }
 
 // Context Menu Functionality
@@ -3059,11 +3110,76 @@ function hideContextMenu() {
     contextMenu.setAttribute('aria-hidden', 'true');
 }
 
-// Desktop: Right-click
-document.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    showContextMenu(e.clientX, e.clientY);
-});
+// Desktop: Right-click context menu (only on non-touch devices)
+if (!isTouch) {
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showContextMenu(e.clientX, e.clientY);
+    });
+}
+
+// Touch: Long-press context menu (except on rail buttons)
+let globalLongPressTimer = null;
+let globalLongPressActive = false;
+let globalTouchStartX = 0;
+let globalTouchStartY = 0;
+
+document.addEventListener('touchstart', (e) => {
+    // Don't show context menu if touching rail buttons
+    const target = e.target.closest('button');
+    const isRailButton = target && (
+        target.id === 'mobilePrevSentenceBtn' ||
+        target.id === 'mobileNextSentenceBtn' ||
+        target.id === 'landPrevBtn' ||
+        target.id === 'landNextBtn'
+    );
+    
+    if (isRailButton) {
+        return; // Let the rail button handler deal with it
+    }
+    
+    globalTouchStartX = e.touches[0].clientX;
+    globalTouchStartY = e.touches[0].clientY;
+    globalLongPressActive = false;
+    
+    globalLongPressTimer = setTimeout(() => {
+        globalLongPressActive = true;
+        showContextMenu(globalTouchStartX, globalTouchStartY);
+        
+        // Haptic feedback
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+    }, 500);
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+    // Cancel long press if finger moves too much
+    if (globalLongPressTimer) {
+        const moveX = Math.abs(e.touches[0].clientX - globalTouchStartX);
+        const moveY = Math.abs(e.touches[0].clientY - globalTouchStartY);
+        
+        if (moveX > 10 || moveY > 10) {
+            clearTimeout(globalLongPressTimer);
+            globalLongPressTimer = null;
+        }
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+    if (globalLongPressTimer) {
+        clearTimeout(globalLongPressTimer);
+        globalLongPressTimer = null;
+    }
+}, { passive: true });
+
+document.addEventListener('touchcancel', () => {
+    if (globalLongPressTimer) {
+        clearTimeout(globalLongPressTimer);
+        globalLongPressTimer = null;
+    }
+}, { passive: true });
+
 
 // Close context menu on click outside
 document.addEventListener('click', (e) => {
@@ -3114,13 +3230,7 @@ document.getElementById('ctxToggleTheme').addEventListener('click', () => {
     hideContextMenu();
 });
 
-document.getElementById('landPrevBtn').addEventListener('click', () => {
-    previousSentence();
-});
-
-document.getElementById('landNextBtn').addEventListener('click', () => {
-    nextSentence();
-});
+// Landscape buttons now handled by setupLongPress in DOMContentLoaded
 
 document.getElementById('gridToggleBtn').addEventListener('click', () => {
     toggleImageGrid();
@@ -3352,12 +3462,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Setup mobile bottom rail buttons (must be inside DOMContentLoaded)
+    // Touch devices: tap = next/prev sentence, long-press = next/prev chapter
+    // Desktop/mouse: click = next/prev sentence (no long-press needed for chapters, use keyboard or nav)
     setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
     setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
     setupLongPress('landPrevBtn', previousSentence, previousChapter);
     setupLongPress('landNextBtn', nextSentence, nextChapter);
     
     console.log('✓ IFIMAYBEFRANK');
+    console.log(`Input mode: ${isTouch ? 'Touch' : 'Mouse/Trackpad'}`);
+    console.log(`Context menu: ${isTouch ? 'Long-press anywhere' : 'Right-click'}`);
+    console.log(`Rail buttons: ${isTouch ? 'Tap=sentence, Long-press=chapter' : 'Click=sentence'}`);
 });
     </script>
 </body>
