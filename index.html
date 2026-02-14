@@ -45,29 +45,29 @@
 
 /* Newspaper/Ink Light Theme */
 body.theme-newspaper {
-    --bg-color: #faf8f3;
+    --bg-color: #f5f1e8;
     --ink: #000000;
-    --ink-2: #1a1a1a;
-    --ink-3: #2a2a2a;
+    --ink-2: #0a0a0a;
+    --ink-3: #1a1a1a;
     --accent: #8b4513;
-    --vig-opacity: 0.12;
+    --vig-opacity: 0.15;
     --bracket-color: #5d4e37;
     --bracket-hover: #8b4513;
-    --bracket-bg: rgba(139, 69, 19, 0.03);
+    --bracket-bg: rgba(139, 69, 19, 0.04);
 }
 
 /* Academic Theme */
 body.theme-academic {
     --bg-color: #ffffff;
     --ink: #000000;
-    --ink-2: #1a1a1a;
-    --ink-3: #333333;
-    --accent: #0066cc;
+    --ink-2: #0f0f0f;
+    --ink-3: #2a2a2a;
+    --accent: #0052a3;
     --vig-opacity: 0;
     --edge-blur: 0px;
-    --bracket-color: #004080;
-    --bracket-hover: #0066cc;
-    --bracket-bg: rgba(0, 102, 204, 0.05);
+    --bracket-color: #003d7a;
+    --bracket-hover: #0052a3;
+    --bracket-bg: rgba(0, 82, 163, 0.06);
 }
 
 /* ... [All original styles preserved] ... */
@@ -91,9 +91,9 @@ body.theme-academic .grain, body.theme-academic .vignette, body.theme-academic .
 body.theme-academic .chapter-dropdown { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.2); }
 body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .sentence { color: #000000; }
-body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
-body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.4; color: #333333; }
+body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 82, 163, 0.14); padding: 3px 7px; border-radius: 3px; box-shadow: 0 2px 6px rgba(0, 82, 163, 0.15); }
+body.theme-academic .sentence.active { color: #ffffff; background: #0052a3; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
+body.theme-academic .sentence.dimmed { opacity: 0.35; color: #2a2a2a; }
 body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
 body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
 body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
@@ -114,9 +114,9 @@ body.theme-newspaper .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.
 body.theme-newspaper .grid-image-item { border-color: rgba(0, 0, 0, 0.15); background: #e8e4d8; }
 body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); }
 body.theme-newspaper .sentence { color: #000000; }
-body.theme-newspaper .sentence:hover { color: #000000; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+body.theme-newspaper .sentence:hover { color: #000000; background: rgba(139, 69, 19, 0.12); padding: 3px 7px; border-radius: 3px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); }
 body.theme-newspaper .sentence.active { color: #ffffff; background: #000000; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-newspaper .sentence.dimmed { opacity: 0.35; color: #333333; }
+body.theme-newspaper .sentence.dimmed { opacity: 0.30; color: #2a2a2a; }
 body.theme-newspaper .chapter-break { border-top-color: rgba(139, 69, 19, 0.25); border-bottom-color: rgba(139, 69, 19, 0.25); color: var(--accent); }
 
 /* Newspaper Context Menu */
@@ -132,7 +132,7 @@ body.layout-layered .stream { color: rgba(255, 255, 255, 0.85); }
 body.layout-layered .hover-image { position: absolute; left: 50%; top: 50%; }
 body.layout-split .text-layer { width: 50%; margin: 0; padding-left: 6vw; }
 body.layout-split .stream { color: rgba(255, 255, 255, 0.9); font-size: clamp(16px, 2vw, 28px); }
-body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; }
+body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; opacity: 1 !important; }
 body:not(.cursor-preview-mode) .hover-image { display: block; }
 body:not(.cursor-preview-mode) #cursorImage { display: none !important; }
 body.cursor-preview-mode .hover-image { display: none !important; }
