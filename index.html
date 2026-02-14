@@ -1149,31 +1149,29 @@ body::after {
 
 .grid-close-hotspot {
     z-index: calc(var(--z-overlay) + 10);
+    display: none; /* Hidden by default */
 }
 
-.image-grid-overlay.open ~ .grid-close-hotspot {
+/* Show grid hotspot when grid overlay is open - set via JS */
+body.grid-open .grid-close-hotspot {
     display: block;
 }
 
 .split-close-hotspot {
     z-index: calc(var(--z-ui) + 10);
-}
-
-body.layout-split .split-close-hotspot {
-    display: block;
+    display: none !important; /* Never show for split-view mode itself */
 }
 
 .rotate-close-hotspot {
     z-index: calc(var(--z-rotate-warning) + 1);
+    display: none; /* Hidden by default */
 }
 
-.rotate-warning.visible ~ .rotate-close-hotspot {
-    display: block;
-}
-
-/* Show hotspots on all devices */
-.close-hotspot {
-    display: block;
+/* Show rotate hotspot only when rotate warning overlay is visible */
+@media (orientation: portrait) {
+    body.layout-split .rotate-close-hotspot {
+        display: block; /* Show when rotate warning is displayed */
+    }
 }
 
 /* Cursor X state */
@@ -2482,6 +2480,7 @@ function toggleImageGrid() {
     
     if (overlay.classList.contains('open')) {
         overlay.classList.remove('open');
+        document.body.classList.remove('grid-open'); // Remove hotspot trigger
         document.body.style.overflow = '';
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
@@ -2489,6 +2488,7 @@ function toggleImageGrid() {
         });
     } else {
         overlay.classList.add('open');
+        document.body.classList.add('grid-open'); // Add hotspot trigger
         document.body.style.overflow = 'hidden'; // Lock scroll
         btns.forEach(btn => {
             const icon = btn.querySelector('span:last-child') || btn.querySelector('span');
@@ -2811,31 +2811,6 @@ decreaseBtn.addEventListener('click', () => {
 // Initialize at default level
 applyAccessibilityLevel(accessibilityLevel);
 
-const layoutToggle = document.getElementById('layoutToggle');
-const layoutIcon = layoutToggle.querySelector('.layout-icon');
-const brandLogo = document.getElementById('brandLogo');
-
-function updateLayoutIcon() {
-    if (state.layoutMode === 'layered') {
-        layoutIcon.className = 'layout-icon layered';
-    } else {
-        layoutIcon.className = 'layout-icon split';
-    }
-}
-
-brandLogo.addEventListener('click', () => {
-    toggleChapterDropdown();
-});
-
-document.addEventListener('click', (e) => {
-    const dropdown = document.getElementById('chapterDropdown');
-    const brand = document.getElementById('brandLogo');
-    
-    if (!brand.contains(e.target) && !dropdown.contains(e.target)) {
-        closeChapterDropdown();
-    }
-});
-
 document.getElementById('prevSentenceBtn').addEventListener('click', () => {
     previousSentence();
 });
@@ -2979,7 +2954,7 @@ document.getElementById('ctxResetProgress').addEventListener('click', () => {
 });
 
 document.getElementById('ctxToggleTheme').addEventListener('click', () => {
-    themeToggle.click();
+    window.toggleTheme();
     hideContextMenu();
 });
 
@@ -2997,7 +2972,7 @@ document.getElementById('gridToggleBtn').addEventListener('click', () => {
 
 // Hotspot close handlers
 const gridCloseHotspot = document.getElementById('gridCloseHotspot');
-const splitCloseHotspot = document.getElementById('splitCloseHotspot');
+const rotateCloseHotspot = document.getElementById('rotateCloseHotspot');
 
 gridCloseHotspot.addEventListener('mouseenter', () => {
     cursor.classList.add('close-mode');
@@ -3012,27 +2987,7 @@ gridCloseHotspot.addEventListener('click', () => {
     cursor.classList.remove('close-mode');
 });
 
-splitCloseHotspot.addEventListener('mouseenter', () => {
-    cursor.classList.add('close-mode');
-});
-
-splitCloseHotspot.addEventListener('mouseleave', () => {
-    cursor.classList.remove('close-mode');
-});
-
-splitCloseHotspot.addEventListener('click', () => {
-    if (state.layoutMode === 'split') {
-        state.layoutMode = 'layered';
-        document.body.classList.remove('layout-split');
-        document.body.classList.add('layout-layered');
-        updateLayoutIcon();
-        cursor.classList.remove('close-mode');
-    }
-});
-
-// Rotate warning close hotspot
-const rotateCloseHotspot = document.getElementById('rotateCloseHotspot');
-
+// Rotate warning close hotspot (for the overlay, not split-view itself)
 rotateCloseHotspot.addEventListener('mouseenter', () => {
     cursor.classList.add('close-mode');
 });
@@ -3042,45 +2997,18 @@ rotateCloseHotspot.addEventListener('mouseleave', () => {
 });
 
 rotateCloseHotspot.addEventListener('click', () => {
+    // Close rotate warning by rotating device or use Escape key
+    // Since the warning auto-shows/hides based on orientation,
+    // clicking just dismisses the current instance
     const rotateWarning = document.querySelector('.rotate-warning');
-    if (rotateWarning && rotateWarning.classList.contains('visible')) {
-        rotateWarning.classList.remove('visible');
+    if (rotateWarning) {
+        rotateWarning.style.display = 'none';
         cursor.classList.remove('close-mode');
     }
 });
 
 // Removed bottom rail grid toggle listener as the element was removed
 // Removed landscape grid toggle as well
-
-layoutToggle.addEventListener('click', () => {
-    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
-    
-    document.body.classList.remove('layout-layered', 'layout-split');
-    document.body.classList.add(`layout-${state.layoutMode}`);
-    
-    updateLayoutIcon();
-    
-    document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-    setTimeout(() => {
-        document.body.style.transition = '';
-    }, 500);
-});
-
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = themeToggle.querySelector('.theme-icon');
-
-function updateThemeIcon() {
-    if (document.body.classList.contains('theme-newspaper')) {
-        themeIcon.textContent = '🌙';
-    } else {
-        themeIcon.textContent = '☀️';
-    }
-}
-
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('theme-newspaper');
-    updateThemeIcon();
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     preloadImages();
@@ -3089,7 +3017,77 @@ document.addEventListener('DOMContentLoaded', () => {
     updateParallax();
     
     document.body.classList.add(`layout-${state.layoutMode}`);
+    
+    // Setup layout toggle
+    const layoutToggle = document.getElementById('layoutToggle');
+    const layoutIcon = layoutToggle.querySelector('.layout-icon');
+    
+    function updateLayoutIcon() {
+        if (state.layoutMode === 'layered') {
+            layoutIcon.className = 'layout-icon layered';
+        } else {
+            layoutIcon.className = 'layout-icon split';
+        }
+    }
+    
     updateLayoutIcon();
+    
+    // Global layout toggle function
+    window.toggleLayout = function() {
+        state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
+        
+        document.body.classList.remove('layout-layered', 'layout-split');
+        document.body.classList.add(`layout-${state.layoutMode}`);
+        
+        updateLayoutIcon();
+        
+        document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 500);
+    };
+    
+    layoutToggle.addEventListener('click', () => {
+        window.toggleLayout();
+    });
+    
+    // Setup theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('.theme-icon');
+    
+    function updateThemeIcon() {
+        if (document.body.classList.contains('theme-newspaper')) {
+            themeIcon.textContent = '🌙';
+        } else {
+            themeIcon.textContent = '☀️';
+        }
+    }
+    
+    // Global theme toggle function
+    window.toggleTheme = function() {
+        document.body.classList.toggle('theme-newspaper');
+        updateThemeIcon();
+    };
+    
+    themeToggle.addEventListener('click', () => {
+        window.toggleTheme();
+    });
+    
+    // Setup brand logo and chapter dropdown
+    const brandLogo = document.getElementById('brandLogo');
+    
+    brandLogo.addEventListener('click', () => {
+        toggleChapterDropdown();
+    });
+    
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('chapterDropdown');
+        const brand = document.getElementById('brandLogo');
+        
+        if (!brand.contains(e.target) && !dropdown.contains(e.target)) {
+            closeChapterDropdown();
+        }
+    });
     
     // Check initial orientation for landscape
     if (window.matchMedia("(orientation: landscape) and (max-height: 500px)").matches) {
@@ -3131,11 +3129,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextChapter();
                 break;
             case 'l':
-                layoutToggle.click();
+                window.toggleLayout();
                 break;
             case 't':
             case 'T':
-                themeToggle.click();
+                window.toggleTheme();
                 break;
             case 'Home':
                 e.preventDefault();
