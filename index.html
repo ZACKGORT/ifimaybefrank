@@ -551,9 +551,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     <div class="vignette" aria-hidden="true"></div>
 
     <div class="scroll-progress" aria-label="Navigation controls">
-        <button class="nav-button prev-chapter" id="prevChapterBtn" title="Previous Chapter ([)" aria-label="Previous Chapter">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z"/></svg>
-        </button>
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
@@ -562,9 +559,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-        </button>
-        <button class="nav-button next-chapter" id="nextChapterBtn" title="Next Chapter (])" aria-label="Next Chapter">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
         </button>
     </div>
 
@@ -1483,11 +1477,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLongPress('landPrevBtn', previousSentence, previousChapter);
     setupLongPress('landNextBtn', nextSentence, nextChapter);
     
-    // Add click listeners for desktop nav
+    // Add click listeners for desktop nav (sentence navigation only)
     document.getElementById('prevSentenceBtn').addEventListener('click', previousSentence);
     document.getElementById('nextSentenceBtn').addEventListener('click', nextSentence);
-    document.getElementById('prevChapterBtn').addEventListener('click', previousChapter);
-    document.getElementById('nextChapterBtn').addEventListener('click', nextChapter);
 });
     </script>
 </body>
