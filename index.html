@@ -45,29 +45,29 @@
 
 /* Newspaper/Ink Light Theme */
 body.theme-newspaper {
-    --bg-color: #f5f1e8;
+    --bg-color: #faf8f3;
     --ink: #000000;
-    --ink-2: #0a0a0a;
-    --ink-3: #1a1a1a;
+    --ink-2: #1a1a1a;
+    --ink-3: #2a2a2a;
     --accent: #8b4513;
-    --vig-opacity: 0.15;
+    --vig-opacity: 0.12;
     --bracket-color: #5d4e37;
     --bracket-hover: #8b4513;
-    --bracket-bg: rgba(139, 69, 19, 0.04);
+    --bracket-bg: rgba(139, 69, 19, 0.03);
 }
 
 /* Academic Theme */
 body.theme-academic {
     --bg-color: #ffffff;
     --ink: #000000;
-    --ink-2: #0f0f0f;
-    --ink-3: #2a2a2a;
-    --accent: #0052a3;
+    --ink-2: #1a1a1a;
+    --ink-3: #333333;
+    --accent: #0066cc;
     --vig-opacity: 0;
     --edge-blur: 0px;
-    --bracket-color: #003d7a;
-    --bracket-hover: #0052a3;
-    --bracket-bg: rgba(0, 82, 163, 0.06);
+    --bracket-color: #004080;
+    --bracket-hover: #0066cc;
+    --bracket-bg: rgba(0, 102, 204, 0.05);
 }
 
 /* ... [All original styles preserved] ... */
@@ -91,9 +91,9 @@ body.theme-academic .grain, body.theme-academic .vignette, body.theme-academic .
 body.theme-academic .chapter-dropdown { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.2); }
 body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .sentence { color: #000000; }
-body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 82, 163, 0.14); padding: 3px 7px; border-radius: 3px; box-shadow: 0 2px 6px rgba(0, 82, 163, 0.15); }
-body.theme-academic .sentence.active { color: #ffffff; background: #0052a3; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.35; color: #2a2a2a; }
+body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
+body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
+body.theme-academic .sentence.dimmed { opacity: 0.4; color: #333333; }
 body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
 body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
 body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
@@ -114,9 +114,9 @@ body.theme-newspaper .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.
 body.theme-newspaper .grid-image-item { border-color: rgba(0, 0, 0, 0.15); background: #e8e4d8; }
 body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); }
 body.theme-newspaper .sentence { color: #000000; }
-body.theme-newspaper .sentence:hover { color: #000000; background: rgba(139, 69, 19, 0.12); padding: 3px 7px; border-radius: 3px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); }
+body.theme-newspaper .sentence:hover { color: #000000; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
 body.theme-newspaper .sentence.active { color: #ffffff; background: #000000; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-newspaper .sentence.dimmed { opacity: 0.30; color: #2a2a2a; }
+body.theme-newspaper .sentence.dimmed { opacity: 0.35; color: #333333; }
 body.theme-newspaper .chapter-break { border-top-color: rgba(139, 69, 19, 0.25); border-bottom-color: rgba(139, 69, 19, 0.25); color: var(--accent); }
 
 /* Newspaper Context Menu */
@@ -132,7 +132,7 @@ body.layout-layered .stream { color: rgba(255, 255, 255, 0.85); }
 body.layout-layered .hover-image { position: absolute; left: 50%; top: 50%; }
 body.layout-split .text-layer { width: 50%; margin: 0; padding-left: 6vw; }
 body.layout-split .stream { color: rgba(255, 255, 255, 0.9); font-size: clamp(16px, 2vw, 28px); }
-body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; opacity: 1 !important; }
+body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; }
 body:not(.cursor-preview-mode) .hover-image { display: block; }
 body:not(.cursor-preview-mode) #cursorImage { display: none !important; }
 body.cursor-preview-mode .hover-image { display: none !important; }
@@ -840,7 +840,7 @@ function hideImage() {
     const hoverImage = document.getElementById('hoverImage');
     const cursorImage = document.getElementById('cursorImage');
     const cursor = document.getElementById('cursor');
-    clearTimeout(state.imageTimeout);
+    if (state.imageTimeout) clearTimeout(state.imageTimeout);
     hoverImage.classList.remove('active');
     cursorImage.classList.remove('active');
     cursorImage.classList.remove('enlarged');
@@ -1207,135 +1207,143 @@ function render() {
     }, { passive: true });
 }
 
-const cursor = document.getElementById('cursor');
-const cursorImage = document.getElementById('cursorImage');
 let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0;
+let cursorEl, cursorImageEl;
 
 function updateCursor() {
+    if (!cursorEl) return;
     cursorX += (targetX - cursorX) * CURSOR_SMOOTHING;
     cursorY += (targetY - cursorY) * CURSOR_SMOOTHING;
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
-    if (cursorImage) cursorImage.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    cursorEl.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    if (cursorImageEl) cursorImageEl.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
     requestAnimationFrame(updateCursor);
 }
 
-document.addEventListener('mousemove', e => { targetX = e.clientX; targetY = e.clientY; mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
-document.addEventListener('mouseover', e => {
-    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
-        cursor.classList.add('hovering');
-        if (e.target.matches('button, a, .grid-image-item')) cursor.classList.add('pointer');
-    }
-}, { passive: true });
-document.addEventListener('mouseout', e => {
-    if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
-        cursor.classList.remove('hovering');
-        cursor.classList.remove('pointer');
-    }
-}, { passive: true });
-
-let accessibilityLevel = 2;
-const accessibilityLevels = [0, 0.25, 0.5, 0.75, 1];
-
-function applyAccessibilityLevel(level) {
-    const value = accessibilityLevels[level];
-    document.documentElement.style.setProperty('--curve-k', value * 3);
-    document.documentElement.style.setProperty('--vig-opacity', Math.min(value * 2.4, 1.2));
-    document.documentElement.style.setProperty('--edge-blur', (value * 20) + 'px');
-    document.body.style.fontSize = ((1.3 - (value * 0.9)) * 100) + '%';
-    document.querySelectorAll('.level-indicator').forEach((el, i) => i === level ? el.classList.add('active') : el.classList.remove('active'));
-}
-
-document.getElementById('accessibilityIncrease').addEventListener('click', () => { if (accessibilityLevel > 0) applyAccessibilityLevel(--accessibilityLevel); });
-document.getElementById('accessibilityDecrease').addEventListener('click', () => { if (accessibilityLevel < accessibilityLevels.length - 1) applyAccessibilityLevel(++accessibilityLevel); });
-applyAccessibilityLevel(accessibilityLevel);
-
-function setupLongPress(buttonId, normalAction, longPressAction) {
-    const button = document.getElementById(buttonId);
-    if (!button) return;
-    let longPressTimer = null, longPressActivated = false;
-
-    button.addEventListener('touchstart', (e) => {
-        longPressActivated = false;
-        longPressTimer = setTimeout(() => {
-            longPressActivated = true;
-            longPressAction();
-            if (navigator.vibrate) navigator.vibrate(50);
-        }, 500);
-    }, { passive: true });
-
-    button.addEventListener('touchend', (e) => {
-        if (longPressTimer) clearTimeout(longPressTimer);
-        if (longPressActivated) {
-            e.preventDefault(); 
-        } else {
-            // Let the click handler fire for normal tap
-        }
-    }, { passive: false });
-
-    button.addEventListener('touchcancel', () => { if (longPressTimer) clearTimeout(longPressTimer); }, { passive: true });
-    
-    button.addEventListener('click', (e) => {
-        if (longPressActivated) {
-            e.preventDefault();
-            e.stopPropagation();
-            longPressActivated = false;
-        } else {
-            normalAction();
-        }
-    });
-}
-
-const contextMenu = document.getElementById('contextMenu');
-function showContextMenu(x, y) {
-    contextMenu.style.left = x + 'px';
-    contextMenu.style.top = y + 'px';
-    contextMenu.classList.add('open');
-    contextMenu.setAttribute('aria-hidden', 'false');
-    
-    const themeText = document.getElementById('ctxThemeText');
-    const themeIcon = document.getElementById('ctxThemeIcon');
-    if (document.body.classList.contains('theme-academic')) { themeText.textContent = 'Dark Theme'; themeIcon.textContent = '🌙'; }
-    else if (document.body.classList.contains('theme-newspaper')) { themeText.textContent = 'Academic Theme'; themeIcon.textContent = '📖'; }
-    else { themeText.textContent = 'Newspaper Theme'; themeIcon.textContent = '☀️'; }
-
-    const rect = contextMenu.getBoundingClientRect();
-    if (rect.right > window.innerWidth) contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
-    if (rect.bottom > window.innerHeight) contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
-}
-
-function hideContextMenu() {
-    contextMenu.classList.remove('open');
-    contextMenu.setAttribute('aria-hidden', 'true');
-}
-
-document.addEventListener('contextmenu', e => { if (!lastInteractionWasTouch) { e.preventDefault(); showContextMenu(e.clientX, e.clientY); } });
-document.addEventListener('click', e => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
-
-let globalLongPressTimer = null;
-document.addEventListener('touchstart', e => {
-    if (e.target.closest('button')) return;
-    globalLongPressTimer = setTimeout(() => { showContextMenu(e.touches[0].clientX, e.touches[0].clientY); if (navigator.vibrate) navigator.vibrate(50); }, 500);
-}, { passive: true });
-document.addEventListener('touchend', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
-document.addEventListener('touchmove', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
-
-document.getElementById('ctxCopyLink').addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); hideContextMenu(); });
-document.getElementById('ctxShare').addEventListener('click', async () => { try { await navigator.share({ title: 'IFIMAYBEFRANK', url: window.location.href }); } catch(e){} hideContextMenu(); });
-document.getElementById('ctxResetProgress').addEventListener('click', () => { resetToBeginning(); hideContextMenu(); });
-document.getElementById('ctxToggleTheme').addEventListener('click', () => { window.toggleTheme(); hideContextMenu(); });
-document.getElementById('gridToggleBtn').addEventListener('click', toggleImageGrid);
-
-const gridCloseHotspot = document.getElementById('gridCloseHotspot');
-gridCloseHotspot.addEventListener('mouseenter', () => cursor.classList.add('close-mode'));
-gridCloseHotspot.addEventListener('mouseleave', () => cursor.classList.remove('close-mode'));
-gridCloseHotspot.addEventListener('click', () => { toggleImageGrid(); cursor.classList.remove('close-mode'); });
-
-const rotateCloseHotspot = document.getElementById('rotateCloseHotspot');
-rotateCloseHotspot.addEventListener('mouseenter', () => cursor.classList.add('close-mode'));
-rotateCloseHotspot.addEventListener('mouseleave', () => cursor.classList.remove('close-mode'));
-rotateCloseHotspot.addEventListener('click', () => { document.querySelector('.rotate-warning').style.display = 'none'; cursor.classList.remove('close-mode'); });
-
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize cursor elements
+    cursorEl = document.getElementById('cursor');
+    cursorImageEl = document.getElementById('cursorImage');
+    const cursor = cursorEl; // Local alias for use in event handlers
+    const cursorImage = cursorImageEl;
+    
+    document.addEventListener('mousemove', e => { targetX = e.clientX; targetY = e.clientY; mouseX = e.clientX; mouseY = e.clientY; }, { passive: true });
+    document.addEventListener('mouseover', e => {
+        if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
+            cursor.classList.add('hovering');
+            if (e.target.matches('button, a, .grid-image-item')) cursor.classList.add('pointer');
+        }
+    }, { passive: true });
+    document.addEventListener('mouseout', e => {
+        if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
+            cursor.classList.remove('hovering');
+            cursor.classList.remove('pointer');
+        }
+    }, { passive: true });
+    
+    // Accessibility
+    let accessibilityLevel = 2;
+    const accessibilityLevels = [0, 0.25, 0.5, 0.75, 1];
+    
+    function applyAccessibilityLevel(level) {
+        const value = accessibilityLevels[level];
+        document.documentElement.style.setProperty('--curve-k', value * 3);
+        document.documentElement.style.setProperty('--vig-opacity', Math.min(value * 2.4, 1.2));
+        document.documentElement.style.setProperty('--edge-blur', (value * 20) + 'px');
+        document.body.style.fontSize = ((1.3 - (value * 0.9)) * 100) + '%';
+        document.querySelectorAll('.level-indicator').forEach((el, i) => i === level ? el.classList.add('active') : el.classList.remove('active'));
+    }
+    
+    document.getElementById('accessibilityIncrease').addEventListener('click', () => { if (accessibilityLevel > 0) applyAccessibilityLevel(--accessibilityLevel); });
+    document.getElementById('accessibilityDecrease').addEventListener('click', () => { if (accessibilityLevel < accessibilityLevels.length - 1) applyAccessibilityLevel(++accessibilityLevel); });
+    applyAccessibilityLevel(accessibilityLevel);
+    
+    // Long press setup
+    function setupLongPress(buttonId, normalAction, longPressAction) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        let longPressTimer = null, longPressActivated = false;
+
+        button.addEventListener('touchstart', (e) => {
+            longPressActivated = false;
+            longPressTimer = setTimeout(() => {
+                longPressActivated = true;
+                longPressAction();
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 500);
+        }, { passive: true });
+
+        button.addEventListener('touchend', (e) => {
+            if (longPressTimer) clearTimeout(longPressTimer);
+            if (longPressActivated) {
+                e.preventDefault(); 
+            }
+        }, { passive: false });
+
+        button.addEventListener('touchcancel', () => { if (longPressTimer) clearTimeout(longPressTimer); }, { passive: true });
+        
+        button.addEventListener('click', (e) => {
+            if (longPressActivated) {
+                e.preventDefault();
+                e.stopPropagation();
+                longPressActivated = false;
+            } else {
+                normalAction();
+            }
+        });
+    }
+    
+    // Context menu
+    const contextMenu = document.getElementById('contextMenu');
+    function showContextMenu(x, y) {
+        contextMenu.style.left = x + 'px';
+        contextMenu.style.top = y + 'px';
+        contextMenu.classList.add('open');
+        contextMenu.setAttribute('aria-hidden', 'false');
+        
+        const themeText = document.getElementById('ctxThemeText');
+        const themeIcon = document.getElementById('ctxThemeIcon');
+        if (document.body.classList.contains('theme-academic')) { themeText.textContent = 'Dark Theme'; themeIcon.textContent = '🌙'; }
+        else if (document.body.classList.contains('theme-newspaper')) { themeText.textContent = 'Academic Theme'; themeIcon.textContent = '📖'; }
+        else { themeText.textContent = 'Newspaper Theme'; themeIcon.textContent = '☀️'; }
+
+        const rect = contextMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        if (rect.bottom > window.innerHeight) contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
+    }
+    
+    function hideContextMenu() {
+        contextMenu.classList.remove('open');
+        contextMenu.setAttribute('aria-hidden', 'true');
+    }
+    
+    document.addEventListener('contextmenu', e => { if (!lastInteractionWasTouch) { e.preventDefault(); showContextMenu(e.clientX, e.clientY); } });
+    document.addEventListener('click', e => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
+    
+    let globalLongPressTimer = null;
+    document.addEventListener('touchstart', e => {
+        if (e.target.closest('button')) return;
+        globalLongPressTimer = setTimeout(() => { showContextMenu(e.touches[0].clientX, e.touches[0].clientY); if (navigator.vibrate) navigator.vibrate(50); }, 500);
+    }, { passive: true });
+    document.addEventListener('touchend', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
+    document.addEventListener('touchmove', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
+    
+    document.getElementById('ctxCopyLink').addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); hideContextMenu(); });
+    document.getElementById('ctxShare').addEventListener('click', async () => { try { await navigator.share({ title: 'IFIMAYBEFRANK', url: window.location.href }); } catch(e){} hideContextMenu(); });
+    document.getElementById('ctxResetProgress').addEventListener('click', () => { resetToBeginning(); hideContextMenu(); });
+    document.getElementById('ctxToggleTheme').addEventListener('click', () => { window.toggleTheme(); hideContextMenu(); });
+    document.getElementById('gridToggleBtn').addEventListener('click', toggleImageGrid);
+    
+    const gridCloseHotspot = document.getElementById('gridCloseHotspot');
+    gridCloseHotspot.addEventListener('mouseenter', () => cursor.classList.add('close-mode'));
+    gridCloseHotspot.addEventListener('mouseleave', () => cursor.classList.remove('close-mode'));
+    gridCloseHotspot.addEventListener('click', () => { toggleImageGrid(); cursor.classList.remove('close-mode'); });
+    
+    const rotateCloseHotspot = document.getElementById('rotateCloseHotspot');
+    rotateCloseHotspot.addEventListener('mouseenter', () => cursor.classList.add('close-mode'));
+    rotateCloseHotspot.addEventListener('mouseleave', () => cursor.classList.remove('close-mode'));
+    rotateCloseHotspot.addEventListener('click', () => { document.querySelector('.rotate-warning').style.display = 'none'; cursor.classList.remove('close-mode'); });
+    
+    // Initialize
     preloadImages();
     render();
     updateCursor();
