@@ -157,8 +157,13 @@ body.cursor-preview-mode #cursorImage { display: block !important; }
 
 /* Navigation Rails */
 .scroll-progress { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: var(--z-ui); pointer-events: auto; }
-.scroll-progress-bar-container { width: 2px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; position: relative; margin: 10px 0; }
-.scroll-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--accent); border-radius: 1px; transition: height 0.3s ease; }
+.scroll-progress-bar-container { width: 2px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; position: relative; margin: 10px 0; cursor: pointer; transition: width 0.2s ease; }
+.scroll-progress-bar-container:hover { width: 8px; background: rgba(255, 255, 255, 0.2); }
+.scroll-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--accent); border-radius: 1px; transition: height 0.3s ease; pointer-events: none; }
+.scroll-progress-handle { position: absolute; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: var(--accent); border: 2px solid rgba(0, 0, 0, 0.3); border-radius: 50%; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+.scroll-progress-bar-container:hover .scroll-progress-handle { opacity: 1; }
+.scroll-progress-bar-container.dragging { width: 12px; }
+.scroll-progress-bar-container.dragging .scroll-progress-handle { opacity: 1; transform: translateX(-50%) scale(1.2); }
 .nav-button { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--ink-3); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; font-size: 14px; pointer-events: auto; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .nav-button:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
 .nav-button:active { transform: scale(0.95); }
@@ -245,6 +250,12 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .sentence { display: inline; transition: opacity 0.3s ease, color 0.3s ease; cursor: none; position: relative; z-index: 2; letter-spacing: -0.01em; }
 .sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.95); padding: 2px 6px; border-radius: 2px; }
 .sentence.dimmed { opacity: 0.4; color: rgba(255, 255, 255, 0.5); }
+
+.bullet-item, .numbered-bullet-item { display: block; margin: 0.5em 0; padding-left: 1.5em; position: relative; }
+.bullet-marker, .numbered-marker { position: absolute; left: 0; color: var(--accent); font-weight: 600; }
+.bullet-marker { font-size: 1.2em; line-height: 1.5; }
+.numbered-marker { font-family: 'Space Mono', monospace; font-size: 0.85em; }
+
 .chapter-break { display: block; margin: 3em 0 2em; padding: 1.5em 0; border-top: 1px solid rgba(218, 165, 32, 0.2); border-bottom: 1px solid rgba(218, 165, 32, 0.2); text-align: center; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); opacity: 0.6; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; }
 .chapter-break:hover { opacity: 1; background: rgba(218, 165, 32, 0.05); padding: 1.5em 1em; }
 .chapter-break .chapter-number { display: block; font-size: 0.7em; margin-bottom: 0.5em; color: var(--ink-3); }
@@ -554,8 +565,9 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
-        <div class="scroll-progress-bar-container">
+        <div class="scroll-progress-bar-container" id="scrollProgressContainer">
             <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+            <div class="scroll-progress-handle" id="scrollProgressHandle"></div>
         </div>
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
@@ -830,6 +842,12 @@ function getCurrentChapter() {
 function parseNarrative(text) {
     const parts = [];
     let idCounter = 0;
+    
+    // First, handle line breaks: / = <br>, // = <br><br>
+    // Do this before splitting into segments to preserve structure
+    text = text.replace(/\/\//g, '|||DOUBLE_BREAK|||');
+    text = text.replace(/\//g, '|||SINGLE_BREAK|||');
+    
     const segments = text.split(/(\[|\])/);
     let inBracket = false;
     let bracketId = null;
@@ -848,9 +866,41 @@ function parseNarrative(text) {
                 const bracket = parts.find(p => p.id === bracketId);
                 if (bracket) bracket.content = segment.trim();
             } else {
+                // Process non-bracket content
+                // Split by sentences first, then process formatting within each sentence
                 const sentences = segment.split(/(?<=[.!?])\s+/);
                 sentences.forEach(sentence => {
-                    if (sentence.trim()) parts.push({ type: 'sentence', id: idCounter++, text: sentence.trim() });
+                    if (sentence.trim()) {
+                        // Check for bullet points and numbered lists
+                        const trimmedSentence = sentence.trim();
+                        
+                        // Handle numbered bullets: (#) where # is a number
+                        if (/^\(\d+\)\s/.test(trimmedSentence)) {
+                            const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
+                            if (match) {
+                                parts.push({ 
+                                    type: 'numbered-bullet', 
+                                    id: idCounter++, 
+                                    number: match[1],
+                                    text: match[2].trim() 
+                                });
+                                return;
+                            }
+                        }
+                        
+                        // Handle regular bullets: *
+                        if (trimmedSentence.startsWith('* ')) {
+                            parts.push({ 
+                                type: 'bullet', 
+                                id: idCounter++, 
+                                text: trimmedSentence.substring(2).trim() 
+                            });
+                            return;
+                        }
+                        
+                        // Regular sentence
+                        parts.push({ type: 'sentence', id: idCounter++, text: sentence.trim() });
+                    }
                 });
             }
         }
@@ -1017,6 +1067,7 @@ function previousChapter() {
 
 function updateScrollProgress() {
     const progressBar = document.getElementById('scrollProgressBar');
+    const progressHandle = document.getElementById('scrollProgressHandle');
     const mobileProgressFill = document.getElementById('mobileProgressFill');
     const mobileProgressText = document.getElementById('mobileProgressText');
     const landProgressFill = document.getElementById('landProgressFill');
@@ -1026,6 +1077,11 @@ function updateScrollProgress() {
     const progress = (current / total) * 100;
     
     if (progressBar) progressBar.style.height = `${progress}%`;
+    if (progressHandle) {
+        const containerHeight = 200; // matches CSS height
+        const handlePosition = (progress / 100) * containerHeight;
+        progressHandle.style.bottom = `${handlePosition - 8}px`; // -8 to center the 16px handle
+    }
     if (mobileProgressFill) mobileProgressFill.style.width = `${progress}%`;
     if (landProgressFill) landProgressFill.style.height = `${progress}%`;
     if (mobileProgressText) mobileProgressText.textContent = `${current} / ${total}`;
@@ -1185,8 +1241,10 @@ function render() {
     parsedContent.forEach(part => {
         if (nextChapterIndex < chapters.length) {
             const nextChapter = chapters[nextChapterIndex];
-            const textContent = part.type === 'sentence' ? part.text : part.content;
-            if (textContent.includes(nextChapter.startText.replace(/^\[/, ''))) {
+            const textContent = part.type === 'sentence' || part.type === 'bullet' || part.type === 'numbered-bullet' 
+                ? part.text 
+                : part.content;
+            if (textContent && textContent.includes(nextChapter.startText)) {
                 state.chapterStartIndices[nextChapter.id] = sentenceCount;
                 const chapterBreak = document.createElement('div');
                 chapterBreak.className = 'chapter-break';
@@ -1212,7 +1270,12 @@ function render() {
                 }
             }
 
-            span.innerHTML = wrapImageTriggers(part.text) + ' ';
+            // Process line breaks in the text
+            let processedText = part.text;
+            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
+            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
+            
+            span.innerHTML = wrapImageTriggers(processedText) + ' ';
             if (state.hoveredSentence === part.id) span.classList.add('active');
             else if (state.hoveredSentence !== null) span.classList.add('dimmed');
             
@@ -1226,6 +1289,64 @@ function render() {
             state.allSentenceElements.push(span);
             sentenceCount++;
             fragment.appendChild(span);
+        } else if (part.type === 'bullet') {
+            const li = document.createElement('div');
+            li.className = 'sentence bullet-item';
+            li.dataset.sentenceIndex = sentenceCount;
+            li.style.cursor = 'pointer';
+            
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter });
+                    break;
+                }
+            }
+            
+            let processedText = part.text;
+            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
+            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
+            
+            li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(processedText);
+            
+            li.addEventListener('mouseenter', () => {
+                const index = parseInt(li.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => s.style.opacity = i === index ? '0.7' : '0.25');
+            }, { passive: true });
+            li.addEventListener('mouseleave', () => state.allSentenceElements.forEach(s => s.style.opacity = ''), { passive: true });
+            li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
+            
+            state.allSentenceElements.push(li);
+            sentenceCount++;
+            fragment.appendChild(li);
+        } else if (part.type === 'numbered-bullet') {
+            const li = document.createElement('div');
+            li.className = 'sentence numbered-bullet-item';
+            li.dataset.sentenceIndex = sentenceCount;
+            li.style.cursor = 'pointer';
+            
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter });
+                    break;
+                }
+            }
+            
+            let processedText = part.text;
+            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
+            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
+            
+            li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(processedText);
+            
+            li.addEventListener('mouseenter', () => {
+                const index = parseInt(li.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => s.style.opacity = i === index ? '0.7' : '0.25');
+            }, { passive: true });
+            li.addEventListener('mouseleave', () => state.allSentenceElements.forEach(s => s.style.opacity = ''), { passive: true });
+            li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
+            
+            state.allSentenceElements.push(li);
+            sentenceCount++;
+            fragment.appendChild(li);
         } else if (part.type === 'bracket') {
             const trigger = document.createElement('button');
             trigger.className = 'bracket-trigger';
@@ -1316,6 +1437,52 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('accessibilityIncrease').addEventListener('click', () => { if (accessibilityLevel > 0) applyAccessibilityLevel(--accessibilityLevel); });
     document.getElementById('accessibilityDecrease').addEventListener('click', () => { if (accessibilityLevel < accessibilityLevels.length - 1) applyAccessibilityLevel(++accessibilityLevel); });
     applyAccessibilityLevel(accessibilityLevel);
+    
+    // Interactive Scroll Progress Bar
+    const progressContainer = document.getElementById('scrollProgressContainer');
+    const progressHandle = document.getElementById('scrollProgressHandle');
+    let isDraggingProgress = false;
+    
+    function calculateSentenceFromPosition(clientY) {
+        const rect = progressContainer.getBoundingClientRect();
+        const relativeY = clientY - rect.top;
+        const percentage = Math.max(0, Math.min(1, relativeY / rect.height));
+        const sentenceIndex = Math.floor(percentage * state.allSentenceElements.length);
+        return Math.max(0, Math.min(state.allSentenceElements.length - 1, sentenceIndex));
+    }
+    
+    function handleProgressInteraction(clientY) {
+        const targetIndex = calculateSentenceFromPosition(clientY);
+        state.currentSentenceIndex = targetIndex;
+        highlightSentence(targetIndex);
+    }
+    
+    progressContainer.addEventListener('mousedown', (e) => {
+        isDraggingProgress = true;
+        progressContainer.classList.add('dragging');
+        handleProgressInteraction(e.clientY);
+        cursor.classList.add('pointer');
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (isDraggingProgress) {
+            handleProgressInteraction(e.clientY);
+        }
+    });
+    
+    document.addEventListener('mouseup', () => {
+        if (isDraggingProgress) {
+            isDraggingProgress = false;
+            progressContainer.classList.remove('dragging');
+            cursor.classList.remove('pointer');
+        }
+    });
+    
+    progressContainer.addEventListener('click', (e) => {
+        if (!isDraggingProgress) {
+            handleProgressInteraction(e.clientY);
+        }
+    });
     
     // Long press setup
     function setupLongPress(buttonId, normalAction, longPressAction) {
