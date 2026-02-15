@@ -1567,20 +1567,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let contextMenuLongPressTimer = null;
     let contextMenuDownX = 0;
     let contextMenuDownY = 0;
+    let isScrolling = false;
+    let scrollTimeout = null;
     const CONTEXT_MENU_LONG_PRESS_DURATION = 500; // ms
     const CONTEXT_MENU_MOVEMENT_THRESHOLD = 10; // px
+    
+    // Detect scrolling to prevent context menu during scroll gestures
+    window.addEventListener('wheel', () => {
+        isScrolling = true;
+        if (contextMenuLongPressTimer) {
+            clearTimeout(contextMenuLongPressTimer);
+            contextMenuLongPressTimer = null;
+        }
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            isScrolling = false;
+        }, 150);
+    }, { passive: true });
     
     document.addEventListener('mousedown', e => {
         // Don't trigger on buttons, inputs, or interactive elements
         if (e.target.closest('button, input, select, textarea, a, .nav-button, .bracket-trigger')) return;
         if (lastInteractionWasTouch) return;
+        if (isScrolling) return; // Don't trigger during scroll
         
         contextMenuDownX = e.clientX;
         contextMenuDownY = e.clientY;
         
         contextMenuLongPressTimer = setTimeout(() => {
-            showContextMenu(e.clientX, e.clientY);
-            if (navigator.vibrate) navigator.vibrate(50);
+            if (!isScrolling) { // Double-check we're not scrolling
+                showContextMenu(contextMenuDownX, contextMenuDownY);
+                if (navigator.vibrate) navigator.vibrate(50);
+            }
         }, CONTEXT_MENU_LONG_PRESS_DURATION);
     });
     
