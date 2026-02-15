@@ -1563,18 +1563,41 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let isScrolling = false;
     let scrollTimeout = null;
+    let recentScrollEvents = 0;
+    let scrollEventTimeout = null;
     
-    // Track scrolling state
+    // Detect if we're on a Chromebook
+    const isChromebook = /CrOS/.test(navigator.userAgent);
+    
+    // Track scrolling state with more aggressive detection for Chromebook
     window.addEventListener('wheel', () => {
         isScrolling = true;
+        recentScrollEvents++;
+        
         clearTimeout(scrollTimeout);
+        clearTimeout(scrollEventTimeout);
+        
+        // On Chromebook, extend the blocking window significantly
+        const blockDuration = isChromebook ? 500 : 200;
+        
         scrollTimeout = setTimeout(() => {
             isScrolling = false;
-        }, 200);
+        }, blockDuration);
+        
+        scrollEventTimeout = setTimeout(() => {
+            recentScrollEvents = 0;
+        }, 1000);
     }, { passive: true });
     
     // Right-click opens context menu (desktop mouse only)
     document.addEventListener('contextmenu', e => {
+        // AGGRESSIVE CHROMEBOOK BLOCKING: Block if any scroll activity in last second
+        if (isChromebook && (isScrolling || recentScrollEvents > 0)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        
         // Block if scrolling or if it's a touch interaction
         if (isScrolling || lastInteractionWasTouch) {
             e.preventDefault();
@@ -1591,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         showContextMenu(e.clientX, e.clientY);
         return false;
-    });
+    }, { capture: true }); // Use capture phase for Chromebook
     
     document.addEventListener('click', e => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
     
