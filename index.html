@@ -256,6 +256,8 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .bullet-marker { font-size: 1.2em; line-height: 1.5; }
 .numbered-marker { font-family: 'Space Mono', monospace; font-size: 0.85em; }
 
+.line-break-spacer { display: inline; pointer-events: none; background: none !important; padding: 0 !important; }
+
 .chapter-break { display: block; margin: 3em 0 2em; padding: 1.5em 0; border-top: 1px solid rgba(218, 165, 32, 0.2); border-bottom: 1px solid rgba(218, 165, 32, 0.2); text-align: center; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); opacity: 0.6; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; }
 .chapter-break:hover { opacity: 1; background: rgba(218, 165, 32, 0.05); padding: 1.5em 1em; }
 .chapter-break .chapter-number { display: block; font-size: 0.7em; margin-bottom: 0.5em; color: var(--ink-3); }
@@ -774,24 +776,26 @@ const imageMap = {
 
 const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
-    { id: 1, title: "Early Years", startText: "Convention" },
-    { id: 2, title: "First Steps", startText: "I built my first computer" },
+    { id: 1, title: "Words from the Maker", startText: "Convention? or convection" },
+    { id: 2, title: "Early Days", startText: "I built my first computer" },
     { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
-    { id: 4, title: "Leadnomics", startText: "Okay, so Leadnomics was shifty." },
+    { id: 4, title: "Leadnomics", startText: "Okay, so Leadnomics was shifty" },
     { id: 5, title: "Learning to Code", startText: "From here, I desired to move" },
-    { id: 6, title: "One Sixty Over Ninety", startText: "One Sixty Over Ninety—" },
+    { id: 6, title: "One Sixty Over Ninety", startText: "One Sixty Over Ninety" },
     { id: 7, title: "O3 World", startText: "An elevating experience with O3 World" },
     { id: 8, title: "FlightPath", startText: "Did I mention I co-founded" },
-    { id: 9, title: "LiveArea", startText: "A paradigm shift: From Midtown to Uptown." },
+    { id: 9, title: "LiveArea", startText: "A paradigm shift" },
     { id: 10, title: "Huge", startText: "At Huge, I couldn't tell you" },
-    { id: 11, title: "Elva / GNC", startText: "Heavy lift. Big gains. This is the whey." },
+    { id: 11, title: "Elva / GNC", startText: "Heavy lift. Big gains" },
     { id: 12, title: "Code and Theory", startText: "It's a long way to the top" },
     { id: 13, title: "Publicis Sapient", startText: "Okay, fine. Huge only wanted me" },
-    { id: 14, title: "The Twist", startText: "Come on, baby. Let's do the twist." },
+    { id: 14, title: "The Twist", startText: "Come on, baby. Let's do the twist" },
     { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
 ];
 
-const narrative = `The year is 2026, and folks still need to be told to scroll. But alas, to what avail? To wander into the void—blinded by the light? To aimlessly interact with that which disinterests us—or worse yet—offends us with boredom? Repeatedly. Masochism by minimalism in excess. A world where delineation dissolves between Most Valuable, or Minimally Viable?
+const narrative = `The year is 2026, and folks still need to be told to scroll. But alas, to what avail? To wander into the void—blinded by the light? To aimlessly interact with that which disinterests us—or worse yet—offends us with boredom? Repeatedly. 
+//
+Convention? or convection. Are we cooked? Masochism by mass minimalism in excess. Wherein a world where delineation dissolves between Most Valuable, or Minimally Viable? [One for all? All for one? One and done?]
 
 [Convention? or convection.] Are we cooked? There are stories to tell, and this is my journey. Pratt Institute—art school—too expensive, and loans or financial aid were simply out of reach. At nineteen years old, there wasn't much that I could afford, so I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station. Already in my twenties, without a degree and with zero applicable skills beyond what I could bullshit with my so-called talent. But I had a budding passion for graphic design. What's in my head? A head-first approach. Headless, sans ego.
 
@@ -847,11 +851,8 @@ function parseNarrative(text) {
     const parts = [];
     let idCounter = 0;
     
-    // First, handle line breaks: / = <br>, // = <br><br>
-    // Do this before splitting into segments to preserve structure
-    text = text.replace(/\/\//g, '|||DOUBLE_BREAK|||');
-    text = text.replace(/\//g, '|||SINGLE_BREAK|||');
-    
+    // First, handle line breaks but preserve them as separate elements
+    // Split by brackets first to preserve bracket structure
     const segments = text.split(/(\[|\])/);
     let inBracket = false;
     let bracketId = null;
@@ -871,41 +872,54 @@ function parseNarrative(text) {
                 if (bracket) bracket.content = segment.trim();
             } else {
                 // Process non-bracket content
-                // Split by sentences first, then process formatting within each sentence
-                const sentences = segment.split(/(?<=[.!?])\s+/);
-                sentences.forEach(sentence => {
-                    if (sentence.trim()) {
-                        // Check for bullet points and numbered lists
-                        const trimmedSentence = sentence.trim();
-                        
-                        // Handle numbered bullets: (#) where # is a number
-                        if (/^\(\d+\)\s/.test(trimmedSentence)) {
-                            const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
-                            if (match) {
+                // Split by line break markers first
+                const lineSegments = segment.split(/(\/\/|\/)/);
+                
+                for (let j = 0; j < lineSegments.length; j++) {
+                    const lineSegment = lineSegments[j];
+                    
+                    if (lineSegment === '//') {
+                        // Add double line break as separate element
+                        parts.push({ type: 'line-break', id: idCounter++, breakType: 'double' });
+                    } else if (lineSegment === '/') {
+                        // Add single line break as separate element
+                        parts.push({ type: 'line-break', id: idCounter++, breakType: 'single' });
+                    } else if (lineSegment.trim()) {
+                        // Process text content
+                        const sentences = lineSegment.split(/(?<=[.!?])\s+/);
+                        sentences.forEach(sentence => {
+                            const trimmedSentence = sentence.trim();
+                            if (!trimmedSentence) return;
+                            
+                            // Handle numbered bullets: (#) where # is a number
+                            if (/^\(\d+\)\s/.test(trimmedSentence)) {
+                                const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
+                                if (match) {
+                                    parts.push({ 
+                                        type: 'numbered-bullet', 
+                                        id: idCounter++, 
+                                        number: match[1],
+                                        text: match[2].trim() 
+                                    });
+                                    return;
+                                }
+                            }
+                            
+                            // Handle regular bullets: *
+                            if (trimmedSentence.startsWith('* ')) {
                                 parts.push({ 
-                                    type: 'numbered-bullet', 
+                                    type: 'bullet', 
                                     id: idCounter++, 
-                                    number: match[1],
-                                    text: match[2].trim() 
+                                    text: trimmedSentence.substring(2).trim() 
                                 });
                                 return;
                             }
-                        }
-                        
-                        // Handle regular bullets: *
-                        if (trimmedSentence.startsWith('* ')) {
-                            parts.push({ 
-                                type: 'bullet', 
-                                id: idCounter++, 
-                                text: trimmedSentence.substring(2).trim() 
-                            });
-                            return;
-                        }
-                        
-                        // Regular sentence
-                        parts.push({ type: 'sentence', id: idCounter++, text: sentence.trim() });
+                            
+                            // Regular sentence
+                            parts.push({ type: 'sentence', id: idCounter++, text: trimmedSentence });
+                        });
                     }
-                });
+                }
             }
         }
     }
@@ -1274,12 +1288,7 @@ function render() {
                 }
             }
 
-            // Process line breaks in the text
-            let processedText = part.text;
-            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
-            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
-            
-            span.innerHTML = wrapImageTriggers(processedText) + ' ';
+            span.innerHTML = wrapImageTriggers(part.text) + ' ';
             if (state.hoveredSentence === part.id) span.classList.add('active');
             else if (state.hoveredSentence !== null) span.classList.add('dimmed');
             
@@ -1293,6 +1302,16 @@ function render() {
             state.allSentenceElements.push(span);
             sentenceCount++;
             fragment.appendChild(span);
+        } else if (part.type === 'line-break') {
+            // Add line breaks as non-interactive elements
+            const br = document.createElement('span');
+            br.className = 'line-break-spacer';
+            if (part.breakType === 'double') {
+                br.innerHTML = '<br><br>';
+            } else {
+                br.innerHTML = '<br>';
+            }
+            fragment.appendChild(br);
         } else if (part.type === 'bullet') {
             const li = document.createElement('div');
             li.className = 'sentence bullet-item';
@@ -1306,11 +1325,7 @@ function render() {
                 }
             }
             
-            let processedText = part.text;
-            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
-            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
-            
-            li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(processedText);
+            li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(part.text);
             
             li.addEventListener('mouseenter', () => {
                 const index = parseInt(li.dataset.sentenceIndex);
@@ -1335,11 +1350,7 @@ function render() {
                 }
             }
             
-            let processedText = part.text;
-            processedText = processedText.replace(/\|\|\|DOUBLE_BREAK\|\|\|/g, '<br><br>');
-            processedText = processedText.replace(/\|\|\|SINGLE_BREAK\|\|\|/g, '<br>');
-            
-            li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(processedText);
+            li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(part.text);
             
             li.addEventListener('mouseenter', () => {
                 const index = parseInt(li.dataset.sentenceIndex);
