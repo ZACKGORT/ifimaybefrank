@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="IFIMAYBEFRANK">
-    <title>IFIMAYBEFRANK</title>
+    <meta name="description" content="An anti-scroll manifesto. A portfolio that makes you read one sentence at a time. Sentence-based navigation meets parallax storytelling.">
+    <meta name="author" content="Zack Gort">
+    <meta name="keywords" content="experimental portfolio, sentence navigation, UX design, interaction design, storytelling, Zack Gort">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ifimaybefrank.com/">
+    <meta property="og:title" content="IFIMAYBEFRANK - Zack Gort">
+    <meta property="og:description" content="What if reading on the web felt intentional? A sentence-based narrative interface. No endless scrolling. Just you, the story, and the space between sentences.">
+    <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ifimaybefrank.com/">
+    <meta property="twitter:title" content="IFIMAYBEFRANK - Zack Gort">
+    <meta property="twitter:description" content="An anti-scroll manifesto. One sentence at a time.">
+    <meta property="twitter:image" content="https://ifimaybefrank.com/og-image.jpg">
+    
+    <title>IFIMAYBEFRANK - Zack Gort</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -132,10 +149,7 @@ body.layout-layered .stream { color: rgba(255, 255, 255, 0.85); }
 body.layout-layered .hover-image { position: absolute; left: 50%; top: 50%; }
 body.layout-split .text-layer { width: 50%; margin: 0; padding-left: 6vw; }
 body.layout-split .stream { color: rgba(255, 255, 255, 0.9); font-size: clamp(16px, 2vw, 28px); }
-body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; opacity: 1 !important; }
-body.layout-split .sentence.dimmed { opacity: 0.75 !important; }
-body.layout-split.theme-newspaper .sentence.dimmed { opacity: 0.70 !important; color: #1a1a1a !important; }
-body.layout-split.theme-academic .sentence.dimmed { opacity: 0.70 !important; color: #1a1a1a !important; }
+body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; }
 body:not(.cursor-preview-mode) .hover-image { display: block; }
 body:not(.cursor-preview-mode) #cursorImage { display: none !important; }
 body.cursor-preview-mode .hover-image { display: none !important; }
@@ -198,6 +212,17 @@ body::-webkit-scrollbar { display: none; }
 body { -ms-overflow-style: none; scrollbar-width: none; }
 ::selection { background: rgba(218, 165, 32, 0.25); color: #fff; }
 
+/* Flow Mode - Mobile Progressive Reveal */
+body.flow-mode .sentence { opacity: 0.15; transition: opacity 0.6s ease; }
+body.flow-mode .sentence.active { opacity: 1; }
+body.flow-mode .sentence.revealed { opacity: 0.6; }
+body.flow-mode .text-layer { overflow-y: auto; height: 100vh; -webkit-overflow-scrolling: touch; }
+
+/* First-Time User Hint */
+.interaction-hint { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%); z-index: 9998; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); opacity: 0; animation: hintPulse 3s ease-in-out; pointer-events: none; }
+@keyframes hintPulse { 0%, 100% { opacity: 0; } 10%, 90% { opacity: 0.6; } 50% { opacity: 0.3; } }
+body.hint-shown .interaction-hint { display: none; }
+
 .context-menu { position: fixed; z-index: calc(var(--z-overlay) + 100); background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 8px 0; min-width: 200px; opacity: 0; transform: scale(0.95); pointer-events: none; transition: opacity 0.15s ease, transform 0.15s ease; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); }
 .context-menu.open { opacity: 1; transform: scale(1); pointer-events: auto; }
 .context-menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: var(--ink-2); font-family: 'Space Mono', monospace; font-size: 13px; cursor: pointer; transition: all 0.15s ease; user-select: none; }
@@ -218,7 +243,7 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .image-layer { position: fixed; inset: 0; z-index: 5; pointer-events: none; transform-style: preserve-3d; will-change: transform; transition: transform 0.1s linear; }
 .stream { font-size: clamp(18px, 2.5vw, 32px); line-height: 1.8; letter-spacing: -0.01em; max-width: 100%; color: rgba(255, 255, 255, 0.85); }
 .sentence { display: inline; transition: opacity 0.3s ease, color 0.3s ease; cursor: none; position: relative; z-index: 2; letter-spacing: -0.01em; }
-.sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.85); padding: 2px 6px; border-radius: 2px; }
+.sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.95); padding: 2px 6px; border-radius: 2px; }
 .sentence.dimmed { opacity: 0.4; color: rgba(255, 255, 255, 0.5); }
 .chapter-break { display: block; margin: 3em 0 2em; padding: 1.5em 0; border-top: 1px solid rgba(218, 165, 32, 0.2); border-bottom: 1px solid rgba(218, 165, 32, 0.2); text-align: center; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); opacity: 0.6; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; }
 .chapter-break:hover { opacity: 1; background: rgba(218, 165, 32, 0.05); padding: 1.5em 1em; }
@@ -304,7 +329,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
 .grid-images-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
 .grid-image-item { position: relative; aspect-ratio: 4/3; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; background: #111; }
 .grid-image-item:hover { transform: scale(1.02); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 2; }
-.grid-image-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s ease; }
+.grid-image-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: opacity 0.3s ease; }
 .grid-image-item:hover img { opacity: 0.4; filter: blur(2px); }
 .grid-image-caption { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
 .grid-image-item:hover .grid-image-caption { opacity: 1; }
@@ -370,24 +395,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
 </head>
 <body>
     <div class="context-menu" id="contextMenu" aria-hidden="true">
-        <div class="context-menu-item" id="ctxNextChapter">
-            <span class="ctx-icon">→</span>
-            <span>Next Chapter</span>
-        </div>
-        <div class="context-menu-item" id="ctxPrevChapter">
-            <span class="ctx-icon">←</span>
-            <span>Previous Chapter</span>
-        </div>
-        <div class="context-menu-divider"></div>
-        <div class="context-menu-item" id="ctxResetProgress">
-            <span class="ctx-icon">↑</span>
-            <span>Back to Top</span>
-        </div>
-        <div class="context-menu-item" id="ctxToggleTheme">
-            <span class="ctx-icon" id="ctxThemeIcon">☀️</span>
-            <span id="ctxThemeText">Light Theme</span>
-        </div>
-        <div class="context-menu-divider"></div>
         <div class="context-menu-item" id="ctxCopyLink">
             <span class="ctx-icon">🔗</span>
             <span>Copy Link</span>
@@ -396,7 +403,23 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
             <span class="ctx-icon">↗</span>
             <span>Share</span>
         </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="ctxResetProgress">
+            <span class="ctx-icon">↻</span>
+            <span>Reset to Beginning</span>
+        </div>
+        <div class="context-menu-item" id="ctxToggleTheme">
+            <span class="ctx-icon" id="ctxThemeIcon">☀️</span>
+            <span id="ctxThemeText">Light Theme</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item context-menu-info">
+            <span class="ctx-icon">ℹ️</span>
+            <span>IFIMAYBEFRANK</span>
+        </div>
     </div>
+
+    <div class="interaction-hint" id="interactionHint">Click or tap to begin</div>
     
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -528,6 +551,9 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     <div class="vignette" aria-hidden="true"></div>
 
     <div class="scroll-progress" aria-label="Navigation controls">
+        <button class="nav-button prev-chapter" id="prevChapterBtn" title="Previous Chapter ([)" aria-label="Previous Chapter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L10.83 12l4.58 4.59L14 18l-6-6 6-6 1.41 1.41z"/></svg>
+        </button>
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
@@ -536,6 +562,9 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+        </button>
+        <button class="nav-button next-chapter" id="nextChapterBtn" title="Next Chapter (])" aria-label="Next Chapter">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
         </button>
     </div>
 
@@ -589,8 +618,9 @@ const imageMap = {
     'repeatedly': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
     'excess': 'https://i.ibb.co/8njbYh3K/603d0b5635e8053bc120bec7-DSC09034.webp',   
     'most valuable': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',   
-    'cooked': 'https://i.ibb.co/L9BB3tR/603a93eedce047078935438a-IMG-5686.jpg',
-    'alright': 'https://i.ibb.co/8cFGqNB/6463c90009f6d464ffca5fe3-wellbeaight.jpg',
+    'convention': 'https://i.ibb.co/qRFbHHN/603d138e1d5ed053b509992a-IMG-5199.jpg',
+    'convection': 'https://i.ibb.co/L9BB3tR/603a93eedce047078935438a-IMG-5686.jpg',
+    'pirated Adobe software': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'pirated copies of Adobe': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'built my first computer': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
@@ -1338,12 +1368,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     document.addEventListener('touchmove', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     
-    document.getElementById('ctxNextChapter').addEventListener('click', () => { nextChapter(); hideContextMenu(); });
-    document.getElementById('ctxPrevChapter').addEventListener('click', () => { previousChapter(); hideContextMenu(); });
-    document.getElementById('ctxResetProgress').addEventListener('click', () => { resetToBeginning(); hideContextMenu(); });
-    document.getElementById('ctxToggleTheme').addEventListener('click', () => { window.toggleTheme(); hideContextMenu(); });
     document.getElementById('ctxCopyLink').addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); hideContextMenu(); });
     document.getElementById('ctxShare').addEventListener('click', async () => { try { await navigator.share({ title: 'IFIMAYBEFRANK', url: window.location.href }); } catch(e){} hideContextMenu(); });
+    document.getElementById('ctxResetProgress').addEventListener('click', () => { resetToBeginning(); hideContextMenu(); });
+    document.getElementById('ctxToggleTheme').addEventListener('click', () => { window.toggleTheme(); hideContextMenu(); });
     document.getElementById('gridToggleBtn').addEventListener('click', toggleImageGrid);
     
     const gridCloseHotspot = document.getElementById('gridCloseHotspot');
@@ -1362,6 +1390,20 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCursor();
     updateParallax();
     document.body.classList.add(`layout-${state.layoutMode}`);
+    
+    // First-time user hint
+    const hint = document.getElementById('interactionHint');
+    let hintDismissed = false;
+    const dismissHint = () => {
+        if (!hintDismissed) {
+            document.body.classList.add('hint-shown');
+            hintDismissed = true;
+        }
+    };
+    document.addEventListener('click', dismissHint, { once: true });
+    document.addEventListener('touchstart', dismissHint, { once: true });
+    document.addEventListener('keydown', dismissHint, { once: true });
+    setTimeout(dismissHint, 3000); // Auto-dismiss after 3s
     
     window.toggleLayout = function() {
         state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
@@ -1416,9 +1458,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLongPress('landPrevBtn', previousSentence, previousChapter);
     setupLongPress('landNextBtn', nextSentence, nextChapter);
     
-    // Add click listeners for desktop nav (sentence navigation only)
+    // Add click listeners for desktop nav
     document.getElementById('prevSentenceBtn').addEventListener('click', previousSentence);
     document.getElementById('nextSentenceBtn').addEventListener('click', nextSentence);
+    document.getElementById('prevChapterBtn').addEventListener('click', previousChapter);
+    document.getElementById('nextChapterBtn').addEventListener('click', nextChapter);
 });
     </script>
 </body>
