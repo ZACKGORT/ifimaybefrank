@@ -215,7 +215,7 @@ body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-in
 .image-layer { position: fixed; inset: 0; z-index: 5; pointer-events: none; transform-style: preserve-3d; will-change: transform; transition: transform 0.1s linear; }
 .stream { font-size: clamp(18px, 2.5vw, 32px); line-height: 1.8; letter-spacing: -0.01em; max-width: 100%; color: rgba(255, 255, 255, 0.85); }
 .sentence { display: inline; transition: opacity 0.3s ease, color 0.3s ease; cursor: none; position: relative; z-index: 2; letter-spacing: -0.01em; }
-.sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.85); padding: 2px 6px; border-radius: 2px; }
+.sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.95); padding: 2px 6px; border-radius: 2px; }
 .sentence.dimmed { opacity: 0.4; color: rgba(255, 255, 255, 0.5); }
 .chapter-break { display: block; margin: 3em 0 2em; padding: 1.5em 0; border-top: 1px solid rgba(218, 165, 32, 0.2); border-bottom: 1px solid rgba(218, 165, 32, 0.2); text-align: center; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); opacity: 0.6; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; }
 .chapter-break:hover { opacity: 1; background: rgba(218, 165, 32, 0.05); padding: 1.5em 1em; }
@@ -301,7 +301,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
 .grid-images-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
 .grid-image-item { position: relative; aspect-ratio: 4/3; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; background: #111; }
 .grid-image-item:hover { transform: scale(1.02); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); z-index: 2; }
-.grid-image-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: opacity 0.3s ease; }
+.grid-image-item img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: opacity 0.3s ease; }
 .grid-image-item:hover img { opacity: 0.4; filter: blur(2px); }
 .grid-image-caption { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; }
 .grid-image-item:hover .grid-image-caption { opacity: 1; }
