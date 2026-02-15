@@ -1498,6 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Long press setup
+    // LONG-PRESS FOR UI BUTTONS (prev/next navigation) - 500ms hold triggers chapter navigation
     function setupLongPress(buttonId, normalAction, longPressAction) {
         const button = document.getElementById(buttonId);
         if (!button) return;
@@ -1556,49 +1557,49 @@ document.addEventListener('DOMContentLoaded', () => {
         contextMenu.setAttribute('aria-hidden', 'true');
     }
     
-    // Disable native right-click context menu (trackpad/mouse)
-    // Only allow long-press to trigger custom context menu
+    // GLOBALLY DISABLE RIGHT-CLICK (both mouse and trackpad)
     document.addEventListener('contextmenu', e => { 
-        e.preventDefault(); // Disable native context menu
+        e.preventDefault(); 
         return false;
-    });
+    }, { capture: true });
     
-    // Long-press detection for mouse/trackpad
-    let mouseDownTimer = null;
-    let mouseDownX = 0;
-    let mouseDownY = 0;
-    const LONG_PRESS_DURATION = 500; // ms
-    const MOVEMENT_THRESHOLD = 10; // px
+    // LONG-PRESS FOR CONTEXT MENU (mouse/trackpad) - separate from UI button long-press
+    let contextMenuLongPressTimer = null;
+    let contextMenuDownX = 0;
+    let contextMenuDownY = 0;
+    const CONTEXT_MENU_LONG_PRESS_DURATION = 500; // ms
+    const CONTEXT_MENU_MOVEMENT_THRESHOLD = 10; // px
     
     document.addEventListener('mousedown', e => {
-        // Don't trigger on buttons or if it's a touch event
-        if (e.target.closest('button') || lastInteractionWasTouch) return;
+        // Don't trigger on buttons, inputs, or interactive elements
+        if (e.target.closest('button, input, select, textarea, a, .nav-button, .bracket-trigger')) return;
+        if (lastInteractionWasTouch) return;
         
-        mouseDownX = e.clientX;
-        mouseDownY = e.clientY;
+        contextMenuDownX = e.clientX;
+        contextMenuDownY = e.clientY;
         
-        mouseDownTimer = setTimeout(() => {
+        contextMenuLongPressTimer = setTimeout(() => {
             showContextMenu(e.clientX, e.clientY);
             if (navigator.vibrate) navigator.vibrate(50);
-        }, LONG_PRESS_DURATION);
+        }, CONTEXT_MENU_LONG_PRESS_DURATION);
     });
     
     document.addEventListener('mousemove', e => {
-        // Cancel long-press if mouse moves too much
-        if (mouseDownTimer) {
-            const deltaX = Math.abs(e.clientX - mouseDownX);
-            const deltaY = Math.abs(e.clientY - mouseDownY);
-            if (deltaX > MOVEMENT_THRESHOLD || deltaY > MOVEMENT_THRESHOLD) {
-                clearTimeout(mouseDownTimer);
-                mouseDownTimer = null;
+        // Cancel context menu long-press if mouse moves too much
+        if (contextMenuLongPressTimer) {
+            const deltaX = Math.abs(e.clientX - contextMenuDownX);
+            const deltaY = Math.abs(e.clientY - contextMenuDownY);
+            if (deltaX > CONTEXT_MENU_MOVEMENT_THRESHOLD || deltaY > CONTEXT_MENU_MOVEMENT_THRESHOLD) {
+                clearTimeout(contextMenuLongPressTimer);
+                contextMenuLongPressTimer = null;
             }
         }
     });
     
     document.addEventListener('mouseup', () => {
-        if (mouseDownTimer) {
-            clearTimeout(mouseDownTimer);
-            mouseDownTimer = null;
+        if (contextMenuLongPressTimer) {
+            clearTimeout(contextMenuLongPressTimer);
+            contextMenuLongPressTimer = null;
         }
     });
     
