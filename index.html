@@ -1557,68 +1557,40 @@ document.addEventListener('DOMContentLoaded', () => {
         contextMenu.setAttribute('aria-hidden', 'true');
     }
     
-    // GLOBALLY DISABLE RIGHT-CLICK (both mouse and trackpad)
-    document.addEventListener('contextmenu', e => { 
-        e.preventDefault(); 
-        return false;
-    }, { capture: true });
+    // RIGHT-CLICK CONTEXT MENU
+    // Desktop: Allow native right-click to open custom context menu
+    // Chromebook/Trackpad: Disabled to prevent accidental triggers during scrolling
     
-    // LONG-PRESS FOR CONTEXT MENU (mouse/trackpad) - separate from UI button long-press
-    let contextMenuLongPressTimer = null;
-    let contextMenuDownX = 0;
-    let contextMenuDownY = 0;
     let isScrolling = false;
     let scrollTimeout = null;
-    const CONTEXT_MENU_LONG_PRESS_DURATION = 500; // ms
-    const CONTEXT_MENU_MOVEMENT_THRESHOLD = 10; // px
     
-    // Detect scrolling to prevent context menu during scroll gestures
+    // Track scrolling state
     window.addEventListener('wheel', () => {
         isScrolling = true;
-        if (contextMenuLongPressTimer) {
-            clearTimeout(contextMenuLongPressTimer);
-            contextMenuLongPressTimer = null;
-        }
         clearTimeout(scrollTimeout);
         scrollTimeout = setTimeout(() => {
             isScrolling = false;
-        }, 150);
+        }, 200);
     }, { passive: true });
     
-    document.addEventListener('mousedown', e => {
-        // Don't trigger on buttons, inputs, or interactive elements
-        if (e.target.closest('button, input, select, textarea, a, .nav-button, .bracket-trigger')) return;
-        if (lastInteractionWasTouch) return;
-        if (isScrolling) return; // Don't trigger during scroll
-        
-        contextMenuDownX = e.clientX;
-        contextMenuDownY = e.clientY;
-        
-        contextMenuLongPressTimer = setTimeout(() => {
-            if (!isScrolling) { // Double-check we're not scrolling
-                showContextMenu(contextMenuDownX, contextMenuDownY);
-                if (navigator.vibrate) navigator.vibrate(50);
-            }
-        }, CONTEXT_MENU_LONG_PRESS_DURATION);
-    });
-    
-    document.addEventListener('mousemove', e => {
-        // Cancel context menu long-press if mouse moves too much
-        if (contextMenuLongPressTimer) {
-            const deltaX = Math.abs(e.clientX - contextMenuDownX);
-            const deltaY = Math.abs(e.clientY - contextMenuDownY);
-            if (deltaX > CONTEXT_MENU_MOVEMENT_THRESHOLD || deltaY > CONTEXT_MENU_MOVEMENT_THRESHOLD) {
-                clearTimeout(contextMenuLongPressTimer);
-                contextMenuLongPressTimer = null;
-            }
+    // Right-click opens context menu (desktop mouse only)
+    document.addEventListener('contextmenu', e => {
+        // Block if scrolling or if it's a touch interaction
+        if (isScrolling || lastInteractionWasTouch) {
+            e.preventDefault();
+            return false;
         }
-    });
-    
-    document.addEventListener('mouseup', () => {
-        if (contextMenuLongPressTimer) {
-            clearTimeout(contextMenuLongPressTimer);
-            contextMenuLongPressTimer = null;
+        
+        // Block on buttons and interactive elements
+        if (e.target.closest('button, input, select, textarea, a, .nav-button, .bracket-trigger')) {
+            e.preventDefault();
+            return false;
         }
+        
+        // Allow right-click context menu on desktop
+        e.preventDefault();
+        showContextMenu(e.clientX, e.clientY);
+        return false;
     });
     
     document.addEventListener('click', e => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
