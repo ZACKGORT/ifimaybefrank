@@ -90,7 +90,20 @@ body.theme-academic {
 /* ... [All original styles preserved] ... */
 /* Consolidated optimized styles for performance below */
 
-body.theme-newspaper .scroll-progress-bar-container { background: rgba(0, 0, 0, 0.08); }
+/* Chapter Progress - Newspaper Theme */
+body.theme-newspaper .chapter-bar { background: rgba(0, 0, 0, 0.12); }
+body.theme-newspaper .chapter-bar:hover { background: rgba(0, 0, 0, 0.25); }
+body.theme-newspaper .chapter-bar.active { background: var(--accent); }
+body.theme-newspaper .chapter-bar.completed { background: rgba(139, 69, 19, 0.3); }
+body.theme-newspaper .chapter-bar::after { background: rgba(245, 241, 232, 0.95); border-color: rgba(0, 0, 0, 0.12); color: var(--ink-2); }
+
+/* Chapter Progress - Academic Theme */
+body.theme-academic .chapter-bar { background: rgba(0, 0, 0, 0.15); }
+body.theme-academic .chapter-bar:hover { background: rgba(0, 0, 0, 0.3); }
+body.theme-academic .chapter-bar.active { background: var(--accent); }
+body.theme-academic .chapter-bar.completed { background: rgba(0, 102, 204, 0.3); }
+body.theme-academic .chapter-bar::after { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.15); color: var(--ink-2); }
+
 body.theme-newspaper .nav-button, body.theme-newspaper .lens-control-container, body.theme-newspaper .mobile-bottom-rail, body.theme-newspaper .mobile-right-rail { background: rgba(245, 241, 232, 0.95); border-color: rgba(0, 0, 0, 0.12); }
 body.theme-newspaper .nav-button:hover { background: rgba(139, 69, 19, 0.08); }
 body.theme-newspaper .stream { color: var(--ink) !important; }
@@ -99,7 +112,6 @@ body.theme-newspaper .chapter-dropdown { background: rgba(245, 241, 232, 0.98); 
 body.theme-newspaper .chapter-item:hover { background: rgba(139, 69, 19, 0.06); }
 
 /* Academic styles */
-body.theme-academic .scroll-progress-bar-container { background: rgba(0, 0, 0, 0.1); }
 body.theme-academic .nav-button, body.theme-academic .lens-control-container, body.theme-academic .mobile-bottom-rail, body.theme-academic .mobile-right-rail { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.15); }
 body.theme-academic .nav-button:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .lens-slider { background: rgba(0, 0, 0, 0.15); }
@@ -157,13 +169,73 @@ body.cursor-preview-mode #cursorImage { display: block !important; }
 
 /* Navigation Rails */
 .scroll-progress { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: var(--z-ui); pointer-events: auto; }
-.scroll-progress-bar-container { width: 2px; height: 200px; background: rgba(255, 255, 255, 0.1); border-radius: 1px; position: relative; margin: 10px 0; cursor: pointer; transition: width 0.2s ease; }
-.scroll-progress-bar-container:hover { width: 8px; background: rgba(255, 255, 255, 0.2); }
-.scroll-progress-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: var(--accent); border-radius: 1px; transition: height 0.3s ease; pointer-events: none; }
-.scroll-progress-handle { position: absolute; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: var(--accent); border: 2px solid rgba(0, 0, 0, 0.3); border-radius: 50%; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
-.scroll-progress-bar-container:hover .scroll-progress-handle { opacity: 1; }
-.scroll-progress-bar-container.dragging { width: 12px; }
-.scroll-progress-bar-container.dragging .scroll-progress-handle { opacity: 1; transform: translateX(-50%) scale(1.2); }
+
+/* Chapter Progress Bars */
+.chapter-progress-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 6px; 
+    padding: 10px 0; 
+    align-items: center;
+}
+
+.chapter-bar { 
+    width: 20px; 
+    height: 4px; 
+    background: rgba(255, 255, 255, 0.15); 
+    border-radius: 2px; 
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.chapter-bar:hover { 
+    width: 32px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.chapter-bar.active { 
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+}
+
+.chapter-bar.active:hover {
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+}
+
+.chapter-bar.completed {
+    background: rgba(218, 165, 32, 0.4);
+}
+
+.chapter-bar.completed:hover {
+    background: rgba(218, 165, 32, 0.6);
+}
+
+.chapter-bar::after {
+    content: attr(data-chapter-title);
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chapter-bar:hover::after {
+    opacity: 1;
+}
+
 .nav-button { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--ink-3); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; font-size: 14px; pointer-events: auto; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 .nav-button:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
 .nav-button:active { transform: scale(0.95); }
@@ -571,9 +643,8 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
-        <div class="scroll-progress-bar-container" id="scrollProgressContainer">
-            <div class="scroll-progress-bar" id="scrollProgressBar"></div>
-            <div class="scroll-progress-handle" id="scrollProgressHandle"></div>
+        <div class="chapter-progress-container" id="chapterProgressContainer">
+            <!-- Chapter bars will be generated dynamically -->
         </div>
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
@@ -1048,7 +1119,7 @@ function highlightSentence(index) {
     sentence.classList.add('active');
     sentence.classList.remove('dimmed');
     
-    updateScrollProgress();
+    updateChapterProgress();
     updateChapterDropdown();
     
     sentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1081,9 +1152,89 @@ function previousChapter() {
     if (currentChapter > 0) goToChapter(currentChapter - 1);
 }
 
-function updateScrollProgress() {
-    const progressBar = document.getElementById('scrollProgressBar');
-    const progressHandle = document.getElementById('scrollProgressHandle');
+function initializeChapterProgress() {
+    const container = document.getElementById('chapterProgressContainer');
+    if (!container) {
+        console.warn('Chapter progress container not found');
+        return;
+    }
+    
+    container.innerHTML = ''; // Clear existing
+    
+    // Track rapid scrolling state
+    let isRapidScrolling = false;
+    let rapidScrollTimeout = null;
+    
+    chapters.forEach((chapter, index) => {
+        const bar = document.createElement('div');
+        bar.className = 'chapter-bar';
+        bar.dataset.chapterId = chapter.id;
+        bar.dataset.chapterTitle = `${String(chapter.id + 1).padStart(2, '0')}. ${chapter.title}`;
+        bar.title = chapter.title;
+        
+        // Click to navigate
+        bar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const chapterId = parseInt(this.dataset.chapterId);
+            goToChapter(chapterId);
+        });
+        
+        // Mouseenter for rapid chapter scrolling
+        bar.addEventListener('mouseenter', function() {
+            if (isRapidScrolling) {
+                const chapterId = parseInt(this.dataset.chapterId);
+                goToChapter(chapterId);
+            }
+        });
+        
+        // Start rapid scrolling on mousedown
+        bar.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            isRapidScrolling = true;
+            
+            // Clear any existing timeout
+            if (rapidScrollTimeout) {
+                clearTimeout(rapidScrollTimeout);
+            }
+        });
+        
+        container.appendChild(bar);
+    });
+    
+    // End rapid scrolling on mouseup anywhere
+    document.addEventListener('mouseup', function() {
+        if (isRapidScrolling) {
+            isRapidScrolling = false;
+            // Small delay before allowing normal clicks again
+            if (rapidScrollTimeout) clearTimeout(rapidScrollTimeout);
+            rapidScrollTimeout = setTimeout(() => {
+                isRapidScrolling = false;
+            }, 100);
+        }
+    });
+    
+    updateChapterProgress();
+}
+
+function updateChapterProgress() {
+    const currentChapter = getCurrentChapter();
+    const bars = document.querySelectorAll('.chapter-bar');
+    
+    bars.forEach((bar, index) => {
+        const chapterId = parseInt(bar.dataset.chapterId);
+        
+        // Remove all state classes
+        bar.classList.remove('active', 'completed');
+        
+        // Add appropriate class
+        if (chapterId === currentChapter) {
+            bar.classList.add('active');
+        } else if (chapterId < currentChapter) {
+            bar.classList.add('completed');
+        }
+    });
+    
+    // Also update mobile progress
     const mobileProgressFill = document.getElementById('mobileProgressFill');
     const mobileProgressText = document.getElementById('mobileProgressText');
     const landProgressFill = document.getElementById('landProgressFill');
@@ -1092,12 +1243,6 @@ function updateScrollProgress() {
     const current = state.currentSentenceIndex + 1;
     const progress = (current / total) * 100;
     
-    if (progressBar) progressBar.style.height = `${progress}%`;
-    if (progressHandle) {
-        const containerHeight = 200; // matches CSS height
-        const handlePosition = (progress / 100) * containerHeight;
-        progressHandle.style.bottom = `${handlePosition - 8}px`; // -8 to center the 16px handle
-    }
     if (mobileProgressFill) mobileProgressFill.style.width = `${progress}%`;
     if (landProgressFill) landProgressFill.style.height = `${progress}%`;
     if (mobileProgressText) mobileProgressText.textContent = `${current} / ${total}`;
@@ -1387,6 +1532,7 @@ function render() {
     streamEl.innerHTML = '';
     streamEl.appendChild(fragment);
     buildChapterDropdown();
+    initializeChapterProgress(); // Initialize chapter progress bars after content is rendered
     
     streamEl.addEventListener('mouseover', e => {
         const trigger = e.target.closest('.image-trigger');
@@ -1450,52 +1596,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('accessibilityIncrease').addEventListener('click', () => { if (accessibilityLevel > 0) applyAccessibilityLevel(--accessibilityLevel); });
     document.getElementById('accessibilityDecrease').addEventListener('click', () => { if (accessibilityLevel < accessibilityLevels.length - 1) applyAccessibilityLevel(++accessibilityLevel); });
     applyAccessibilityLevel(accessibilityLevel);
-    
-    // Interactive Scroll Progress Bar
-    const progressContainer = document.getElementById('scrollProgressContainer');
-    const progressHandle = document.getElementById('scrollProgressHandle');
-    let isDraggingProgress = false;
-    
-    function calculateSentenceFromPosition(clientY) {
-        const rect = progressContainer.getBoundingClientRect();
-        const relativeY = clientY - rect.top;
-        const percentage = Math.max(0, Math.min(1, relativeY / rect.height));
-        const sentenceIndex = Math.floor(percentage * state.allSentenceElements.length);
-        return Math.max(0, Math.min(state.allSentenceElements.length - 1, sentenceIndex));
-    }
-    
-    function handleProgressInteraction(clientY) {
-        const targetIndex = calculateSentenceFromPosition(clientY);
-        state.currentSentenceIndex = targetIndex;
-        highlightSentence(targetIndex);
-    }
-    
-    progressContainer.addEventListener('mousedown', (e) => {
-        isDraggingProgress = true;
-        progressContainer.classList.add('dragging');
-        handleProgressInteraction(e.clientY);
-        cursor.classList.add('pointer');
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-        if (isDraggingProgress) {
-            handleProgressInteraction(e.clientY);
-        }
-    });
-    
-    document.addEventListener('mouseup', () => {
-        if (isDraggingProgress) {
-            isDraggingProgress = false;
-            progressContainer.classList.remove('dragging');
-            cursor.classList.remove('pointer');
-        }
-    });
-    
-    progressContainer.addEventListener('click', (e) => {
-        if (!isDraggingProgress) {
-            handleProgressInteraction(e.clientY);
-        }
-    });
     
     // Long press setup
     // LONG-PRESS FOR UI BUTTONS (prev/next navigation) - 500ms hold triggers chapter navigation
