@@ -7,14 +7,12 @@
     <meta name="author" content="Zack Gort">
     <meta name="keywords" content="experimental portfolio, sentence navigation, UX design, interaction design, storytelling, Zack Gort">
     
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ifimaybefrank.com/">
     <meta property="og:title" content="IFIMAYBEFRANK - Zack Gort">
     <meta property="og:description" content="What if reading on the web felt intentional? A sentence-based narrative interface. No endless scrolling. Just you, the story, and the space between sentences.">
     <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://ifimaybefrank.com/">
     <meta property="twitter:title" content="IFIMAYBEFRANK - Zack Gort">
@@ -644,8 +642,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
         <div class="chapter-progress-container" id="chapterProgressContainer">
-            <!-- Chapter bars will be generated dynamically -->
-        </div>
+            </div>
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
         </button>
@@ -849,7 +846,7 @@ const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
     { id: 1, title: "Words from the Maker", startText: "Convention? or convection" },
     { id: 2, title: "First Steps", startText: "I built my first computer" },
-    { id: 3, title: "Turn5 / Xoxide", startText: "Alright. Now, where to begin?" },
+    { id: 3, title: "Turn5 / Xoxide", startText: "Alright" },
     { id: 4, title: "Leadnomics", startText: "Okay, so Leadnomics was shifty" },
     { id: 5, title: "Learning to Code", startText: "From here, I desired to move" },
     { id: 6, title: "One Sixty Over Ninety", startText: "One Sixty Over Ninety" },
@@ -857,10 +854,10 @@ const chapters = [
     { id: 8, title: "FlightPath", startText: "Did I mention I co-founded" },
     { id: 9, title: "LiveArea", startText: "A paradigm shift" },
     { id: 10, title: "Huge", startText: "At Huge, I couldn't tell you" },
-    { id: 11, title: "Elva / GNC", startText: "Heavy lift. Big gains" },
+    { id: 11, title: "Elva / GNC", startText: "Heavy lift" },
     { id: 12, title: "Code and Theory", startText: "It's a long way to the top" },
-    { id: 13, title: "Publicis Sapient", startText: "Okay, fine. Huge only wanted me" },
-    { id: 14, title: "The Twist", startText: "Come on, baby. Let's do the twist" },
+    { id: 13, title: "Publicis Sapient", startText: "Okay, fine" },
+    { id: 14, title: "The Twist", startText: "Come on, baby" },
     { id: 15, title: "Conclusion", startText: "As an aside, I've been keeping up" }
 ];
 
@@ -1597,31 +1594,48 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('accessibilityDecrease').addEventListener('click', () => { if (accessibilityLevel < accessibilityLevels.length - 1) applyAccessibilityLevel(++accessibilityLevel); });
     applyAccessibilityLevel(accessibilityLevel);
     
-    // Long press setup
-    // LONG-PRESS FOR UI BUTTONS (prev/next navigation) - 500ms hold triggers chapter navigation
+    // LONG-PRESS FOR UI BUTTONS (Touch AND Mouse support)
     function setupLongPress(buttonId, normalAction, longPressAction) {
         const button = document.getElementById(buttonId);
         if (!button) return;
-        let longPressTimer = null, longPressActivated = false;
+        
+        let longPressTimer = null;
+        let longPressActivated = false;
 
-        button.addEventListener('touchstart', (e) => {
+        const startHandler = (e) => {
+            // Only left click for mouse
+            if (e.type === 'mousedown' && e.button !== 0) return;
+            
             longPressActivated = false;
             longPressTimer = setTimeout(() => {
                 longPressActivated = true;
                 longPressAction();
                 if (navigator.vibrate) navigator.vibrate(50);
             }, 500);
-        }, { passive: true });
+        };
 
-        button.addEventListener('touchend', (e) => {
-            if (longPressTimer) clearTimeout(longPressTimer);
-            if (longPressActivated) {
-                e.preventDefault(); 
+        const endHandler = (e) => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
             }
-        }, { passive: false });
+            if (longPressActivated) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+            }
+        };
 
+        // Touch events
+        button.addEventListener('touchstart', startHandler, { passive: true });
+        button.addEventListener('touchend', endHandler, { passive: false });
         button.addEventListener('touchcancel', () => { if (longPressTimer) clearTimeout(longPressTimer); }, { passive: true });
-        
+
+        // Mouse events
+        button.addEventListener('mousedown', startHandler);
+        button.addEventListener('mouseup', endHandler);
+        button.addEventListener('mouseleave', () => { if (longPressTimer) clearTimeout(longPressTimer); });
+
+        // Click handler - only fires if long press didn't happen
         button.addEventListener('click', (e) => {
             if (longPressActivated) {
                 e.preventDefault();
@@ -1726,8 +1740,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('touchend', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     document.addEventListener('touchmove', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     
-    document.getElementById('ctxNextChapter').addEventListener('click', () => { nextChapter(); hideContextMenu(); });
-    document.getElementById('ctxPrevChapter').addEventListener('click', () => { previousChapter(); hideContextMenu(); });
+    document.getElementById('ctxNextChapter').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        nextChapter(); 
+        hideContextMenu(); 
+    });
+    
+    document.getElementById('ctxPrevChapter').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        previousChapter(); 
+        hideContextMenu(); 
+    });
     document.getElementById('ctxCopyLink').addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); hideContextMenu(); });
     document.getElementById('ctxShare').addEventListener('click', async () => { try { await navigator.share({ title: 'IFIMAYBEFRANK', url: window.location.href }); } catch(e){} hideContextMenu(); });
     document.getElementById('ctxResetProgress').addEventListener('click', () => { resetToBeginning(); hideContextMenu(); });
