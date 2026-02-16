@@ -2168,9 +2168,6 @@ function highlightSentence(index) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
     
-    // Update current index
-    state.currentSentenceIndex = index;
-    
     state.allSentenceElements.forEach(s => {
         s.classList.remove('active');
         s.classList.add('dimmed');
@@ -2191,32 +2188,6 @@ function highlightSentence(index) {
     } else {
         hideImage();
     }
-}
-
-// Track visible sentences to update chapter progress
-function observeVisibleSentences() {
-    const observer = new IntersectionObserver((entries) => {
-        // Only update if we're not actively navigating via scroll controls
-        if (!state.scrollCooldownActive) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-                    const index = parseInt(entry.target.dataset.sentenceIndex);
-                    if (!isNaN(index) && index !== state.currentSentenceIndex) {
-                        state.currentSentenceIndex = index;
-                        updateChapterProgress();
-                        updateChapterDropdown();
-                    }
-                }
-            });
-        }
-    }, {
-        root: null,
-        threshold: 0.5
-    });
-    
-    state.allSentenceElements.forEach(sentence => {
-        observer.observe(sentence);
-    });
 }
 
 function resetToBeginning() {
@@ -2782,9 +2753,6 @@ function render() {
     
     buildChapterDropdown();
     initializeChapterProgress();
-    
-    // Observe sentences to track chapter progress
-    observeVisibleSentences();
     
     // Event delegation for image triggers
     streamEl.addEventListener('mouseover', e => {
