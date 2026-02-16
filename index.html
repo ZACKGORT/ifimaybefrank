@@ -1733,10 +1733,37 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', e => { if (!contextMenu.contains(e.target)) hideContextMenu(); });
     
     let globalLongPressTimer = null;
+    let allTextVisible = false;
+    
+    const toggleAllTextVisible = () => {
+        allTextVisible = !allTextVisible;
+        const sentences = document.querySelectorAll('.sentence');
+        
+        if (allTextVisible) {
+            // Show all text at max contrast
+            sentences.forEach(s => {
+                s.classList.remove('dimmed');
+                s.classList.add('active');
+            });
+        } else {
+            // Restore normal dimming behavior
+            sentences.forEach(s => s.classList.remove('active'));
+            highlightSentence(state.currentSentenceIndex);
+        }
+        
+        // Visual/haptic feedback
+        if (navigator.vibrate) navigator.vibrate(allTextVisible ? [30, 50, 30] : 50);
+    };
+    
     document.addEventListener('touchstart', e => {
-        if (e.target.closest('button')) return;
-        globalLongPressTimer = setTimeout(() => { showContextMenu(e.touches[0].clientX, e.touches[0].clientY); if (navigator.vibrate) navigator.vibrate(50); }, 500);
+        if (e.target.closest('button, .nav-button, .bracket-trigger, .context-menu')) return;
+        
+        globalLongPressTimer = setTimeout(() => { 
+            // Toggle all text visibility on long press
+            toggleAllTextVisible();
+        }, 500);
     }, { passive: true });
+    
     document.addEventListener('touchend', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     document.addEventListener('touchmove', () => { if (globalLongPressTimer) clearTimeout(globalLongPressTimer); }, { passive: true });
     
