@@ -1712,7 +1712,7 @@ const parallax = {
 // ===================================
 const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
-    { id: 1, title: "Words from the Maker", startText: "TL;DR: This isn't some grand manifesto" },
+    { id: 1, title: "Words from the Maker", startText: "This isn't some grand manifesto" },
     { id: 2, title: "The Early Days", startText: "I built my first computer" },
     { id: 3, title: "Suburbia Startup", startText: "Alright, where to begin with Turn5" },
     { id: 4, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
@@ -1728,17 +1728,20 @@ const chapters = [
 // ===================================
 const imageMap = {
     // Chapter 0 & 1 - Hello World / Words from the Maker
-    'scroll': 'https://i.ibb.co/Y7wVfbfK/DSC08212.webp',
+    'scrolling': 'https://i.ibb.co/Y7wVfbfK/DSC08212.webp',
     'void': 'https://i.ibb.co/MZbMqsT/6039d4bbb15be328fc33b54d-IMG-6478.jpg',
-    'boredom': 'https://i.ibb.co/m5sNTvYX/603a967916b10d5bef5a6dd8-ZAX02712-1.webp',
+    'paused': 'https://i.ibb.co/BjZQ8KG/2322060064540385797-5144774570.jpg',
     'beat': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
-    'excess': 'https://i.ibb.co/8njbYh3K/603d0b5635e8053bc120bec7-DSC09034.webp',
-    'most valuable': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
-    'convention': 'https://i.ibb.co/qRFbHHN/603d138e1d5ed053b509992a-IMG-5199.jpg',
-    'convection': 'https://i.ibb.co/L9BB3tR/603a93eedce047078935438a-IMG-5686.jpg',
+    'grand': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
+    'my own way': 'https://i.ibb.co/bHsf63Q/2269150474215204867-5144774570.jpg',
+    'conviction': 'https://i.ibb.co/bjCjbfbT/603a93efdfd184c21ef2d238-IMG-3352.webp',
+    'curriculum vitae': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'career': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'journey': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
     'intentional': 'https://i.ibb.co/m5sNTvYX/603a967916b10d5bef5a6dd8-ZAX02712-1.webp',
-    'sentence at a time': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
-    'proof of concept': 'https://i.ibb.co/8njbYh3K/603d0b5635e8053bc120bec7-DSC09034.webp',
+    'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
+    'proof of concept': 'https://i.ibb.co/9HzBPc7Y/603a93eea83b1aab7a98c35b-DSC08228.webp',
+    'Zack': 'https://i.ibb.co/NZ0y6Hn/2272303929273225747-5144774570.jpg',
     
     // Chapter 2 - The Early Days
     'pirated Adobe software': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
@@ -1920,13 +1923,14 @@ Object.keys(imageMap).forEach(phrase => {
 // ===================================
 // DATA: NEW NARRATIVE CONTENT
 // ===================================
-const narrative = `The year is 2026. Here we are—scrolling endlessly through feeds optimized for engagement rather than enlightenment. [Operational fulfillment, not emotional] Tapping mindlessly through stories designed to dissolve into the void. What if we paused? What if reading felt intentional again? A steady beat with natural cadence. One moment unto another. This is my story, told my way. [All em dashes in this piece were sourced from www.emdash.click]
+const narrative = `The year is 2026. Here we are—scrolling endlessly through feeds optimized for engagement rather than enlightenment. [Operational fulfillment, not emotional] Tapping mindlessly through stories designed to dissolve into the void. What if we paused? What if reading felt intentional again? Beat by beat by beat. One moment unto another.   [All em dashes in this piece were sourced from www.emdash.click]
 
-TL;DR: This isn't some grand manifesto about the future of storytelling or the death of UX. This is my curriculum vitae. My career. My journey. Told beat by beat because this story was drawn from memory. It was recalled with care, and so should it consumed—deliberately, not devoured. [] 
+This isn't some grand manifesto about the state UX. [That jacket is pretty grand, NGL] But I will say this: conviction abhors convection by convention. This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Facts are never facts. Truths are almost always half-lies. Capabilities become curbed. move through content that does not move you. It feels static. It feels stale.]  My career. My journey. My story told my own way [The underlying mechanism that defines the user experience of this site concept is a 'stream of consciousness'] 
+
 //
-Truth be told, I'm building something greater than this portfolio. Consider what you see here a proof of concept. A glimpse of what's possible when we resist the tyranny of the scroll. But first, let me introduce myself properly.
+Truth be told, I'm building something greater than this. [] Consider what you see here a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
 //
-I am Zack—Thinker, Maker, left-handed autodidact with a penchant for defying convention. Self-taught designer who learned to code. Experience designer who builds products. The kind of person who wore a pink onesie to America and made it part of his personal brand because pink is a boy's color in Korea, and I've been challenging expectations ever since.
+I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with a penchant for doing things different [sic]. Self-taught designer who learned to code. Experience designer who builds products. Canny with E-Commerce. Savvy with SaaS. Fine with Fintech.  
 
 I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator—because when you can't afford art school tuition, you find another way. While I didn't study at university long enough to graduate, I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, examining magazines, observing the world with designer's eyes. I studied color theory through online tutorials, teaching myself to master the tools at my disposal. I created faux website concepts to understand designing for the medium. I learned professional etiquette for finding gainful employment. All this culminated in responding to a Craigslist post that changed everything. [I can still pull up my original cover letter from 2007] Here I was brought on as a graphic designer, full-time, at sixteen-fifty an hour plus full benefits, a 401K, and my own cubicle. You have no idea how happy I was. This was Turn5—a garage startup in the suburbs of Philadelphia that would become my formal education.
 
