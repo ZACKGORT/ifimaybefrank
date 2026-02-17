@@ -543,6 +543,11 @@ body.flow-mode .sentence.active { opacity: 1; }
 body.flow-mode .sentence.revealed { opacity: 0.6; }
 body.flow-mode .text-layer { overflow-y: auto; height: 100vh; -webkit-overflow-scrolling: touch; }
 
+
+/* Split view with active image - full opacity */
+body.layout-split.image-active .sentence.dimmed { opacity: .44 !important; color: rgba(255, 255, 255, 0.9) !important; }
+
+
 /* ===================================
    INTERACTION HINTS
    =================================== */
@@ -567,6 +572,8 @@ body.flow-mode .text-layer { overflow-y: auto; height: 100vh; -webkit-overflow-s
     50% { opacity: 0.3; } 
 }
 body.hint-shown .interaction-hint { display: none; }
+
+
 
 /* ===================================
    CONTEXT MENU
