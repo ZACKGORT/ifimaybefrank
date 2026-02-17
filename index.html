@@ -123,7 +123,7 @@ body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .sentence { color: #000000; }
 body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
 body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.65; color: #333333; }
+body.theme-academic .sentence.dimmed { opacity: 0.44; color: #333333; }
 body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
 body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
 body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
@@ -146,7 +146,7 @@ body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-s
 body.theme-newspaper .sentence { color: #000000; }
 body.theme-newspaper .sentence:hover { color: #000000; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
 body.theme-newspaper .sentence.active { color: #ffffff; background: #000000; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-newspaper .sentence.dimmed { opacity: 0.65; color: #333333; }
+body.theme-newspaper .sentence.dimmed { opacity: 0.44; color: #333333; }
 body.theme-newspaper .chapter-break { border-top-color: rgba(139, 69, 19, 0.25); border-bottom-color: rgba(139, 69, 19, 0.25); color: var(--accent); }
 
 /* Newspaper Context Menu */
@@ -508,7 +508,7 @@ body.theme-newspaper .level-indicator.active { background: var(--accent); }
     width: 0%; 
 }
 
-body.image-active .sentence:not(.active) { opacity: 0.1; color: rgba(255, 255, 255, 0.3); }
+body.image-active .sentence:not(.active) { opacity: 0.77; color: rgba(255, 255, 255, 0.3); }
 body.image-active .sentence.active { opacity: 1; color: #fff; }
 body.image-active .sentence.dimmed { opacity: 0.05; color: rgba(255, 255, 255, 0.15); }
 
@@ -723,7 +723,7 @@ body::after {
     padding: 2px 6px; 
     border-radius: 2px; 
 }
-.sentence.dimmed { opacity: 0.4; color: rgba(255, 255, 255, 0.5); }
+.sentence.dimmed { opacity: 0.44; color: rgba(255, 255, 255, 0.5); }
 
 .bullet-item, .numbered-bullet-item { 
     display: block; 
@@ -1713,14 +1713,15 @@ const imageMap = {
     'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
     'proof of concept': 'https://i.ibb.co/9HzBPc7Y/603a93eea83b1aab7a98c35b-DSC08228.webp',
     'Zack': 'https://i.ibb.co/NZ0y6Hn/2272303929273225747-5144774570.jpg',
-    'left-handed': 'https://i.ibb.co/bgmCG0qb/ZAX02330.jpg',
-    'self-taught': 'https://i.ibb.co/M5D5vF9c/download-13.png',
+    'left-handed': 'https://i.ibb.co/Kp0wZtgT/ZAX01496.jpg',
+    'self-taught': 'https://i.ibb.co/bg5W6vyn/DSC09125.jpg',
+    'a craftsman': 'https://i.ibb.co/DDFpj6Dm/ZAX03810.jpg',
     'dreamer': 'https://i.ibb.co/hqCtdrS/ZAX02263.jpg',
 
     // Chapter 2 - The Early Days
-    'installed pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
-    'thinks before he builds': 'https://i.ibb.co/hqCtdrS/ZAX02263.jpg',
     'built my first computer': 'https://i.ibb.co/fdxZdwwC/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp',
+    'installed pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'what I saw around me': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
     'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
@@ -1904,17 +1905,29 @@ This is not some grand manifesto about the state of UX [] — but may I say, Con
 //
 Truth be told, I'm building something greater than this. [] Consider what you see here a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
 //
-I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. I seek not to disrupt, but to discover.  
+I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. A craftsman. I seek not to disrupt, but to discover.  
 
-I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. [because when you can't afford art school tuition, you find another way] While I didn't study at university long enough to graduate, I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, examining magazines, observing the world with designer's eyes. I studied color theory through online tutorials, teaching myself to master the tools at my disposal. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [I can still pull up my original cover letter from 2007] Here I was brought on as a graphic designer, full-time, at sixteen-fifty an hour plus full benefits, a 401K, and my own cubicle. You have no idea how happy I was. This was Turn5—a garage startup in the suburbs of Philadelphia that would become my formal education.
-
-More than a turning point, but a paradigm shift. I'd just been brought into the fold at a budding home-grown startup. Turn5 had set up its new headquarters at a warehouse office facility in Great Valley, Pennsylvania—about twenty miles outside of Philly. The company was owned and operated by two brothers, one of whom wasn't even old enough to drink at the company holiday party. I was provided a brand new PC with a dual-screen monitor setup and a Canon Rebel DSLR. I became graphic designer for all web properties. Graphic designer for all print initiatives including package design and catalogue design. Product photographer specializing in lighting and establishing systematic protocols for visual uniformity at scale. We photographed thousands of parts with customization at the heart of what we sold—countless product permutations requiring perfect color matching to mimic OEM quality. Our product photography had to look consistent through print and digital media alike. Having eventually passed the torch of photography duties onto a true professional, I focused on email marketing and feature design. Working with analytical data helped inform top-level site design changes. It was at this point I graduated from graphic designer to web designer. Four years—the company went from garage startup to forty million per year. I learned by doing. Turn5 served as my formal education in every sense.
+I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. [because when you can't afford art school tuition, you find another way] While I didn't study at university long enough to graduate, I studied obsessively what I saw around me. 
 //
-Okay, so Leadnomics was shifty. Paradigm shifty, we'll say. Great place to work though—I have lasting friendships with folks from there, two of whom now work at Google. But our work fed upon the uneducated and disenfranchised in some respects. Our focus was lead generation. Our cash cow was facilitating easy access to payday loans—high-interest short-term financial instruments targeting desperate people. We had free lunches, regular bonuses, company outings, free snacks, solid benefits. Each of us had our own super-thin Apple laptops and the ability to work from home occasionally—this was 2011, mind you. In short, my job was to make it intuitive and stress-free, daresay pleasant, for users to make catastrophic financial decisions at a scale of tens of thousands per month. I had a ninety-five-point-eight percent conversion rate with a bounce rate lower than fifteen percent. This wasn't magic—this was the result of introducing Responsive Web Design practices via Twitter's Bootstrap ethos, backed by thoughtful action and solutions based on analytical data, insights drawn from user testing and AB split-testing. We fashioned one hell of a fishing net. Business is necessity, not idealism. [tell that to a graphic designer and see how that goes]
+Whatever piqued my interest, I examined intensely. I studied typography by reading books, examining magazines, observing the world with designer's eyes. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [I can still pull up my original cover letter from 2007] 
 //
-From Leadnomics, I desired to move my creative talents into an environment where I was happy to share and expound upon the work. There was a period between Leadnomics and One Sixty Over Ninety where I recovered from a catastrophically comminuted clavicle injury. During my downtime, I determined my best chance at landing an agency job was proving I understood the ins and outs of web design beyond just visual design. So I learned to code—HTML, CSS, a little JavaScript to make the magic happen. I did this by concepting an interactive Haiku that communicated in various ways the things I wished to convey. My gateway to agency life.
+Here I was brought on as a graphic designer, full-time, at sixteen-fifty an hour plus full benefits, a 401K, and my own cubicle. You have no idea how happy I was. This was Turn5 — a garage startup in the suburbs of Philadelphia that would become my formal education.
 
-One Sixty Over Ninety—my heart rate when I was offered a full-time gig as an Interaction Designer at a leading design agency at the literal epicenter of Center City, Philadelphia. Granted, I accepted the job at approximately twelve thousand dollars less than I made at my previous startup, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160over90 headquarters. I was there to learn. Day, night, lots of nights, weekends too. When waterfall process meets business-minded clients with exceptional aspirations meets unmanaged expectations meets crunch time—well, compromises happen. We explored grayscale wireframes that looked like design. We explored mega menus and full-screen takeovers. We pondered whether the hamburger icon was intuitive enough. [remember, this was circa 2014 when these were legitimate questions] Interactive Designers at 160over90 were responsible for information architecture, user experience, and visual design—everything. Clients included Comcast, Philadelphia Eagles, University of Wisconsin-Madison, Kent State University, Texas A&M.
+More than a turning point, but a paradigm shift. I'd just been brought into the fold at a budding home-grown startup. Turn5 had set up its new headquarters at a warehouse office facility in Great Valley, Pennsylvania — about twenty miles outside of Philly.
+//
+I was provided a brand new PC with a dual-screen monitor setup and a Canon Rebel DSLR. I became graphic designer for all web properties. Graphic designer for all print initiatives including package design and catalogue design. Product photographer specializing in lighting and establishing systematic protocols for visual uniformity at scale. We photographed thousands of parts with customization at the heart of what we sold — countless product permutations requiring perfect color matching to mimic OEM quality. 
+//
+I then focused on email marketing and feature design. Working with analytical data helped inform top-level site design changes. It was at this point I graduated from graphic designer to web designer. Four years — the company went from garage startup to forty million per year. I learned by doing. Turn5 served as my formal education in every sense.
+//
+Okay, so Leadnomics was shifty. Paradigm shifty, we'll say. Great place to work though — I have lasting friendships with folks from there, two of whom now work at Google. But our work fed upon the uneducated and disenfranchised in some respects. Our focus was lead generation. Our cash cow was facilitating easy access to payday loans — high-interest short-term financial instruments targeting desperate people. We had free lunches, regular bonuses, company outings, free snacks, solid benefits. Each of us had our own super-thin Apple laptops and the ability to work from home occasionally — this was 2011, mind you. 
+//
+In short, my job was to make it intuitive and stress-free, daresay pleasant, for users to make catastrophic financial decisions at a scale of tens of thousands per month. I had a ninety-five-point-eight percent conversion rate with a bounce rate lower than fifteen percent. This wasn't magic — this was the result of introducing Responsive Web Design practices via Twitter's Bootstrap ethos, backed by thoughtful action and solutions based on analytical data, insights drawn from user testing and AB split-testing. We fashioned one hell of a fishing net. Business is necessity, not idealism. [tell that to a graphic designer and see how that goes]
+//
+From Leadnomics, I desired to move my creative talents into an environment where I was happy to share and expound upon the work. There was a period between Leadnomics and One Sixty Over Ninety where I recovered from a catastrophically comminuted clavicle injury. So I bid my time learning to code — HTML, CSS, a little JavaScript to make the magic happen. I did this by concepting an interactive Haiku that communicated in various ways the things I wished to convey. My gateway to agency life.
+
+One Sixty Over Ninety—my heart rate when I was offered a full-time gig as an Interaction Designer at a leading design agency at the literal epicenter of Center City, Philadelphia. Granted, I accepted the job at approximately twelve thousand dollars less than I made at my previous startup, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160over90 headquarters. I was there to learn. Day, night, lots of nights, weekends too. When waterfall process meets business-minded clients with exceptional aspirations meets unmanaged expectations meets crunch time—well, compromises happen. We explored grayscale wireframes that looked like design. 
+//
+We explored mega menus and full-screen takeovers. We pondered whether the hamburger icon was intuitive enough. [remember, this was circa 2014 when these were legitimate questions] Interactive Designers at 160over90 were responsible for information architecture, user experience, and visual design—everything. Clients included Comcast, Philadelphia Eagles, University of Wisconsin-Madison, Kent State University, Texas A&M.
 //
 An elevating experience with O3 World—a digital product shop based in Fishtown, Philadelphia. Wireframes at 160/90 fit the workflow there, but wireframing at O3 World was different—reverting to the basics. Here it was less about impressing our clients and all about working with our clients. We were agile in nature and scrum-led. We had daily scrums and weekly sprint schedules. We dealt with client feedback organically and responsively, as opposed to reactively. Clients included Vertex, SEI, La Colombe, and WOVN. I also spent time at Workarea—a proprietary SaaS e-commerce platform based in Old City Philadelphia. Here we did wireframes differently, working in direct partnership with ever-ready-to-help developers. Napkin sketches, low-fidelity mockups, or just a few messages on Slack were all that was needed. The work was building out our proprietary platform which we marketed to A-list brands, using all insights and analytics toward optimizing functionality. I don't have work to show from here—I didn't save any of my napkins.
 
