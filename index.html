@@ -123,7 +123,7 @@ body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .sentence { color: #000000; }
 body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
 body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.44; color: #333333; }
+body.theme-academic .sentence.dimmed { opacity: 0.65; color: #333333; }
 body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
 body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
 body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
@@ -146,7 +146,7 @@ body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-s
 body.theme-newspaper .sentence { color: #000000; }
 body.theme-newspaper .sentence:hover { color: #000000; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
 body.theme-newspaper .sentence.active { color: #ffffff; background: #000000; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-newspaper .sentence.dimmed { opacity: 0.44; color: #333333; }
+body.theme-newspaper .sentence.dimmed { opacity: 0.65; color: #333333; }
 body.theme-newspaper .chapter-break { border-top-color: rgba(139, 69, 19, 0.25); border-bottom-color: rgba(139, 69, 19, 0.25); color: var(--accent); }
 
 /* Newspaper Context Menu */
@@ -170,10 +170,7 @@ body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45
 /* UPDATED: Split View specific - 100% Opacity for active images */
 body.layout-split .hover-image.active { opacity: 1 !important; filter: brightness(1) contrast(1); }
 
-body:not(.cursor-preview-mode) .hover-image { display: block; }
-body:not(.cursor-preview-mode) #cursorImage { display: none !important; }
-body.cursor-preview-mode .hover-image { display: none !important; }
-body.cursor-preview-mode #cursorImage { display: block !important; }
+body .hover-image { display: block; }
 
 /* ===================================
    NAVIGATION RAILS
@@ -880,29 +877,6 @@ body::after {
     border-radius: 8px; 
 }
 
-#cursorImage { 
-    position: fixed; 
-    pointer-events: none; 
-    z-index: 9999; 
-    transform: translate(-50%, -50%); 
-    opacity: 0; 
-    transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease; 
-    border-radius: 4px; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
-    width: 400px; 
-    height: 300px; 
-    object-fit: cover; 
-    display: none; 
-    top: 0; 
-    left: 0; 
-}
-#cursorImage.active { opacity: 1; }
-#cursorImage.enlarged { 
-    width: 600px; 
-    height: 450px; 
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
-}
-
 /* ===================================
    HEADER
    =================================== */
@@ -1317,7 +1291,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     gap: 8px; 
     z-index: var(--z-ui); 
     opacity: 0; 
-    animation: fadeInOut 4s ease-in-out; 
+    animation: fadeInOut 8s ease-in-out; 
     pointer-events: none; 
 }
 .scroll-hint-icon { 
@@ -1472,7 +1446,8 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
 
-    <div class="interaction-hint" id="interactionHint">Click or tap to begin</div>
+    <div class="interaction-hint" id="interactionHint">Move by touch</div>
+
     
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1490,7 +1465,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     </div>
 
     <div id="cursor" aria-hidden="true"></div>
-    <img id="cursorImage" alt="Preview" aria-hidden="true">
     
     <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
@@ -1613,7 +1587,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll · Press P · Long-press to free scroll</span>
+        <span class="scroll-hint-text">Scroll · Left / Right / Up / Down · SPC / ENT / SHFT / ESC</span>
     </div>
 
     <main class="curved">
@@ -1660,7 +1634,6 @@ const state = {
     expandedBrackets: new Set(),
     imageActive: false,
     layoutMode: 'layered',
-    previewMode: 'background',
     
     // Navigation State
     currentSentenceIndex: -1,
@@ -1679,7 +1652,6 @@ const state = {
     isTouch: false,
     lastInteractionWasTouch: false,
     scrollCooldownActive: false,
-    spacebarPressed: false,
     
     // Touch State
     touchStartY: 0,
@@ -1694,7 +1666,6 @@ const cursor = {
     targetX: 0,
     targetY: 0,
     element: null,
-    imageElement: null,
     currentImageElement: null
 };
 
@@ -2123,22 +2094,17 @@ function showImage(imageUrl, triggerElement) {
     state.currentTriggerRect = triggerElement.getBoundingClientRect();
     document.body.classList.add('image-active');
     
-    if (state.previewMode === 'cursor') {
-        cursor.imageElement.src = imageUrl;
-        cursor.imageElement.classList.add('active');
-        cursor.element.classList.add('has-image');
-    } else {
-        const hoverImage = Utils.$('#hoverImage');
-        const hoverImageImg = Utils.$('#hoverImageImg');
-        
-        if (state.imageTimeout) clearTimeout(state.imageTimeout);
-        
-        state.imageTimeout = setTimeout(() => {
-            hoverImageImg.onload = () => hoverImage.classList.add('active');
-            hoverImageImg.onerror = () => hoverImage.classList.add('active');
-            hoverImageImg.src = imageUrl;
-        }, CONFIG.IMAGE_HOVER_DELAY);
-    }
+    // Removed cursor preview check logic
+    const hoverImage = Utils.$('#hoverImage');
+    const hoverImageImg = Utils.$('#hoverImageImg');
+    
+    if (state.imageTimeout) clearTimeout(state.imageTimeout);
+    
+    state.imageTimeout = setTimeout(() => {
+        hoverImageImg.onload = () => hoverImage.classList.add('active');
+        hoverImageImg.onerror = () => hoverImage.classList.add('active');
+        hoverImageImg.src = imageUrl;
+    }, CONFIG.IMAGE_HOVER_DELAY);
 }
 
 function hideImage() {
@@ -2147,18 +2113,12 @@ function hideImage() {
     if (state.imageTimeout) clearTimeout(state.imageTimeout);
     
     hoverImage.classList.remove('active');
-    cursor.imageElement.classList.remove('active', 'enlarged');
     cursor.element.classList.remove('has-image');
     document.body.classList.remove('image-active');
     
     state.imageActive = false;
     cursor.currentImageElement = null;
     state.currentTriggerRect = null;
-}
-
-function toggleImageSize() {
-    if (!state.imageActive || state.previewMode !== 'cursor') return;
-    cursor.imageElement.classList.toggle('enlarged');
 }
 
 // ===================================
@@ -2584,10 +2544,6 @@ function updateCursor() {
     
     cursor.element.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
     
-    if (cursor.imageElement) {
-        cursor.imageElement.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
-    }
-    
     requestAnimationFrame(updateCursor);
 }
 
@@ -3005,25 +2961,29 @@ function initializeCloseHotspots() {
 // ===================================
 function initializeKeyboardControls() {
     document.addEventListener('keydown', e => {
-        if (e.code === 'Space') {
+        if (e.key === 'Space' || e.code === 'Space') {
             e.preventDefault();
-            if (!state.spacebarPressed) {
-                toggleImageSize();
-                state.spacebarPressed = true;
-            }
+            nextSentence();
+        } else if (e.key === 'Backspace') {
+            e.preventDefault();
+            previousSentence();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextChapter();
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            previousChapter();
         } else if (e.key === 'ArrowDown' || e.key === 'j') {
             e.preventDefault();
             nextSentence();
         } else if (e.key === 'ArrowUp' || e.key === 'k') {
             e.preventDefault();
             previousSentence();
-        } else if (e.key === '[') {
+        } else if (e.key === 'Shift') {
             e.preventDefault();
-            previousChapter();
-        } else if (e.key === ']') {
-            e.preventDefault();
-            nextChapter();
+            toggleLayout();
         } else if (e.key === 'l') {
+            // Keep 'l' as alternative
             toggleLayout();
         } else if (e.key.toLowerCase() === 't') {
             toggleTheme();
@@ -3042,12 +3002,6 @@ function initializeKeyboardControls() {
             } else if (state.layoutMode === 'split') {
                 toggleLayout();
             }
-        }
-    });
-    
-    document.addEventListener('keyup', e => {
-        if (e.code === 'Space') {
-            state.spacebarPressed = false;
         }
     });
 }
@@ -3074,7 +3028,7 @@ function initializeInteractionHint() {
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize cursor elements
     cursor.element = Utils.$('#cursor');
-    cursor.imageElement = Utils.$('#cursorImage');
+    // Removed cursorImage reference
     
     // Cursor tracking
     document.addEventListener('mousemove', e => {
@@ -3157,4 +3111,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
     </script>
 </body>
-</html>
+</html> 
