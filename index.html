@@ -766,7 +766,7 @@ body.theme-transitioning::after {
     display: flex; justify-content: space-between; align-items: center; pointer-events: none; 
 }
 .brand-container { position: relative; pointer-events: auto; }
-.header-right { display: flex; align-items: center; gap: 12px; }
+.header-right { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
 .brand { 
     font-family: var(--ui-font); font-size: 11px; letter-spacing: 0.08em; 
     text-transform: uppercase; color: var(--ink-3); padding: 6px 10px; border-radius: 3px; 
@@ -2247,8 +2247,6 @@ function toggleLayout() {
     document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
     // SVG icons are now controlled by CSS classes on body, no need to update className
-    document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-    setTimeout(() => document.body.style.transition = '', 500);
 }
 
 function toggleTheme() {
