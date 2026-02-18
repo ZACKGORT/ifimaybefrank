@@ -1575,7 +1575,9 @@ function trackBracketOpen() {
 // ===================================
 function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
     let isDragging = false;
+    let hasMoved = false;
     let startX, startY, initialA, initialB;
+    const DRAG_THRESHOLD = 4; // px of movement before drag activates
 
     function getInitialPos() {
         const style = window.getComputedStyle(el);
@@ -1609,8 +1611,9 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
 
     // Mouse
     el.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list')) return;
+        if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
+        hasMoved = false;
         el.style.cursor = 'grabbing';
         startX = e.clientX; startY = e.clientY;
         getInitialPos();
@@ -1621,34 +1624,42 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
         if (!isDragging) return;
         const dX = useRight ? startX - e.clientX : e.clientX - startX;
         const dY = useBottom ? startY - e.clientY : e.clientY - startY;
+        if (!hasMoved && Math.abs(e.clientX - startX) < DRAG_THRESHOLD && Math.abs(e.clientY - startY) < DRAG_THRESHOLD) return;
+        hasMoved = true;
         applyPos(initialA + dX, initialB + dY);
     });
 
-    document.addEventListener('mouseup', () => {
-        if (isDragging) { isDragging = false; el.style.cursor = ''; }
+    document.addEventListener('mouseup', (e) => {
+        if (isDragging) {
+            isDragging = false;
+            hasMoved = false;
+            el.style.cursor = '';
+        }
     });
 
     // Touch
     let tStartX, tStartY;
     el.addEventListener('touchstart', (e) => {
-        if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list')) return;
-        e.preventDefault();
+        if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
+        hasMoved = false;
         const t = e.touches[0];
         tStartX = t.clientX; tStartY = t.clientY;
         getInitialPos();
-    }, { passive: false });
+    }, { passive: true });
 
     document.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        if (e.cancelable) e.preventDefault();
         const t = e.touches[0];
+        if (!hasMoved && Math.abs(t.clientX - tStartX) < DRAG_THRESHOLD && Math.abs(t.clientY - tStartY) < DRAG_THRESHOLD) return;
+        hasMoved = true;
+        if (e.cancelable) e.preventDefault();
         const dX = useRight ? tStartX - t.clientX : t.clientX - tStartX;
         const dY = useBottom ? tStartY - t.clientY : t.clientY - tStartY;
         applyPos(initialA + dX, initialB + dY);
     }, { passive: false });
 
-    document.addEventListener('touchend', () => { isDragging = false; });
+    document.addEventListener('touchend', () => { isDragging = false; hasMoved = false; });
 }
 
 // ===================================
