@@ -337,11 +337,13 @@ body.theme-academic .k-key:hover { color: #fff; }
     .stats-widget {
         /* Float above iOS safe area */
         bottom: calc(16px + env(safe-area-inset-bottom));
-        left: 50%;
-        transform: translateX(-50%);
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         /* Reset desktop draggable positioning */
-        right: auto;
+        right: auto !important;
         cursor: default;
+        max-width: calc(100vw - 32px);
+        width: auto;
         touch-action: none;
         padding: 6px 6px 6px 10px;
         border-radius: 14px;
@@ -761,6 +763,13 @@ body.theme-academic .chapter-dropdown.dragging { border-color: rgba(0, 102, 204,
 .layout-icon.split::after { width: 10px; height: 100%; background: var(--ink-3); margin-left: 4px; opacity: 0.5; }
 .grid-toggle-btn { text-transform: uppercase; letter-spacing: 0.05em; }
 
+/* New SVG layout icon styles */
+.layout-icon-landscape, .layout-icon-portrait { stroke: var(--ink-3); transition: all 0.3s ease; }
+body.layout-layered .layout-icon-landscape { display: block; }
+body.layout-layered .layout-icon-portrait { display: none; }
+body.layout-split .layout-icon-landscape { display: none; }
+body.layout-split .layout-icon-portrait { display: block; }
+
 /* ===================================
    IMAGE GRID OVERLAY
    =================================== */
@@ -1011,7 +1020,12 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
             </button>
             <div class="layout-toggle">
                 <button id="layoutToggle" class="layout-button" aria-label="Toggle layout mode" title="Switch layout">
-                    <span class="layout-icon layered"></span>
+                    <svg class="layout-icon-landscape" style="width: 20px; height: 20px; display: block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="10" rx="2"/>
+                    </svg>
+                    <svg class="layout-icon-portrait" style="width: 20px; height: 20px; display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="7" y="2" width="10" height="20" rx="2"/>
+                    </svg>
                 </button>
             </div>
             <div class="theme-toggle">
@@ -2125,7 +2139,7 @@ function toggleLayout() {
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
-    Utils.$('.layout-icon').className = `layout-icon ${state.layoutMode}`;
+    // SVG icons are now controlled by CSS classes on body, no need to update className
     document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
     setTimeout(() => document.body.style.transition = '', 500);
 }
@@ -2204,11 +2218,27 @@ function initializeKeyboardControls() {
         if (key === 'ArrowDown' || key === 'j' || key === ' ' || key === 'Space' || key === 'ArrowRight') return Utils.$('#hudNextBtn');
         return null;
     };
+    // Get keyboard legend key element for highlighting
+    const getKeyElement = (key) => {
+        if (key === 'ArrowUp' || key === 'k') return Utils.$('#keyPrevSentence');
+        if (key === 'ArrowDown' || key === 'j') return Utils.$('#keyNextSentence');
+        if (key === 'ArrowLeft') return Utils.$('#keyPrevChapter');
+        if (key === 'ArrowRight') return Utils.$('#keyNextChapter');
+        return null;
+    };
     document.addEventListener('keydown', e => {
         const btn = getBtnForKey(e.key);
         if (btn) btn.classList.add('active-press');
         const hudBtn = getHudBtnForKey(e.key);
         if (hudBtn) hudBtn.classList.add('active-press');
+        // Highlight keyboard legend keys
+        const keyElement = getKeyElement(e.key);
+        if (keyElement) {
+            keyElement.style.background = 'var(--accent)';
+            keyElement.style.color = '#fff';
+            keyElement.style.borderColor = 'var(--accent)';
+        }
+        
         if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); nextSentence(); }
         else if (e.key === 'Backspace') { e.preventDefault(); previousSentence(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); nextChapter(); }
@@ -2229,6 +2259,13 @@ function initializeKeyboardControls() {
     document.addEventListener('keyup', e => { 
         const btn = getBtnForKey(e.key); if (btn) btn.classList.remove('active-press');
         const hudBtn = getHudBtnForKey(e.key); if (hudBtn) hudBtn.classList.remove('active-press');
+        // Remove highlight from keyboard legend keys
+        const keyElement = getKeyElement(e.key);
+        if (keyElement) {
+            keyElement.style.background = '';
+            keyElement.style.color = '';
+            keyElement.style.borderColor = '';
+        }
     });
 }
 
@@ -2287,18 +2324,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const statsWidget = document.getElementById('statsWidget');
     if (statsWidget) {
         // Only make draggable on desktop — on mobile it's a centered floating HUD
+        const updateStatsWidgetPosition = () => {
+            if (window.innerWidth <= 768) {
+                // Mobile: clear all inline positioning styles to let CSS !important rules take effect
+                statsWidget.style.left = '';
+                statsWidget.style.right = '';
+                statsWidget.style.transform = '';
+                statsWidget.style.bottom = '';
+            } else {
+                // Desktop: restore draggable positioning
+                statsWidget.style.left = statsWidget.dataset.desktopLeft || '80px';
+                statsWidget.style.transform = '';
+            }
+        };
+        
+        // Initial setup - apply immediately
         if (window.innerWidth > 768) {
             makeDraggable(statsWidget, { useRight: false, useBottom: true });
+            // Save initial desktop position
+            statsWidget.dataset.desktopLeft = statsWidget.style.left || '80px';
         }
-        // Re-evaluate on resize (e.g. dev tools opening)
+        
+        // Apply position on initial load
+        updateStatsWidgetPosition();
+        
+        // Re-evaluate on resize
         window.addEventListener('resize', Utils.debounce(() => {
-            if (window.innerWidth > 768) {
-                statsWidget.style.left = statsWidget.style.left || '80px';
-                statsWidget.style.transform = '';
-            } else {
-                statsWidget.style.left = '50%';
-                statsWidget.style.transform = 'translateX(-50%)';
-                statsWidget.style.right = 'auto';
+            if (window.innerWidth <= 768) {
+                updateStatsWidgetPosition();
+            } else if (window.innerWidth > 768) {
+                makeDraggable(statsWidget, { useRight: false, useBottom: true });
+                updateStatsWidgetPosition();
             }
         }, 200));
     }
