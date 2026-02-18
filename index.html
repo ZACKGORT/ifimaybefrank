@@ -154,6 +154,9 @@ body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45
 body.layout-split .hover-image.active { opacity: 1 !important; filter: brightness(1) contrast(1); }
 body .hover-image { display: block; }
 
+/* HIDE MOBILE RIGHT RAIL IN SPLIT VIEW */
+body.layout-split .mobile-right-rail { display: none !important; }
+
 /* ===================================
    KEYBOARD LEGEND WIDGET
    =================================== */
@@ -833,10 +836,13 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
    ROTATE WARNING
    =================================== */
 .rotate-warning { 
-    position: fixed; inset: 0; z-index: var(--z-rotate-warning); background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); 
-    display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; color: var(--accent); 
+    position: fixed; inset: 0; z-index: var(--z-rotate-warning); 
+    background: var(--bg-color); /* Theme aware background */
+    backdrop-filter: blur(10px); 
+    display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; 
+    color: var(--accent); 
 }
-.rotate-warning svg { width: 48px; height: 48px; fill: currentColor; margin-bottom: 20px; animation: rotateIcon 2s infinite ease-in-out; }
+.rotate-warning svg { width: 48px; height: 48px; fill: var(--accent); margin-bottom: 20px; animation: rotateIcon 2s infinite ease-in-out; }
 .rotate-warning p { font-family: 'Space Mono', monospace; font-size: 14px; color: var(--ink); max-width: 300px; line-height: 1.6; }
 @keyframes rotateIcon { 0% { transform: rotate(0deg); } 25% { transform: rotate(-90deg); } 75% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
 @keyframes bounce { 0%, 100% { transform: rotate(45deg) translateY(0); } 50% { transform: rotate(45deg) translateY(8px); } }
@@ -905,7 +911,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         <p>Please rotate your device to landscape for Split View.</p>
     </div>
 
-    <!-- KEYBOARD LEGEND WIDGET -->
     <div id="keyboardLegend" class="keyboard-legend" title="Drag to move">
         <div class="drag-handle">⋮⋮</div>
         <div class="k-group">
@@ -920,10 +925,8 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
 
-    <!-- STATS / MOBILE HUD WIDGET -->
     <div id="statsWidget" class="stats-widget" title="Drag to move" aria-label="Reading stats and navigation">
         <div class="stats-drag-handle">⋮⋮</div>
-        <!-- Prev button (mobile only) -->
         <button class="hud-nav-btn" id="hudPrevBtn" aria-label="Previous Sentence" title="Previous (long-press for prev chapter)">
             <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
         </button>
@@ -943,7 +946,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
             </div>
         </div>
         <div class="hud-divider"></div>
-        <!-- Next button (mobile only) -->
         <button class="hud-nav-btn" id="hudNextBtn" aria-label="Next Sentence" title="Next (long-press for next chapter)">
             <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
         </button>
@@ -957,7 +959,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     
     <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
-            <span class="lens-label">Accessibility</span>
             <div class="accessibility-controls">
                 <button class="accessibility-btn" id="accessibilityIncrease" aria-label="Increase accessibility" title="Increase">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
