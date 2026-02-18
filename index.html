@@ -554,7 +554,8 @@ body {
     background: var(--bg-color); color: var(--ink); font: 18px/1.8 'Crimson Text', Georgia, serif; 
     overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
     -webkit-tap-highlight-color: transparent; cursor: none; user-select: none; 
-    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; 
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+    transition: background-color 0.35s ease, color 0.35s ease;
 }
 body::-webkit-scrollbar { display: none; }
 body { -ms-overflow-style: none; scrollbar-width: none; }
@@ -620,6 +621,7 @@ body.hint-shown .interaction-hint { display: none; }
     opacity: calc(var(--vig-opacity) * var(--curve-k));
     transform: translateZ(0);
     will-change: opacity;
+    transition: opacity 0.35s ease;
 }
 body::after { 
     content: ""; position: fixed; inset: 0; pointer-events: none; z-index: var(--z-grain); opacity: 0.08; 
@@ -627,6 +629,10 @@ body::after {
     background-size: 120px 120px;
     transform: translateZ(0);
     will-change: transform;
+    transition: opacity 0.35s ease;
+}
+body.theme-transitioning::after {
+    opacity: 0;
 }
 
 /* ===================================
@@ -652,8 +658,8 @@ body::after {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
 }
-.stream { font-size: clamp(18px, 2.5vw, 32px); line-height: 1.8; letter-spacing: -0.01em; max-width: 100%; color: rgba(255, 255, 255, 0.85); }
-.sentence { display: inline; transition: opacity 0.3s ease, color 0.3s ease; cursor: none; position: relative; z-index: 2; letter-spacing: -0.01em; }
+.stream { font-size: clamp(18px, 2.5vw, 32px); line-height: 1.8; letter-spacing: -0.01em; max-width: 100%; color: rgba(255, 255, 255, 0.85); transition: color 0.35s ease; }
+.sentence { display: inline; transition: opacity 0.3s ease, color 0.3s ease, background 0.3s ease; cursor: none; position: relative; z-index: 2; letter-spacing: -0.01em; }
 .sentence.active { color: #fff; opacity: 1; text-shadow: 0 0 20px rgba(218, 165, 32, 0.3); background: rgba(0, 0, 0, 0.95); padding: 2px 6px; border-radius: 2px; }
 .sentence.dimmed { opacity: 0.4; color: rgba(255, 255, 255, 0.5); }
 .bullet-item, .numbered-bullet-item { display: block; margin: 0.5em 0; padding-left: 1.5em; position: relative; }
@@ -2286,11 +2292,18 @@ function toggleLayout() {
 
 function toggleTheme() {
     const body = document.body;
-    if (body.classList.contains('theme-sport')) body.classList.remove('theme-sport');
-    else if (body.classList.contains('theme-newspaper')) { body.classList.remove('theme-newspaper'); body.classList.add('theme-sport'); }
-    else body.classList.add('theme-newspaper');
-    const icon = Utils.$('.theme-icon');
-    icon.textContent = body.classList.contains('theme-sport') ? '⚡' : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
+    // Add a transitioning flag so grain/edge-blur don't flash during the swap
+    body.classList.add('theme-transitioning');
+    requestAnimationFrame(() => {
+        if (body.classList.contains('theme-sport')) body.classList.remove('theme-sport');
+        else if (body.classList.contains('theme-newspaper')) { body.classList.remove('theme-newspaper'); body.classList.add('theme-sport'); }
+        else body.classList.add('theme-newspaper');
+        const icon = Utils.$('.theme-icon');
+        icon.textContent = body.classList.contains('theme-sport') ? '⚡' : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
+        requestAnimationFrame(() => {
+            body.classList.remove('theme-transitioning');
+        });
+    });
 }
 
 // ===================================
