@@ -20,7 +20,7 @@
     <title>IFIMAYBEFRANK - Zack Gort</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
 /* ===================================
    CSS VARIABLES & THEMES
@@ -70,17 +70,17 @@ body.theme-newspaper {
     --bracket-bg: rgba(139, 69, 19, 0.03);
 }
 
-body.theme-academic {
-    --bg-color: #ffffff;
-    --ink: #000000;
-    --ink-2: #1a1a1a;
-    --ink-3: #333333;
-    --accent: #0066cc;
-    --vig-opacity: 0;
-    --edge-blur: 0px;
-    --bracket-color: #004080;
-    --bracket-hover: #0066cc;
-    --bracket-bg: rgba(0, 102, 204, 0.05);
+body.theme-sport {
+    --bg-color: #0a0a0a;
+    --ink: #f5f5f5;
+    --ink-2: #e0e0e0;
+    --ink-3: #888888;
+    --accent: #fa3c00;
+    --vig-opacity: 0.6;
+    --edge-blur: 4px;
+    --bracket-color: #cc3000;
+    --bracket-hover: #fa3c00;
+    --bracket-bg: rgba(250, 60, 0, 0.06);
 }
 
 /* ===================================
@@ -91,42 +91,74 @@ body.theme-newspaper .chapter-bar:hover { background: rgba(0, 0, 0, 0.25); }
 body.theme-newspaper .chapter-bar.active { background: var(--accent); }
 body.theme-newspaper .chapter-bar.completed { background: rgba(139, 69, 19, 0.3); }
 body.theme-newspaper .chapter-bar::after { background: rgba(245, 241, 232, 0.95); border-color: rgba(0, 0, 0, 0.12); color: var(--ink-2); }
-body.theme-academic .chapter-bar { background: rgba(0, 0, 0, 0.15); }
-body.theme-academic .chapter-bar:hover { background: rgba(0, 0, 0, 0.3); }
-body.theme-academic .chapter-bar.active { background: var(--accent); }
-body.theme-academic .chapter-bar.completed { background: rgba(0, 102, 204, 0.3); }
-body.theme-academic .chapter-bar::after { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.15); color: var(--ink-2); }
+body.theme-sport .chapter-bar { background: rgba(255, 255, 255, 0.1); }
+body.theme-sport .chapter-bar:hover { background: rgba(255, 255, 255, 0.25); }
+body.theme-sport .chapter-bar.active { background: var(--accent); }
+body.theme-sport .chapter-bar.completed { background: rgba(250, 60, 0, 0.35); }
+body.theme-sport .chapter-bar::after { background: rgba(10, 10, 10, 0.97); border-color: rgba(250, 60, 0, 0.3); color: var(--ink-2); }
 body.theme-newspaper .nav-button, body.theme-newspaper .lens-control-container, body.theme-newspaper .mobile-bottom-rail, body.theme-newspaper .mobile-right-rail { background: rgba(245, 241, 232, 0.95); border-color: rgba(0, 0, 0, 0.12); }
 body.theme-newspaper .nav-button:hover { background: rgba(139, 69, 19, 0.08); }
 body.theme-newspaper .stream { color: var(--ink) !important; }
 body.theme-newspaper .grain { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjkiIG51bU9jdGF2ZXM9IjQiLz48ZmVDb2xvck1hdHJpeCB0eXBlPSJzYXR1cmF0ZSIgdmFsdWVzPSIwIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4='); opacity: 0.3; }
 body.theme-newspaper .chapter-dropdown { background: rgba(245, 241, 232, 0.98); border-color: rgba(0, 0, 0, 0.15); }
 body.theme-newspaper .chapter-item:hover { background: rgba(139, 69, 19, 0.06); }
-body.theme-academic .nav-button, body.theme-academic .lens-control-container, body.theme-academic .mobile-bottom-rail, body.theme-academic .mobile-right-rail { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.15); }
-body.theme-academic .nav-button:hover { background: rgba(0, 102, 204, 0.08); }
-body.theme-academic .lens-slider { background: rgba(0, 0, 0, 0.15); }
-body.theme-academic .stream { color: var(--ink) !important; line-height: 1.9; }
-body.theme-academic .grain, body.theme-academic .vignette, body.theme-academic .edge-blur { display: none; }
-body.theme-academic .chapter-dropdown { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.2); }
-body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
-body.theme-academic .sentence { color: #000000; }
-body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
-body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.65; color: #333333; }
-body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
-body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
-body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
-body.theme-academic .grid-image-item { border-color: rgba(0, 0, 0, 0.2); background: #f5f5f5; }
-body.theme-academic .grid-image-item:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2); }
-body.theme-academic .accessibility-btn { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.15); }
-body.theme-academic .accessibility-btn:hover { background: rgba(0, 102, 204, 0.1); }
-body.theme-academic .level-indicator { background: rgba(0, 0, 0, 0.15); }
-body.theme-academic .level-indicator.active { background: var(--accent); }
-body.theme-academic .context-menu { background: rgba(255, 255, 255, 0.98); border-color: rgba(0, 0, 0, 0.2); }
-body.theme-academic .context-menu-item { color: var(--ink-2); }
-body.theme-academic .context-menu-item:hover { background: rgba(0, 102, 204, 0.08); color: var(--accent); }
-body.theme-academic .context-menu-item:active { background: rgba(0, 102, 204, 0.15); }
-body.theme-academic .context-menu-divider { background: rgba(0, 0, 0, 0.15); }
+body.theme-sport .nav-button, body.theme-sport .lens-control-container, body.theme-sport .mobile-bottom-rail, body.theme-sport .mobile-right-rail { background: rgba(10, 10, 10, 0.92); border-color: rgba(250, 60, 0, 0.2); }
+body.theme-sport .nav-button:hover { background: rgba(250, 60, 0, 0.12); }
+body.theme-sport .lens-slider { background: rgba(255, 255, 255, 0.15); }
+body.theme-sport .stream { color: var(--ink) !important; line-height: 1.75; font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: -0.02em; }
+body.theme-sport .grain { display: block; opacity: 0.04; }
+body.theme-sport .vignette { display: block; }
+body.theme-sport .edge-blur { display: block; }
+body.theme-sport .chapter-dropdown { background: rgba(10, 10, 10, 0.97); border-color: rgba(250, 60, 0, 0.2); }
+body.theme-sport .chapter-item:hover { background: rgba(250, 60, 0, 0.1); }
+body.theme-sport .sentence { color: var(--ink-2); font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: -0.02em; }
+body.theme-sport .sentence:hover { color: #ffffff; background: rgba(250, 60, 0, 0.12); padding: 2px 8px; border-radius: 2px; }
+body.theme-sport .sentence.active { color: #ffffff; background: var(--accent); padding: 2px 8px; border-radius: 2px; text-shadow: none; font-weight: 600; letter-spacing: -0.02em; }
+body.theme-sport .sentence.dimmed { opacity: 0.45; color: var(--ink-3); }
+body.theme-sport .chapter-break { border-top-color: rgba(250, 60, 0, 0.3); border-bottom-color: rgba(250, 60, 0, 0.3); color: var(--accent); font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: 0.12em; }
+body.theme-sport .image-grid-overlay { background: rgba(10, 10, 10, 0.98); }
+body.theme-sport .grid-chapter-title { border-bottom-color: rgba(250, 60, 0, 0.2); font-family: 'Inter', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+body.theme-sport .grid-image-item { border-color: rgba(255, 255, 255, 0.08); background: #111111; }
+body.theme-sport .grid-image-item:hover { border-color: var(--accent); box-shadow: 0 4px 24px rgba(250, 60, 0, 0.25); }
+body.theme-sport .accessibility-btn { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.12); }
+body.theme-sport .accessibility-btn:hover { background: rgba(250, 60, 0, 0.15); border-color: var(--accent); color: var(--accent); }
+body.theme-sport .level-indicator { background: rgba(255, 255, 255, 0.1); }
+body.theme-sport .level-indicator.active { background: var(--accent); }
+body.theme-sport .context-menu { background: rgba(10, 10, 10, 0.98); border-color: rgba(250, 60, 0, 0.2); }
+body.theme-sport .context-menu-item { color: var(--ink-2); font-family: 'Inter', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.02em; }
+body.theme-sport .context-menu-item:hover { background: rgba(250, 60, 0, 0.1); color: var(--accent); }
+body.theme-sport .context-menu-item:active { background: rgba(250, 60, 0, 0.18); }
+body.theme-sport .context-menu-divider { background: rgba(255, 255, 255, 0.08); }
+body.theme-sport .brand { font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; font-size: 12px; border-color: rgba(250, 60, 0, 0.25); background: rgba(250, 60, 0, 0.05); }
+body.theme-sport .brand:hover { background: rgba(250, 60, 0, 0.12); border-color: var(--accent); color: #fff; }
+body.theme-sport .chapter-dropdown-header h3 { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.1em; }
+body.theme-sport .chapter-item-title { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 13px; font-style: normal; }
+body.theme-sport .chapter-item-number { font-family: 'Inter', sans-serif; font-weight: 600; }
+body.theme-sport .stat-value { color: var(--accent); font-family: 'Inter', sans-serif; font-weight: 800; font-size: 16px; }
+body.theme-sport .stat-label { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 8px; letter-spacing: 0.1em; color: var(--ink-3); }
+body.theme-sport .stats-widget { background: rgba(10, 10, 10, 0.92); border-color: rgba(250, 60, 0, 0.2); }
+body.theme-sport .keyboard-legend { background: rgba(10, 10, 10, 0.9); border-color: rgba(250, 60, 0, 0.2); }
+body.theme-sport .k-key { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.15); color: var(--ink); font-family: 'Inter', sans-serif; font-weight: 700; }
+body.theme-sport .k-key:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+body.theme-sport .lens-label { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.1em; }
+body.theme-sport .mobile-nav-label { font-family: 'Inter', sans-serif; font-weight: 600; }
+body.theme-sport .mobile-nav-button { border-color: rgba(250, 60, 0, 0.25); }
+body.theme-sport .mobile-nav-button:active { background: rgba(250, 60, 0, 0.15); }
+body.theme-sport .interaction-hint { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.15em; }
+body.theme-sport .grid-toggle-btn { font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 0.06em; }
+body.theme-sport .scroll-hint-text { font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+body.theme-sport .chapter-break .chapter-title { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; }
+body.theme-sport .chapter-break .chapter-number { font-family: 'Inter', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+body.theme-sport ::selection { background: rgba(250, 60, 0, 0.3); color: #fff; }
+body.theme-sport .hud-nav-btn { color: var(--accent); }
+body.theme-sport .hud-nav-btn:hover { background: rgba(250, 60, 0, 0.15); border-color: rgba(250, 60, 0, 0.4); }
+body.theme-sport .nav-button { color: var(--ink-2); }
+body.theme-sport .nav-button:hover { color: var(--accent); }
+body.theme-sport .bracket-trigger { font-family: 'Inter', sans-serif; font-weight: 700; }
+body.theme-sport .image-trigger { border-bottom-color: var(--accent); }
+body.theme-sport .image-trigger:hover { color: var(--accent); }
+body.theme-sport .scroll-progress { border-color: rgba(250, 60, 0, 0.15); }
+body.theme-sport .chapter-item.active { background: rgba(250, 60, 0, 0.1); border-left-color: var(--accent); }
 body.theme-newspaper .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.12); }
 body.theme-newspaper .grid-image-item { border-color: rgba(0, 0, 0, 0.15); background: #e8e4d8; }
 body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); }
@@ -226,10 +258,10 @@ body.theme-newspaper .keyboard-legend { background: rgba(245, 241, 232, 0.85); b
 body.theme-newspaper .drag-handle { color: rgba(0,0,0,0.3); border-right-color: rgba(0,0,0,0.1); }
 body.theme-newspaper .k-key { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.15); color: #000; }
 body.theme-newspaper .k-key:hover { color: #fff; }
-body.theme-academic .keyboard-legend { background: rgba(255, 255, 255, 0.9); border-color: rgba(0, 0, 0, 0.2); }
-body.theme-academic .drag-handle { color: rgba(0,0,0,0.3); border-right-color: rgba(0,0,0,0.1); }
-body.theme-academic .k-key { background: rgba(0, 0, 0, 0.05); border-color: rgba(0, 0, 0, 0.15); color: #000; }
-body.theme-academic .k-key:hover { color: #fff; }
+body.theme-sport .keyboard-legend { background: rgba(10, 10, 10, 0.9); border-color: rgba(250, 60, 0, 0.25); }
+body.theme-sport .drag-handle { color: rgba(250,60,0,0.4); border-right-color: rgba(250,60,0,0.15); }
+body.theme-sport .k-key { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.15); color: var(--ink); }
+body.theme-sport .k-key:hover { color: #fff; }
 
 @media (max-width: 768px) { .keyboard-legend { display: none; } }
 
@@ -383,13 +415,13 @@ body.theme-newspaper .stat-label { color: var(--ink-3); }
 body.theme-newspaper .hud-nav-btn { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.12); }
 body.theme-newspaper .hud-divider { background: rgba(0,0,0,0.1); }
 
-body.theme-academic .stats-widget { background: rgba(255, 255, 255, 0.95); border-color: rgba(0, 0, 0, 0.2); }
-body.theme-academic .stats-drag-handle { color: rgba(0,0,0,0.3); border-right-color: rgba(0,0,0,0.1); }
-body.theme-academic .stat-item { border-right-color: rgba(0,0,0,0.08); }
-body.theme-academic .stat-value { color: var(--accent); }
-body.theme-academic .stat-label { color: var(--ink-3); }
-body.theme-academic .hud-nav-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); }
-body.theme-academic .hud-divider { background: rgba(0,0,0,0.1); }
+body.theme-sport .stats-widget { background: rgba(10, 10, 10, 0.92); border-color: rgba(250, 60, 0, 0.25); }
+body.theme-sport .stats-drag-handle { color: rgba(250,60,0,0.4); border-right-color: rgba(250,60,0,0.15); }
+body.theme-sport .stat-item { border-right-color: rgba(255,255,255,0.07); }
+body.theme-sport .stat-value { color: var(--accent); }
+body.theme-sport .stat-label { color: var(--ink-3); }
+body.theme-sport .hud-nav-btn { background: rgba(255,255,255,0.06); border-color: rgba(250,60,0,0.2); }
+body.theme-sport .hud-divider { background: rgba(255,255,255,0.08); }
 
 /* ===================================
    NAVIGATION RAILS
@@ -743,9 +775,9 @@ body::after {
 body.theme-newspaper .chapter-dropdown-header { cursor: grab; }
 body.theme-newspaper .dropdown-drag-handle { color: rgba(0,0,0,0.25); }
 body.theme-newspaper .chapter-dropdown.dragging { border-color: rgba(139, 69, 19, 0.4); }
-body.theme-academic .chapter-dropdown-header { cursor: grab; }
-body.theme-academic .dropdown-drag-handle { color: rgba(0,0,0,0.25); }
-body.theme-academic .chapter-dropdown.dragging { border-color: rgba(0, 102, 204, 0.4); }
+body.theme-sport .chapter-dropdown-header { cursor: grab; }
+body.theme-sport .dropdown-drag-handle { color: rgba(250,60,0,0.4); }
+body.theme-sport .chapter-dropdown.dragging { border-color: rgba(250, 60, 0, 0.5); }
 
 /* ===================================
    HEADER BUTTONS
@@ -889,6 +921,90 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     .edge-blur { backdrop-filter: none; -webkit-backdrop-filter: none; }
     * { animation: none !important; transition: none !important; }
 }
+
+/* ===================================
+   SPORT THEME — GLOBAL TYPOGRAPHY & ATMOSPHERE
+   =================================== */
+body.theme-sport {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+}
+body.theme-sport .stream {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(17px, 2.4vw, 30px);
+    line-height: 1.75;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+}
+body.theme-sport .chapter-break {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 10px;
+    padding: 1.2em 0;
+    border-top: 2px solid rgba(250, 60, 0, 0.4);
+    border-bottom: 2px solid rgba(250, 60, 0, 0.4);
+}
+body.theme-sport .preview-button,
+body.theme-sport .layout-button,
+body.theme-sport .grid-toggle-btn,
+body.theme-sport .theme-button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    font-size: 10px;
+    background: rgba(250, 60, 0, 0.06);
+    border-color: rgba(250, 60, 0, 0.2);
+    color: var(--ink-3);
+    text-transform: uppercase;
+}
+body.theme-sport .preview-button:hover,
+body.theme-sport .layout-button:hover,
+body.theme-sport .grid-toggle-btn:hover,
+body.theme-sport .theme-button:hover {
+    background: rgba(250, 60, 0, 0.15);
+    border-color: var(--accent);
+    color: #fff;
+}
+body.theme-sport .scroll-hint-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+}
+body.theme-sport .k-tooltip {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 9px;
+    background: rgba(10, 10, 10, 0.97);
+    border-color: rgba(250, 60, 0, 0.3);
+}
+body.theme-sport .mobile-progress-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+body.theme-sport .mobile-progress-fill {
+    background: var(--accent);
+}
+body.theme-sport .mobile-right-rail {
+    background: rgba(10, 10, 10, 0.92);
+    border-left-color: rgba(250, 60, 0, 0.15);
+}
+/* Sport cursor style */
+body.theme-sport #cursor {
+    background: var(--accent);
+    mix-blend-mode: normal;
+    opacity: 0.85;
+}
+/* Sport selection */
+body.theme-sport::selection,
+body.theme-sport *::selection {
+    background: rgba(250, 60, 0, 0.35);
+    color: #fff;
+}
     </style>
 </head>
 <body>
@@ -897,7 +1013,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         <div class="context-menu-item" id="ctxPrevChapter"><span class="ctx-icon">←</span><span>Previous Chapter</span></div>
         <div class="context-menu-divider"></div>
         <div class="context-menu-item" id="ctxResetProgress"><span class="ctx-icon">↑</span><span>Back to Top</span></div>
-        <div class="context-menu-item" id="ctxToggleTheme"><span class="ctx-icon" id="ctxThemeIcon">☀️</span><span id="ctxThemeText">Light Theme</span></div>
+        <div class="context-menu-item" id="ctxToggleTheme"><span class="ctx-icon" id="ctxThemeIcon">⚡</span><span id="ctxThemeText">Sport Theme</span></div>
         <div class="context-menu-divider"></div>
         <div class="context-menu-item" id="ctxCopyLink"><span class="ctx-icon">🔗</span><span>Copy Link</span></div>
         <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
@@ -1033,7 +1149,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
                 </button>
             </div>
             <div class="theme-toggle">
-                <button id="themeToggle" class="theme-button" aria-label="Toggle theme" title="Switch theme (T)">
+                <button id="themeToggle" class="theme-button" aria-label="Toggle theme" title="Switch theme: Default → Newspaper → Sport (T)">
                     <span class="theme-icon">☀️</span>
                 </button>
             </div>
@@ -2150,11 +2266,11 @@ function toggleLayout() {
 
 function toggleTheme() {
     const body = document.body;
-    if (body.classList.contains('theme-academic')) body.classList.remove('theme-academic');
-    else if (body.classList.contains('theme-newspaper')) { body.classList.remove('theme-newspaper'); body.classList.add('theme-academic'); }
+    if (body.classList.contains('theme-sport')) body.classList.remove('theme-sport');
+    else if (body.classList.contains('theme-newspaper')) { body.classList.remove('theme-newspaper'); body.classList.add('theme-sport'); }
     else body.classList.add('theme-newspaper');
     const icon = Utils.$('.theme-icon');
-    icon.textContent = body.classList.contains('theme-academic') ? '🌙' : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
+    icon.textContent = body.classList.contains('theme-sport') ? '⚡' : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
 }
 
 // ===================================
