@@ -338,12 +338,14 @@ body.theme-academic .k-key:hover { color: #fff; }
 /* ── Mobile overrides ── */
 @media (max-width: 768px) {
     .stats-widget {
-        /* Float above iOS safe area */
+        /* Float above iOS safe area — centered without transform (Safari-safe) */
         bottom: calc(16px + env(safe-area-inset-bottom));
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        /* Reset desktop draggable positioning */
-        right: auto !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: fit-content !important;
         cursor: default;
         max-width: calc(100vw - 32px);
         width: auto;
@@ -2328,10 +2330,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Only make draggable on desktop — on mobile it's a centered floating HUD
         const updateStatsWidgetPosition = () => {
             if (window.innerWidth <= 768) {
-                // Mobile: clear all inline positioning styles to let CSS !important rules take effect
-                statsWidget.style.left = '';
-                statsWidget.style.right = '';
-                statsWidget.style.transform = '';
+                // Mobile: explicitly enforce centering — don't just clear, set the values
+                // so drag code's inline styles can't win
+                statsWidget.style.left = '0';
+                statsWidget.style.right = '0';
+                statsWidget.style.transform = 'none';
+                statsWidget.style.marginLeft = 'auto';
+                statsWidget.style.marginRight = 'auto';
+                statsWidget.style.width = 'fit-content';
                 statsWidget.style.bottom = '';
             } else {
                 // Desktop: restore draggable positioning
