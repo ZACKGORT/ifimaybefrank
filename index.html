@@ -1814,7 +1814,7 @@ const parallax = {
 // ===================================
 const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
-    { id: 1, title: "Words from the Maker", startText: "This is not some grand manifesto" },
+    { id: 1, title: "Words from the Maker", startText: "I loathe to be so bold" },
     { id: 2, title: "The Early Days", startText: "I built my first computer" },
     { id: 3, title: "Suburbia Startup", startText: "Turn5 was a paradigm shift" },
     { id: 4, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
@@ -1835,7 +1835,8 @@ const imageMap = {
     'paused': 'https://i.ibb.co/BjZQ8KG/2322060064540385797-5144774570.jpg',
     'intentional': 'https://i.ibb.co/m5sNTvYX/603a967916b10d5bef5a6dd8-ZAX02712-1.webp',
     'beat': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
-    'grand': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
+
+    'I loathe to be so bold': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
     'my own way': 'https://i.ibb.co/bHsf63Q/2269150474215204867-5144774570.jpg',
     'conviction': 'https://i.ibb.co/bjCjbfbT/603a93efdfd184c21ef2d238-IMG-3352.webp',
     'curriculum vitae': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
@@ -1843,7 +1844,9 @@ const imageMap = {
     'journey materialized': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
     'eyes and mind': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp',
     'to discover': 'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg',
-    
+
+    'the moments that make up a dull day': 'https://i.ibb.co/gMDT38J5/IMG-20200527-221611-475.jpg',
+        
     'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
     'proof of concept': 'https://i.ibb.co/9HzBPc7Y/603a93eea83b1aab7a98c35b-DSC08228.webp',
     'Zack': 'https://i.ibb.co/NZ0y6Hn/2272303929273225747-5144774570.jpg',
@@ -2025,16 +2028,19 @@ Object.keys(imageMap).forEach(phrase => {
 // ===================================
 // DATA: NEW NARRATIVE CONTENT (HYBRID)
 // ===================================
-const narrative = `The year is 2026. Here we are — scrolling mindlessly through feeds optimized for monetization over mindfulness. [operational fulfillment, not emotional] Tapping endlessly through content fabricated to fade fast into the void. What if we paused? What if reading felt intentional again? Beat by beat. Beat for beat. One moment unto another.   [All em dashes in this piece were sourced from www.emdash.click]
+const narrative = `The year is 2026. Here we are — scrolling endlessly through feeds optimized for monetization over mindfulness. [operational fulfillment, not emotional] Flowing endlessly through content fabricated to fade into the void. What if we paused? What if reading felt intentional again? Beat by beat. One moment unto another. [All em dashes in this piece were sourced from www.emdash.click] 
 
-This is not some grand manifesto about the state of UX [] — but may I say, Conviction Abhors Convection by Convention. This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Facts are never facts. Truths are almost always half-lies. Capabilities become curbed. move through content that does not move you. It feels static. It feels stale.]  My career focus realized. My journey materialized. Through the eyes and mind of the beholder [The underlying mechanism that defines the user experience of this site concept is a 'stream of consciousness'] 
+
+I loathe to be so bold [This is not some grand manifesto about the state of UX] — but may I say, conviction abhors convection by convention. This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Facts are never facts. Truths are almost always half-lies. Capabilities become curbed. move through content that does not move you. It feels static. It feels stale.]  My career focus realized. My journey materialized. Through the eyes and mind of the beholder [The underlying mechanism that defines the user experience of this site concept is a 'stream of consciousness'] 
 
 //
-Truth be told, I'm building something greater than this. [] Consider what you see here a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
+Truth be told, I'm building something greater than this. [] Consider what you see here a proof of concept — if not of the final product, but of my approach. 
 //
-I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. I seek not to disrupt, but to discover.  
+But first, let me introduce myself properly.
+//
+I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. A craftsman. I seek not to disrupt, but to discover.  
 
-I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. [because when you can't afford art school tuition, you find another way] While I didn't study at university long enough to graduate, I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, examining magazines, observing the world with designer's eyes. I studied color theory through online tutorials, teaching myself to master the tools at my disposal. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [I can still pull up my original cover letter from 2007] Here I was brought on as a graphic designer, full-time, at sixteen-fifty an hour plus full benefits, a 401K, and my own cubicle. You have no idea how happy I was. This was Turn5—a garage startup in the suburbs of Philadelphia that would become my formal education.
+I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university long enough to graduate [stop-out, not drop-out], I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, flipping through magazines, and taking on client work. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [] A garage startup in the suburbs of Philadelphia that would become my formal education.
 
 Turn5 was a paradigm shift. I joined a budding home-grown startup. I was provided a brand new PC and a Canon Rebel DSLR. I became the graphic designer for all web properties, handling package design and catalogue design. I became a Product Photographer, specializing in color match and OEM quality. We photographed thousands of parts. I later pivoted to web designer, focusing on email marketing and feature design. In four years, the company grew to forty million per year. Turn5 was my education.
 //
