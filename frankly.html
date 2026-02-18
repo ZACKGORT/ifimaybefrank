@@ -123,7 +123,7 @@ body.theme-academic .chapter-item:hover { background: rgba(0, 102, 204, 0.08); }
 body.theme-academic .sentence { color: #000000; }
 body.theme-academic .sentence:hover { color: #000000; background: rgba(0, 102, 204, 0.1); padding: 2px 6px; border-radius: 2px; }
 body.theme-academic .sentence.active { color: #ffffff; background: #0066cc; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-academic .sentence.dimmed { opacity: 0.4; color: #333333; }
+body.theme-academic .sentence.dimmed { opacity: 0.65; color: #333333; }
 body.theme-academic .chapter-break { border-top-color: rgba(0, 102, 204, 0.3); border-bottom-color: rgba(0, 102, 204, 0.3); color: var(--accent); }
 body.theme-academic .image-grid-overlay { background: rgba(255, 255, 255, 0.98); }
 body.theme-academic .grid-chapter-title { border-bottom-color: rgba(0, 0, 0, 0.15); }
@@ -146,7 +146,7 @@ body.theme-newspaper .grid-image-item:hover { border-color: var(--accent); box-s
 body.theme-newspaper .sentence { color: #000000; }
 body.theme-newspaper .sentence:hover { color: #000000; background: rgba(255, 255, 255, 0.95); padding: 2px 6px; border-radius: 2px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
 body.theme-newspaper .sentence.active { color: #ffffff; background: #000000; padding: 2px 6px; border-radius: 2px; text-shadow: none; }
-body.theme-newspaper .sentence.dimmed { opacity: 0.35; color: #333333; }
+body.theme-newspaper .sentence.dimmed { opacity: 0.65; color: #333333; }
 body.theme-newspaper .chapter-break { border-top-color: rgba(139, 69, 19, 0.25); border-bottom-color: rgba(139, 69, 19, 0.25); color: var(--accent); }
 
 /* Newspaper Context Menu */
@@ -166,10 +166,11 @@ body.layout-layered .hover-image { position: absolute; left: 50%; top: 50%; }
 body.layout-split .text-layer { width: 50%; margin: 0; padding-left: 6vw; }
 body.layout-split .stream { color: rgba(255, 255, 255, 0.9); font-size: clamp(16px, 2vw, 28px); }
 body.layout-split .hover-image { position: fixed; left: 72%; top: 50%; width: 45vw; height: 34vw; }
-body:not(.cursor-preview-mode) .hover-image { display: block; }
-body:not(.cursor-preview-mode) #cursorImage { display: none !important; }
-body.cursor-preview-mode .hover-image { display: none !important; }
-body.cursor-preview-mode #cursorImage { display: block !important; }
+
+/* UPDATED: Split View specific - 100% Opacity for active images */
+body.layout-split .hover-image.active { opacity: 1 !important; filter: brightness(1) contrast(1); }
+
+body .hover-image { display: block; }
 
 /* ===================================
    NAVIGATION RAILS
@@ -543,10 +544,8 @@ body.flow-mode .sentence.active { opacity: 1; }
 body.flow-mode .sentence.revealed { opacity: 0.6; }
 body.flow-mode .text-layer { overflow-y: auto; height: 100vh; -webkit-overflow-scrolling: touch; }
 
-
-/* Split view with active image - full opacity */
-body.layout-split.image-active .sentence.dimmed { opacity: .44 !important; color: rgba(255, 255, 255, 0.9) !important; }
-
+/* UPDATED: Split View specific - Ensures visibility for non-active sentences in all themes */
+body.layout-split.image-active .sentence:not(.active) { opacity: 0.8 !important; color: var(--ink) !important; }
 
 /* ===================================
    INTERACTION HINTS
@@ -876,29 +875,6 @@ body::after {
     height: 100%; 
     object-fit: cover; 
     border-radius: 8px; 
-}
-
-#cursorImage { 
-    position: fixed; 
-    pointer-events: none; 
-    z-index: 9999; 
-    transform: translate(-50%, -50%); 
-    opacity: 0; 
-    transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease; 
-    border-radius: 4px; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
-    width: 400px; 
-    height: 300px; 
-    object-fit: cover; 
-    display: none; 
-    top: 0; 
-    left: 0; 
-}
-#cursorImage.active { opacity: 1; }
-#cursorImage.enlarged { 
-    width: 600px; 
-    height: 450px; 
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
 }
 
 /* ===================================
@@ -1315,7 +1291,7 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     gap: 8px; 
     z-index: var(--z-ui); 
     opacity: 0; 
-    animation: fadeInOut 4s ease-in-out; 
+    animation: fadeInOut 8s ease-in-out; 
     pointer-events: none; 
 }
 .scroll-hint-icon { 
@@ -1441,7 +1417,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     </style>
 </head>
 <body>
-    <!-- Context Menu -->
     <div class="context-menu" id="contextMenu" aria-hidden="true">
         <div class="context-menu-item" id="ctxNextChapter">
             <span class="ctx-icon">→</span>
@@ -1471,14 +1446,13 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
 
-    <div class="interaction-hint" id="interactionHint">Click or tap to begin</div>
+    <div class="interaction-hint" id="interactionHint">Move by touch</div>
+
     
-    <!-- Close Hotspots -->
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot rotate-close-hotspot" id="rotateCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     
-    <!-- Rotate Warning -->
     <div class="rotate-warning">
         <svg viewBox="0 0 24 24">
             <path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/>
@@ -1486,16 +1460,12 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         <p>Please rotate your device to landscape for Split View.</p>
     </div>
 
-    <!-- Image Grid Overlay -->
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
         <div class="grid-content" id="gridContent"></div>
     </div>
 
-    <!-- Custom Cursor -->
     <div id="cursor" aria-hidden="true"></div>
-    <img id="cursorImage" alt="Preview" aria-hidden="true">
     
-    <!-- Left Rail (Accessibility Controls) -->
     <div class="left-rail" aria-hidden="true">
         <div class="lens-control-container">
             <span class="lens-label">Accessibility</span>
@@ -1522,7 +1492,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
     
-    <!-- Mobile Bottom Rail -->
     <div class="mobile-bottom-rail" aria-label="Mobile navigation">
         <div class="mobile-nav-container">
             <div class="mobile-nav-group">
@@ -1548,7 +1517,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
 
-    <!-- Mobile Right Rail (Landscape) -->
     <div class="mobile-right-rail" aria-label="Mobile navigation landscape">
         <div class="mobile-nav-container">
             <div class="rail-top-group"></div>
@@ -1572,7 +1540,6 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </div>
     
-    <!-- Header -->
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
@@ -1605,11 +1572,9 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
         </div>
     </header>
 
-    <!-- Visual Effects -->
     <div class="edge-blur" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
 
-    <!-- Desktop Navigation -->
     <div class="scroll-progress" aria-label="Navigation controls">
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
@@ -1622,10 +1587,9 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
 
     <div class="scroll-hint" aria-hidden="true">
         <div class="scroll-hint-icon"></div>
-        <span class="scroll-hint-text">Scroll · Press P · Long-press to free scroll</span>
+        <span class="scroll-hint-text">Scroll · Left / Right / Up / Down · SPC / ENT / SHFT / ESC</span>
     </div>
 
-    <!-- Main Content -->
     <main class="curved">
         <div class="parallax-container">
             <div id="imageLayer" class="image-layer">
@@ -1640,1336 +1604,1446 @@ body.theme-newspaper #cursor.close-mode::before { color: var(--accent); }
     </main>
 
     <script>
-      // ===================================
-      // IFIMAYBEFRANK - Complete JavaScript
-      // ===================================
-      
-      // ===================================
-      // CONFIGURATION & CONSTANTS
-      // ===================================
-      const CONFIG = {
-          TAIL_LENGTH: 12,
-          CURSOR_SMOOTHING: 0.35,
-          IMAGE_HOVER_DELAY: 120,
-          TEXT_PARALLAX_STRENGTH: 0.03,
-          IMAGE_PARALLAX_STRENGTH: 0.15,
-          CENTER_MAGNET_STRENGTH: 0.25,
-          PARALLAX_DAMPING: 0.1,
-          SCROLL_THRESHOLD: 30,
-          SCROLL_COOLDOWN: 100,
-          LONG_PRESS_DURATION: 500,
-          FLICK_THRESHOLD: 50
-      };
-      
-      // ===================================
-      // STATE MANAGEMENT
-      // ===================================
-      const state = {
-          // UI State
-          hoveredSentence: null,
-          expandedBrackets: new Set(),
-          imageActive: false,
-          layoutMode: 'layered',
-          previewMode: 'background',
-          
-          // Navigation State
-          currentSentenceIndex: -1,
-          currentChapterIndex: 0,
-          allSentenceElements: [],
-          chapterStartIndices: [],
-          gridImages: [],
-          
-          // Mouse & Touch State
-          mouseX: 0,
-          mouseY: 0,
-          currentTriggerRect: null,
-          imageTimeout: null,
-          
-          // Interaction State
-          isTouch: false,
-          lastInteractionWasTouch: false,
-          scrollCooldownActive: false,
-          spacebarPressed: false,
-          
-          // Touch State
-          touchStartY: 0,
-          touchStartX: 0,
-          touchMoved: false
-      };
-      
-      // Cursor State
-      const cursor = {
-          x: 0,
-          y: 0,
-          targetX: 0,
-          targetY: 0,
-          element: null,
-          imageElement: null,
-          currentImageElement: null
-      };
-      
-      // Parallax State
-      const parallax = {
-          text: { x: 0, y: 0, targetX: 0, targetY: 0 },
-          image: { x: 0, y: 0, targetX: 0, targetY: 0 }
-      };
-      
-      // ===================================
-      // DATA: CHAPTERS
-      // ===================================
-      const chapters = [
-          { id: 0, title: "Introduction", startText: "UX is dead." },
-          { id: 1, title: "About Me", startText: "I think." },
-          { id: 2, title: "BNY Mellon", startText: "The client was BNY Melon" },
-          { id: 3, title: "GNC", startText: "General Nutrition Centers." },
-          { id: 4, title: "Contact", startText: "Yeah, so if any creative teams" }
-      ];
-      
-      // ===================================
-      // DATA: IMAGE MAP (Sourced from zackgort.html)
-      // ===================================
-      const imageMap = {
-          // Intro
-          'UX is dead': 'https://i.ibb.co/cSQCgNQ/work1.webp',
-          'Experience Design': 'https://i.ibb.co/kDXnBz5/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
-          'find money': 'https://i.ibb.co/XkM2hn8n/bny1.png',
-          'spend money': 'https://i.ibb.co/pBMMxY1Z/11.webp',
-          'invest money': 'https://i.ibb.co/wZY2bhKF/bny4.png',
-          'Accessibility': 'https://i.ibb.co/Z69xjMQY/tiktok-cat.gif',
-          'Creative Coding': 'https://i.ibb.co/RCnjfFv/6105c90759377c59c854a562-ZAX02142.jpg',
-          'TikTok For Business': 'https://i.ibb.co/9qFzTQH/tiktok-proto-gif.gif',
-      
-          // BNY Mellon
-          'BNY Melon': 'https://i.ibb.co/XkM2hn8n/bny1.png',
-          'Pershing X': 'https://i.ibb.co/vvMZmq94/bny2.png',
-          'Wove': 'https://i.ibb.co/xS49C07B/bny3.png',
-          'dashboard': 'https://i.ibb.co/wZY2bhKF/bny4.png',
-          'disconnected tools': 'https://i.ibb.co/FJNG1jC/14.jpg',
-          'No Artificial Intelligence': 'https://i.ibb.co/gtQLYJQ/17.jpg',
-          'legacy application': 'https://i.ibb.co/dcXH5fn/13.jpg',
-          'Product Design Lead': 'https://i.ibb.co/HGv7ymj/4.jpg',
-      
-          // GNC
-          'General Nutrition Centers': 'https://i.ibb.co/cSQCgNQY/work1.webp',
-          'GNC': 'https://i.ibb.co/pBMMxY1Z/11.webp',
-          'This is the Whey': 'https://i.ibb.co/7N2rDqrN/8.webp',
-          'e-commerce ecosystem': 'https://i.ibb.co/vx76zjgf/10.webp',
-          'market research': 'https://i.ibb.co/spHgPH6N/1.webp',
-          'design system': 'https://i.ibb.co/rft2bf0T/9.webp',
-          'mobile-first': 'https://i.ibb.co/gZ58PKyk/4.webp',
-          'Shopify': 'https://i.ibb.co/ynjWYqv8/2.webp',
-          'consumer engagement': 'https://i.ibb.co/Y7pGqJ69/5.webp',
-          'rewards program': 'https://i.ibb.co/yB4RwkTf/7.webp',
-          
-          // Contact / Misc
-          'LinkedIn': 'https://i.ibb.co/LXmyD2hq/IMG-20170104-184947-650.webp',
-          'photos of mine': 'https://i.ibb.co/mCK7D4Xb/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp'
-      };
-      
-      // Precompile regex patterns for performance
-      const phraseRegexMap = new Map();
-      Object.keys(imageMap).forEach(phrase => {
-          const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
-      });
-      
-      // ===================================
-      // DATA: NARRATIVE CONTENT
-      // ===================================
-      const narrative = `UX is dead. Long live the Product Experience. Welcome to the portfolio of Zack Gort. [Digital Experience Designer]
-      //
-      I think. I make. I think about design and data as systems. I think about business requirements and better ways to build. I think about form and function. I make things too. I've made websites for people to find money. I've made websites for people to spend money. I've made websites for people to invest money. Now, as for design, I design those experiences. [I didn't use AI to build this website, per-se. It was human blood, sweat, and copious amounts of caffeine.] My toolkit includes Figma, Adobe CS, and a whiteboard. I specialize in User Experience Design, Visual Interface Design, Accessibility Compliance, and Creative Coding. I have built for brands like TikTok For Business, BNY Mellon, and GNC.
-      //
-      The client was BNY Melon — Pershing X. [Agency: Publicis Sapient] The mission was clear: Design systems, dashboards, data, & due diligence. I served as Senior User Experience Designer and Product Design Lead (IA/flows) for Wove’s advisor experience. I partnered with the PM, Tech Lead, Data, Compliance, and designers to ship unified, cross-workflow journeys. The problem? Advisors worked across many disconnected tools; context was lost and data had to be re-entered. We sought to flatten the experience through a uniform and interconnected dashboard. [No Artificial Intelligence Here. This was only 2023 into 2024, before the buzzword craze.] It was human effort that did the due diligence of analyzing every legacy application, mapping that out, and shipping a viable modernized financial product ecosystem. The outcome? Wove launched with BNY Mellon power, scale, and security, helping advisors work faster and serve more clients.
-      //
-      General Nutrition Centers. [Agency: Elva Design Group] This is the Whey. As part of a total overhaul and overcoming a recent bankruptcy, GNC asked us to shake things up. We provided them with a modern and modular e-commerce solution through a ground-up build on the Shopify platform. My role was Senior User Experience Designer. Scope included diving deep into GNC's e-commerce ecosystem. From market research to user data to wireframe feature prototyping. We built a modular component-based design system optimized for continued optimization. It was a heavy lift with huge gains; a 12-week engagement meant tight cadence, fast-on-our-feet design strategy, and weekly executive reviews. We introduced a modern mobile-first navigation schema and retail taxonomy strategy. The result helped GNC reclaim ~$500M in annual revenue. [If the bar ain't bending, you’re just pretending.]
-      //
-      Yeah, so if any creative teams out there are hiring, hit me up on LinkedIn. Or you can just stay here and enjoy some photos of mine.`;
-      
-      // ===================================
-      // UTILITY FUNCTIONS
-      // ===================================
-      const Utils = {
-          debounce(func, wait) {
-              let timeout;
-              return function executedFunction(...args) {
-                  const later = () => {
-                      clearTimeout(timeout);
-                      func(...args);
-                  };
-                  clearTimeout(timeout);
-                  timeout = setTimeout(later, wait);
-              };
-          },
-      
-          throttle(func, limit) {
-              let inThrottle;
-              return function(...args) {
-                  if (!inThrottle) {
-                      func.apply(this, args);
-                      inThrottle = true;
-                      setTimeout(() => inThrottle = false, limit);
-                  }
-              };
-          },
-      
-          $(selector) {
-              return document.querySelector(selector);
-          },
-      
-          $$(selector) {
-              return Array.from(document.querySelectorAll(selector));
-          }
-      };
-      
-      // ===================================
-      // TOUCH DETECTION
-      // ===================================
-      function detectTouch() {
-          window.addEventListener('touchstart', () => {
-              state.lastInteractionWasTouch = true;
-              state.isTouch = true;
-          }, { passive: true });
-      
-          window.addEventListener('mousedown', () => {
-              state.lastInteractionWasTouch = false;
-              state.isTouch = false;
-          }, { passive: true });
-      }
-      
-      // ===================================
-      // NARRATIVE PARSING
-      // ===================================
-      function parseNarrative(text) {
-          const parts = [];
-          let idCounter = 0;
-          
-          const segments = text.split(/(\[|\])/);
-          let inBracket = false;
-          let bracketId = null;
-          
-          for (let i = 0; i < segments.length; i++) {
-              const segment = segments[i];
-              
-              if (segment === '[') {
-                  inBracket = true;
-                  bracketId = idCounter++;
-                  parts.push({ type: 'bracket', id: bracketId, content: '' });
-              } else if (segment === ']') {
-                  inBracket = false;
-                  bracketId = null;
-              } else if (segment.length > 0) {
-                  if (inBracket && bracketId !== null) {
-                      const bracket = parts.find(p => p.id === bracketId);
-                      if (bracket) bracket.content = segment.trim();
-                  } else {
-                      const lineSegments = segment.split(/(\/\/|\/)/);
-                      
-                      for (let j = 0; j < lineSegments.length; j++) {
-                          const lineSegment = lineSegments[j];
-                          
-                          if (lineSegment === '//') {
-                              parts.push({ type: 'line-break', id: idCounter++, breakType: 'double' });
-                          } else if (lineSegment === '/') {
-                              parts.push({ type: 'line-break', id: idCounter++, breakType: 'single' });
-                          } else if (lineSegment.trim()) {
-                              const sentences = lineSegment.split(/(?<=[.!?])\s+/);
-                              sentences.forEach(sentence => {
-                                  const trimmedSentence = sentence.trim();
-                                  if (!trimmedSentence) return;
-                                  
-                                  if (/^\(\d+\)\s/.test(trimmedSentence)) {
-                                      const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
-                                      if (match) {
-                                          parts.push({ 
-                                              type: 'numbered-bullet', 
-                                              id: idCounter++, 
-                                              number: match[1],
-                                              text: match[2].trim() 
-                                          });
-                                          return;
-                                      }
-                                  }
-                                  
-                                  if (trimmedSentence.startsWith('* ')) {
-                                      parts.push({ 
-                                          type: 'bullet', 
-                                          id: idCounter++, 
-                                          text: trimmedSentence.substring(2).trim() 
-                                      });
-                                      return;
-                                  }
-                                  
-                                  parts.push({ type: 'sentence', id: idCounter++, text: trimmedSentence });
-                              });
-                          }
-                      }
-                  }
-              }
-          }
-          return parts;
-      }
-      
-      // ===================================
-      // IMAGE HANDLING
-      // ===================================
-      function wrapImageTriggers(text) {
-          let wrapped = text;
-          for (const [phrase, url] of Object.entries(imageMap)) {
-              const regex = phraseRegexMap.get(phrase);
-              if (regex) {
-                  wrapped = wrapped.replace(regex, `<span class="image-trigger" data-image="${url}">$&</span>`);
-              }
-          }
-          return wrapped;
-      }
-      
-      function preloadImages() {
-          const imageUrls = [...new Set(Object.values(imageMap))];
-          imageUrls.forEach(url => {
-              const img = new Image();
-              img.src = url;
-          });
-      }
-      
-      function showImage(imageUrl, triggerElement) {
-          cursor.currentImageElement = triggerElement;
-          state.imageActive = true;
-          state.currentTriggerRect = triggerElement.getBoundingClientRect();
-          document.body.classList.add('image-active');
-          
-          if (state.previewMode === 'cursor') {
-              cursor.imageElement.src = imageUrl;
-              cursor.imageElement.classList.add('active');
-              cursor.element.classList.add('has-image');
-          } else {
-              const hoverImage = Utils.$('#hoverImage');
-              const hoverImageImg = Utils.$('#hoverImageImg');
-              
-              if (state.imageTimeout) clearTimeout(state.imageTimeout);
-              
-              state.imageTimeout = setTimeout(() => {
-                  hoverImageImg.onload = () => hoverImage.classList.add('active');
-                  hoverImageImg.onerror = () => hoverImage.classList.add('active');
-                  hoverImageImg.src = imageUrl;
-              }, CONFIG.IMAGE_HOVER_DELAY);
-          }
-      }
-      
-      function hideImage() {
-          const hoverImage = Utils.$('#hoverImage');
-          
-          if (state.imageTimeout) clearTimeout(state.imageTimeout);
-          
-          hoverImage.classList.remove('active');
-          cursor.imageElement.classList.remove('active', 'enlarged');
-          cursor.element.classList.remove('has-image');
-          document.body.classList.remove('image-active');
-          
-          state.imageActive = false;
-          cursor.currentImageElement = null;
-          state.currentTriggerRect = null;
-      }
-      
-      function toggleImageSize() {
-          if (!state.imageActive || state.previewMode !== 'cursor') return;
-          cursor.imageElement.classList.toggle('enlarged');
-      }
-      
-      // ===================================
-      // CHAPTER MANAGEMENT
-      // ===================================
-      function getCurrentChapter() {
-          if (state.allSentenceElements.length === 0) return 0;
-          for (let i = chapters.length - 1; i >= 0; i--) {
-              if (state.currentSentenceIndex >= state.chapterStartIndices[i]) return i;
-          }
-          return 0;
-      }
-      
-      function goToChapter(chapterId) {
-          const startIndex = state.chapterStartIndices[chapterId];
-          if (startIndex !== undefined) {
-              state.currentSentenceIndex = startIndex;
-              highlightSentence(startIndex);
-              closeChapterDropdown();
-          }
-      }
-      
-      function nextChapter() {
-          const currentChapter = getCurrentChapter();
-          if (currentChapter < chapters.length - 1) {
-              goToChapter(currentChapter + 1);
-          }
-      }
-      
-      function previousChapter() {
-          const currentChapter = getCurrentChapter();
-          if (currentChapter > 0) {
-              goToChapter(currentChapter - 1);
-          }
-      }
-      
-      // ===================================
-      // SENTENCE NAVIGATION
-      // ===================================
-      function nextSentence() {
-          if (state.allSentenceElements.length === 0) return;
-          state.currentSentenceIndex = (state.currentSentenceIndex + 1) % state.allSentenceElements.length;
-          highlightSentence(state.currentSentenceIndex);
-      }
-      
-      function previousSentence() {
-          if (state.allSentenceElements.length === 0) return;
-          state.currentSentenceIndex = (state.currentSentenceIndex - 1 + state.allSentenceElements.length) % state.allSentenceElements.length;
-          highlightSentence(state.currentSentenceIndex);
-      }
-      
-      function highlightSentence(index) {
-          const sentence = state.allSentenceElements[index];
-          if (!sentence) return;
-          
-          state.allSentenceElements.forEach(s => {
-              s.classList.remove('active');
-              s.classList.add('dimmed');
-          });
-          
-          sentence.classList.add('active');
-          sentence.classList.remove('dimmed');
-          
-          updateChapterProgress();
-          updateChapterDropdown();
-          
-          sentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          
-          const imageTrigger = sentence.querySelector('.image-trigger');
-          if (imageTrigger) {
-              const imageUrl = imageTrigger.getAttribute('data-image');
-              if (imageUrl) showImage(imageUrl, imageTrigger);
-          } else {
-              hideImage();
-          }
-      }
-      
-      function resetToBeginning() {
-          if (state.allSentenceElements.length === 0) return;
-          state.currentSentenceIndex = 0;
-          highlightSentence(0);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      
-      // ===================================
-      // UI UPDATE FUNCTIONS
-      // ===================================
-      function updateChapterProgress() {
-          const currentChapter = getCurrentChapter();
-          const bars = Utils.$$('.chapter-bar');
-          
-          bars.forEach(bar => {
-              const chapterId = parseInt(bar.dataset.chapterId);
-              bar.classList.remove('active', 'completed');
-              
-              if (chapterId === currentChapter) {
-                  bar.classList.add('active');
-              } else if (chapterId < currentChapter) {
-                  bar.classList.add('completed');
-              }
-          });
-          
-          const total = state.allSentenceElements.length;
-          const current = state.currentSentenceIndex + 1;
-          const progress = (current / total) * 100;
-          
-          const mobileProgressFill = Utils.$('#mobileProgressFill');
-          const mobileProgressText = Utils.$('#mobileProgressText');
-          const landProgressFill = Utils.$('#landProgressFill');
-          
-          if (mobileProgressFill) mobileProgressFill.style.width = `${progress}%`;
-          if (landProgressFill) landProgressFill.style.height = `${progress}%`;
-          if (mobileProgressText) mobileProgressText.textContent = `${current} / ${total}`;
-      }
-      
-      function updateChapterDropdown() {
-          const currentChapter = getCurrentChapter();
-          const items = Utils.$$('.chapter-item');
-          
-          items.forEach(item => {
-              const chapterId = parseInt(item.dataset.chapterId);
-              if (chapterId === currentChapter) {
-                  item.classList.add('active');
-                  if (isDropdownOpen()) {
-                      item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                  }
-              } else {
-                  item.classList.remove('active');
-              }
-          });
-      }
-      
-      function initializeChapterProgress() {
-          const container = Utils.$('#chapterProgressContainer');
-          if (!container) return;
-          
-          container.innerHTML = '';
-          let isRapidScrolling = false;
-          let rapidScrollTimeout = null;
-          
-          chapters.forEach(chapter => {
-              const bar = document.createElement('div');
-              bar.className = 'chapter-bar';
-              bar.dataset.chapterId = chapter.id;
-              bar.dataset.chapterTitle = `${String(chapter.id + 1).padStart(2, '0')}. ${chapter.title}`;
-              bar.title = chapter.title;
-              
-              bar.addEventListener('click', function(e) {
-                  e.stopPropagation();
-                  goToChapter(parseInt(this.dataset.chapterId));
-              });
-              
-              bar.addEventListener('mouseenter', function() {
-                  if (isRapidScrolling) {
-                      goToChapter(parseInt(this.dataset.chapterId));
-                  }
-              });
-              
-              bar.addEventListener('mousedown', function(e) {
-                  e.preventDefault();
-                  isRapidScrolling = true;
-                  if (rapidScrollTimeout) clearTimeout(rapidScrollTimeout);
-              });
-              
-              container.appendChild(bar);
-          });
-          
-          document.addEventListener('mouseup', function() {
-              if (isRapidScrolling) {
-                  isRapidScrolling = false;
-                  if (rapidScrollTimeout) clearTimeout(rapidScrollTimeout);
-                  rapidScrollTimeout = setTimeout(() => isRapidScrolling = false, 100);
-              }
-          });
-          
-          updateChapterProgress();
-      }
-      
-      function buildChapterDropdown() {
-          const dropdownList = Utils.$('#chapterDropdownList');
-          dropdownList.innerHTML = '';
-          
-          chapters.forEach(chapter => {
-              const startIndex = state.chapterStartIndices[chapter.id];
-              const endIndex = chapter.id < chapters.length - 1 
-                  ? state.chapterStartIndices[chapter.id + 1] 
-                  : state.allSentenceElements.length;
-              
-              const li = document.createElement('li');
-              li.className = 'chapter-item';
-              li.dataset.chapterId = chapter.id;
-              li.innerHTML = `
-                  <span class="chapter-item-number">${String(chapter.id + 1).padStart(2, '0')}</span>
-                  <span class="chapter-item-title">${chapter.title}</span>
-                  <span class="chapter-item-progress">${endIndex - startIndex} sentences</span>
-              `;
-              li.addEventListener('click', () => goToChapter(chapter.id));
-              dropdownList.appendChild(li);
-          });
-      }
-      
-      // ===================================
-      // DROPDOWN MANAGEMENT
-      // ===================================
-      function isDropdownOpen() {
-          return Utils.$('#chapterDropdown').classList.contains('open');
-      }
-      
-      function toggleChapterDropdown() {
-          const brand = Utils.$('#brandLogo');
-          const dropdown = Utils.$('#chapterDropdown');
-          
-          brand.classList.toggle('open');
-          dropdown.classList.toggle('open');
-          
-          if (dropdown.classList.contains('open')) {
-              updateChapterDropdown();
-          }
-      }
-      
-      function closeChapterDropdown() {
-          Utils.$('#brandLogo').classList.remove('open');
-          Utils.$('#chapterDropdown').classList.remove('open');
-      }
-      
-      // ===================================
-      // IMAGE GRID
-      // ===================================
-      function isGridOpen() {
-          return Utils.$('#imageGridOverlay').classList.contains('open');
-      }
-      
-      function toggleImageGrid() {
-          const overlay = Utils.$('#imageGridOverlay');
-          const btns = Utils.$$('.grid-toggle-btn');
-          
-          if (overlay.classList.contains('open')) {
-              overlay.classList.remove('open');
-              document.body.classList.remove('grid-open');
-              document.body.style.overflow = '';
-              btns.forEach(btn => btn.querySelector('span:last-child').textContent = '▦');
-          } else {
-              overlay.classList.add('open');
-              document.body.classList.add('grid-open');
-              document.body.style.overflow = 'hidden';
-              btns.forEach(btn => btn.querySelector('span:last-child').textContent = '✕');
-              buildImageGrid();
-          }
-      }
-      
-      function buildImageGrid() {
-          const content = Utils.$('#gridContent');
-          content.innerHTML = '';
-          
-          const imagesByChapter = {};
-          state.gridImages.forEach(imgData => {
-              if (!imagesByChapter[imgData.chapterId]) {
-                  imagesByChapter[imgData.chapterId] = [];
-              }
-              imagesByChapter[imgData.chapterId].push(imgData);
-          });
-          
-          chapters.forEach(chapter => {
-              if (imagesByChapter[chapter.id] && imagesByChapter[chapter.id].length > 0) {
-                  const section = document.createElement('div');
-                  section.className = 'grid-chapter-section';
-                  section.innerHTML = `<div class="grid-chapter-title">Chapter ${String(chapter.id + 1).padStart(2, '0')} · ${chapter.title}</div>`;
-                  
-                  const grid = document.createElement('div');
-                  grid.className = 'grid-images-container';
-                  
-                  imagesByChapter[chapter.id].forEach(imgData => {
-                      const item = document.createElement('div');
-                      item.className = 'grid-image-item';
-                      item.innerHTML = `
-                          <img src="${imgData.url}" loading="lazy" alt="Grid preview">
-                          <div class="grid-image-caption">
-                              <span class="caption-text">${imgData.text}</span>
-                          </div>
-                      `;
-                      item.addEventListener('click', () => {
-                          toggleImageGrid();
-                          state.currentSentenceIndex = imgData.index;
-                          highlightSentence(imgData.index);
-                      });
-                      grid.appendChild(item);
-                  });
-                  
-                  section.appendChild(grid);
-                  content.appendChild(section);
-              }
-          });
-      }
-      
-      // ===================================
-      // SCROLL HANDLING
-      // ===================================
-      function handleScroll(event) {
-          if (state.scrollCooldownActive) return;
-          if (event.target.closest('.chapter-dropdown-list, .image-grid-overlay')) return;
-          if (isDropdownOpen()) {
-              event.preventDefault();
-              return;
-          }
-          if (isGridOpen()) return;
-          
-          const scrollDelta = event.deltaY;
-          if (Math.abs(scrollDelta) >= CONFIG.SCROLL_THRESHOLD) {
-              state.scrollCooldownActive = true;
-              
-              if (scrollDelta > 0) nextSentence();
-              else previousSentence();
-              
-              setTimeout(() => {
-                  state.scrollCooldownActive = false;
-              }, CONFIG.SCROLL_COOLDOWN);
-          }
-          
-          event.preventDefault();
-      }
-      
-      // ===================================
-      // TOUCH HANDLING
-      // ===================================
-      function handleTouchStart(e) {
-          state.touchStartY = e.touches[0].clientY;
-          state.touchStartX = e.touches[0].clientX;
-          state.touchMoved = false;
-      }
-      
-      function handleTouchMove(e) {
-          state.touchMoved = true;
-          
-          if (e.target.closest('.chapter-dropdown-list, .image-grid-overlay')) return;
-          if (isDropdownOpen()) {
-              e.preventDefault();
-              return;
-          }
-          if (isGridOpen()) return;
-          
-          e.preventDefault();
-      }
-      
-      function handleTouchEnd(e) {
-          if (!state.touchMoved || state.scrollCooldownActive || isDropdownOpen() || isGridOpen()) return;
-          
-          const touchEndY = e.changedTouches[0].clientY;
-          const deltaY = state.touchStartY - touchEndY;
-          
-          if (Math.abs(deltaY) > CONFIG.FLICK_THRESHOLD) {
-              state.scrollCooldownActive = true;
-              
-              if (deltaY > 0) nextSentence();
-              else previousSentence();
-              
-              setTimeout(() => {
-                  state.scrollCooldownActive = false;
-              }, CONFIG.SCROLL_COOLDOWN);
-          }
-      }
-      
-      // ===================================
-      // PARALLAX UPDATES
-      // ===================================
-      function updateParallax() {
-          const viewportCenterX = window.innerWidth / 2;
-          const viewportCenterY = window.innerHeight / 2;
-          
-          const mouseOffsetX = (state.mouseX - viewportCenterX) / viewportCenterX;
-          const mouseOffsetY = (state.mouseY - viewportCenterY) / viewportCenterY;
-          
-          parallax.text.targetX = mouseOffsetX * 20 * CONFIG.TEXT_PARALLAX_STRENGTH;
-          parallax.text.targetY = mouseOffsetY * 20 * CONFIG.TEXT_PARALLAX_STRENGTH;
-          
-          if (state.imageActive && state.currentTriggerRect) {
-              const trigger = state.currentTriggerRect;
-              const triggerCenterX = trigger.left + trigger.width / 2;
-              const triggerCenterY = trigger.top + trigger.height / 2;
-              
-              const distToCenterX = (viewportCenterX - triggerCenterX) / viewportCenterX;
-              const distToCenterY = (viewportCenterY - triggerCenterY) / viewportCenterY;
-              
-              const magnetX = distToCenterX * CONFIG.CENTER_MAGNET_STRENGTH * 100;
-              const magnetY = distToCenterY * CONFIG.CENTER_MAGNET_STRENGTH * 100;
-              
-              parallax.image.targetX = (mouseOffsetX * 100 * CONFIG.IMAGE_PARALLAX_STRENGTH) - magnetX;
-              parallax.image.targetY = (mouseOffsetY * 100 * CONFIG.IMAGE_PARALLAX_STRENGTH) - magnetY;
-          } else {
-              parallax.image.targetX = 0;
-              parallax.image.targetY = 0;
-          }
-          
-          parallax.text.x += (parallax.text.targetX - parallax.text.x) * CONFIG.PARALLAX_DAMPING;
-          parallax.text.y += (parallax.text.targetY - parallax.text.y) * CONFIG.PARALLAX_DAMPING;
-          parallax.image.x += (parallax.image.targetX - parallax.image.x) * CONFIG.PARALLAX_DAMPING;
-          parallax.image.y += (parallax.image.targetY - parallax.image.y) * CONFIG.PARALLAX_DAMPING;
-          
-          const textLayer = Utils.$('#textLayer');
-          const imageLayer = Utils.$('#imageLayer');
-          const gridOverlay = Utils.$('#gridContent');
-          
-          if (textLayer) {
-              textLayer.style.transform = `translate3d(${parallax.text.x}px, ${parallax.text.y}px, 0)`;
-          }
-          if (imageLayer) {
-              imageLayer.style.transform = `translate3d(${parallax.image.x}px, ${parallax.image.y}px, 0)`;
-          }
-          if (gridOverlay) {
-              gridOverlay.style.transform = `translate3d(${parallax.image.x * 0.5}px, ${parallax.image.y * 0.5}px, 0)`;
-          }
-          
-          requestAnimationFrame(updateParallax);
-      }
-      
-      // ===================================
-      // CURSOR UPDATES
-      // ===================================
-      function updateCursor() {
-          if (!cursor.element) return;
-          
-          cursor.x += (cursor.targetX - cursor.x) * CONFIG.CURSOR_SMOOTHING;
-          cursor.y += (cursor.targetY - cursor.y) * CONFIG.CURSOR_SMOOTHING;
-          
-          cursor.element.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
-          
-          if (cursor.imageElement) {
-              cursor.imageElement.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
-          }
-          
-          requestAnimationFrame(updateCursor);
-      }
-      
-      // ===================================
-      // RENDER FUNCTION
-      // ===================================
-      function render() {
-          const streamEl = Utils.$('#stream');
-          const parsedContent = parseNarrative(narrative);
-          const fragment = document.createDocumentFragment();
-          
-          state.allSentenceElements = [];
-          state.gridImages = [];
-          
-          // Pre-calculate chapter positions by finding start text in raw narrative
-          state.chapterStartIndices = new Array(chapters.length).fill(-1);
-          chapters.forEach(chapter => {
-              const index = narrative.indexOf(chapter.startText);
-              if (index !== -1) {
-                  state.chapterStartIndices[chapter.id] = index; // Store character position temporarily
-              }
-          });
-          
-          let sentenceCount = 0;
-          let narrativePosition = 0;
-          let nextChapterIndex = 0;
-          let currentActiveChapter = 0;
-      
-          parsedContent.forEach(part => {
-              // Check if we've reached a new chapter based on narrative position
-              if (nextChapterIndex < chapters.length) {
-                  const nextChapter = chapters[nextChapterIndex];
-                  const textContent = part.type === 'sentence' || part.type === 'bullet' || part.type === 'numbered-bullet' 
-                      ? part.text 
-                      : (part.type === 'bracket' ? part.content : '');
-                  
-                  if (textContent && textContent.includes(nextChapter.startText)) {
-                      state.chapterStartIndices[nextChapter.id] = sentenceCount;
-                      
-                      const chapterBreak = document.createElement('div');
-                      chapterBreak.className = 'chapter-break';
-                      chapterBreak.dataset.chapterId = nextChapter.id;
-                      chapterBreak.innerHTML = `
-                          <span class="chapter-number">Chapter ${String(nextChapter.id + 1).padStart(2, '0')}</span>
-                          <span class="chapter-title">${nextChapter.title}</span>
-                      `;
-                      chapterBreak.addEventListener('click', () => goToChapter(nextChapter.id));
-                      fragment.appendChild(chapterBreak);
-                      
-                      currentActiveChapter = nextChapter.id;
-                      nextChapterIndex++;
-                  }
-              }
-      
-              if (part.type === 'sentence') {
-                  const span = document.createElement('span');
-                  span.className = 'sentence';
-                  span.dataset.sentenceIndex = sentenceCount;
-                  span.style.cursor = 'pointer';
-                  
-                  // Check for associated images
-                  for (const [phrase, url] of Object.entries(imageMap)) {
-                      if (part.text.includes(phrase)) {
-                          state.gridImages.push({
-                              index: sentenceCount,
-                              text: part.text,
-                              url: url,
-                              chapterId: currentActiveChapter
-                          });
-                          break;
-                      }
-                  }
-      
-                  span.innerHTML = wrapImageTriggers(part.text) + ' ';
-                  
-                  span.addEventListener('mouseenter', () => {
-                      const index = parseInt(span.dataset.sentenceIndex);
-                      state.allSentenceElements.forEach((s, i) => {
-                          s.style.opacity = i === index ? '0.7' : '0.25';
-                      });
-                  }, { passive: true });
-                  
-                  span.addEventListener('mouseleave', () => {
-                      state.allSentenceElements.forEach(s => s.style.opacity = '');
-                  }, { passive: true });
-                  
-                  span.addEventListener('click', () => {
-                      state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex);
-                      highlightSentence(state.currentSentenceIndex);
-                  });
-                  
-                  state.allSentenceElements.push(span);
-                  sentenceCount++;
-                  fragment.appendChild(span);
-              } else if (part.type === 'line-break') {
-                  const br = document.createElement('span');
-                  br.className = 'line-break-spacer';
-                  br.innerHTML = part.breakType === 'double' ? '<br><br>' : '<br>';
-                  fragment.appendChild(br);
-              } else if (part.type === 'bullet') {
-                  const li = document.createElement('div');
-                  li.className = 'sentence bullet-item';
-                  li.dataset.sentenceIndex = sentenceCount;
-                  li.style.cursor = 'pointer';
-                  
-                  for (const [phrase, url] of Object.entries(imageMap)) {
-                      if (part.text.includes(phrase)) {
-                          state.gridImages.push({
-                              index: sentenceCount,
-                              text: part.text,
-                              url: url,
-                              chapterId: currentActiveChapter
-                          });
-                          break;
-                      }
-                  }
-                  
-                  li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(part.text);
-                  
-                  li.addEventListener('mouseenter', () => {
-                      const index = parseInt(li.dataset.sentenceIndex);
-                      state.allSentenceElements.forEach((s, i) => {
-                          s.style.opacity = i === index ? '0.7' : '0.25';
-                      });
-                  }, { passive: true });
-                  
-                  li.addEventListener('mouseleave', () => {
-                      state.allSentenceElements.forEach(s => s.style.opacity = '');
-                  }, { passive: true });
-                  
-                  li.addEventListener('click', () => {
-                      state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex);
-                      highlightSentence(state.currentSentenceIndex);
-                  });
-                  
-                  state.allSentenceElements.push(li);
-                  sentenceCount++;
-                  fragment.appendChild(li);
-              } else if (part.type === 'numbered-bullet') {
-                  const li = document.createElement('div');
-                  li.className = 'sentence numbered-bullet-item';
-                  li.dataset.sentenceIndex = sentenceCount;
-                  li.style.cursor = 'pointer';
-                  
-                  for (const [phrase, url] of Object.entries(imageMap)) {
-                      if (part.text.includes(phrase)) {
-                          state.gridImages.push({
-                              index: sentenceCount,
-                              text: part.text,
-                              url: url,
-                              chapterId: currentActiveChapter
-                          });
-                          break;
-                      }
-                  }
-                  
-                  li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(part.text);
-                  
-                  li.addEventListener('mouseenter', () => {
-                      const index = parseInt(li.dataset.sentenceIndex);
-                      state.allSentenceElements.forEach((s, i) => {
-                          s.style.opacity = i === index ? '0.7' : '0.25';
-                      });
-                  }, { passive: true });
-                  
-                  li.addEventListener('mouseleave', () => {
-                      state.allSentenceElements.forEach(s => s.style.opacity = '');
-                  }, { passive: true });
-                  
-                  li.addEventListener('click', () => {
-                      state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex);
-                      highlightSentence(state.currentSentenceIndex);
-                  });
-                  
-                  state.allSentenceElements.push(li);
-                  sentenceCount++;
-                  fragment.appendChild(li);
-              } else if (part.type === 'bracket') {
-                  const trigger = document.createElement('button');
-                  trigger.className = 'bracket-trigger';
-                  trigger.textContent = '[+]';
-                  const contentId = `bracket-content-${part.id}`;
-                  trigger.setAttribute('aria-controls', contentId);
-                  
-                  const content = document.createElement('span');
-                  content.className = 'bracket-content';
-                  content.id = contentId;
-                  content.textContent = ' ' + part.content + ' ';
-                  
-                  trigger.addEventListener('click', () => {
-                      const isExpanded = content.classList.toggle('visible');
-                      trigger.textContent = isExpanded ? '[−]' : '[+]';
-                      trigger.classList.toggle('expanded');
-                      
-                      if (isExpanded) {
-                          state.expandedBrackets.add(part.id);
-                      } else {
-                          state.expandedBrackets.delete(part.id);
-                      }
-                  });
-                  
-                  fragment.appendChild(trigger);
-                  fragment.appendChild(content);
-              }
-          });
-          
-          streamEl.innerHTML = '';
-          streamEl.appendChild(fragment);
-          
-          buildChapterDropdown();
-          initializeChapterProgress();
-          
-          // Event delegation for image triggers
-          streamEl.addEventListener('mouseover', e => {
-              const trigger = e.target.closest('.image-trigger');
-              if (trigger) {
-                  const imageUrl = trigger.getAttribute('data-image');
-                  if (imageUrl) showImage(imageUrl, trigger);
-              }
-          }, { passive: true });
-          
-          streamEl.addEventListener('mouseout', e => {
-              if (e.target.closest('.image-trigger')) {
-                  hideImage();
-              }
-          }, { passive: true });
-      }
-      
-      // ===================================
-      // CONTEXT MENU
-      // ===================================
-      function initializeContextMenu() {
-          const contextMenu = Utils.$('#contextMenu');
-          
-          function showContextMenu(x, y) {
-              contextMenu.style.left = x + 'px';
-              contextMenu.style.top = y + 'px';
-              contextMenu.classList.add('open');
-              contextMenu.setAttribute('aria-hidden', 'false');
-              
-              const themeText = Utils.$('#ctxThemeText');
-              const themeIcon = Utils.$('#ctxThemeIcon');
-              
-              if (document.body.classList.contains('theme-academic')) {
-                  themeText.textContent = 'Dark Theme';
-                  themeIcon.textContent = '🌙';
-              } else if (document.body.classList.contains('theme-newspaper')) {
-                  themeText.textContent = 'Academic Theme';
-                  themeIcon.textContent = '📖';
-              } else {
-                  themeText.textContent = 'Newspaper Theme';
-                  themeIcon.textContent = '☀️';
-              }
-      
-              const rect = contextMenu.getBoundingClientRect();
-              if (rect.right > window.innerWidth) {
-                  contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
-              }
-              if (rect.bottom > window.innerHeight) {
-                  contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
-              }
-          }
-          
-          function hideContextMenu() {
-              contextMenu.classList.remove('open');
-              contextMenu.setAttribute('aria-hidden', 'true');
-          }
-          
-          // Desktop context menu - DISABLED
-          document.addEventListener('contextmenu', e => {
-              e.preventDefault(); // Just disable browser context menu
-          });
-      }
-      
-      // ===================================
-      // LAYOUT & THEME FUNCTIONS
-      // ===================================
-      function toggleLayout() {
-          state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
-          document.body.classList.remove('layout-layered', 'layout-split');
-          document.body.classList.add(`layout-${state.layoutMode}`);
-          Utils.$('.layout-icon').className = `layout-icon ${state.layoutMode}`;
-          document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-          setTimeout(() => document.body.style.transition = '', 500);
-      }
-      
-      function toggleTheme() {
-          const body = document.body;
-          if (body.classList.contains('theme-academic')) {
-              body.classList.remove('theme-academic');
-          } else if (body.classList.contains('theme-newspaper')) {
-              body.classList.remove('theme-newspaper');
-              body.classList.add('theme-academic');
-          } else {
-              body.classList.add('theme-newspaper');
-          }
-          
-          const icon = Utils.$('.theme-icon');
-          icon.textContent = body.classList.contains('theme-academic') 
-              ? '🌙' 
-              : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
-      }
-      
-      // ===================================
-      // ACCESSIBILITY CONTROLS
-      // ===================================
-      function initializeAccessibility() {
-          let accessibilityLevel = 2;
-          const accessibilityLevels = [0, 0.25, 0.5, 0.75, 1];
-          
-          function applyAccessibilityLevel(level) {
-              const value = accessibilityLevels[level];
-              document.documentElement.style.setProperty('--curve-k', value * 3);
-              document.documentElement.style.setProperty('--vig-opacity', Math.min(value * 2.4, 1.2));
-              document.documentElement.style.setProperty('--edge-blur', (value * 20) + 'px');
-              document.body.style.fontSize = ((1.3 - (value * 0.9)) * 100) + '%';
-              
-              Utils.$$('.level-indicator').forEach((el, i) => {
-                  if (i === level) {
-                      el.classList.add('active');
-                  } else {
-                      el.classList.remove('active');
-                  }
-              });
-          }
-          
-          Utils.$('#accessibilityIncrease').addEventListener('click', () => {
-              if (accessibilityLevel > 0) {
-                  applyAccessibilityLevel(--accessibilityLevel);
-              }
-          });
-          
-          Utils.$('#accessibilityDecrease').addEventListener('click', () => {
-              if (accessibilityLevel < accessibilityLevels.length - 1) {
-                  applyAccessibilityLevel(++accessibilityLevel);
-              }
-          });
-          
-          applyAccessibilityLevel(accessibilityLevel);
-      }
-      
-      // ===================================
-      // LONG PRESS SETUP
-      // ===================================
-      function setupLongPress(buttonId, normalAction, longPressAction) {
-          const button = Utils.$(`#${buttonId}`);
-          if (!button) return;
-          
-          let longPressTimer = null;
-          let longPressActivated = false;
-      
-          button.addEventListener('touchstart', () => {
-              longPressActivated = false;
-              longPressTimer = setTimeout(() => {
-                  longPressActivated = true;
-                  longPressAction();
-                  if (navigator.vibrate) navigator.vibrate(50);
-              }, CONFIG.LONG_PRESS_DURATION);
-          }, { passive: true });
-      
-          button.addEventListener('touchend', (e) => {
-              if (longPressTimer) clearTimeout(longPressTimer);
-              if (longPressActivated) {
-                  e.preventDefault();
-              }
-          }, { passive: false });
-      
-          button.addEventListener('touchcancel', () => {
-              if (longPressTimer) clearTimeout(longPressTimer);
-          }, { passive: true });
-          
-          button.addEventListener('click', (e) => {
-              if (longPressActivated) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  longPressActivated = false;
-              } else {
-                  normalAction();
-              }
-          });
-      }
-      
-      // ===================================
-      // CLOSE HOTSPOTS
-      // ===================================
-      function initializeCloseHotspots() {
-          const gridCloseHotspot = Utils.$('#gridCloseHotspot');
-          const rotateCloseHotspot = Utils.$('#rotateCloseHotspot');
-          
-          gridCloseHotspot.addEventListener('mouseenter', () => {
-              cursor.element.classList.add('close-mode');
-          });
-          gridCloseHotspot.addEventListener('mouseleave', () => {
-              cursor.element.classList.remove('close-mode');
-          });
-          gridCloseHotspot.addEventListener('click', () => {
-              toggleImageGrid();
-              cursor.element.classList.remove('close-mode');
-          });
-          
-          rotateCloseHotspot.addEventListener('mouseenter', () => {
-              cursor.element.classList.add('close-mode');
-          });
-          rotateCloseHotspot.addEventListener('mouseleave', () => {
-              cursor.element.classList.remove('close-mode');
-          });
-          rotateCloseHotspot.addEventListener('click', () => {
-              Utils.$('.rotate-warning').style.display = 'none';
-              cursor.element.classList.remove('close-mode');
-          });
-      }
-      
-      // ===================================
-      // KEYBOARD CONTROLS
-      // ===================================
-      function initializeKeyboardControls() {
-          document.addEventListener('keydown', e => {
-              if (e.code === 'Space') {
-                  e.preventDefault();
-                  if (!state.spacebarPressed) {
-                      toggleImageSize();
-                      state.spacebarPressed = true;
-                  }
-              } else if (e.key === 'ArrowDown' || e.key === 'j') {
-                  e.preventDefault();
-                  nextSentence();
-              } else if (e.key === 'ArrowUp' || e.key === 'k') {
-                  e.preventDefault();
-                  previousSentence();
-              } else if (e.key === '[') {
-                  e.preventDefault();
-                  previousChapter();
-              } else if (e.key === ']') {
-                  e.preventDefault();
-                  nextChapter();
-              } else if (e.key === 'l') {
-                  toggleLayout();
-              } else if (e.key.toLowerCase() === 't') {
-                  toggleTheme();
-              } else if (e.key === 'Home') {
-                  e.preventDefault();
-                  resetToBeginning();
-              } else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
-                  closeChapterDropdown();
-                  
-                  if (isGridOpen()) {
-                      toggleImageGrid();
-                      cursor.element.classList.remove('close-mode');
-                  } else if (Utils.$('.rotate-warning').style.display === 'flex') {
-                      Utils.$('.rotate-warning').style.display = 'none';
-                      cursor.element.classList.remove('close-mode');
-                  } else if (state.layoutMode === 'split') {
-                      toggleLayout();
-                  }
-              }
-          });
-          
-          document.addEventListener('keyup', e => {
-              if (e.code === 'Space') {
-                  state.spacebarPressed = false;
-              }
-          });
-      }
-      
-      // ===================================
-      // INTERACTION HINT
-      // ===================================
-      function initializeInteractionHint() {
-          let hintDismissed = false;
-          const dismissHint = () => {
-              if (!hintDismissed) {
-                  document.body.classList.add('hint-shown');
-                  hintDismissed = true;
-              }
-          };
-          document.addEventListener('click', dismissHint, { once: true });
-          document.addEventListener('touchstart', dismissHint, { once: true });
-          setTimeout(dismissHint, 3000);
-      }
-      
-      // ===================================
-      // MAIN INITIALIZATION
-      // ===================================
-      document.addEventListener('DOMContentLoaded', () => {
-          // Initialize cursor elements
-          cursor.element = Utils.$('#cursor');
-          cursor.imageElement = Utils.$('#cursorImage');
-          
-          // Cursor tracking
-          document.addEventListener('mousemove', e => {
-              cursor.targetX = e.clientX;
-              cursor.targetY = e.clientY;
-              state.mouseX = e.clientX;
-              state.mouseY = e.clientY;
-          }, { passive: true });
-          
-          // Cursor hover effects
-          document.addEventListener('mouseover', e => {
-              if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
-                  cursor.element.classList.add('hovering');
-                  if (e.target.matches('button, a, .grid-image-item')) {
-                      cursor.element.classList.add('pointer');
-                  }
-              }
-          }, { passive: true });
-          
-          document.addEventListener('mouseout', e => {
-              if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
-                  cursor.element.classList.remove('hovering', 'pointer');
-              }
-          }, { passive: true });
-          
-          // Initialize all modules
-          detectTouch();
-          initializeAccessibility();
-          initializeContextMenu();
-          initializeCloseHotspots();
-          initializeKeyboardControls();
-          initializeInteractionHint();
-          
-          // Event listeners
-          Utils.$('#brandLogo').addEventListener('click', toggleChapterDropdown);
-          Utils.$('#gridToggleBtn').addEventListener('click', toggleImageGrid);
-          Utils.$('#layoutToggle').addEventListener('click', toggleLayout);
-          Utils.$('#themeToggle').addEventListener('click', toggleTheme);
-          
-          Utils.$('#prevSentenceBtn').addEventListener('click', previousSentence);
-          Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
-          
-          document.addEventListener('click', e => {
-              if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target)) {
-                  closeChapterDropdown();
-              }
-          });
-          
-          window.addEventListener('wheel', handleScroll, { passive: false });
-          window.addEventListener('touchstart', handleTouchStart, { passive: true });
-          window.addEventListener('touchmove', handleTouchMove, { passive: false });
-          window.addEventListener('touchend', handleTouchEnd, { passive: true });
-          
-          // Setup long-press buttons
-          setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
-          setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
-          setupLongPress('landPrevBtn', previousSentence, previousChapter);
-          setupLongPress('landNextBtn', nextSentence, nextChapter);
-          
-          // Initialize content
-          preloadImages();
-          render();
-          
-          // Start animations
-          updateCursor();
-          updateParallax();
-          
-          // Set initial layout
-          document.body.classList.add(`layout-${state.layoutMode}`);
-          
-          // Start at first sentence
-          if (state.allSentenceElements.length > 0) {
-              state.currentSentenceIndex = 0;
-              highlightSentence(0);
-          }
-          
-          // Expose global functions for inline event handlers
-          window.toggleLayout = toggleLayout;
-          window.toggleTheme = toggleTheme;
-      });
-      </script>
+// ===================================
+// IFIMAYBEFRANK - Complete JavaScript
+// ===================================
+
+// ===================================
+// CONFIGURATION & CONSTANTS
+// ===================================
+const CONFIG = {
+    TAIL_LENGTH: 12,
+    CURSOR_SMOOTHING: 0.35,
+    IMAGE_HOVER_DELAY: 120,
+    TEXT_PARALLAX_STRENGTH: 0.03,
+    IMAGE_PARALLAX_STRENGTH: 0.15,
+    CENTER_MAGNET_STRENGTH: 0.25,
+    PARALLAX_DAMPING: 0.1,
+    SCROLL_THRESHOLD: 30,
+    SCROLL_COOLDOWN: 100,
+    LONG_PRESS_DURATION: 500,
+    FLICK_THRESHOLD: 50
+};
+
+// ===================================
+// STATE MANAGEMENT
+// ===================================
+const state = {
+    // UI State
+    hoveredSentence: null,
+    expandedBrackets: new Set(),
+    imageActive: false,
+    layoutMode: 'layered',
+    
+    // Navigation State
+    currentSentenceIndex: -1,
+    currentChapterIndex: 0,
+    allSentenceElements: [],
+    chapterStartIndices: [],
+    gridImages: [],
+    
+    // Mouse & Touch State
+    mouseX: 0,
+    mouseY: 0,
+    currentTriggerRect: null,
+    imageTimeout: null,
+    
+    // Interaction State
+    isTouch: false,
+    lastInteractionWasTouch: false,
+    scrollCooldownActive: false,
+    
+    // Touch State
+    touchStartY: 0,
+    touchStartX: 0,
+    touchMoved: false
+};
+
+// Cursor State
+const cursor = {
+    x: 0,
+    y: 0,
+    targetX: 0,
+    targetY: 0,
+    element: null,
+    currentImageElement: null
+};
+
+// Parallax State
+const parallax = {
+    text: { x: 0, y: 0, targetX: 0, targetY: 0 },
+    image: { x: 0, y: 0, targetX: 0, targetY: 0 }
+};
+
+// ===================================
+// DATA: CHAPTERS (10-CHAPTER STRUCTURE)
+// ===================================
+const chapters = [
+    { id: 0, title: "Hello World", startText: "The year is 2026" },
+    { id: 1, title: "Words from the Maker", startText: "This is not some grand manifesto" },
+    { id: 2, title: "The Early Days", startText: "I built my first computer" },
+    { id: 3, title: "Suburbia Startup", startText: "Turn5 was a paradigm shift" },
+    { id: 4, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
+    { id: 5, title: "The New York Experience", startText: "FlightPath was my gateway to New York" },
+    { id: 6, title: "Latest & Greatest", startText: "As an aside, I've been building" },
+    { id: 7, title: "About", startText: "Currently I'm seeking my next" },
+    { id: 8, title: "Conclusion", startText: "Beyond the work, there's music" },
+    { id: 9, title: "Extras", startText: "You can find my music on SoundCloud" }
+];
+
+// ===================================
+// DATA: COMPLETE IMAGE MAP
+// ===================================
+const imageMap = {
+    // Chapter 0 & 1 - Hello World / Words from the Maker
+    'scrolling': 'https://i.ibb.co/Y7wVfbfK/DSC08212.webp',
+    'void': 'https://i.ibb.co/MZbMqsT/6039d4bbb15be328fc33b54d-IMG-6478.jpg',
+    'paused': 'https://i.ibb.co/BjZQ8KG/2322060064540385797-5144774570.jpg',
+    'intentional': 'https://i.ibb.co/m5sNTvYX/603a967916b10d5bef5a6dd8-ZAX02712-1.webp',
+    'beat': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
+    'grand': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
+    'my own way': 'https://i.ibb.co/bHsf63Q/2269150474215204867-5144774570.jpg',
+    'conviction': 'https://i.ibb.co/bjCjbfbT/603a93efdfd184c21ef2d238-IMG-3352.webp',
+    'curriculum vitae': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'career focus realized': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'journey materialized': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
+    'eyes and mind': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp',
+    'to discover': 'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg',
+    
+    'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
+    'proof of concept': 'https://i.ibb.co/9HzBPc7Y/603a93eea83b1aab7a98c35b-DSC08228.webp',
+    'Zack': 'https://i.ibb.co/NZ0y6Hn/2272303929273225747-5144774570.jpg',
+    'left-handed': 'https://i.ibb.co/bgmCG0qb/ZAX02330.jpg',
+    'self-taught': 'https://i.ibb.co/M5D5vF9c/download-13.png',
+    'dreamer': 'https://i.ibb.co/hqCtdrS/ZAX02263.jpg',
+
+    // Chapter 2 - The Early Days
+    'built my first computer': 'https://i.ibb.co/fdxZdwwC/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp',
+    'installed pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
+    'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
+    'faux website concepts': 'https://i.ibb.co/DHHzHw8G/1-pu-HZ09-ELFPd-Aa-MK0-HAxq-Q.webp',
+    'Craigslist post': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'cover letter': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'original cover letter': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    'sixteen-fifty an hour': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
+    
+    // Chapter 3 - Suburbia Startup (Turn5/Xoxide & Leadnomics)
+    'Turn5': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
+    'package design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
+    'catalogue design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
+    'Product Photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
+    'color match': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'OEM quality': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'photographed thousands': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
+    'web designer': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
+    'forty million per year': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
+    'Leadnomics': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
+    'payday loans': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'free lunches': 'https://i.ibb.co/27BznHGJ/1-BNs-Ch8k1bclj-KMu1-KN-g.gif',
+    'catastrophic financial decisions': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    '95.8%': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'fishing net': 'https://i.ibb.co/RGXh3Zn6/1-HI1b-Kb-Zm-FYVgs3-My-H3wvg.webp',
+    'interactive haiku': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
+    
+    // Chapter 4 - #AgencyLife (160/90, O3, Workarea)
+    'One Sixty Over Ninety': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
+    'Interaction Designer': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
+    'Interactive Department': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
+    'grayscale wireframes': 'https://i.ibb.co/nNLv6NKB/1-CQ-4u-Tk-D6-MUBWABKw-JIZg-A.webp',
+    'mega menus': 'https://i.ibb.co/pBYP6wt8/1-HXIU3nxu-ZGq-Ne-Ef3-Wv-Lf-MQ.webp',
+    'hamburger icon': 'https://i.ibb.co/s9DPSGLM/1-Vf-C4i592d-OFh-Rbeo-C22ikw.webp',
+    'O3 World': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'scrum led': 'https://i.ibb.co/fdPcvQHJ/1-H-0uci-Bq6-4k-OUn1-BV-hpg.webp',
+    'daily scrums': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
+    'Workarea': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'proprietary SaaS': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'napkin sketches': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
+    'A-list brands': 'https://i.ibb.co/840YDJMT/1-6ft-VCi9-Pi-L1q47-Vskw-Mb-WA.webp',
+    
+    // Chapter 5 - The New York Experience
+    'FlightPath': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'pharmaceutical': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
+    'WCAG': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
+    'LiveArea': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'UX Manager': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'one-point-two million': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'two-thirty-five per hour': 'https://i.ibb.co/VYpfVW1J/1-q6-XH2u-HTIVh-Nd-NY0ab-XW3g.webp',
+    'Cards Against Bad UX': 'https://i.ibb.co/KxyvFKmq/1-P4-Gyqav-HMmzp-A-Ehqy9g-w.webp',
+    'guest user': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'content manager': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
+    'Elva Design Group': 'https://i.ibb.co/cSQCgNQY/work1.webp',
+    'GNC': 'https://i.ibb.co/7N2rDqrN/8.webp',
+    'mobile-first navigation': 'https://i.ibb.co/vx76zjgf/10.webp',
+    'modernized and optimized': 'https://i.ibb.co/cSQCgNQY/work1.webp',
+    'Huge': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'single user flow': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'siloed': 'https://i.ibb.co/7JSWc10M/1-p-XU6-Sp-Y7-Mx-MKiyf-VI-976g.gif',
+    'Code and Theory': 'https://i.ibb.co/jP8rS95G/1-5g-Mvv7027-cm7r0vm-IDy1-A.webp',
+    'Senior Designer': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'ACD': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'Directly Responsible Individual': 'https://i.ibb.co/99qqJkRJ/1-aso-Tm-Z5c-V3-Zkodr-Mcu-Yjig.webp',
+    'Publicis Sapient': 'https://i.ibb.co/XkM2hn8n/bny1.png',
+    'Digital Transformation': 'https://i.ibb.co/vvMZmq94/bny2.png',
+    'BNY Mellon': 'https://i.ibb.co/xS49C07B/bny3.png',
+    'Team Lead': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
+    'exhaustive research': 'https://i.ibb.co/XrpnL50W/1-x-Qoqr-V021-PFk0sxts5-AWAg.webp',
+    'client workshops': 'https://i.ibb.co/XfXGRWZ5/1-RTEI5a-Ccw31fj-Fzqj-Bg-FEg.webp',
+    'consistent presence': 'https://i.ibb.co/fdW3K2gp/1-1gjr-Eff-Bio-JYo-EAv-MWHf-KQ.webp',
+    'laid off': 'https://i.ibb.co/jkpcGvMF/1-f-TX-d-BN7l7of-M3nf-KU7p8g.webp',
+    
+    // Low Voltage / The Twist
+    'low voltage networking': 'https://i.ibb.co/sJkpkV9Q/1-l4jg-O1-4g-Ey-Wy-IBEQZho0g.webp',
+    'RJ45': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    '30–45 seconds': 'https://i.ibb.co/ZR7Tb6YW/1-b-Q-s-X24b-Qk-Utx50-Q5j-MZNg.webp',
+    'Run cables': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'security systems': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'cable management': 'https://i.ibb.co/fdvw7XLN/1-PGk-VR2s-OAfc-Kk5kk-Trn-Qdw.webp',
+    'twist parity': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    
+    // Chapter 6 - Latest & Greatest (intoview.pro)
+    'intoview.pro': 'https://i.ibb.co/ym1z1pyb/DSC05994.webp',
+    'note-taking app': 'https://i.ibb.co/qLWQC0cN/DSC08358.webp',
+    'kanban': 'https://i.ibb.co/xSCsZcyn/wmzWGlaw.webp',
+    'emdash.click': 'https://i.ibb.co/0p7Ktz5L/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
+    'em dash utility': 'https://i.ibb.co/0p7Ktz5L/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
+    
+    // Chapter 7 & 8 - About / Conclusion
+    'sees potential': 'https://i.ibb.co/4Rfyq6Z8/1-S3-L6-fci-CRNsv-Vq-Pk8-NRA.webp',
+    'systems thinking': 'https://i.ibb.co/4wtq5p9V/1-g-C-cm-PMo-CAMgckq051lw-Zg.webp',
+    'hands-on prototyping': 'https://i.ibb.co/NdwrPWfV/1-Na-ZV6rc-Ew-RT55p-R12-BY0jg.webp',
+    'bridge design and development': 'https://i.ibb.co/2YMPHshQ/1-3gn-Cq0a4-Kb-Y8-MGJy-VKy-P-A.webp',
+    'guitar': 'https://i.ibb.co/MyqYv5cS/1-RLgidsi-DWtxpf-Y4y52-WLWA.webp',
+    'photographs': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
+    'Wolfgang': 'https://i.ibb.co/tTTgw7Md/1-q-zg-Zh-Kn-Cs6ab-K8-CIp-E00-Q.webp',
+    'pink onesie': 'https://i.ibb.co/psftCmn/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'AI': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
+    'uplift imagination': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp'
+};
+
+// Precompile regex patterns for performance
+const phraseRegexMap = new Map();
+Object.keys(imageMap).forEach(phrase => {
+    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+});
+
+// ===================================
+// DATA: NARRATIVE CONTENT (HYBRID)
+// ===================================
+const narrative = `The year is 2026. Here we are — scrolling mindlessly through feeds optimized for monetization over mindfulness. [operational fulfillment, not emotional] Tapping endlessly through content fabricated to fade fast into the void. What if we paused? What if reading felt intentional again? Beat by beat. Beat for beat. One moment unto another.   [All em dashes in this piece were sourced from www.emdash.click]
+
+This is not some grand manifesto about the state of UX [] — but may I say, Conviction Abhors Convection by Convention. This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Facts are never facts. Truths are almost always half-lies. Capabilities become curbed. move through content that does not move you. It feels static. It feels stale.]  My career focus realized. My journey materialized. Through the eyes and mind of the beholder [The underlying mechanism that defines the user experience of this site concept is a 'stream of consciousness'] 
+
+//
+Truth be told, I'm building something greater than this. [] Consider what you see here a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
+//
+I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. I seek not to disrupt, but to discover.  
+
+I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. [because when you can't afford art school tuition, you find another way] While I didn't study at university long enough to graduate, I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, examining magazines, observing the world with designer's eyes. I studied color theory through online tutorials, teaching myself to master the tools at my disposal. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [I can still pull up my original cover letter from 2007] Here I was brought on as a graphic designer, full-time, at sixteen-fifty an hour plus full benefits, a 401K, and my own cubicle. You have no idea how happy I was. This was Turn5—a garage startup in the suburbs of Philadelphia that would become my formal education.
+
+Turn5 was a paradigm shift. I joined a budding home-grown startup. I was provided a brand new PC and a Canon Rebel DSLR. I became the graphic designer for all web properties, handling package design and catalogue design. I became a Product Photographer, specializing in color match and OEM quality. We photographed thousands of parts. I later pivoted to web designer, focusing on email marketing and feature design. In four years, the company grew to forty million per year. Turn5 was my education.
+//
+Leadnomics was shifty. We focused on lead generation for payday loans. I helped facilitate high-interest loans for desperate people. But the perks were great — free lunches and flexible work. My job was to make catastrophic financial decisions feel intuitive. I achieved a 95.8% conversion rate using responsive design and rigorous testing. We fashioned a hell of a fishing net. Business is necessity, not idealism.
+//
+Recovering from an injury, I spent my downtime learning to code — HTML, CSS, and JavaScript. I built an interactive haiku to prove my skills. This was my gateway to agency life.
+
+One Sixty Over Ninety hired me as an Interaction Designer in Center City, Philadelphia. I took a pay cut to join their new Interactive Department. We worked long nights and weekends. We explored grayscale wireframes, mega menus, and debated the hamburger icon. Clients included Comcast, Kent State, and the Philadelphia Eagles. I learned the hard realities of agency life.
+//
+O3 World was an elevating experience. We were agile in nature and scrum led. We used daily scrums to manage projects for clients like Vertex and La Colombe. Later, at Workarea, I worked on a proprietary SaaS platform. We skipped high-fidelity mockups for napkin sketches and direct collaboration with developers. We built a platform for A-list brands.
+//
+FlightPath was my gateway to New York. Emerging from bankruptcy, the agency served the pharmaceutical sector. I worked on rigorous WCAG compliance for clients like Merck. I was let go after exactly one year, having accomplished my goal of breaking into the NYC market.
+//
+LiveArea was a paradigm shift. As a UX Manager, I handled contracts worth one-point-two million at a rate of two-thirty-five per hour. I created "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
+//
+At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema. We didn't have time for perfection, but we successfully modernized and optimized their online experience.
+//
+At Huge, teams were massive. I was responsible for a single user flow, unaware of the other designers on the project. To say we were siloed would be an understatement.
+//
+At Code and Theory, I was hired as a Senior Designer with sights on ACD. I quickly proved my worth. But leadership churn and a lack of support made it a challenging experience. I acted as a Directly Responsible Individual for UX and strategy. I learned hard lessons about large agencies.
+//
+Enter Publicis Sapient. I spent a year working on Digital Transformation for BNY Mellon. I became the de facto Team Lead, driving exhaustive research and client workshops. Despite my consistent presence and hard work securing a contract extension, I was laid off. I was just a number on a spreadsheet.
+//
+Come on baby, let's do the twist. I pivoted to low voltage networking. I learned to terminate an RJ45 in 30–45 seconds. I run cables, install security systems, and manage cable management. It requires specific twist parity. I'm using different parts of my brain, but I still have mouths to feed.
+
+As an aside, I've been building. I repurposed intoview.pro as a platform for creative exploration. I built a note-taking app and a kanban board. I created emdash.click because the world needed it. These aren't just portfolio pieces; they are functioning products that prove I can build.
+
+Currently I'm seeking my next full-time role. I want work that matters with people who care. I offer systems thinking and hands-on prototyping. I bridge design and development. I think. I make.
+
+Beyond the work, there's music. I play guitar left-handed. I take photographs of New York. I have a dog named Wolfgang. I once wore a pink onesie to this country. These details make the whole picture.
+//
+I'm not worried about AI taking our jobs. My talent is presenting ideas that uplift imagination. I do this with capable hands. [I think different]
+
+You can find my music on SoundCloud. My photography lives on Instagram. My full portfolio is at zackgort.com. Thanks for reading one sentence at a time.`;
+
+// ===================================
+// UTILITY FUNCTIONS
+// ===================================
+const Utils = {
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+
+    throttle(func, limit) {
+        let inThrottle;
+        return function(...args) {
+            if (!inThrottle) {
+                func.apply(this, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    },
+
+    $(selector) {
+        return document.querySelector(selector);
+    },
+
+    $$(selector) {
+        return Array.from(document.querySelectorAll(selector));
+    }
+};
+
+// ===================================
+// TOUCH DETECTION
+// ===================================
+function detectTouch() {
+    window.addEventListener('touchstart', () => {
+        state.lastInteractionWasTouch = true;
+        state.isTouch = true;
+    }, { passive: true });
+
+    window.addEventListener('mousedown', () => {
+        state.lastInteractionWasTouch = false;
+        state.isTouch = false;
+    }, { passive: true });
+}
+
+// ===================================
+// NARRATIVE PARSING
+// ===================================
+function parseNarrative(text) {
+    const parts = [];
+    let idCounter = 0;
+    
+    const segments = text.split(/(\[|\])/);
+    let inBracket = false;
+    let bracketId = null;
+    
+    for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i];
+        
+        if (segment === '[') {
+            inBracket = true;
+            bracketId = idCounter++;
+            parts.push({ type: 'bracket', id: bracketId, content: '' });
+        } else if (segment === ']') {
+            inBracket = false;
+            bracketId = null;
+        } else if (segment.length > 0) {
+            if (inBracket && bracketId !== null) {
+                const bracket = parts.find(p => p.id === bracketId);
+                if (bracket) bracket.content = segment.trim();
+            } else {
+                const lineSegments = segment.split(/(\/\/|\/)/);
+                
+                for (let j = 0; j < lineSegments.length; j++) {
+                    const lineSegment = lineSegments[j];
+                    
+                    if (lineSegment === '//') {
+                        parts.push({ type: 'line-break', id: idCounter++, breakType: 'double' });
+                    } else if (lineSegment === '/') {
+                        parts.push({ type: 'line-break', id: idCounter++, breakType: 'single' });
+                    } else if (lineSegment.trim()) {
+                        const sentences = lineSegment.split(/(?<=[.!?])\s+/);
+                        sentences.forEach(sentence => {
+                            const trimmedSentence = sentence.trim();
+                            if (!trimmedSentence) return;
+                            
+                            if (/^\(\d+\)\s/.test(trimmedSentence)) {
+                                const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
+                                if (match) {
+                                    parts.push({ 
+                                        type: 'numbered-bullet', 
+                                        id: idCounter++, 
+                                        number: match[1],
+                                        text: match[2].trim() 
+                                    });
+                                    return;
+                                }
+                            }
+                            
+                            if (trimmedSentence.startsWith('* ')) {
+                                parts.push({ 
+                                    type: 'bullet', 
+                                    id: idCounter++, 
+                                    text: trimmedSentence.substring(2).trim() 
+                                });
+                                return;
+                            }
+                            
+                            parts.push({ type: 'sentence', id: idCounter++, text: trimmedSentence });
+                        });
+                    }
+                }
+            }
+        }
+    }
+    return parts;
+}
+
+// ===================================
+// IMAGE HANDLING
+// ===================================
+function wrapImageTriggers(text) {
+    let wrapped = text;
+    for (const [phrase, url] of Object.entries(imageMap)) {
+        const regex = phraseRegexMap.get(phrase);
+        if (regex) {
+            wrapped = wrapped.replace(regex, `<span class="image-trigger" data-image="${url}">$&</span>`);
+        }
+    }
+    return wrapped;
+}
+
+function preloadImages() {
+    const imageUrls = [...new Set(Object.values(imageMap))];
+    imageUrls.forEach(url => {
+        const img = new Image();
+        img.src = url;
+    });
+}
+
+function showImage(imageUrl, triggerElement) {
+    cursor.currentImageElement = triggerElement;
+    state.imageActive = true;
+    state.currentTriggerRect = triggerElement.getBoundingClientRect();
+    document.body.classList.add('image-active');
+    
+    // Removed cursor preview check logic
+    const hoverImage = Utils.$('#hoverImage');
+    const hoverImageImg = Utils.$('#hoverImageImg');
+    
+    if (state.imageTimeout) clearTimeout(state.imageTimeout);
+    
+    state.imageTimeout = setTimeout(() => {
+        hoverImageImg.onload = () => hoverImage.classList.add('active');
+        hoverImageImg.onerror = () => hoverImage.classList.add('active');
+        hoverImageImg.src = imageUrl;
+    }, CONFIG.IMAGE_HOVER_DELAY);
+}
+
+function hideImage() {
+    const hoverImage = Utils.$('#hoverImage');
+    
+    if (state.imageTimeout) clearTimeout(state.imageTimeout);
+    
+    hoverImage.classList.remove('active');
+    cursor.element.classList.remove('has-image');
+    document.body.classList.remove('image-active');
+    
+    state.imageActive = false;
+    cursor.currentImageElement = null;
+    state.currentTriggerRect = null;
+}
+
+// ===================================
+// CHAPTER MANAGEMENT
+// ===================================
+function getCurrentChapter() {
+    if (state.allSentenceElements.length === 0) return 0;
+    for (let i = chapters.length - 1; i >= 0; i--) {
+        if (state.currentSentenceIndex >= state.chapterStartIndices[i]) return i;
+    }
+    return 0;
+}
+
+function goToChapter(chapterId) {
+    const startIndex = state.chapterStartIndices[chapterId];
+    if (startIndex !== undefined) {
+        state.currentSentenceIndex = startIndex;
+        highlightSentence(startIndex);
+        closeChapterDropdown();
+    }
+}
+
+function nextChapter() {
+    const currentChapter = getCurrentChapter();
+    if (currentChapter < chapters.length - 1) {
+        goToChapter(currentChapter + 1);
+    }
+}
+
+function previousChapter() {
+    const currentChapter = getCurrentChapter();
+    if (currentChapter > 0) {
+        goToChapter(currentChapter - 1);
+    }
+}
+
+// ===================================
+// SENTENCE NAVIGATION
+// ===================================
+function nextSentence() {
+    if (state.allSentenceElements.length === 0) return;
+    state.currentSentenceIndex = (state.currentSentenceIndex + 1) % state.allSentenceElements.length;
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function previousSentence() {
+    if (state.allSentenceElements.length === 0) return;
+    state.currentSentenceIndex = (state.currentSentenceIndex - 1 + state.allSentenceElements.length) % state.allSentenceElements.length;
+    highlightSentence(state.currentSentenceIndex);
+}
+
+function highlightSentence(index) {
+    const sentence = state.allSentenceElements[index];
+    if (!sentence) return;
+    
+    state.allSentenceElements.forEach(s => {
+        s.classList.remove('active');
+        s.classList.add('dimmed');
+    });
+    
+    sentence.classList.add('active');
+    sentence.classList.remove('dimmed');
+    
+    updateChapterProgress();
+    updateChapterDropdown();
+    
+    sentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    const imageTrigger = sentence.querySelector('.image-trigger');
+    if (imageTrigger) {
+        const imageUrl = imageTrigger.getAttribute('data-image');
+        if (imageUrl) showImage(imageUrl, imageTrigger);
+    } else {
+        hideImage();
+    }
+}
+
+function resetToBeginning() {
+    if (state.allSentenceElements.length === 0) return;
+    state.currentSentenceIndex = 0;
+    highlightSentence(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===================================
+// UI UPDATE FUNCTIONS
+// ===================================
+function updateChapterProgress() {
+    const currentChapter = getCurrentChapter();
+    const bars = Utils.$$('.chapter-bar');
+    
+    bars.forEach(bar => {
+        const chapterId = parseInt(bar.dataset.chapterId);
+        bar.classList.remove('active', 'completed');
+        
+        if (chapterId === currentChapter) {
+            bar.classList.add('active');
+        } else if (chapterId < currentChapter) {
+            bar.classList.add('completed');
+        }
+    });
+    
+    const total = state.allSentenceElements.length;
+    const current = state.currentSentenceIndex + 1;
+    const progress = (current / total) * 100;
+    
+    const mobileProgressFill = Utils.$('#mobileProgressFill');
+    const mobileProgressText = Utils.$('#mobileProgressText');
+    const landProgressFill = Utils.$('#landProgressFill');
+    
+    if (mobileProgressFill) mobileProgressFill.style.width = `${progress}%`;
+    if (landProgressFill) landProgressFill.style.height = `${progress}%`;
+    if (mobileProgressText) mobileProgressText.textContent = `${current} / ${total}`;
+}
+
+function updateChapterDropdown() {
+    const currentChapter = getCurrentChapter();
+    const items = Utils.$$('.chapter-item');
+    
+    items.forEach(item => {
+        const chapterId = parseInt(item.dataset.chapterId);
+        if (chapterId === currentChapter) {
+            item.classList.add('active');
+            if (isDropdownOpen()) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+function initializeChapterProgress() {
+    const container = Utils.$('#chapterProgressContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    let isRapidScrolling = false;
+    let rapidScrollTimeout = null;
+    
+    chapters.forEach(chapter => {
+        const bar = document.createElement('div');
+        bar.className = 'chapter-bar';
+        bar.dataset.chapterId = chapter.id;
+        bar.dataset.chapterTitle = `${String(chapter.id + 1).padStart(2, '0')}. ${chapter.title}`;
+        bar.title = chapter.title;
+        
+        bar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            goToChapter(parseInt(this.dataset.chapterId));
+        });
+        
+        bar.addEventListener('mouseenter', function() {
+            if (isRapidScrolling) {
+                goToChapter(parseInt(this.dataset.chapterId));
+            }
+        });
+        
+        bar.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            isRapidScrolling = true;
+            if (rapidScrollTimeout) clearTimeout(rapidScrollTimeout);
+        });
+        
+        container.appendChild(bar);
+    });
+    
+    document.addEventListener('mouseup', function() {
+        if (isRapidScrolling) {
+            isRapidScrolling = false;
+            if (rapidScrollTimeout) clearTimeout(rapidScrollTimeout);
+            rapidScrollTimeout = setTimeout(() => isRapidScrolling = false, 100);
+        }
+    });
+    
+    updateChapterProgress();
+}
+
+function buildChapterDropdown() {
+    const dropdownList = Utils.$('#chapterDropdownList');
+    dropdownList.innerHTML = '';
+    
+    chapters.forEach(chapter => {
+        const startIndex = state.chapterStartIndices[chapter.id];
+        const endIndex = chapter.id < chapters.length - 1 
+            ? state.chapterStartIndices[chapter.id + 1] 
+            : state.allSentenceElements.length;
+        
+        const li = document.createElement('li');
+        li.className = 'chapter-item';
+        li.dataset.chapterId = chapter.id;
+        li.innerHTML = `
+            <span class="chapter-item-number">${String(chapter.id + 1).padStart(2, '0')}</span>
+            <span class="chapter-item-title">${chapter.title}</span>
+            <span class="chapter-item-progress">${endIndex - startIndex} sentences</span>
+        `;
+        li.addEventListener('click', () => goToChapter(chapter.id));
+        dropdownList.appendChild(li);
+    });
+}
+
+// ===================================
+// DROPDOWN MANAGEMENT
+// ===================================
+function isDropdownOpen() {
+    return Utils.$('#chapterDropdown').classList.contains('open');
+}
+
+function toggleChapterDropdown() {
+    const brand = Utils.$('#brandLogo');
+    const dropdown = Utils.$('#chapterDropdown');
+    
+    brand.classList.toggle('open');
+    dropdown.classList.toggle('open');
+    
+    if (dropdown.classList.contains('open')) {
+        updateChapterDropdown();
+    }
+}
+
+function closeChapterDropdown() {
+    Utils.$('#brandLogo').classList.remove('open');
+    Utils.$('#chapterDropdown').classList.remove('open');
+}
+
+// ===================================
+// IMAGE GRID
+// ===================================
+function isGridOpen() {
+    return Utils.$('#imageGridOverlay').classList.contains('open');
+}
+
+function toggleImageGrid() {
+    const overlay = Utils.$('#imageGridOverlay');
+    const btns = Utils.$$('.grid-toggle-btn');
+    
+    if (overlay.classList.contains('open')) {
+        overlay.classList.remove('open');
+        document.body.classList.remove('grid-open');
+        document.body.style.overflow = '';
+        btns.forEach(btn => btn.querySelector('span:last-child').textContent = '▦');
+    } else {
+        overlay.classList.add('open');
+        document.body.classList.add('grid-open');
+        document.body.style.overflow = 'hidden';
+        btns.forEach(btn => btn.querySelector('span:last-child').textContent = '✕');
+        buildImageGrid();
+    }
+}
+
+function buildImageGrid() {
+    const content = Utils.$('#gridContent');
+    content.innerHTML = '';
+    
+    const imagesByChapter = {};
+    state.gridImages.forEach(imgData => {
+        if (!imagesByChapter[imgData.chapterId]) {
+            imagesByChapter[imgData.chapterId] = [];
+        }
+        imagesByChapter[imgData.chapterId].push(imgData);
+    });
+    
+    chapters.forEach(chapter => {
+        if (imagesByChapter[chapter.id] && imagesByChapter[chapter.id].length > 0) {
+            const section = document.createElement('div');
+            section.className = 'grid-chapter-section';
+            section.innerHTML = `<div class="grid-chapter-title">Chapter ${String(chapter.id + 1).padStart(2, '0')} · ${chapter.title}</div>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid-images-container';
+            
+            imagesByChapter[chapter.id].forEach(imgData => {
+                const item = document.createElement('div');
+                item.className = 'grid-image-item';
+                item.innerHTML = `
+                    <img src="${imgData.url}" loading="lazy" alt="Grid preview">
+                    <div class="grid-image-caption">
+                        <span class="caption-text">${imgData.text}</span>
+                    </div>
+                `;
+                item.addEventListener('click', () => {
+                    toggleImageGrid();
+                    state.currentSentenceIndex = imgData.index;
+                    highlightSentence(imgData.index);
+                });
+                grid.appendChild(item);
+            });
+            
+            section.appendChild(grid);
+            content.appendChild(section);
+        }
+    });
+}
+
+// ===================================
+// SCROLL HANDLING
+// ===================================
+function handleScroll(event) {
+    if (state.scrollCooldownActive) return;
+    if (event.target.closest('.chapter-dropdown-list, .image-grid-overlay')) return;
+    if (isDropdownOpen()) {
+        event.preventDefault();
+        return;
+    }
+    if (isGridOpen()) return;
+    
+    const scrollDelta = event.deltaY;
+    if (Math.abs(scrollDelta) >= CONFIG.SCROLL_THRESHOLD) {
+        state.scrollCooldownActive = true;
+        
+        if (scrollDelta > 0) nextSentence();
+        else previousSentence();
+        
+        setTimeout(() => {
+            state.scrollCooldownActive = false;
+        }, CONFIG.SCROLL_COOLDOWN);
+    }
+    
+    event.preventDefault();
+}
+
+// ===================================
+// TOUCH HANDLING
+// ===================================
+function handleTouchStart(e) {
+    state.touchStartY = e.touches[0].clientY;
+    state.touchStartX = e.touches[0].clientX;
+    state.touchMoved = false;
+}
+
+function handleTouchMove(e) {
+    state.touchMoved = true;
+    
+    if (e.target.closest('.chapter-dropdown-list, .image-grid-overlay')) return;
+    if (isDropdownOpen()) {
+        e.preventDefault();
+        return;
+    }
+    if (isGridOpen()) return;
+    
+    e.preventDefault();
+}
+
+function handleTouchEnd(e) {
+    if (!state.touchMoved || state.scrollCooldownActive || isDropdownOpen() || isGridOpen()) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = state.touchStartY - touchEndY;
+    
+    if (Math.abs(deltaY) > CONFIG.FLICK_THRESHOLD) {
+        state.scrollCooldownActive = true;
+        
+        if (deltaY > 0) nextSentence();
+        else previousSentence();
+        
+        setTimeout(() => {
+            state.scrollCooldownActive = false;
+        }, CONFIG.SCROLL_COOLDOWN);
+    }
+}
+
+// ===================================
+// PARALLAX UPDATES
+// ===================================
+function updateParallax() {
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+    
+    const mouseOffsetX = (state.mouseX - viewportCenterX) / viewportCenterX;
+    const mouseOffsetY = (state.mouseY - viewportCenterY) / viewportCenterY;
+    
+    parallax.text.targetX = mouseOffsetX * 20 * CONFIG.TEXT_PARALLAX_STRENGTH;
+    parallax.text.targetY = mouseOffsetY * 20 * CONFIG.TEXT_PARALLAX_STRENGTH;
+    
+    if (state.imageActive && state.currentTriggerRect) {
+        const trigger = state.currentTriggerRect;
+        const triggerCenterX = trigger.left + trigger.width / 2;
+        const triggerCenterY = trigger.top + trigger.height / 2;
+        
+        const distToCenterX = (viewportCenterX - triggerCenterX) / viewportCenterX;
+        const distToCenterY = (viewportCenterY - triggerCenterY) / viewportCenterY;
+        
+        const magnetX = distToCenterX * CONFIG.CENTER_MAGNET_STRENGTH * 100;
+        const magnetY = distToCenterY * CONFIG.CENTER_MAGNET_STRENGTH * 100;
+        
+        parallax.image.targetX = (mouseOffsetX * 100 * CONFIG.IMAGE_PARALLAX_STRENGTH) - magnetX;
+        parallax.image.targetY = (mouseOffsetY * 100 * CONFIG.IMAGE_PARALLAX_STRENGTH) - magnetY;
+    } else {
+        parallax.image.targetX = 0;
+        parallax.image.targetY = 0;
+    }
+    
+    parallax.text.x += (parallax.text.targetX - parallax.text.x) * CONFIG.PARALLAX_DAMPING;
+    parallax.text.y += (parallax.text.targetY - parallax.text.y) * CONFIG.PARALLAX_DAMPING;
+    parallax.image.x += (parallax.image.targetX - parallax.image.x) * CONFIG.PARALLAX_DAMPING;
+    parallax.image.y += (parallax.image.targetY - parallax.image.y) * CONFIG.PARALLAX_DAMPING;
+    
+    const textLayer = Utils.$('#textLayer');
+    const imageLayer = Utils.$('#imageLayer');
+    const gridOverlay = Utils.$('#gridContent');
+    
+    if (textLayer) {
+        textLayer.style.transform = `translate3d(${parallax.text.x}px, ${parallax.text.y}px, 0)`;
+    }
+    if (imageLayer) {
+        imageLayer.style.transform = `translate3d(${parallax.image.x}px, ${parallax.image.y}px, 0)`;
+    }
+    if (gridOverlay) {
+        gridOverlay.style.transform = `translate3d(${parallax.image.x * 0.5}px, ${parallax.image.y * 0.5}px, 0)`;
+    }
+    
+    requestAnimationFrame(updateParallax);
+}
+
+// ===================================
+// CURSOR UPDATES
+// ===================================
+function updateCursor() {
+    if (!cursor.element) return;
+    
+    cursor.x += (cursor.targetX - cursor.x) * CONFIG.CURSOR_SMOOTHING;
+    cursor.y += (cursor.targetY - cursor.y) * CONFIG.CURSOR_SMOOTHING;
+    
+    cursor.element.style.transform = `translate3d(${cursor.x}px, ${cursor.y}px, 0) translate(-50%, -50%)`;
+    
+    requestAnimationFrame(updateCursor);
+}
+
+// ===================================
+// RENDER FUNCTION
+// ===================================
+function render() {
+    const streamEl = Utils.$('#stream');
+    const parsedContent = parseNarrative(narrative);
+    const fragment = document.createDocumentFragment();
+    
+    state.allSentenceElements = [];
+    state.gridImages = [];
+    
+    // Pre-calculate chapter positions by finding start text in raw narrative
+    state.chapterStartIndices = new Array(chapters.length).fill(-1);
+    chapters.forEach(chapter => {
+        const index = narrative.indexOf(chapter.startText);
+        if (index !== -1) {
+            state.chapterStartIndices[chapter.id] = index; // Store character position temporarily
+        }
+    });
+    
+    let sentenceCount = 0;
+    let narrativePosition = 0;
+    let nextChapterIndex = 0;
+    let currentActiveChapter = 0;
+
+    parsedContent.forEach(part => {
+        // Check if we've reached a new chapter based on narrative position
+        if (nextChapterIndex < chapters.length) {
+            const nextChapter = chapters[nextChapterIndex];
+            const textContent = part.type === 'sentence' || part.type === 'bullet' || part.type === 'numbered-bullet' 
+                ? part.text 
+                : (part.type === 'bracket' ? part.content : '');
+            
+            if (textContent && textContent.includes(nextChapter.startText)) {
+                state.chapterStartIndices[nextChapter.id] = sentenceCount;
+                
+                const chapterBreak = document.createElement('div');
+                chapterBreak.className = 'chapter-break';
+                chapterBreak.dataset.chapterId = nextChapter.id;
+                chapterBreak.innerHTML = `
+                    <span class="chapter-number">Chapter ${String(nextChapter.id + 1).padStart(2, '0')}</span>
+                    <span class="chapter-title">${nextChapter.title}</span>
+                `;
+                chapterBreak.addEventListener('click', () => goToChapter(nextChapter.id));
+                fragment.appendChild(chapterBreak);
+                
+                currentActiveChapter = nextChapter.id;
+                nextChapterIndex++;
+            }
+        }
+
+        if (part.type === 'sentence') {
+            const span = document.createElement('span');
+            span.className = 'sentence';
+            span.dataset.sentenceIndex = sentenceCount;
+            span.style.cursor = 'pointer';
+            
+            // Check for associated images
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({
+                        index: sentenceCount,
+                        text: part.text,
+                        url: url,
+                        chapterId: currentActiveChapter
+                    });
+                    break;
+                }
+            }
+
+            span.innerHTML = wrapImageTriggers(part.text) + ' ';
+            
+            span.addEventListener('mouseenter', () => {
+                const index = parseInt(span.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => {
+                    s.style.opacity = i === index ? '0.7' : '0.25';
+                });
+            }, { passive: true });
+            
+            span.addEventListener('mouseleave', () => {
+                state.allSentenceElements.forEach(s => s.style.opacity = '');
+            }, { passive: true });
+            
+            span.addEventListener('click', () => {
+                state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex);
+                highlightSentence(state.currentSentenceIndex);
+            });
+            
+            state.allSentenceElements.push(span);
+            sentenceCount++;
+            fragment.appendChild(span);
+        } else if (part.type === 'line-break') {
+            const br = document.createElement('span');
+            br.className = 'line-break-spacer';
+            br.innerHTML = part.breakType === 'double' ? '<br><br>' : '<br>';
+            fragment.appendChild(br);
+        } else if (part.type === 'bullet') {
+            const li = document.createElement('div');
+            li.className = 'sentence bullet-item';
+            li.dataset.sentenceIndex = sentenceCount;
+            li.style.cursor = 'pointer';
+            
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({
+                        index: sentenceCount,
+                        text: part.text,
+                        url: url,
+                        chapterId: currentActiveChapter
+                    });
+                    break;
+                }
+            }
+            
+            li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(part.text);
+            
+            li.addEventListener('mouseenter', () => {
+                const index = parseInt(li.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => {
+                    s.style.opacity = i === index ? '0.7' : '0.25';
+                });
+            }, { passive: true });
+            
+            li.addEventListener('mouseleave', () => {
+                state.allSentenceElements.forEach(s => s.style.opacity = '');
+            }, { passive: true });
+            
+            li.addEventListener('click', () => {
+                state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex);
+                highlightSentence(state.currentSentenceIndex);
+            });
+            
+            state.allSentenceElements.push(li);
+            sentenceCount++;
+            fragment.appendChild(li);
+        } else if (part.type === 'numbered-bullet') {
+            const li = document.createElement('div');
+            li.className = 'sentence numbered-bullet-item';
+            li.dataset.sentenceIndex = sentenceCount;
+            li.style.cursor = 'pointer';
+            
+            for (const [phrase, url] of Object.entries(imageMap)) {
+                if (part.text.includes(phrase)) {
+                    state.gridImages.push({
+                        index: sentenceCount,
+                        text: part.text,
+                        url: url,
+                        chapterId: currentActiveChapter
+                    });
+                    break;
+                }
+            }
+            
+            li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(part.text);
+            
+            li.addEventListener('mouseenter', () => {
+                const index = parseInt(li.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => {
+                    s.style.opacity = i === index ? '0.7' : '0.25';
+                });
+            }, { passive: true });
+            
+            li.addEventListener('mouseleave', () => {
+                state.allSentenceElements.forEach(s => s.style.opacity = '');
+            }, { passive: true });
+            
+            li.addEventListener('click', () => {
+                state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex);
+                highlightSentence(state.currentSentenceIndex);
+            });
+            
+            state.allSentenceElements.push(li);
+            sentenceCount++;
+            fragment.appendChild(li);
+        } else if (part.type === 'bracket') {
+            const trigger = document.createElement('button');
+            trigger.className = 'bracket-trigger';
+            trigger.textContent = '[+]';
+            const contentId = `bracket-content-${part.id}`;
+            trigger.setAttribute('aria-controls', contentId);
+            
+            const content = document.createElement('span');
+            content.className = 'bracket-content';
+            content.id = contentId;
+            content.textContent = ' ' + part.content + ' ';
+            
+            trigger.addEventListener('click', () => {
+                const isExpanded = content.classList.toggle('visible');
+                trigger.textContent = isExpanded ? '[−]' : '[+]';
+                trigger.classList.toggle('expanded');
+                
+                if (isExpanded) {
+                    state.expandedBrackets.add(part.id);
+                } else {
+                    state.expandedBrackets.delete(part.id);
+                }
+            });
+            
+            fragment.appendChild(trigger);
+            fragment.appendChild(content);
+        }
+    });
+    
+    streamEl.innerHTML = '';
+    streamEl.appendChild(fragment);
+    
+    buildChapterDropdown();
+    initializeChapterProgress();
+    
+    // Event delegation for image triggers
+    streamEl.addEventListener('mouseover', e => {
+        const trigger = e.target.closest('.image-trigger');
+        if (trigger) {
+            const imageUrl = trigger.getAttribute('data-image');
+            if (imageUrl) showImage(imageUrl, trigger);
+        }
+    }, { passive: true });
+    
+    streamEl.addEventListener('mouseout', e => {
+        if (e.target.closest('.image-trigger')) {
+            hideImage();
+        }
+    }, { passive: true });
+}
+
+// ===================================
+// CONTEXT MENU
+// ===================================
+function initializeContextMenu() {
+    const contextMenu = Utils.$('#contextMenu');
+    
+    function showContextMenu(x, y) {
+        contextMenu.style.left = x + 'px';
+        contextMenu.style.top = y + 'px';
+        contextMenu.classList.add('open');
+        contextMenu.setAttribute('aria-hidden', 'false');
+        
+        const themeText = Utils.$('#ctxThemeText');
+        const themeIcon = Utils.$('#ctxThemeIcon');
+        
+        if (document.body.classList.contains('theme-academic')) {
+            themeText.textContent = 'Dark Theme';
+            themeIcon.textContent = '🌙';
+        } else if (document.body.classList.contains('theme-newspaper')) {
+            themeText.textContent = 'Academic Theme';
+            themeIcon.textContent = '📖';
+        } else {
+            themeText.textContent = 'Newspaper Theme';
+            themeIcon.textContent = '☀️';
+        }
+
+        const rect = contextMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        }
+        if (rect.bottom > window.innerHeight) {
+            contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
+        }
+    }
+    
+    function hideContextMenu() {
+        contextMenu.classList.remove('open');
+        contextMenu.setAttribute('aria-hidden', 'true');
+    }
+    
+    // Desktop context menu - DISABLED
+    document.addEventListener('contextmenu', e => {
+        e.preventDefault(); // Just disable browser context menu
+    });
+}
+
+// ===================================
+// LAYOUT & THEME FUNCTIONS
+// ===================================
+function toggleLayout() {
+    state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
+    document.body.classList.remove('layout-layered', 'layout-split');
+    document.body.classList.add(`layout-${state.layoutMode}`);
+    Utils.$('.layout-icon').className = `layout-icon ${state.layoutMode}`;
+    document.body.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+    setTimeout(() => document.body.style.transition = '', 500);
+}
+
+function toggleTheme() {
+    const body = document.body;
+    if (body.classList.contains('theme-academic')) {
+        body.classList.remove('theme-academic');
+    } else if (body.classList.contains('theme-newspaper')) {
+        body.classList.remove('theme-newspaper');
+        body.classList.add('theme-academic');
+    } else {
+        body.classList.add('theme-newspaper');
+    }
+    
+    const icon = Utils.$('.theme-icon');
+    icon.textContent = body.classList.contains('theme-academic') 
+        ? '🌙' 
+        : (body.classList.contains('theme-newspaper') ? '📖' : '☀️');
+}
+
+// ===================================
+// ACCESSIBILITY CONTROLS
+// ===================================
+function initializeAccessibility() {
+    let accessibilityLevel = 2;
+    const accessibilityLevels = [0, 0.25, 0.5, 0.75, 1];
+    
+    function applyAccessibilityLevel(level) {
+        const value = accessibilityLevels[level];
+        document.documentElement.style.setProperty('--curve-k', value * 3);
+        document.documentElement.style.setProperty('--vig-opacity', Math.min(value * 2.4, 1.2));
+        document.documentElement.style.setProperty('--edge-blur', (value * 20) + 'px');
+        document.body.style.fontSize = ((1.3 - (value * 0.9)) * 100) + '%';
+        
+        Utils.$$('.level-indicator').forEach((el, i) => {
+            if (i === level) {
+                el.classList.add('active');
+            } else {
+                el.classList.remove('active');
+            }
+        });
+    }
+    
+    Utils.$('#accessibilityIncrease').addEventListener('click', () => {
+        if (accessibilityLevel > 0) {
+            applyAccessibilityLevel(--accessibilityLevel);
+        }
+    });
+    
+    Utils.$('#accessibilityDecrease').addEventListener('click', () => {
+        if (accessibilityLevel < accessibilityLevels.length - 1) {
+            applyAccessibilityLevel(++accessibilityLevel);
+        }
+    });
+    
+    applyAccessibilityLevel(accessibilityLevel);
+}
+
+// ===================================
+// LONG PRESS SETUP
+// ===================================
+function setupLongPress(buttonId, normalAction, longPressAction) {
+    const button = Utils.$(`#${buttonId}`);
+    if (!button) return;
+    
+    let longPressTimer = null;
+    let longPressActivated = false;
+
+    button.addEventListener('touchstart', () => {
+        longPressActivated = false;
+        longPressTimer = setTimeout(() => {
+            longPressActivated = true;
+            longPressAction();
+            if (navigator.vibrate) navigator.vibrate(50);
+        }, CONFIG.LONG_PRESS_DURATION);
+    }, { passive: true });
+
+    button.addEventListener('touchend', (e) => {
+        if (longPressTimer) clearTimeout(longPressTimer);
+        if (longPressActivated) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    button.addEventListener('touchcancel', () => {
+        if (longPressTimer) clearTimeout(longPressTimer);
+    }, { passive: true });
+    
+    button.addEventListener('click', (e) => {
+        if (longPressActivated) {
+            e.preventDefault();
+            e.stopPropagation();
+            longPressActivated = false;
+        } else {
+            normalAction();
+        }
+    });
+}
+
+// ===================================
+// CLOSE HOTSPOTS
+// ===================================
+function initializeCloseHotspots() {
+    const gridCloseHotspot = Utils.$('#gridCloseHotspot');
+    const rotateCloseHotspot = Utils.$('#rotateCloseHotspot');
+    
+    gridCloseHotspot.addEventListener('mouseenter', () => {
+        cursor.element.classList.add('close-mode');
+    });
+    gridCloseHotspot.addEventListener('mouseleave', () => {
+        cursor.element.classList.remove('close-mode');
+    });
+    gridCloseHotspot.addEventListener('click', () => {
+        toggleImageGrid();
+        cursor.element.classList.remove('close-mode');
+    });
+    
+    rotateCloseHotspot.addEventListener('mouseenter', () => {
+        cursor.element.classList.add('close-mode');
+    });
+    rotateCloseHotspot.addEventListener('mouseleave', () => {
+        cursor.element.classList.remove('close-mode');
+    });
+    rotateCloseHotspot.addEventListener('click', () => {
+        Utils.$('.rotate-warning').style.display = 'none';
+        cursor.element.classList.remove('close-mode');
+    });
+}
+
+// ===================================
+// KEYBOARD CONTROLS
+// ===================================
+function initializeKeyboardControls() {
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Space' || e.code === 'Space') {
+            e.preventDefault();
+            nextSentence();
+        } else if (e.key === 'Backspace') {
+            e.preventDefault();
+            previousSentence();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            nextChapter();
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            previousChapter();
+        } else if (e.key === 'ArrowDown' || e.key === 'j') {
+            e.preventDefault();
+            nextSentence();
+        } else if (e.key === 'ArrowUp' || e.key === 'k') {
+            e.preventDefault();
+            previousSentence();
+        } else if (e.key === 'Shift') {
+            e.preventDefault();
+            toggleLayout();
+        } else if (e.key === 'l') {
+            // Keep 'l' as alternative
+            toggleLayout();
+        } else if (e.key.toLowerCase() === 't') {
+            toggleTheme();
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            resetToBeginning();
+        } else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
+            closeChapterDropdown();
+            
+            if (isGridOpen()) {
+                toggleImageGrid();
+                cursor.element.classList.remove('close-mode');
+            } else if (Utils.$('.rotate-warning').style.display === 'flex') {
+                Utils.$('.rotate-warning').style.display = 'none';
+                cursor.element.classList.remove('close-mode');
+            } else if (state.layoutMode === 'split') {
+                toggleLayout();
+            }
+        }
+    });
+}
+
+// ===================================
+// INTERACTION HINT
+// ===================================
+function initializeInteractionHint() {
+    let hintDismissed = false;
+    const dismissHint = () => {
+        if (!hintDismissed) {
+            document.body.classList.add('hint-shown');
+            hintDismissed = true;
+        }
+    };
+    document.addEventListener('click', dismissHint, { once: true });
+    document.addEventListener('touchstart', dismissHint, { once: true });
+    setTimeout(dismissHint, 3000);
+}
+
+// ===================================
+// MAIN INITIALIZATION
+// ===================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize cursor elements
+    cursor.element = Utils.$('#cursor');
+    // Removed cursorImage reference
+    
+    // Cursor tracking
+    document.addEventListener('mousemove', e => {
+        cursor.targetX = e.clientX;
+        cursor.targetY = e.clientY;
+        state.mouseX = e.clientX;
+        state.mouseY = e.clientY;
+    }, { passive: true });
+    
+    // Cursor hover effects
+    document.addEventListener('mouseover', e => {
+        if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
+            cursor.element.classList.add('hovering');
+            if (e.target.matches('button, a, .grid-image-item')) {
+                cursor.element.classList.add('pointer');
+            }
+        }
+    }, { passive: true });
+    
+    document.addEventListener('mouseout', e => {
+        if (e.target.matches('a, button, .image-trigger, input[type="range"], .chapter-break, .chapter-item, .grid-image-item')) {
+            cursor.element.classList.remove('hovering', 'pointer');
+        }
+    }, { passive: true });
+    
+    // Initialize all modules
+    detectTouch();
+    initializeAccessibility();
+    initializeContextMenu();
+    initializeCloseHotspots();
+    initializeKeyboardControls();
+    initializeInteractionHint();
+    
+    // Event listeners
+    Utils.$('#brandLogo').addEventListener('click', toggleChapterDropdown);
+    Utils.$('#gridToggleBtn').addEventListener('click', toggleImageGrid);
+    Utils.$('#layoutToggle').addEventListener('click', toggleLayout);
+    Utils.$('#themeToggle').addEventListener('click', toggleTheme);
+    
+    Utils.$('#prevSentenceBtn').addEventListener('click', previousSentence);
+    Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
+    
+    document.addEventListener('click', e => {
+        if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target)) {
+            closeChapterDropdown();
+        }
+    });
+    
+    window.addEventListener('wheel', handleScroll, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    // Setup long-press buttons
+    setupLongPress('mobilePrevSentenceBtn', previousSentence, previousChapter);
+    setupLongPress('mobileNextSentenceBtn', nextSentence, nextChapter);
+    setupLongPress('landPrevBtn', previousSentence, previousChapter);
+    setupLongPress('landNextBtn', nextSentence, nextChapter);
+    
+    // Initialize content
+    preloadImages();
+    render();
+    
+    // Start animations
+    updateCursor();
+    updateParallax();
+    
+    // Set initial layout
+    document.body.classList.add(`layout-${state.layoutMode}`);
+    
+    // Start at first sentence
+    if (state.allSentenceElements.length > 0) {
+        state.currentSentenceIndex = 0;
+        highlightSentence(0);
+    }
+    
+    // Expose global functions for inline event handlers
+    window.toggleLayout = toggleLayout;
+    window.toggleTheme = toggleTheme;
+});
+    </script>
 </body>
 </html>
