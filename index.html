@@ -514,7 +514,7 @@ body.layout-split .mobile-right-rail { display: none !important; }
 }
 .left-rail { 
     position: fixed; left: 0; top: 50%; transform: translateY(-50%); 
-    z-index: var(--z-rail); padding: 20px 12px; pointer-events: auto; display: flex; align-items: center; 
+    z-index: var(--z-rail); padding: 20px 12px 20px 0; pointer-events: auto; display: flex; align-items: center; 
 }
 .lens-control-container { 
     background: var(--surface); border: 1px solid var(--border); 
@@ -949,8 +949,7 @@ body.grid-open .grid-close-hotspot { display: block; }
    =================================== */
 @media (max-height: 500px) and (orientation: landscape) {
     .scroll-progress { display: none; }
-    .left-rail { display: flex; padding: 10px 4px; }
-    .mobile-right-rail { display: flex; }
+    .left-rail { display: flex; padding: 10px 4px 10px 0; }
     .mobile-nav-button { width: 36px; height: 36px; }
     .mobile-progress-text { font-size: 9px; }
     .scroll-hint { display: none; }
@@ -1069,28 +1068,6 @@ body.grid-open .grid-close-hotspot { display: block; }
                 <button class="accessibility-btn" id="accessibilityDecrease" aria-label="Decrease accessibility" title="Decrease">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
-            </div>
-        </div>
-    </div>
-    
-
-    <div class="mobile-right-rail" aria-label="Mobile navigation landscape">
-        <div class="mobile-nav-container">
-            <div class="rail-top-group"></div>
-            <div class="mobile-progress-container">
-                <div class="mobile-progress-bar"><div class="mobile-progress-fill" id="landProgressFill"></div></div>
-            </div>
-            <div class="rail-bottom-group">
-                <div class="mobile-nav-group">
-                    <button class="mobile-nav-button" id="landPrevBtn" title="Previous Sentence" aria-label="Previous Sentence">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
-                    </button>
-                </div>
-                <div class="mobile-nav-group">
-                    <button class="mobile-nav-button" id="landNextBtn" title="Next Sentence" aria-label="Next Sentence">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -2271,7 +2248,8 @@ function toggleLayout() {
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
-    // SVG icons are now controlled by CSS classes on body, no need to update className
+    // Re-evaluate image/dimming state for the current sentence after layout switch
+    highlightSentence(state.currentSentenceIndex);
 }
 
 function toggleTheme() {
