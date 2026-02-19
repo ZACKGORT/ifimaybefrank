@@ -1860,7 +1860,7 @@ function previousSentence() {
 function highlightSentence(index) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
-    state.allSentenceElements.forEach(s => { s.classList.remove('active'); s.classList.add('dimmed'); });
+    state.allSentenceElements.forEach(s => { s.classList.remove('active'); s.classList.add('dimmed'); s.style.opacity = ''; });
     sentence.classList.add('active');
     sentence.classList.remove('dimmed');
     
@@ -2157,8 +2157,8 @@ function render() {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
             span.innerHTML = wrapImageTriggers(part.text) + ' ';
-            span.addEventListener('mouseenter', () => { const index = parseInt(span.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
-            span.addEventListener('mouseleave', () => { state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
+            span.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(span.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
+            span.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             span.addEventListener('click', () => { state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
             state.allSentenceElements.push(span);
             sentenceCount++;
@@ -2177,8 +2177,8 @@ function render() {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
             li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(part.text);
-            li.addEventListener('mouseenter', () => { const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
-            li.addEventListener('mouseleave', () => { state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
+            li.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
+            li.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
             state.allSentenceElements.push(li);
             sentenceCount++;
@@ -2192,8 +2192,8 @@ function render() {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
             li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(part.text);
-            li.addEventListener('mouseenter', () => { const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
-            li.addEventListener('mouseleave', () => { state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
+            li.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
+            li.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
             state.allSentenceElements.push(li);
             sentenceCount++;
