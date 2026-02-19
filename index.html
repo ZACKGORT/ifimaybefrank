@@ -168,7 +168,7 @@ body.theme-newspaper {
 
     --cursor-bg: transparent;
     --cursor-border: rgba(0, 0, 0, 0.40);
-    --cursor-blend: difference;
+    --cursor-blend: normal;
     --cursor-opacity: 1;
 
     --selection-bg: rgba(139, 69, 19, 0.25);
@@ -607,7 +607,12 @@ body.flow-mode .sentence { opacity: 0.15; transition: opacity 0.6s ease; }
 body.flow-mode .sentence.active { opacity: 1; }
 body.flow-mode .sentence.revealed { opacity: 0.6; }
 body.flow-mode .text-layer { overflow-y: auto; height: 100vh; -webkit-overflow-scrolling: touch; }
-body.layout-split.image-active .sentence:not(.active) { opacity: 0.8 !important; color: var(--ink) !important; }
+/* Nuanced Split View trigger: allows text to fade when an image is active */
+body.layout-split.image-active .sentence:not(.active) { 
+    opacity: 0.25; 
+    color: var(--ink-3); 
+    transition: opacity 0.4s ease;
+}
 
 /* ===================================
    INTERACTION HINTS
