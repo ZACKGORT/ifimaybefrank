@@ -24,10 +24,6 @@
     <style>
 /* ===================================
    CSS VARIABLES & THEMES
-   ===================================
-   Design principle: every component reads exclusively from these
-   variables. Adding a new theme means only adding a new variable
-   block here — zero component-level overrides required.
    =================================== */
 :root {
     /* ── Palette ── */
@@ -1530,10 +1526,13 @@ function trackBracketOpen() {
 // DRAGGABLE WIDGET FACTORY
 // ===================================
 function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
+    if (!el || el.dataset.draggableBound) return;
+    el.dataset.draggableBound = 'true';
+
     let isDragging = false;
     let hasMoved = false;
     let startX, startY, initialA, initialB;
-    const DRAG_THRESHOLD = 4; // px of movement before drag activates
+    const DRAG_THRESHOLD = 4;
 
     function getInitialPos() {
         const style = window.getComputedStyle(el);
@@ -1567,6 +1566,7 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
 
     // Mouse
     el.addEventListener('mousedown', (e) => {
+        if (window.innerWidth <= 768) return; // Disable drag on mobile
         if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
         hasMoved = false;
@@ -1596,6 +1596,7 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
     // Touch
     let tStartX, tStartY;
     el.addEventListener('touchstart', (e) => {
+        if (window.innerWidth <= 768) return; // Disable drag on mobile
         if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
         hasMoved = false;
@@ -2439,45 +2440,55 @@ document.addEventListener('DOMContentLoaded', () => {
         Utils.$('#keyNextChapter').addEventListener('click', (e) => { e.stopPropagation(); nextChapter(); });
     }
     
+    // Stats Widget Logic
     const statsWidget = document.getElementById('statsWidget');
     if (statsWidget) {
-        // Only make draggable on desktop — on mobile it's a centered floating HUD
-        const updateStatsWidgetPosition = () => {
-            if (window.innerWidth <= 768) {
-                // Mobile: explicitly enforce centering — don't just clear, set the values
-                // so drag code's inline styles can't win
-                statsWidget.style.left = '0';
-                statsWidget.style.right = '0';
-                statsWidget.style.transform = 'none';
-                statsWidget.style.marginLeft = 'auto';
-                statsWidget.style.marginRight = 'auto';
-                statsWidget.style.width = 'fit-content';
-                statsWidget.style.bottom = '';
-            } else {
-                // Desktop: restore draggable positioning
-                statsWidget.style.left = statsWidget.dataset.desktopLeft || '80px';
-                statsWidget.style.transform = '';
-            }
-        };
-        
-        // Initial setup - apply immediately
-        if (window.innerWidth > 768) {
-            makeDraggable(statsWidget, { useRight: false, useBottom: true });
-            // Save initial desktop position
-            statsWidget.dataset.desktopLeft = statsWidget.style.left || '80px';
-        }
-        
+        let lastDesktopLeft = '80px';
+        let lastDesktopBottom = '20px';
+        let isMobileMode = window.innerWidth <= 768;
 
-        
-        // Re-evaluate on resize
+        const applyDesktopStyles = () => {
+             statsWidget.style.left = lastDesktopLeft;
+             statsWidget.style.bottom = lastDesktopBottom;
+             statsWidget.style.right = 'auto'; // clear mobile styles
+             statsWidget.style.transform = ''; // clear mobile centering
+             statsWidget.style.width = ''; // clear mobile width
+             statsWidget.style.margin = ''; // clear mobile margin
+             statsWidget.style.cursor = 'grab';
+        };
+
+        const applyMobileStyles = () => {
+             // Save desktop position before switching to mobile layout
+             if (statsWidget.style.left && statsWidget.style.left !== '0px') lastDesktopLeft = statsWidget.style.left;
+             if (statsWidget.style.bottom) lastDesktopBottom = statsWidget.style.bottom;
+             
+             // Apply mobile layout override
+             statsWidget.style.left = '0'; 
+             statsWidget.style.right = '0';
+             statsWidget.style.bottom = 'calc(16px + env(safe-area-inset-bottom))';
+             statsWidget.style.marginLeft = 'auto';
+             statsWidget.style.marginRight = 'auto';
+             statsWidget.style.width = 'fit-content';
+             statsWidget.style.transform = 'none';
+             statsWidget.style.cursor = 'default';
+        };
+
+        // Initialize Draggable ONCE
+        makeDraggable(statsWidget, { useRight: false, useBottom: true });
+
+        // Set Initial State
+        if (isMobileMode) applyMobileStyles();
+        else applyDesktopStyles();
+
+        // Resize Listener
         window.addEventListener('resize', Utils.debounce(() => {
-            if (window.innerWidth <= 768) {
-                updateStatsWidgetPosition();
-            } else if (window.innerWidth > 768) {
-                makeDraggable(statsWidget, { useRight: false, useBottom: true });
-                updateStatsWidgetPosition();
+            const newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile !== isMobileMode) {
+                isMobileMode = newIsMobile;
+                if (isMobileMode) applyMobileStyles();
+                else applyDesktopStyles();
             }
-        }, 200));
+        }, 100));
     }
     
     // Event listeners
