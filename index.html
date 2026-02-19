@@ -948,6 +948,15 @@ body.grid-open .grid-close-hotspot { display: block; }
 @media (orientation: portrait) { body.layout-split .rotate-warning { display: flex; } }
 .rotate-warning.visible { display: flex; }
 
+/* Ensure header controls remain accessible above the rotate warning overlay on mobile */
+@media (orientation: portrait) {
+    body.layout-split .header {
+        z-index: calc(var(--z-rotate-warning) + 1);
+        position: fixed;
+        pointer-events: auto;
+    }
+}
+
 /* ===================================
    RESPONSIVE BREAKPOINTS
    =================================== */
@@ -2252,6 +2261,7 @@ function initializeContextMenu() {
 // LAYOUT & THEME
 // ===================================
 function toggleLayout() {
+    hideImage();
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
@@ -2259,6 +2269,7 @@ function toggleLayout() {
 }
 
 function toggleTheme() {
+    hideImage();
     const body = document.body;
     // Add a transitioning flag so grain/edge-blur don't flash during the swap
     body.classList.add('theme-transitioning');
