@@ -52,7 +52,7 @@
     --sentence-active-shadow: 0 0 20px rgba(218, 165, 32, 0.30);
     --sentence-hover-color: var(--ink);
     --sentence-hover-bg: rgba(218, 165, 32, 0.08);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: rgba(255, 255, 255, 0.50);
 
     /* ── Typography ── */
@@ -145,7 +145,7 @@ body.theme-newspaper {
     --sentence-active-shadow: none;
     --sentence-hover-color: #000000;
     --sentence-hover-bg: rgba(255, 255, 255, 0.95);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: #333333;
 
     --chapter-bar-bg: rgba(0, 0, 0, 0.12);
@@ -196,7 +196,7 @@ body.theme-sport {
     --sentence-active-shadow: none;
     --sentence-hover-color: #ffffff;
     --sentence-hover-bg: rgba(250, 60, 0, 0.12);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: var(--ink-3);
 
     --ui-font: 'Inter', sans-serif;
@@ -581,7 +581,7 @@ body.layout-split .mobile-right-rail { display: none !important; }
 
 body.image-active .sentence:not(.active) { opacity: 0.1; color: var(--ink-3); }
 body.image-active .sentence.active { opacity: 1; color: var(--sentence-active-color); }
-body.image-active .sentence.dimmed { opacity: 0.05; color: var(--ink-3); }
+body.image-active .sentence.dimmed { opacity: 0.01; color: var(--ink-3); }
 
 /* ===================================
    BASE STYLES
@@ -1223,7 +1223,7 @@ const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
     { id: 1, title: "Words from the Maker", startText: "I loathe to be so bold" },
     { id: 2, title: "The Early Days", startText: "I built my first computer" },
-    { id: 3, title: "Suburbia Startup", startText: "Turn5 was a paradigm shift" },
+    { id: 3, title: "Suburbia Startup", startText: "A turning point at Turn5 Inc." },
     { id: 4, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
     { id: 5, title: "The New York Experience", startText: "FlightPath was my gateway to New York" },
     { id: 6, title: "Latest & Greatest", startText: "As an aside, I've been building" },
@@ -1257,7 +1257,8 @@ const imageMap = {
     'dreamer': 'https://i.ibb.co/hqCtdrS/ZAX02263.jpg',
     'built my first computer': 'https://i.ibb.co/fdxZdwwC/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp',
     'installed pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
-    'what I saw around me': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
+    'what I saw around me': 'https://i.ibb.co/mVkj6sxm/1-g-Ax-Wr-Bz-Rv-QDdn-TOBp-GHGt-A.webp',
+    'what I saw around me': 'https://i.ibb.co/mVkj6sxm/1-g-Ax-Wr-Bz-Rv-QDdn-TOBp-GHGt-A.webp',
     'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
@@ -1422,9 +1423,9 @@ But first, let me introduce myself properly.
 //
 I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. A craftsman. I seek not to disrupt, but to discover.  
 
-I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university long enough to graduate [stop-out, not drop-out], I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, flipping through magazines, and taking on client work. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [] A garage startup in the suburbs of Philadelphia that would become my formal education.
+I built my first computer circa 2005 or 2006. Immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university long enough to graduate, [stop-out, not drop-out] I studied obsessively what I saw around me. Whatever piqued my interest, I examined intensely. I studied typography by reading books, flipping through magazines, and taking in my surroundings. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [] A garage startup in the suburbs of Philadelphia that would become my formal education.
 
-Turn5 was a paradigm shift. I joined a budding home-grown startup. I was provided a brand new PC and a Canon Rebel DSLR. I became the graphic designer for all web properties, handling package design and catalogue design. I became a Product Photographer, specializing in color match and OEM quality. We photographed thousands of parts. I later pivoted to web designer, focusing on email marketing and feature design. In four years, the company grew to forty million per year. Turn5 was my education.
+A turning point at Turn5 Inc. I joined a budding home-grown startup. I was provided a brand new PC and a Canon Rebel DSLR. I became the graphic designer for all web properties, handling package design and catalogue design. I became a Product Photographer, specializing in color match and OEM quality. We photographed thousands of parts. I later pivoted to web designer, focusing on email marketing and feature design. In four years, the company grew to forty million per year. Turn5 was my education.
 //
 Leadnomics was shifty. We focused on lead generation for payday loans. I helped facilitate high-interest loans for desperate people. But the perks were great — free lunches and flexible work. My job was to make catastrophic financial decisions feel intuitive. I achieved a 95.8% conversion rate using responsive design and rigorous testing. We fashioned a hell of a fishing net. Business is necessity, not idealism.
 //
@@ -2466,8 +2467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statsWidget.dataset.desktopLeft = statsWidget.style.left || '80px';
         }
         
-        // Apply position on initial load
-        updateStatsWidgetPosition();
+
         
         // Re-evaluate on resize
         window.addEventListener('resize', Utils.debounce(() => {
