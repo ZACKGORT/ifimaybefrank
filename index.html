@@ -24,10 +24,6 @@
     <style>
 /* ===================================
    CSS VARIABLES & THEMES
-   ===================================
-   Design principle: every component reads exclusively from these
-   variables. Adding a new theme means only adding a new variable
-   block here — zero component-level overrides required.
    =================================== */
 :root {
     /* ── Palette ── */
@@ -52,7 +48,7 @@
     --sentence-active-shadow: 0 0 20px rgba(218, 165, 32, 0.30);
     --sentence-hover-color: var(--ink);
     --sentence-hover-bg: rgba(218, 165, 32, 0.08);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: rgba(255, 255, 255, 0.50);
 
     /* ── Typography ── */
@@ -145,7 +141,7 @@ body.theme-newspaper {
     --sentence-active-shadow: none;
     --sentence-hover-color: #000000;
     --sentence-hover-bg: rgba(255, 255, 255, 0.95);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: #333333;
 
     --chapter-bar-bg: rgba(0, 0, 0, 0.12);
@@ -196,7 +192,7 @@ body.theme-sport {
     --sentence-active-shadow: none;
     --sentence-hover-color: #ffffff;
     --sentence-hover-bg: rgba(250, 60, 0, 0.12);
-    --sentence-dimmed-opacity: 0.44;
+    --sentence-dimmed-opacity: 0.5;
     --sentence-dimmed-color: var(--ink-3);
 
     --ui-font: 'Inter', sans-serif;
@@ -581,7 +577,7 @@ body.layout-split .mobile-right-rail { display: none !important; }
 
 body.image-active .sentence:not(.active) { opacity: 0.1; color: var(--ink-3); }
 body.image-active .sentence.active { opacity: 1; color: var(--sentence-active-color); }
-body.image-active .sentence.dimmed { opacity: 0.05; color: var(--ink-3); }
+body.image-active .sentence.dimmed { opacity: 0.01; color: var(--ink-3); }
 
 /* ===================================
    BASE STYLES
@@ -947,15 +943,6 @@ body.grid-open .grid-close-hotspot { display: block; }
 @keyframes fadeInOut { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
 @media (orientation: portrait) { body.layout-split .rotate-warning { display: flex; } }
 .rotate-warning.visible { display: flex; }
-
-/* Ensure header controls remain accessible above the rotate warning overlay on mobile */
-@media (orientation: portrait) {
-    body.layout-split .header {
-        z-index: calc(var(--z-rotate-warning) + 1);
-        position: fixed;
-        pointer-events: auto;
-    }
-}
 
 /* ===================================
    RESPONSIVE BREAKPOINTS
@@ -1538,10 +1525,13 @@ function trackBracketOpen() {
 // DRAGGABLE WIDGET FACTORY
 // ===================================
 function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
+    if (!el || el.dataset.draggableBound) return;
+    el.dataset.draggableBound = 'true';
+
     let isDragging = false;
     let hasMoved = false;
     let startX, startY, initialA, initialB;
-    const DRAG_THRESHOLD = 4; // px of movement before drag activates
+    const DRAG_THRESHOLD = 4;
 
     function getInitialPos() {
         const style = window.getComputedStyle(el);
@@ -1575,6 +1565,7 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
 
     // Mouse
     el.addEventListener('mousedown', (e) => {
+        if (window.innerWidth <= 768) return; // Disable drag on mobile
         if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
         hasMoved = false;
@@ -1604,6 +1595,7 @@ function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
     // Touch
     let tStartX, tStartY;
     el.addEventListener('touchstart', (e) => {
+        if (window.innerWidth <= 768) return; // Disable drag on mobile
         if (e.target.closest('.k-key, .chapter-item, .chapter-dropdown-list, button, a, input, [role="button"]')) return;
         isDragging = true;
         hasMoved = false;
@@ -2257,7 +2249,6 @@ function initializeContextMenu() {
 // LAYOUT & THEME
 // ===================================
 function toggleLayout() {
-    hideImage();
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     document.body.classList.remove('layout-layered', 'layout-split');
     document.body.classList.add(`layout-${state.layoutMode}`);
@@ -2265,7 +2256,6 @@ function toggleLayout() {
 }
 
 function toggleTheme() {
-    hideImage();
     const body = document.body;
     // Add a transitioning flag so grain/edge-blur don't flash during the swap
     body.classList.add('theme-transitioning');
@@ -2449,45 +2439,55 @@ document.addEventListener('DOMContentLoaded', () => {
         Utils.$('#keyNextChapter').addEventListener('click', (e) => { e.stopPropagation(); nextChapter(); });
     }
     
+    // Stats Widget Logic
     const statsWidget = document.getElementById('statsWidget');
     if (statsWidget) {
-        // Only make draggable on desktop — on mobile it's a centered floating HUD
-        const updateStatsWidgetPosition = () => {
-            if (window.innerWidth <= 768) {
-                // Mobile: explicitly enforce centering — don't just clear, set the values
-                // so drag code's inline styles can't win
-                statsWidget.style.left = '0';
-                statsWidget.style.right = '0';
-                statsWidget.style.transform = 'none';
-                statsWidget.style.marginLeft = 'auto';
-                statsWidget.style.marginRight = 'auto';
-                statsWidget.style.width = 'fit-content';
-                statsWidget.style.bottom = '';
-            } else {
-                // Desktop: restore draggable positioning
-                statsWidget.style.left = statsWidget.dataset.desktopLeft || '80px';
-                statsWidget.style.transform = '';
-            }
-        };
-        
-        // Initial setup - apply immediately
-        if (window.innerWidth > 768) {
-            makeDraggable(statsWidget, { useRight: false, useBottom: true });
-            // Save initial desktop position
-            statsWidget.dataset.desktopLeft = statsWidget.style.left || '80px';
-        }
-        
+        let lastDesktopLeft = '80px';
+        let lastDesktopBottom = '20px';
+        let isMobileMode = window.innerWidth <= 768;
 
-        
-        // Re-evaluate on resize
+        const applyDesktopStyles = () => {
+             statsWidget.style.left = lastDesktopLeft;
+             statsWidget.style.bottom = lastDesktopBottom;
+             statsWidget.style.right = 'auto'; // clear mobile styles
+             statsWidget.style.transform = ''; // clear mobile centering
+             statsWidget.style.width = ''; // clear mobile width
+             statsWidget.style.margin = ''; // clear mobile margin
+             statsWidget.style.cursor = 'grab';
+        };
+
+        const applyMobileStyles = () => {
+             // Save desktop position before switching to mobile layout
+             if (statsWidget.style.left && statsWidget.style.left !== '0px') lastDesktopLeft = statsWidget.style.left;
+             if (statsWidget.style.bottom) lastDesktopBottom = statsWidget.style.bottom;
+             
+             // Apply mobile layout override
+             statsWidget.style.left = '0'; 
+             statsWidget.style.right = '0';
+             statsWidget.style.bottom = 'calc(16px + env(safe-area-inset-bottom))';
+             statsWidget.style.marginLeft = 'auto';
+             statsWidget.style.marginRight = 'auto';
+             statsWidget.style.width = 'fit-content';
+             statsWidget.style.transform = 'none';
+             statsWidget.style.cursor = 'default';
+        };
+
+        // Initialize Draggable ONCE
+        makeDraggable(statsWidget, { useRight: false, useBottom: true });
+
+        // Set Initial State
+        if (isMobileMode) applyMobileStyles();
+        else applyDesktopStyles();
+
+        // Resize Listener
         window.addEventListener('resize', Utils.debounce(() => {
-            if (window.innerWidth <= 768) {
-                updateStatsWidgetPosition();
-            } else if (window.innerWidth > 768) {
-                makeDraggable(statsWidget, { useRight: false, useBottom: true });
-                updateStatsWidgetPosition();
+            const newIsMobile = window.innerWidth <= 768;
+            if (newIsMobile !== isMobileMode) {
+                isMobileMode = newIsMobile;
+                if (isMobileMode) applyMobileStyles();
+                else applyDesktopStyles();
             }
-        }, 200));
+        }, 100));
     }
     
     // Event listeners
