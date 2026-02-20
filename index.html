@@ -720,6 +720,7 @@ body.theme-transitioning::after {
     text-transform: uppercase; color: var(--accent); opacity: 0.7; cursor: pointer; transition: all 0.3s ease; pointer-events: auto; 
 }
 .chapter-break:hover { opacity: 1; background: var(--hover-tint); padding: 1.5em 1em; }
+.chapter-break.dropdown-active { opacity: 1; background: var(--hover-tint-strong); border-color: color-mix(in srgb, var(--accent) 60%, transparent); color: var(--accent); }
 .chapter-break .chapter-number { display: block; font-size: 0.7em; margin-bottom: 0.5em; color: var(--ink-3); }
 .chapter-break .chapter-title { display: block; font-size: 1.2em; font-weight: var(--chapter-break-weight); letter-spacing: var(--chapter-break-letter-spacing); }
 
@@ -1341,7 +1342,9 @@ const state = {
     // Stats tracking
     sentencesSeen: new Set(),
     bracketsOpened: 0,
-    chaptersRead: new Set()
+    chaptersRead: new Set(),
+    // Chapter-break dropdown opener tracking
+    chapterBreakOpener: null
 };
 
 const cursor = { x: 0, y: 0, targetX: 0, targetY: 0, element: null, currentImageElement: null };
@@ -2514,11 +2517,50 @@ function toggleChapterDropdown() {
     brand.classList.toggle('open');
     dropdown.classList.toggle('open');
     if (dropdown.classList.contains('open')) updateChapterDropdown();
+    // Clear any chapter-break opener when toggled via logo
+    if (!dropdown.classList.contains('open')) clearChapterBreakOpener();
+}
+
+function clearChapterBreakOpener() {
+    if (state.chapterBreakOpener) {
+        state.chapterBreakOpener.classList.remove('dropdown-active');
+        state.chapterBreakOpener = null;
+    }
 }
 
 function closeChapterDropdown() {
     Utils.$('#brandLogo').classList.remove('open');
     Utils.$('#chapterDropdown').classList.remove('open');
+    clearChapterBreakOpener();
+}
+
+function openDropdownFromChapterBreak(chapterBreakEl, chapterId) {
+    const dropdown = Utils.$('#chapterDropdown');
+    const brand = Utils.$('#brandLogo');
+
+    // If already open from this exact chapter-break → close (toggle off)
+    if (isDropdownOpen() && state.chapterBreakOpener === chapterBreakEl) {
+        closeChapterDropdown();
+        return;
+    }
+
+    // Clear previous opener highlight
+    clearChapterBreakOpener();
+
+    // Open dropdown
+    brand.classList.add('open');
+    dropdown.classList.add('open');
+    updateChapterDropdown();
+
+    // Mark this chapter-break as the opener
+    state.chapterBreakOpener = chapterBreakEl;
+    chapterBreakEl.classList.add('dropdown-active');
+
+    // Scroll the matching chapter item into view inside the dropdown
+    requestAnimationFrame(() => {
+        const item = dropdown.querySelector(`.chapter-item[data-chapter-id="${chapterId}"]`);
+        if (item) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
 }
 
 // ===================================
@@ -2677,7 +2719,7 @@ function render() {
                 chapterBreak.className = 'chapter-break';
                 chapterBreak.dataset.chapterId = nextChapter.id;
                 chapterBreak.innerHTML = `<span class="chapter-number">Chapter ${String(nextChapter.id + 1).padStart(2, '0')}</span><span class="chapter-title">${nextChapter.title}</span>`;
-                chapterBreak.addEventListener('click', () => goToChapter(nextChapter.id));
+                chapterBreak.addEventListener('click', () => openDropdownFromChapterBreak(chapterBreak, nextChapter.id));
                 fragment.appendChild(chapterBreak);
                 currentActiveChapter = nextChapter.id;
                 nextChapterIndex++;
@@ -3035,7 +3077,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
     
     document.addEventListener('click', e => {
-        if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target)) closeChapterDropdown();
+        if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target) && !e.target.closest('.chapter-break')) closeChapterDropdown();
     });
     
     window.addEventListener('wheel', handleScroll, { passive: false });
