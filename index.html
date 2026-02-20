@@ -932,12 +932,11 @@ body.grid-open .grid-close-hotspot { display: block; }
 .toast-container {
     position: fixed;
     bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 48px;
     z-index: calc(var(--z-ui) + 50);
     display: flex;
     flex-direction: column-reverse;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     pointer-events: none;
 }
@@ -956,34 +955,58 @@ body.grid-open .grid-close-hotspot { display: block; }
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-    white-space: nowrap;
     pointer-events: auto;
     cursor: pointer;
     opacity: 0;
-    transform: translateY(12px) scale(0.96);
+    transform: translateX(-8px) scale(0.97);
     transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1),
                 transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    max-width: min(90vw, 420px);
+    max-width: min(85vw, 360px);
     white-space: normal;
-    text-align: center;
+    text-align: left;
+    line-height: 1.5;
 }
 .toast.visible {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(0) scale(1);
 }
 .toast.dismissing {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
+    transform: translateX(-6px) scale(0.97);
 }
+
+/* Banner variant — full-width, centered, appears at top */
+.toast.toast-banner {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    bottom: auto;
+    transform: translateX(-50%) translateY(-16px) scale(0.97);
+    max-width: min(92vw, 560px);
+    text-align: center;
+    justify-content: center;
+    border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    font-size: 12px;
+    padding: 14px 20px;
+    gap: 12px;
+}
+.toast.toast-banner.visible {
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+.toast.toast-banner.dismissing {
+    transform: translateX(-50%) translateY(-10px) scale(0.97);
+}
+
 .toast-icon {
     font-size: 14px;
     flex-shrink: 0;
-    opacity: 0.8;
+    opacity: 0.85;
 }
 .toast-text { line-height: 1.5; }
 .toast-accent { color: var(--accent); font-weight: 600; }
 .toast-action {
-    margin-left: 8px;
+    margin-left: 6px;
     padding: 3px 8px;
     border: 1px solid var(--accent);
     border-radius: 3px;
@@ -993,8 +1016,44 @@ body.grid-open .grid-close-hotspot { display: block; }
     transition: background 0.2s ease;
     flex-shrink: 0;
     pointer-events: auto;
+    white-space: nowrap;
 }
 .toast-action:hover { background: var(--hover-tint-strong); }
+
+/* Toast rail bell button */
+.toast-rail-btn {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    transition: color 0.2s ease;
+    padding: 0;
+}
+.toast-rail-btn:hover { color: var(--accent); }
+.toast-rail-btn svg { width: 18px; height: 18px; }
+.toast-rail-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.toast-rail-dot.active { opacity: 1; animation: dotPulse 2s ease-in-out infinite; }
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+}
 
 /* Chapter logo pulse on chapter crossing */
 .brand.chapter-pulse {
@@ -1006,7 +1065,15 @@ body.grid-open .grid-close-hotspot { display: block; }
 }
 
 @media (max-width: 768px) {
-    .toast-container { bottom: 100px; }
+    .toast-container {
+        left: 50%;
+        bottom: 100px;
+        transform: translateX(-50%);
+        align-items: center;
+    }
+    .toast { text-align: center; transform: translateY(12px) scale(0.96); }
+    .toast.visible { transform: translateY(0) scale(1); }
+    .toast.dismissing { transform: translateY(8px) scale(0.97); }
 }
 
 /* ===================================
@@ -1078,7 +1145,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
     </div>
 
-    <div class="interaction-hint" id="interactionHint">Move by touch</div>
+
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1136,9 +1203,15 @@ body.grid-open .grid-close-hotspot { display: block; }
 
     <div id="cursor" aria-hidden="true"></div>
     
-    <div class="left-rail" aria-hidden="true">
+    <div class="left-rail">
         <div class="lens-control-container">
-            <span class="lens-label">ZOOM</span>
+            <button class="toast-rail-btn" id="toastRailBtn" title="Hints &amp; tips" aria-label="Show hints">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span class="toast-rail-dot" id="toastRailDot"></span>
+            </button>
             <div class="accessibility-controls">
                 <button class="accessibility-btn" id="accessibilityIncrease" aria-label="Increase accessibility" title="Increase">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1633,15 +1706,15 @@ const Toast = (() => {
 
     let activeToasts = 0;
 
-    function show({ id, icon = '💡', message, actionLabel = null, actionFn = null, duration = 6000, force = false }) {
+    function show({ id, icon = '💡', message, actionLabel = null, actionFn = null, duration = 6000, force = false, banner = false, onDismiss = null }) {
         if (!force && hasShown(id)) return;
-        if (activeToasts >= 2) return; // don't stack more than 2
+        if (!banner && activeToasts >= 2) return; // banners bypass stack limit
 
         const container = document.getElementById('toastContainer');
         if (!container) return;
 
         const el = document.createElement('div');
-        el.className = 'toast';
+        el.className = banner ? 'toast toast-banner' : 'toast';
         el.setAttribute('role', 'status');
         el.innerHTML = `
             <span class="toast-icon">${icon}</span>
@@ -1649,8 +1722,13 @@ const Toast = (() => {
             ${actionLabel ? `<span class="toast-action" id="toast-action-${id}">${actionLabel}</span>` : ''}
         `;
 
-        container.appendChild(el);
-        activeToasts++;
+        // Banners go to body directly so they aren't offset by the rail container
+        if (banner) {
+            document.body.appendChild(el);
+        } else {
+            container.appendChild(el);
+            activeToasts++;
+        }
         markShown(id);
 
         // Trigger entrance
@@ -1664,7 +1742,8 @@ const Toast = (() => {
             el.classList.add('dismissing');
             setTimeout(() => {
                 el.remove();
-                activeToasts = Math.max(0, activeToasts - 1);
+                if (!banner) activeToasts = Math.max(0, activeToasts - 1);
+                if (onDismiss) onDismiss();
             }, 350);
         };
 
@@ -1691,9 +1770,16 @@ const Toast = (() => {
 // ===================================
 const toastBehaviors = (() => {
 
-    // ─── Ambient pool: shown on randomized timers, one at a time, never repeat ───
     const isMobile = () => window.innerWidth <= 768 || state.isTouch;
 
+    // ── Dot indicator on rail bell ──
+    function setRailDot(active) {
+        const dot = document.getElementById('toastRailDot');
+        if (!dot) return;
+        dot.classList.toggle('active', active);
+    }
+
+    // ─── Ambient pool: random timers, one at a time, never repeat ───
     const AMBIENT_POOL = [
         {
             id: 'amb-theme',
@@ -1735,90 +1821,86 @@ const toastBehaviors = (() => {
         }
     ];
 
-    // Ambient scheduler: picks a random unshown toast every 45–90s
     let ambientTimer = null;
 
     function scheduleNextAmbient() {
         const remaining = AMBIENT_POOL.filter(t =>
             !Toast.hasShown(t.id) && (!t.condition || t.condition())
         );
-        if (remaining.length === 0) return; // all shown, done
+        if (remaining.length === 0) return;
 
-        const delay = 45000 + Math.random() * 45000; // 45–90s
+        const delay = 45000 + Math.random() * 45000;
         ambientTimer = setTimeout(() => {
-            // Re-check conditions at fire time
             const eligible = remaining.filter(t => !t.condition || t.condition());
             if (eligible.length === 0) { scheduleNextAmbient(); return; }
-
             const pick = eligible[Math.floor(Math.random() * eligible.length)];
+            setRailDot(true);
             Toast.show({
                 id: pick.id,
                 icon: pick.icon,
                 message: typeof pick.message === 'function' ? pick.message() : pick.message,
                 actionLabel: pick.actionLabel || null,
                 actionFn: pick.actionFn || null,
-                duration: 8000
+                duration: 12000,
+                onDismiss: () => setRailDot(false)
             });
             scheduleNextAmbient();
         }, delay);
     }
 
     // ─── Scroll wheel analysis ───
-    // Three behaviors based on scroll-wheel usage patterns:
-    //   1. Rapid scroll wheel → suggest grid (scanning for images)
-    //   2. Rapid scroll wheel (alt path) → suggest split view (reading in full)
-    //   3. Sole scroll-wheel user → suggest spacebar / arrows / chapter dropdown
+    let wheelTimestamps = [];
+    let keyOrButtonUsed = false;
+    let wheelOnlyWarned = false;
+    let totalWheelCount = 0;
 
-    let wheelTimestamps = [];       // rolling window of wheel events
-    let keyOrButtonUsed = false;    // has user ever used keyboard/buttons?
-    let wheelOnlyWarned = false;    // have we sent the scroll-only hint?
-
-    const WHEEL_WINDOW = 2500;      // ms rolling window
-    const RAPID_WHEEL_THRESHOLD = 8; // events in window = rapid
-    let rapidWheelStage = 0;        // 0 = none, 1 = grid shown, 2 = split shown
+    const WHEEL_WINDOW = 2000;
+    const RAPID_WHEEL_THRESHOLD = 5;
+    let rapidWheelStage = 0;
 
     function onWheel() {
         const now = Date.now();
         wheelTimestamps.push(now);
+        totalWheelCount++;
         wheelTimestamps = wheelTimestamps.filter(t => now - t <= WHEEL_WINDOW);
 
         const count = wheelTimestamps.length;
 
         if (count >= RAPID_WHEEL_THRESHOLD) {
-            // Alternate between grid and split suggestions for rapid scrollers
             if (rapidWheelStage === 0 && !Toast.hasShown('rapid-wheel-grid')) {
                 rapidWheelStage = 1;
+                setRailDot(true);
                 Toast.show({
                     id: 'rapid-wheel-grid',
                     icon: '▦',
                     message: 'Scrolling fast? <span class="toast-accent">Display</span> shows all imagery at a glance.',
                     actionLabel: 'Open',
                     actionFn: () => toggleImageGrid(),
-                    duration: 8000
+                    duration: 12000,
+                    onDismiss: () => setRailDot(false)
                 });
             } else if (rapidWheelStage === 1 && !Toast.hasShown('rapid-wheel-split') && state.layoutMode === 'layered') {
                 rapidWheelStage = 2;
+                setRailDot(true);
                 Toast.show({
                     id: 'rapid-wheel-split',
                     icon: '◫',
                     message: 'Or try <span class="toast-accent">Split View</span> — text uninterrupted, images pinned right.',
                     actionLabel: 'Try it',
                     actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
-                    duration: 8000
+                    duration: 12000,
+                    onDismiss: () => setRailDot(false)
                 });
             }
-            wheelTimestamps = []; // reset after firing so it doesn't re-trigger immediately
+            wheelTimestamps = [];
         }
     }
 
     function onSingleWheel() {
-        // Called on every wheel event; if user never touches keys/buttons,
-        // after enough wheel events we suggest proper navigation
         if (keyOrButtonUsed || wheelOnlyWarned) return;
-
-        const totalWheelEvents = wheelTimestamps.length; // reuse existing array
-        if (totalWheelEvents >= 6) { // ~6 slow individual ticks
+        if (totalWheelCount >= 6) {
             wheelOnlyWarned = true;
+            setRailDot(true);
             Toast.show({
                 id: 'scroll-only-nav',
                 icon: '⌨️',
@@ -1827,7 +1909,8 @@ const toastBehaviors = (() => {
                     : 'Try <span class="toast-accent">Space</span>, <span class="toast-accent">↑↓</span>, or the chapter menu for smoother navigation.',
                 actionLabel: 'Chapters',
                 actionFn: () => toggleChapterDropdown(),
-                duration: 9000
+                duration: 12000,
+                onDismiss: () => setRailDot(false)
             });
         }
     }
@@ -1836,7 +1919,7 @@ const toastBehaviors = (() => {
         keyOrButtonUsed = true;
     }
 
-    // ─── Chapter crossing: logo pulse only ───
+    // ─── Chapter crossing: logo pulse ───
     function onChapterAdvance() {
         const brand = document.getElementById('brandLogo');
         if (brand) {
@@ -1845,16 +1928,53 @@ const toastBehaviors = (() => {
         }
     }
 
-    function onBracketOpened() { /* reserved */ }
+    // ─── Conclusion chapter toast ───
+    function onConclusionChapter() {
+        if (Toast.hasShown('conclusion-chapter')) return;
+        setRailDot(true);
+        Toast.show({
+            id: 'conclusion-chapter',
+            icon: '✦',
+            message: 'You\'ve reached <span class="toast-accent">the conclusion</span>. Almost there.',
+            duration: 12000,
+            onDismiss: () => setRailDot(false)
+        });
+    }
 
+    // ─── Last sentence toast ───
+    function onLastSentence() {
+        if (Toast.hasShown('last-sentence')) return;
+        setRailDot(true);
+        Toast.show({
+            id: 'last-sentence',
+            icon: '◼',
+            message: 'You read it. Every sentence. <span class="toast-accent">Thank you.</span>',
+            duration: 12000,
+            onDismiss: () => setRailDot(false)
+        });
+    }
+
+    function onBracketOpened() { /* reserved */ }
     function onSentenceAdvance() { /* reserved */ }
 
     function init() {
-        // Kick off ambient toasts after a short settle delay
-        setTimeout(scheduleNextAmbient, 30000); // first one no sooner than 30s in
+        // Page-load welcome banner
+        setTimeout(() => {
+            Toast.show({
+                id: 'welcome-banner',
+                icon: '✦',
+                message: 'Navigate sentence by sentence — or explore <span class="toast-accent">themes</span>, <span class="toast-accent">split view</span>, and the <span class="toast-accent">chapter menu</span> above.',
+                duration: 12000,
+                banner: true,
+                onDismiss: () => {}
+            });
+        }, 1800);
+
+        // Ambient toasts begin after 30s
+        setTimeout(scheduleNextAmbient, 30000);
     }
 
-    return { onWheel, onSingleWheel, onKeyOrButton, onSentenceAdvance, onChapterAdvance, onBracketOpened, init };
+    return { onWheel, onSingleWheel, onKeyOrButton, onSentenceAdvance, onChapterAdvance, onBracketOpened, onConclusionChapter, onLastSentence, init, getAmbientPool: () => AMBIENT_POOL, clearAmbientTimer: () => clearTimeout(ambientTimer), setRailDot };
 })();
 
 
@@ -2206,6 +2326,12 @@ function highlightSentence(index) {
     trackSentence(index);
     trackChapter(getCurrentChapter());
     
+    // Conclusion chapter toast (chapter id 9)
+    if (getCurrentChapter() === 9) toastBehaviors.onConclusionChapter();
+
+    // Last sentence toast
+    if (index === state.allSentenceElements.length - 1) toastBehaviors.onLastSentence();
+
     updateChapterProgress();
     updateChapterDropdown();
     sentence.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2888,6 +3014,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize toast system
     toastBehaviors.init();
+
+    // Rail bell button — cycles through ambient pool, force-shows even if already seen
+    const toastRailBtn = document.getElementById('toastRailBtn');
+    if (toastRailBtn) {
+        let forceIndex = 0;
+        toastRailBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const pool = toastBehaviors.getAmbientPool();
+            // First try unshown toasts; if all shown, cycle with force
+            const unshown = pool.filter(t => !Toast.hasShown(t.id) && (!t.condition || t.condition()));
+            const pick = unshown.length > 0
+                ? unshown[Math.floor(Math.random() * unshown.length)]
+                : pool[forceIndex++ % pool.length];
+            toastBehaviors.clearAmbientTimer();
+            toastBehaviors.setRailDot(true);
+            Toast.show({
+                id: pick.id,
+                icon: pick.icon,
+                message: typeof pick.message === 'function' ? pick.message() : pick.message,
+                actionLabel: pick.actionLabel || null,
+                actionFn: pick.actionFn || null,
+                duration: 12000,
+                force: true,
+                onDismiss: () => toastBehaviors.setRailDot(false)
+            });
+        });
+    }
 });
     </script>
 </body>
