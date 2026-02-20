@@ -480,10 +480,10 @@ body.layout-split .mobile-right-rail { display: none !important; }
     display: flex; flex-direction: column; gap: 6px; padding: 10px 0; align-items: center;
 }
 .chapter-bar { 
-    width: 12px; height: 12px; background: var(--chapter-bar-bg); border-radius: 2px; 
+    width: 20px; height: 4px; background: var(--chapter-bar-bg); border-radius: 2px; 
     cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
 }
-.chapter-bar:hover { width: 24px; height: 24px; background: var(--chapter-bar-hover-bg); }
+.chapter-bar:hover { width: 32px; height: 6px; background: var(--chapter-bar-hover-bg); }
 .chapter-bar.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .chapter-bar.active:hover { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
 .chapter-bar.completed { background: var(--chapter-bar-completed-bg); }
@@ -1606,7 +1606,7 @@ function trackChapter(chapterId) {
     if (wasNew) {
         pulseStatValue('statChaptersRead');
         updateStats();
-        toastBehaviors.onChapterAdvance(chapterId);
+        toastBehaviors.onChapterAdvance();
     }
 }
 
@@ -1690,144 +1690,171 @@ const Toast = (() => {
 // TOAST BEHAVIORS (triggers)
 // ===================================
 const toastBehaviors = (() => {
-    // --- Timers & counters ---
-    let scrollEventCount = 0;
-    let scrollCountTimer = null;
-    let idleTimer = null;
 
-    // Fast-navigation: track sentence advances within a rolling window
-    let fastNavTimestamps = [];
-    const FAST_NAV_WINDOW = 3000;      // 3s rolling window
-    const FAST_NAV_THRESHOLD = 8;      // 8 sentence advances in 3s = "flying"
-    const FAST_NAV_GRID_THRESHOLD = 14; // even faster = suggest grid
-    let fastNavGridShownAt = 0;         // sentence index when grid toast last fired
+    // ─── Ambient pool: shown on randomized timers, one at a time, never repeat ───
+    const isMobile = () => window.innerWidth <= 768 || state.isTouch;
 
-    const IDLE_THRESHOLD = 12000;
-    const SLOW_SCROLL_WINDOW = 4000;
-    const SLOW_SCROLL_MIN_EVENTS = 5;
+    const AMBIENT_POOL = [
+        {
+            id: 'amb-theme',
+            icon: '☀️',
+            message: () => 'Try a different mood — toggle the <span class="toast-accent">theme</span> in the top right.',
+            actionLabel: 'Switch',
+            actionFn: () => toggleTheme()
+        },
+        {
+            id: 'amb-split',
+            icon: '◫',
+            message: () => 'Try <span class="toast-accent">Split View</span> — text on the left, imagery on the right.',
+            actionLabel: 'Try it',
+            actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
+            condition: () => state.layoutMode === 'layered'
+        },
+        {
+            id: 'amb-grid',
+            icon: '▦',
+            message: () => '<span class="toast-accent">Display</span> shows all chapter imagery in one view.',
+            actionLabel: 'Open',
+            actionFn: () => toggleImageGrid()
+        },
+        {
+            id: 'amb-zoom',
+            icon: '🔍',
+            message: () => isMobile()
+                ? 'Adjust text size with the <span class="toast-accent">zoom</span> control on the left edge.'
+                : 'The <span class="toast-accent">zoom</span> rail on the left adjusts reading size.',
+        },
+        {
+            id: 'amb-chapters',
+            icon: '📖',
+            message: () => isMobile()
+                ? 'Tap <span class="toast-accent">If I May Be Frank</span> to jump between chapters.'
+                : 'Click the logo to open the <span class="toast-accent">chapter menu</span> — or use ← →.',
+            actionLabel: 'Chapters',
+            actionFn: () => toggleChapterDropdown()
+        }
+    ];
 
-    let hasInteracted = false;
-    let chapterNudgeSentAt = -1;
+    // Ambient scheduler: picks a random unshown toast every 45–90s
+    let ambientTimer = null;
 
-    // --- Idle ---
-    function resetIdleTimer() {
-        hasInteracted = true;
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
-    }
+    function scheduleNextAmbient() {
+        const remaining = AMBIENT_POOL.filter(t =>
+            !Toast.hasShown(t.id) && (!t.condition || t.condition())
+        );
+        if (remaining.length === 0) return; // all shown, done
 
-    function onIdle() {
-        if (Toast.hasShown('idle-spacebar')) return;
-        const isMobile = window.innerWidth <= 768 || state.isTouch;
-        Toast.show({
-            id: 'idle-spacebar',
-            icon: '⌨️',
-            message: isMobile
-                ? 'Tap the <span class="toast-accent">arrows</span> or swipe to move sentence by sentence.'
-                : 'Press <span class="toast-accent">Space</span> or <span class="toast-accent">↑↓</span> to navigate sentence by sentence.',
-            duration: 7000
-        });
-    }
+        const delay = 45000 + Math.random() * 45000; // 45–90s
+        ambientTimer = setTimeout(() => {
+            // Re-check conditions at fire time
+            const eligible = remaining.filter(t => !t.condition || t.condition());
+            if (eligible.length === 0) { scheduleNextAmbient(); return; }
 
-    // --- Slow scroll → Split View ---
-    function onScrollActivity() {
-        resetIdleTimer();
-        if (Toast.hasShown('slow-scroll-split')) return;
-        scrollEventCount++;
-        if (scrollCountTimer) clearTimeout(scrollCountTimer);
-        scrollCountTimer = setTimeout(() => { scrollEventCount = 0; }, SLOW_SCROLL_WINDOW);
-
-        if (scrollEventCount >= SLOW_SCROLL_MIN_EVENTS && state.layoutMode === 'layered') {
+            const pick = eligible[Math.floor(Math.random() * eligible.length)];
             Toast.show({
-                id: 'slow-scroll-split',
-                icon: '◫',
-                message: 'Reading slowly? Try <span class="toast-accent">Split View</span> — text left, images right.',
-                actionLabel: 'Try it',
-                actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
+                id: pick.id,
+                icon: pick.icon,
+                message: typeof pick.message === 'function' ? pick.message() : pick.message,
+                actionLabel: pick.actionLabel || null,
+                actionFn: pick.actionFn || null,
                 duration: 8000
             });
-        }
+            scheduleNextAmbient();
+        }, delay);
     }
 
-    // --- Fast sentence navigation ---
-    function onSentenceAdvance() {
-        resetIdleTimer();
+    // ─── Scroll wheel analysis ───
+    // Three behaviors based on scroll-wheel usage patterns:
+    //   1. Rapid scroll wheel → suggest grid (scanning for images)
+    //   2. Rapid scroll wheel (alt path) → suggest split view (reading in full)
+    //   3. Sole scroll-wheel user → suggest spacebar / arrows / chapter dropdown
 
+    let wheelTimestamps = [];       // rolling window of wheel events
+    let keyOrButtonUsed = false;    // has user ever used keyboard/buttons?
+    let wheelOnlyWarned = false;    // have we sent the scroll-only hint?
+
+    const WHEEL_WINDOW = 2500;      // ms rolling window
+    const RAPID_WHEEL_THRESHOLD = 8; // events in window = rapid
+    let rapidWheelStage = 0;        // 0 = none, 1 = grid shown, 2 = split shown
+
+    function onWheel() {
         const now = Date.now();
-        fastNavTimestamps.push(now);
-        // Prune timestamps outside the rolling window
-        fastNavTimestamps = fastNavTimestamps.filter(t => now - t <= FAST_NAV_WINDOW);
+        wheelTimestamps.push(now);
+        wheelTimestamps = wheelTimestamps.filter(t => now - t <= WHEEL_WINDOW);
 
-        const pace = fastNavTimestamps.length;
+        const count = wheelTimestamps.length;
 
-        // Very fast → suggest grid (image overview)
-        if (pace >= FAST_NAV_GRID_THRESHOLD && !Toast.hasShown('fast-nav-grid')) {
-            Toast.show({
-                id: 'fast-nav-grid',
-                icon: '▦',
-                message: 'Moving fast? <span class="toast-accent">Display</span> shows all chapter images at a glance.',
-                actionLabel: 'Open',
-                actionFn: () => toggleImageGrid(),
-                duration: 8000
-            });
-            return; // don't stack with chapter-skip hint
+        if (count >= RAPID_WHEEL_THRESHOLD) {
+            // Alternate between grid and split suggestions for rapid scrollers
+            if (rapidWheelStage === 0 && !Toast.hasShown('rapid-wheel-grid')) {
+                rapidWheelStage = 1;
+                Toast.show({
+                    id: 'rapid-wheel-grid',
+                    icon: '▦',
+                    message: 'Scrolling fast? <span class="toast-accent">Display</span> shows all imagery at a glance.',
+                    actionLabel: 'Open',
+                    actionFn: () => toggleImageGrid(),
+                    duration: 8000
+                });
+            } else if (rapidWheelStage === 1 && !Toast.hasShown('rapid-wheel-split') && state.layoutMode === 'layered') {
+                rapidWheelStage = 2;
+                Toast.show({
+                    id: 'rapid-wheel-split',
+                    icon: '◫',
+                    message: 'Or try <span class="toast-accent">Split View</span> — text uninterrupted, images pinned right.',
+                    actionLabel: 'Try it',
+                    actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
+                    duration: 8000
+                });
+            }
+            wheelTimestamps = []; // reset after firing so it doesn't re-trigger immediately
         }
+    }
 
-        // Fast → suggest chapter skip / dropdown
-        if (pace >= FAST_NAV_THRESHOLD && !Toast.hasShown('fast-nav-chapter-skip')) {
-            const isMobile = window.innerWidth <= 768 || state.isTouch;
+    function onSingleWheel() {
+        // Called on every wheel event; if user never touches keys/buttons,
+        // after enough wheel events we suggest proper navigation
+        if (keyOrButtonUsed || wheelOnlyWarned) return;
+
+        const totalWheelEvents = wheelTimestamps.length; // reuse existing array
+        if (totalWheelEvents >= 6) { // ~6 slow individual ticks
+            wheelOnlyWarned = true;
             Toast.show({
-                id: 'fast-nav-chapter-skip',
-                icon: '⏭',
-                message: isMobile
-                    ? 'Skimming? Long-press the <span class="toast-accent">arrow buttons</span> to jump a whole chapter.'
-                    : 'Skimming? Use <span class="toast-accent">← →</span> to skip chapters, or browse the chapter menu.',
+                id: 'scroll-only-nav',
+                icon: '⌨️',
+                message: isMobile()
+                    ? 'Swipe up/down or tap the <span class="toast-accent">arrows</span> to move sentence by sentence.'
+                    : 'Try <span class="toast-accent">Space</span>, <span class="toast-accent">↑↓</span>, or the chapter menu for smoother navigation.',
                 actionLabel: 'Chapters',
                 actionFn: () => toggleChapterDropdown(),
-                duration: 8000
+                duration: 9000
             });
         }
     }
 
-    // --- Chapter crossing ---
-    function onChapterAdvance(chapterIndex) {
-        resetIdleTimer();
+    function onKeyOrButton() {
+        keyOrButtonUsed = true;
+    }
 
-        // Pulse the brand logo
+    // ─── Chapter crossing: logo pulse only ───
+    function onChapterAdvance() {
         const brand = document.getElementById('brandLogo');
         if (brand) {
             brand.classList.add('chapter-pulse');
             setTimeout(() => brand.classList.remove('chapter-pulse'), 1800);
         }
-
-        // After 2+ chapters read without using chapter jump, hint at it
-        if (!Toast.hasShown('chapter-nav-hint') && state.chaptersRead.size >= 2 && chapterNudgeSentAt !== chapterIndex) {
-            chapterNudgeSentAt = chapterIndex;
-            const isMobile = window.innerWidth <= 768 || state.isTouch;
-            Toast.show({
-                id: 'chapter-nav-hint',
-                icon: '📖',
-                message: isMobile
-                    ? 'Tap <span class="toast-accent">If I May Be Frank</span> above to jump between chapters.'
-                    : 'Use <span class="toast-accent">← →</span> or click the logo to jump between chapters.',
-                actionLabel: 'Chapters',
-                actionFn: () => toggleChapterDropdown(),
-                duration: 7000
-            });
-        }
     }
 
-    function onBracketOpened() {
-        resetIdleTimer();
-    }
+    function onBracketOpened() { /* reserved */ }
+
+    function onSentenceAdvance() { /* reserved */ }
 
     function init() {
-        setTimeout(() => {
-            idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
-        }, 3000);
+        // Kick off ambient toasts after a short settle delay
+        setTimeout(scheduleNextAmbient, 30000); // first one no sooner than 30s in
     }
 
-    return { onScrollActivity, onSentenceAdvance, onChapterAdvance, onBracketOpened, resetIdleTimer, init };
+    return { onWheel, onSingleWheel, onKeyOrButton, onSentenceAdvance, onChapterAdvance, onBracketOpened, init };
 })();
 
 
@@ -2818,10 +2845,21 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
     
-    // Toast: wire scroll/touch activity
-    window.addEventListener('wheel', () => toastBehaviors.onScrollActivity(), { passive: true });
-    window.addEventListener('touchmove', () => toastBehaviors.onScrollActivity(), { passive: true });
-    window.addEventListener('keydown', () => toastBehaviors.resetIdleTimer(), { passive: true });
+    // Toast: wire wheel events (both rapid and single-wheel detection)
+    window.addEventListener('wheel', () => {
+        toastBehaviors.onWheel();
+        toastBehaviors.onSingleWheel();
+    }, { passive: true });
+
+    // Toast: mark that user has used keyboard or nav buttons (not scroll-only)
+    document.addEventListener('keydown', (e) => {
+        const navKeys = ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
+        if (navKeys.includes(e.key) || navKeys.includes(e.code)) toastBehaviors.onKeyOrButton();
+    }, { passive: true });
+    Utils.$('#prevSentenceBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
+    Utils.$('#nextSentenceBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
+    Utils.$('#hudPrevBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
+    Utils.$('#hudNextBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
     
     // Wire HUD nav buttons with long-press (prev/next sentence, long-press for chapter)
     setupLongPress('hudPrevBtn', previousSentence, previousChapter);
