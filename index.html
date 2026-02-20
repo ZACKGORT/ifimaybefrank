@@ -927,6 +927,89 @@ body.grid-open .grid-close-hotspot { display: block; }
 .scroll-hint-text { font-family: var(--ui-font); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
 
 /* ===================================
+   TOAST NOTIFICATIONS
+   =================================== */
+.toast-container {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: calc(var(--z-ui) + 50);
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    color: var(--ink-2);
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+    transition: opacity 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    max-width: min(90vw, 420px);
+    white-space: normal;
+    text-align: center;
+}
+.toast.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.toast.dismissing {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+}
+.toast-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+.toast-text { line-height: 1.5; }
+.toast-accent { color: var(--accent); font-weight: 600; }
+.toast-action {
+    margin-left: 8px;
+    padding: 3px 8px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: var(--accent);
+    font-size: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+    pointer-events: auto;
+}
+.toast-action:hover { background: var(--hover-tint-strong); }
+
+/* Chapter logo pulse on chapter crossing */
+.brand.chapter-pulse {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+    background: var(--hover-tint-strong) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+    transition: all 0.2s ease !important;
+}
+
+@media (max-width: 768px) {
+    .toast-container { bottom: 100px; }
+}
+
+/* ===================================
    ROTATE WARNING
    =================================== */
 .rotate-warning { 
@@ -996,6 +1079,7 @@ body.grid-open .grid-close-hotspot { display: block; }
     </div>
 
     <div class="interaction-hint" id="interactionHint">Move by touch</div>
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot rotate-close-hotspot" id="rotateCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1521,6 +1605,7 @@ function trackChapter(chapterId) {
     if (wasNew) {
         pulseStatValue('statChaptersRead');
         updateStats();
+        toastBehaviors.onChapterAdvance(chapterId);
     }
 }
 
@@ -1528,11 +1613,172 @@ function trackBracketOpen() {
     state.bracketsOpened++;
     pulseStatValue('statBracketsOpened');
     updateStats();
+    toastBehaviors.onBracketOpened();
 }
 
 // ===================================
-// DRAGGABLE WIDGET FACTORY
+// TOAST NOTIFICATION SYSTEM
 // ===================================
+const Toast = (() => {
+    const SHOWN_KEY = 'frank_toasts_shown';
+    const shown = new Set(JSON.parse(sessionStorage.getItem(SHOWN_KEY) || '[]'));
+
+    function markShown(id) {
+        shown.add(id);
+        sessionStorage.setItem(SHOWN_KEY, JSON.stringify([...shown]));
+    }
+
+    function hasShown(id) { return shown.has(id); }
+
+    let activeToasts = 0;
+
+    function show({ id, icon = '💡', message, actionLabel = null, actionFn = null, duration = 6000, force = false }) {
+        if (!force && hasShown(id)) return;
+        if (activeToasts >= 2) return; // don't stack more than 2
+
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.setAttribute('role', 'status');
+        el.innerHTML = `
+            <span class="toast-icon">${icon}</span>
+            <span class="toast-text">${message}</span>
+            ${actionLabel ? `<span class="toast-action" id="toast-action-${id}">${actionLabel}</span>` : ''}
+        `;
+
+        container.appendChild(el);
+        activeToasts++;
+        markShown(id);
+
+        // Trigger entrance
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => el.classList.add('visible'));
+        });
+
+        const dismiss = () => {
+            if (!el.parentNode) return;
+            el.classList.remove('visible');
+            el.classList.add('dismissing');
+            setTimeout(() => {
+                el.remove();
+                activeToasts = Math.max(0, activeToasts - 1);
+            }, 350);
+        };
+
+        const timer = setTimeout(dismiss, duration);
+
+        if (actionLabel && actionFn) {
+            const btn = el.querySelector(`#toast-action-${id}`);
+            if (btn) btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                clearTimeout(timer);
+                dismiss();
+                actionFn();
+            });
+        }
+
+        el.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
+    }
+
+    return { show, hasShown };
+})();
+
+// ===================================
+// TOAST BEHAVIORS (triggers)
+// ===================================
+const toastBehaviors = (() => {
+    // Track slow-scroll detection
+    let scrollEventCount = 0;
+    let scrollCountTimer = null;
+    let idleTimer = null;
+    const IDLE_THRESHOLD = 12000; // 12s of no interaction
+    const SLOW_SCROLL_WINDOW = 4000; // 4s window
+    const SLOW_SCROLL_MIN_EVENTS = 5;
+    let hasInteracted = false;
+    let chapterNudgeSentAt = -1; // which chapter index triggered the chapter-nav toast
+
+    function resetIdleTimer() {
+        hasInteracted = true;
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
+    }
+
+    function onIdle() {
+        if (Toast.hasShown('idle-spacebar')) return;
+        const isMobile = window.innerWidth <= 768 || state.isTouch;
+        Toast.show({
+            id: 'idle-spacebar',
+            icon: '⌨️',
+            message: isMobile
+                ? 'Tap the <span class="toast-accent">arrows</span> or swipe to move sentence by sentence.'
+                : 'Press <span class="toast-accent">Space</span> or <span class="toast-accent">↑↓</span> to navigate sentence by sentence.',
+            duration: 7000
+        });
+    }
+
+    function onScrollActivity() {
+        resetIdleTimer();
+        if (Toast.hasShown('slow-scroll-split')) return;
+        scrollEventCount++;
+        if (scrollCountTimer) clearTimeout(scrollCountTimer);
+        scrollCountTimer = setTimeout(() => { scrollEventCount = 0; }, SLOW_SCROLL_WINDOW);
+
+        if (scrollEventCount >= SLOW_SCROLL_MIN_EVENTS && state.layoutMode === 'layered') {
+            Toast.show({
+                id: 'slow-scroll-split',
+                icon: '◫',
+                message: 'Reading slowly? Try <span class="toast-accent">Split View</span> — text left, images right.',
+                actionLabel: 'Try it',
+                actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
+                duration: 8000
+            });
+        }
+    }
+
+    function onChapterAdvance(chapterIndex) {
+        resetIdleTimer();
+
+        // Pulse the brand logo
+        const brand = document.getElementById('brandLogo');
+        if (brand) {
+            brand.classList.add('chapter-pulse');
+            setTimeout(() => brand.classList.remove('chapter-pulse'), 1800);
+        }
+
+        // After visiting 2+ chapters without using chapter skip, hint at it
+        if (!Toast.hasShown('chapter-nav-hint') && state.chaptersRead.size >= 2 && chapterNudgeSentAt !== chapterIndex) {
+            chapterNudgeSentAt = chapterIndex;
+            const isMobile = window.innerWidth <= 768 || state.isTouch;
+            Toast.show({
+                id: 'chapter-nav-hint',
+                icon: '📖',
+                message: isMobile
+                    ? 'Tap <span class="toast-accent">If I May Be Frank</span> above to jump between chapters.'
+                    : 'Use <span class="toast-accent">← →</span> or click the logo to jump between chapters.',
+                actionLabel: 'Chapters',
+                actionFn: () => toggleChapterDropdown(),
+                duration: 7000
+            });
+        }
+    }
+
+    function onBracketOpened() {
+        resetIdleTimer();
+    }
+
+    function init() {
+        // Start idle timer after a short delay to let page settle
+        setTimeout(() => {
+            idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
+        }, 3000);
+    }
+
+    return { onScrollActivity, onChapterAdvance, onBracketOpened, resetIdleTimer, init };
+})();
+
+
 function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
     if (!el || el.dataset.draggableBound) return;
     el.dataset.draggableBound = 'true';
@@ -2520,6 +2766,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
     
+    // Toast: wire scroll/touch activity
+    window.addEventListener('wheel', () => toastBehaviors.onScrollActivity(), { passive: true });
+    window.addEventListener('touchmove', () => toastBehaviors.onScrollActivity(), { passive: true });
+    window.addEventListener('keydown', () => toastBehaviors.resetIdleTimer(), { passive: true });
+    
     // Wire HUD nav buttons with long-press (prev/next sentence, long-press for chapter)
     setupLongPress('hudPrevBtn', previousSentence, previousChapter);
     setupLongPress('hudNextBtn', nextSentence, nextChapter);
@@ -2544,6 +2795,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.toggleLayout = toggleLayout;
     window.toggleTheme = toggleTheme;
+    
+    // Initialize toast system
+    toastBehaviors.init();
 });
     </script>
 </body>
