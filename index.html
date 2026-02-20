@@ -1145,7 +1145,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
     </div>
 
-
+    <div class="interaction-hint" id="interactionHint">Move by touch</div>
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1772,14 +1772,13 @@ const toastBehaviors = (() => {
 
     const isMobile = () => window.innerWidth <= 768 || state.isTouch;
 
-    // ── Dot indicator on rail bell ──
+    // ── Rail dot indicator ──
     function setRailDot(active) {
         const dot = document.getElementById('toastRailDot');
-        if (!dot) return;
-        dot.classList.toggle('active', active);
+        if (dot) dot.classList.toggle('active', active);
     }
 
-    // ─── Ambient pool: random timers, one at a time, never repeat ───
+    // ─── Ambient pool ───
     const AMBIENT_POOL = [
         {
             id: 'amb-theme',
@@ -1808,7 +1807,7 @@ const toastBehaviors = (() => {
             icon: '🔍',
             message: () => isMobile()
                 ? 'Adjust text size with the <span class="toast-accent">zoom</span> control on the left edge.'
-                : 'The <span class="toast-accent">zoom</span> rail on the left adjusts reading size.',
+                : 'The <span class="toast-accent">zoom</span> rail on the left adjusts reading size.'
         },
         {
             id: 'amb-chapters',
@@ -1828,7 +1827,6 @@ const toastBehaviors = (() => {
             !Toast.hasShown(t.id) && (!t.condition || t.condition())
         );
         if (remaining.length === 0) return;
-
         const delay = 45000 + Math.random() * 45000;
         ambientTimer = setTimeout(() => {
             const eligible = remaining.filter(t => !t.condition || t.condition());
@@ -1848,22 +1846,77 @@ const toastBehaviors = (() => {
         }, delay);
     }
 
+    // ─── Idle detection ───
+    let idleTimer = null;
+    let returnTimer = null;
+    let lastSentenceIndexAtIdle = -1;
+    const IDLE_THRESHOLD = 15000;     // 15s cold idle
+    const RETURN_THRESHOLD = 60000;   // 60s away = "return" scenario
+
+    function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        clearTimeout(returnTimer);
+        idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
+    }
+
+    function onIdle() {
+        lastSentenceIndexAtIdle = state.currentSentenceIndex;
+        // If user goes very long without any input, set a return detection
+        returnTimer = setTimeout(() => {
+            // returnTimer fires — next interaction triggers onReturn
+            document.addEventListener('keydown', onReturn, { once: true });
+            document.addEventListener('wheel', onReturn, { once: true });
+            document.addEventListener('click', onReturn, { once: true });
+            document.addEventListener('touchstart', onReturn, { once: true });
+        }, RETURN_THRESHOLD - IDLE_THRESHOLD);
+
+        if (Toast.hasShown('idle-nav')) return;
+        setRailDot(true);
+        Toast.show({
+            id: 'idle-nav',
+            icon: '⌨️',
+            message: isMobile()
+                ? 'Tap the <span class="toast-accent">arrows</span> or swipe to navigate sentence by sentence.'
+                : 'Press <span class="toast-accent">Space</span> or <span class="toast-accent">↑↓</span> to navigate sentence by sentence.',
+            duration: 12000,
+            onDismiss: () => setRailDot(false)
+        });
+    }
+
+    function onReturn(e) {
+        // Clean up other listeners
+        ['keydown','wheel','click','touchstart'].forEach(ev =>
+            document.removeEventListener(ev, onReturn)
+        );
+        if (Toast.hasShown('return-welcome-back')) return;
+        const sameSentence = state.currentSentenceIndex === lastSentenceIndexAtIdle;
+        setRailDot(true);
+        Toast.show({
+            id: 'return-welcome-back',
+            icon: '↩',
+            message: sameSentence
+                ? 'Welcome back — press <span class="toast-accent">Space</span> to pick up where you left off.'
+                : 'Good to have you back. <span class="toast-accent">Keep reading.</span>',
+            duration: 12000,
+            onDismiss: () => setRailDot(false)
+        });
+    }
+
     // ─── Scroll wheel analysis ───
     let wheelTimestamps = [];
     let keyOrButtonUsed = false;
     let wheelOnlyWarned = false;
     let totalWheelCount = 0;
-
     const WHEEL_WINDOW = 2000;
     const RAPID_WHEEL_THRESHOLD = 5;
     let rapidWheelStage = 0;
 
     function onWheel() {
+        resetIdleTimer();
         const now = Date.now();
         wheelTimestamps.push(now);
         totalWheelCount++;
         wheelTimestamps = wheelTimestamps.filter(t => now - t <= WHEEL_WINDOW);
-
         const count = wheelTimestamps.length;
 
         if (count >= RAPID_WHEEL_THRESHOLD) {
@@ -1917,10 +1970,12 @@ const toastBehaviors = (() => {
 
     function onKeyOrButton() {
         keyOrButtonUsed = true;
+        resetIdleTimer();
     }
 
     // ─── Chapter crossing: logo pulse ───
     function onChapterAdvance() {
+        resetIdleTimer();
         const brand = document.getElementById('brandLogo');
         if (brand) {
             brand.classList.add('chapter-pulse');
@@ -1928,37 +1983,54 @@ const toastBehaviors = (() => {
         }
     }
 
-    // ─── Conclusion chapter toast ───
-    function onConclusionChapter() {
-        if (Toast.hasShown('conclusion-chapter')) return;
-        setRailDot(true);
-        Toast.show({
-            id: 'conclusion-chapter',
-            icon: '✦',
-            message: 'You\'ve reached <span class="toast-accent">the conclusion</span>. Almost there.',
-            duration: 12000,
-            onDismiss: () => setRailDot(false)
-        });
+    // ─── Bracket nudge ───
+    // Fires after 15+ sentences with zero brackets opened
+    let bracketNudgeSent = false;
+    function checkBracketNudge() {
+        if (bracketNudgeSent || Toast.hasShown('bracket-nudge')) return;
+        if (state.bracketsOpened === 0 && state.sentencesSeen.size >= 15) {
+            bracketNudgeSent = true;
+            setRailDot(true);
+            Toast.show({
+                id: 'bracket-nudge',
+                icon: '[ ]',
+                message: 'See the <span class="toast-accent">bracketed annotations</span>? Tap or click them to expand footnotes.',
+                duration: 12000,
+                onDismiss: () => setRailDot(false)
+            });
+        }
     }
 
-    // ─── Last sentence toast ───
+    function onBracketOpened() {
+        resetIdleTimer();
+        bracketNudgeSent = true; // suppress nudge once they've used one
+    }
+
+    // ─── End-of-content CTA ───
     function onLastSentence() {
-        if (Toast.hasShown('last-sentence')) return;
+        if (Toast.hasShown('end-cta')) return;
         setRailDot(true);
         Toast.show({
-            id: 'last-sentence',
-            icon: '◼',
-            message: 'You read it. Every sentence. <span class="toast-accent">Thank you.</span>',
+            id: 'end-cta',
+            icon: '✦',
+            message: 'That\'s everything. Find more at <span class="toast-accent">zackgort.com</span> — or reach out.',
+            actionLabel: 'Portfolio →',
+            actionFn: () => window.open('https://zackgort.com', '_blank'),
             duration: 12000,
+            banner: true,
             onDismiss: () => setRailDot(false)
         });
     }
 
-    function onBracketOpened() { /* reserved */ }
-    function onSentenceAdvance() { /* reserved */ }
+    function onSentenceAdvance() {
+        resetIdleTimer();
+        checkBracketNudge();
+    }
+
+    function onConclusionChapter() { /* removed — replaced by end-of-content CTA */ }
 
     function init() {
-        // Page-load welcome banner
+        // Welcome banner
         setTimeout(() => {
             Toast.show({
                 id: 'welcome-banner',
@@ -1970,13 +2042,15 @@ const toastBehaviors = (() => {
             });
         }, 1800);
 
-        // Ambient toasts begin after 30s
+        // Start idle detection
+        idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
+
+        // Ambient pool after 30s
         setTimeout(scheduleNextAmbient, 30000);
     }
 
     return { onWheel, onSingleWheel, onKeyOrButton, onSentenceAdvance, onChapterAdvance, onBracketOpened, onConclusionChapter, onLastSentence, init, getAmbientPool: () => AMBIENT_POOL, clearAmbientTimer: () => clearTimeout(ambientTimer), setRailDot };
 })();
-
 
 function makeDraggable(el, { useRight = true, useBottom = true } = {}) {
     if (!el || el.dataset.draggableBound) return;
@@ -2325,11 +2399,9 @@ function highlightSentence(index) {
     // Track stats
     trackSentence(index);
     trackChapter(getCurrentChapter());
-    
-    // Conclusion chapter toast (chapter id 9)
-    if (getCurrentChapter() === 9) toastBehaviors.onConclusionChapter();
+    toastBehaviors.onSentenceAdvance();
 
-    // Last sentence toast
+    // End-of-content CTA on last sentence
     if (index === state.allSentenceElements.length - 1) toastBehaviors.onLastSentence();
 
     updateChapterProgress();
@@ -2981,6 +3053,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (e) => {
         const navKeys = ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
         if (navKeys.includes(e.key) || navKeys.includes(e.code)) toastBehaviors.onKeyOrButton();
+        else toastBehaviors.onKeyOrButton(); // any keypress resets idle
     }, { passive: true });
     Utils.$('#prevSentenceBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
     Utils.$('#nextSentenceBtn')?.addEventListener('click', () => toastBehaviors.onKeyOrButton(), { passive: true });
