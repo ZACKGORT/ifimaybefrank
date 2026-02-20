@@ -917,17 +917,6 @@ body.grid-open .grid-close-hotspot { display: block; }
 #cursor.has-image { opacity: 0; }
 
 /* ===================================
-   SCROLL HINT
-   =================================== */
-.scroll-hint { 
-    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
-    display: flex; flex-direction: column; align-items: center; gap: 8px; 
-    z-index: var(--z-ui); opacity: 0; animation: fadeInOut 8s ease-in-out; pointer-events: none; 
-}
-.scroll-hint-icon { width: 24px; height: 24px; border-right: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); transform: rotate(45deg); animation: bounce 1.5s ease-in-out infinite; }
-.scroll-hint-text { font-family: var(--ui-font); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
-
-/* ===================================
    TOAST NOTIFICATIONS
    =================================== */
 .toast-container {
@@ -1103,7 +1092,6 @@ body.grid-open .grid-close-hotspot { display: block; }
     .left-rail { display: flex; padding: 10px 4px 10px 0; }
     .mobile-nav-button { width: 36px; height: 36px; }
     .mobile-progress-text { font-size: 9px; }
-    .scroll-hint { display: none; }
     .text-layer { padding: 10vh 8vw 20vh; max-width: 90%; }
     .header { padding: 10px 20px; }
     .stream { font-size: clamp(16px, 3vw, 24px); }
@@ -1113,7 +1101,6 @@ body.grid-open .grid-close-hotspot { display: block; }
 @media (max-width: 768px) {
     .scroll-progress { display: none; }
     .left-rail { display: flex; }
-    .scroll-hint { display: none; }
     .text-layer { padding: 12vh 6vw 20vh 50px; max-width: 95%; }
     .stream { font-size: clamp(16px, 4vw, 28px); }
     .hover-image { width: 800px; height: 600px; }
@@ -1137,8 +1124,7 @@ body.grid-open .grid-close-hotspot { display: block; }
     body.ui-hidden .scroll-progress,
     body.ui-hidden .left-rail,
     body.ui-hidden #statsWidget,
-    body.ui-hidden #keyboardLegend,
-    body.ui-hidden .scroll-hint {
+    body.ui-hidden #keyboardLegend {
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
@@ -1147,10 +1133,21 @@ body.grid-open .grid-close-hotspot { display: block; }
     body:not(.ui-hidden) .scroll-progress,
     body:not(.ui-hidden) .left-rail,
     body:not(.ui-hidden) #statsWidget,
-    body:not(.ui-hidden) #keyboardLegend,
-    body:not(.ui-hidden) .scroll-hint {
+    body:not(.ui-hidden) #keyboardLegend {
         transition: opacity 0.3s ease;
     }
+    /* ui-hidden hotzone — top-right corner, matches existing close-hotspot geometry */
+    .ui-hidden-hotspot {
+        position: fixed;
+        top: 0; right: 0;
+        width: 25vw; height: 25vh;
+        min-width: 150px; min-height: 150px;
+        z-index: calc(var(--z-ui) + 5);
+        cursor: none;
+        display: none;
+        pointer-events: auto;
+    }
+    body.ui-hidden .ui-hidden-hotspot { display: block; }
     </style>
 </head>
 <body>
@@ -1170,6 +1167,7 @@ body.grid-open .grid-close-hotspot { display: block; }
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot rotate-close-hotspot" id="rotateCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
+    <div class="ui-hidden-hotspot" id="uiHiddenHotspot" aria-label="Move cursor here to restore UI"></div>
     
     <div class="rotate-warning" id="rotateWarning">
         <svg viewBox="0 0 24 24"><path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/></svg>
@@ -1395,8 +1393,8 @@ const imageMap = {
     'my own way': 'https://i.ibb.co/bHsf63Q/2269150474215204867-5144774570.jpg',
     'conviction counters': 'https://i.ibb.co/bjCjbfbT/603a93efdfd184c21ef2d238-IMG-3352.webp',
     'curriculum vitae': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
-    'the impetus': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
-    'the innovations': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
+    'my impetus': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
+    'my innovations': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
     'eyes and mind': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp',
 
     'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
@@ -1801,6 +1799,13 @@ const toastBehaviors = (() => {
 
     // ─── Ambient pool ───
     const AMBIENT_POOL = [
+        {
+            id: 'amb-hide-ui',
+            icon: '◻',
+            message: () => 'Press <span class="toast-accent">H</span> to hide the interface — just you and the text.',
+            actionLabel: 'Try it',
+            actionFn: () => toggleUIVisibility()
+        },
         {
             id: 'amb-theme',
             icon: '☀️',
@@ -2737,7 +2742,7 @@ function render() {
                 chapterBreak.className = 'chapter-break';
                 chapterBreak.dataset.chapterId = nextChapter.id;
                 chapterBreak.innerHTML = `<span class="chapter-number">Chapter ${String(nextChapter.id + 1).padStart(2, '0')}</span><span class="chapter-title">${nextChapter.title}</span>`;
-                chapterBreak.addEventListener('click', () => openDropdownFromChapterBreak(chapterBreak, nextChapter.id));
+                chapterBreak.addEventListener('click', () => { showUI(); openDropdownFromChapterBreak(chapterBreak, nextChapter.id); });
                 fragment.appendChild(chapterBreak);
                 currentActiveChapter = nextChapter.id;
                 nextChapterIndex++;
@@ -2921,6 +2926,12 @@ function initializeCloseHotspots() {
     rotateCloseHotspot.addEventListener('mouseenter', () => cursor.element.classList.add('close-mode'));
     rotateCloseHotspot.addEventListener('mouseleave', () => cursor.element.classList.remove('close-mode'));
     rotateCloseHotspot.addEventListener('click', () => { rotateWarning.style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); });
+
+    // ui-hidden hotspot — top-right corner restores UI (same geometry as close-hotspots)
+    const uiHiddenHotspot = document.getElementById('uiHiddenHotspot');
+    uiHiddenHotspot.addEventListener('mouseenter', () => cursor.element.classList.add('close-mode'));
+    uiHiddenHotspot.addEventListener('mouseleave', () => cursor.element.classList.remove('close-mode'));
+    uiHiddenHotspot.addEventListener('click', () => { showUI(); cursor.element.classList.remove('close-mode'); });
     // Mobile tap-to-dismiss on the overlay itself
     rotateWarning.addEventListener('click', () => { rotateWarning.style.display = 'none'; if (state.layoutMode === 'split') toggleLayout(); });
 }
