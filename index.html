@@ -1626,6 +1626,7 @@ I'm not worried about AI taking our jobs. My talent is presenting ideas that upl
 
 You can find my music on SoundCloud. My photography lives on Instagram. My full portfolio is at zackgort.com. Thanks for reading one sentence at a time.`;
 
+
 // ===================================
 // UTILITY FUNCTIONS
 // ===================================
@@ -3080,7 +3081,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
     
     document.addEventListener('click', e => {
-        if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target)) closeChapterDropdown();
+        if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target) && !e.target.closest('.chapter-break')) closeChapterDropdown();
     });
     
     window.addEventListener('wheel', handleScroll, { passive: false });
