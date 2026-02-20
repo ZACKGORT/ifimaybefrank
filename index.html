@@ -725,6 +725,23 @@ body.theme-transitioning::after {
 .chapter-break .chapter-title { display: block; font-size: 1.2em; font-weight: var(--chapter-break-weight); letter-spacing: var(--chapter-break-letter-spacing); }
 
 /* ===================================
+   SUBCHAPTER BREAKS
+   =================================== */
+.subchapter-break {
+    display: block; margin: 2em 0 1.5em; padding: 0.75em 0;
+    border-top: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+    text-align: center; font-family: var(--ui-font); font-size: var(--chapter-break-font-size);
+    letter-spacing: var(--chapter-break-letter-spacing);
+    text-transform: uppercase; color: var(--ink-3); opacity: 0.5;
+    pointer-events: none; transition: opacity 0.3s ease;
+}
+.subchapter-break .subchapter-title {
+    display: inline-block; font-size: 1.11em;
+    font-weight: var(--chapter-break-weight);
+    letter-spacing: var(--chapter-break-letter-spacing);
+}
+
+/* ===================================
    BRACKETS
    =================================== */
 .bracket-trigger { 
@@ -1607,45 +1624,62 @@ This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Fac
 I built my first computer circa 2005 into 2006. I immediately installed pirated copies of Adobe Photoshop and Illustrator.[bootstrap roots] While I didn't study at university long enough to graduate, [stop-out, not drop-out] I studied what I saw. [] I observed, almalgamated, and carried my craft through conviction. I read books, flipped through magazines, and took on client work. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [] A garage startup in the suburbs of Philadelphia that would become my formal education.
 
 A turning point at Turn5 Inc. The kind of place where you wear the hat you want. I was handed a brand new PC and a Canon Rebel DSLR. Charged with designing for our web properties, product packaging, printed catalogues, emails and ads; all across multiple brand systems. Add product photography and retouching, specializing in color match and OEM quality. Photographing and retouching thousands of parts. 
-//Pivot to web design, focusing on email marketing and bespoke feature design. We designed everything from ground-up. We built a lifestyle brand that grew from ten to forty million per year during my time at Turn5. I played my part, but I wanted to escape suburbia with my eyes set on city life.
-//
+
+### Design By Data.
+Pivot to web design, focusing on email marketing and bespoke feature design. We designed everything from ground-up. We built a lifestyle brand that grew from ten to forty million per year during my time at Turn5. I played my part, but I wanted to escape suburbia with my eyes set on city life.
+
+### From Suburbs to the City.
 Leadnomics was shifty — paradigm shifty. [sic] We focused on lead generation across multiple verticals. But our cash cow were payday loans [Look, I did not know this till after I started working there, but as I was merely the conduit, and not the lender, nor the shark, my conscience abided] Said bluntly, my job was to make it easy for our users to make catastrophic financial decisions. I achieved a 95.8% conversion rate using responsive design and rigorous testing [I am not proud of this, per se; it was actually 98.5%, but that seems less believable] But the pay and perks were great — free lunches, flexible work, nice views. [seeing the city skyline from across the river behooved my next career move]  Business bides by imperative, not by idealism.
-//
+
+### Re-evaluate, then engage.
 Nearing three years with this company, I found myself with a completely comminuted clavicle. [cycling slip along the Schuylkill River Trail] Karma? I think so. [It gave me a moment to pause, evaluate, and act] I spent my downtime learning to code — HTML, CSS, and JavaScript. I built an interactive haiku to test my skills — it wasn't profound, but it proved potential. Enter #agencylife.
 
 One Sixty Over Ninety — my heartrate when offered a job as an Interaction Designer in Center City, Philadelphia. I took a pay cut to join their new Interactive Department, but I was there to learn. Clients included Comcast, Kent State, and the Philadelphia Eagles. We worked long days, longer nights, and short weekends. Lots of weekends. 
 
 //The culture demanded we dare. [to try; to push beyond] The agency invited creatives to take risks; operating and ideating beyond our comfort zone. The work wasn't scientific. It was expressive. It was novel. It was considered. As an interactive designer, I had a hand in every aspect of the creative process.
-//
+
+### A Digital Product Shop.
 O3 World was an elevating experience. A digital product shop in the heart of Fishtown, Philly. We were Agile in nature and scrum led. [via a certified scrum master] We held daily stand-ups to manage projects for clients like La Colombe, Vertex, and SEIC. [E-commerce via Shopify; Web App for small business owners, and enterprise scale financial products] 
 //We practiced true Lean UX methodologies. We workshopped with whiteboards. We wireframed with Balsamiq. We shipped.
 
-//Downtown from Fishtown was Workarea, where I worked on a proprietary SaaS platform. We skipped high-fidelity mockups for napkin sketches and direct collaboration with developers. We were a dev-shop through and through. We built things better, faster, smarter. The company sold, pushing me into yet another pivot.
-//
+### A Bona Fide Dev Shop.
+Downtown from Fishtown was Workarea, where I worked on a proprietary SaaS platform. We skipped high-fidelity mockups for napkin sketches and direct collaboration with developers. We were a dev-shop through and through. We built things better, faster, smarter. The company sold, pushing me into yet another pivot.
+
+### Foot-In-Door to NYC
 Enter FlightPath. My gateway to New York City. Emerging from bankruptcy, the agency served the pharmaceutical sector [reduced from a bustling two-floor office in Midtown to a mere 10 employees; with I being the sole designer] They needed my help, and this was my foot-in-the-door to the NYC scene.
 //
 I worked on rigorous WCAG compliance for our Pharma clients [Merck, Vetsulin, Charter, Organic Girl, Goya, and several non-profits] Commuting from Philly to Manhattan — and back — every business day for a full year. Up and out by 5:00am; home by 10pm — sometimes. Saw both Sunrise and Sunset every day away from home. Two skylines three hours apart. I didn't burnout; I was killing it.
-//
+
+### From Midtown to Uptown.
 From Workarea to LiveArea. From IC to Manager, I owned the UX process for a gamut of B2B & B2C brands [via the SalesForce E-commerce platform] There was your usual ideation & creation process, but my biggest win was in workshopping. After several rounds of our client becoming increasingly overwhelmed and frustrated, [Imagine being a master of your domain, and some agency comes in telling you what you need] I created "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
-//
+
+### West Coast Vibes.
 At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema. We didn't have time for perfection, but we successfully modernized and optimized their online experience.
-//
+
+### Small Cog in a Huge Wheel
 At Huge, teams were massive. I was responsible for a single user flow, unaware of the other designers on the project. To say we were siloed would be an understatement.
-//
+
+### From the 62nd of the One World Trade Center.
 At Code and Theory, I was hired as a Senior Designer with sights on ACD. I quickly proved my worth. But leadership churn and a lack of support made it a challenging experience. I acted as a Directly Responsible Individual for UX and strategy. I learned hard lessons about large agencies.
-//
+
+### Hello from Agency Row.
 Enter Publicis Sapient. I spent a year working on Digital Transformation for BNY Mellon. I became the de facto Team Lead, driving exhaustive research and client workshops. Despite my consistent presence and hard work securing a contract extension, I was laid off. I was just a number on a spreadsheet.
-//
+
+### Down But Not Out
 Come on baby, let's do the twist. I pivoted to low voltage networking. I learned to terminate an RJ45 in 30–45 seconds. I run cables, install security systems, and manage cable management. It requires specific twist parity. I'm using different parts of my brain, but I still have mouths to feed.
 
+### Design Sandbox
 As an aside, I've been building. I repurposed intoview.pro as a platform for creative exploration. I built a note-taking app and a kanban board. I created emdash.click because the world needed it. These aren't just portfolio pieces; they are functioning products that prove I can build.
 
+### Seek & Employ
 Currently I'm seeking my next full-time role. I want work that matters with people who care. I offer systems thinking and hands-on prototyping. I bridge design and development. I think. I make.
 
-Beyond the work, there's music. I play guitar left-handed. I take photographs of New York. I have a dog named Wolfgang. I once wore a pink onesie to this country. These details make the whole picture.
+### Life Stuff
+Beyond the work, there's music. I play guitar left-handed. I take photographs of New York. I have a dog named Wolfgang. I once chased and helped safely capture a wild zebra through the streets of West Philly. 
 //
 I'm not worried about AI taking our jobs. My talent is presenting ideas that uplift imagination. I do this with capable hands. [I think different]
 
+### Connect
 You can find my music on SoundCloud. My photography lives on Instagram. My full portfolio is at zackgort.com. Thanks for reading one sentence at a time.`;
 
 
@@ -2319,6 +2353,10 @@ function parseNarrative(text) {
                         sentences.forEach(sentence => {
                             const trimmedSentence = sentence.trim();
                             if (!trimmedSentence) return;
+                            if (trimmedSentence.startsWith('### ')) {
+                                parts.push({ type: 'subchapter-break', id: idCounter++, title: trimmedSentence.substring(4).trim() });
+                                return;
+                            }
                             if (/^\(\d+\)\s/.test(trimmedSentence)) {
                                 const match = trimmedSentence.match(/^\((\d+)\)\s(.+)/);
                                 if (match) { parts.push({ type: 'numbered-bullet', id: idCounter++, number: match[1], text: match[2].trim() }); return; }
@@ -2779,6 +2817,11 @@ function render() {
             br.className = 'line-break-spacer';
             br.innerHTML = part.breakType === 'double' ? '<br><br>' : '<br>';
             fragment.appendChild(br);
+        } else if (part.type === 'subchapter-break') {
+            const el = document.createElement('div');
+            el.className = 'subchapter-break';
+            el.innerHTML = `<span class="subchapter-title">${part.title}</span>`;
+            fragment.appendChild(el);
         } else if (part.type === 'bullet') {
             const li = document.createElement('div');
             li.className = 'sentence bullet-item';
