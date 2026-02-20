@@ -1000,9 +1000,10 @@ body.grid-open .grid-close-hotspot { display: block; }
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot rotate-close-hotspot" id="rotateCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     
-    <div class="rotate-warning">
+    <div class="rotate-warning" id="rotateWarning">
         <svg viewBox="0 0 24 24"><path d="M4 7.59l5-5c.78-.78 2.05-.78 2.83 0L20 10.76c.78.78.78 2.05 0 2.83L11.83 21.76c-.78.78-2.05.78-2.83 0l-5-5c-.78-.78-.78-2.05 0-2.83L4 7.59zM9 19.17l8.17-8.17L9 2.83 2.83 9 9 19.17zM17 12h-2v2h2v-2zm0-4h-2v2h2V8zm0-4h-2v2h2V4z"/></svg>
         <p>Please rotate your device to landscape for Split View.</p>
+        <p style="font-size:11px;opacity:0.5;margin-top:12px;font-family:var(--ui-font);">TAP TO DISMISS</p>
     </div>
 
     <div id="keyboardLegend" class="keyboard-legend" title="Drag to move">
@@ -1195,7 +1196,6 @@ const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, 
 const chapters = [
     { id: 0, title: "Hello World", startText: "The year is 2026" },
     { id: 1, title: "Words from the Maker", startText: "I loathe to be so bold" },
-    { id: 1, title: "Introduction", startText: "I am Zack" },
     { id: 2, title: "The Early Days", startText: "I built my first computer" },
     { id: 3, title: "Suburbia Startup", startText: "A turning point at Turn5 Inc." },
     { id: 4, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
@@ -1404,11 +1404,11 @@ Object.keys(imageMap).forEach(phrase => {
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
 });
 
-const narrative = `The year is 2026. Here we are — scrolling endlessly through feeds optimized for monetization over mindfulness. [operational fulfillment, not emotional] Flowing endlessly through content fabricated to fade into the void. What if we paused? What if reading felt intentional again? Beat by beat — beat for beat. From moment to movement. [All em dashes in this piece were sourced from www.emdash.click] 
+const narrative = `The year is 2026. Here we are — scrolling endlessly through feeds optimized for monetization over mindfulness. [operational fulfillment, not emotional] Flowing endlessly through content fabricated to fade into the void. What if we paused? What if reading felt intentional again? Beat by beat, beat by beat. From moment to movement. [All em dashes in this piece were sourced from www.emdash.click] 
 
 I loathe to be so bold [This is not some grand manifesto about the state of UX] — but may I say, conviction counters convection by convention [Strong belief resists being carried by the current of convention.] This is my curriculum vitae. [A polished portfolio seems disingenuous to me. Facts are never facts. Truths are almost always half-lies. Capabilities become curbed. We move through content that does not move us. It feels static. It feels stale.It feels safe.]  My career focus realized. My journey materialized. Through the eyes and mind of the beholder [The underlying mechanism that defines the user experience of this site concept is a 'stream of consciousness'] 
 
-//Truth be told, I'm building something beyond than this. [This is just a tribute] May this serve as a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
+//Truth be told, I'm building something greater than this. [] May this serve as a proof of concept — if not of the final product, but of my approach. But first, let me introduce myself properly.
 //I am Zack — Thinker & Maker. [musician, photographer, writer, roamer, wanderer, nomad, Metallica fan] A left-handed autodidact with an affinity for alliterative apropros. [sic] A self-taught designer who learned to code. [amongst many things] An observer, a planner, and a dreamer. A craftsman. I seek not to disrupt, but to discover.  
 
 I built my first computer circa 2005 into 2006. I immediately installed pirated copies of Adobe Photoshop and Illustrator.[bootstrap roots] While I didn't study at university long enough to graduate, [stop-out, not drop-out] I studied what I saw. [] I observed, almalgamated, and carried my craft through conviction. I read books, flipped through magazines, and took on client work. I created faux website concepts to understand designing for the medium. All this culminated in responding to a Craigslist post that changed everything. [] A garage startup in the suburbs of Philadelphia that would become my formal education.
@@ -1420,7 +1420,7 @@ Leadnomics was shifty — paradigm shifty. [sic] We focused on lead generation a
 //
 Recovering from a completely comminuted clavicle, [Karma?] I spent my downtime learning to code — HTML, CSS, and JavaScript. I built an interactive haiku to prove my skills — it wasn't profound, but it proved potential. Enter #agencylife.
 
-One Sixty Over Ninety — my heartrate when offered a job as an Interaction Designer in Center City, Philadelphia. I took a pay cut to join their new Interactive Department, but I was there to learn. Clients included Comcast, Kent State, and the Philadelphia Eagles. We worked long days, longer nights, and short weekends. Lots of weekends. But, the culture was welcomed conviction. The agency invited creatives to take risks and push beyond their comfort zone. I specialized in Information Architecture [navigation sitemaps, content taxonomies,SEO & ADA optimizations] and Visual Design Systems [font ramps, UI kits, developer documentation, & Figma protoypes].
+One Sixty Over Ninety — my heartrate when offered a job as an Interaction Designer in Center City, Philadelphia. I took a pay cut to join their new Interactive Department, but I was there to learn. Clients included Comcast, Kent State, and the Philadelphia Eagles. We worked long days, longer nights, and short weekends. Lots of weekends. But, the culture was welcoming. The agency invited creatives to take risks and push beyond their comfort zone. I specialized in Information Architecture [navigation sitemaps, content taxonomies,SEO & ADA optimizations] and Visual Design Systems [font ramps, UI kits, developer documentation, & Figma protoypes].
 //
 O3 World was an elevating experience. We were agile in nature and scrum led. [like, actually Agile] We held daily scrums to manage projects for clients like La Colombe, Vertex, and SEIC. [E-commerce via Shopify; Web App for small business owners, and enterprise scale financial products]   
 
@@ -2311,12 +2311,15 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
 function initializeCloseHotspots() {
     const gridCloseHotspot = Utils.$('#gridCloseHotspot');
     const rotateCloseHotspot = Utils.$('#rotateCloseHotspot');
+    const rotateWarning = Utils.$('#rotateWarning');
     gridCloseHotspot.addEventListener('mouseenter', () => cursor.element.classList.add('close-mode'));
     gridCloseHotspot.addEventListener('mouseleave', () => cursor.element.classList.remove('close-mode'));
     gridCloseHotspot.addEventListener('click', () => { toggleImageGrid(); cursor.element.classList.remove('close-mode'); });
     rotateCloseHotspot.addEventListener('mouseenter', () => cursor.element.classList.add('close-mode'));
     rotateCloseHotspot.addEventListener('mouseleave', () => cursor.element.classList.remove('close-mode'));
-    rotateCloseHotspot.addEventListener('click', () => { Utils.$('.rotate-warning').style.display = 'none'; cursor.element.classList.remove('close-mode'); });
+    rotateCloseHotspot.addEventListener('click', () => { rotateWarning.style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); });
+    // Mobile tap-to-dismiss on the overlay itself
+    rotateWarning.addEventListener('click', () => { rotateWarning.style.display = 'none'; if (state.layoutMode === 'split') toggleLayout(); });
 }
 
 // ===================================
@@ -2368,7 +2371,7 @@ function initializeKeyboardControls() {
         else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
             closeChapterDropdown();
             if (isGridOpen()) { toggleImageGrid(); cursor.element.classList.remove('close-mode'); }
-            else if (Utils.$('.rotate-warning').style.display === 'flex') { Utils.$('.rotate-warning').style.display = 'none'; cursor.element.classList.remove('close-mode'); }
+            else if (Utils.$('#rotateWarning').style.display === 'flex') { Utils.$('#rotateWarning').style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); }
             else if (state.layoutMode === 'split') toggleLayout();
         }
     });
