@@ -1078,7 +1078,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
     </div>
 
-
+    <div class="interaction-hint" id="interactionHint">Move by touch</div>
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1209,6 +1209,7 @@ body.grid-open .grid-close-hotspot { display: block; }
     </div>
 
     <div class="scroll-hint" aria-hidden="true">
+        <div class="scroll-hint-icon"></div>
         <span class="scroll-hint-text">Scroll · Left / Right / Up / Down · SPC / ENT / SHFT / ESC</span>
     </div>
 
@@ -1826,7 +1827,7 @@ const toastBehaviors = (() => {
                     : 'Try <span class="toast-accent">Space</span>, <span class="toast-accent">↑↓</span>, or the chapter menu for smoother navigation.',
                 actionLabel: 'Chapters',
                 actionFn: () => toggleChapterDropdown(),
-                duration: 12000
+                duration: 9000
             });
         }
     }
