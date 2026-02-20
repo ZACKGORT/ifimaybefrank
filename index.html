@@ -480,10 +480,10 @@ body.layout-split .mobile-right-rail { display: none !important; }
     display: flex; flex-direction: column; gap: 6px; padding: 10px 0; align-items: center;
 }
 .chapter-bar { 
-    width: 20px; height: 4px; background: var(--chapter-bar-bg); border-radius: 2px; 
+    width: 12px; height: 12px; background: var(--chapter-bar-bg); border-radius: 2px; 
     cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
 }
-.chapter-bar:hover { width: 32px; height: 6px; background: var(--chapter-bar-hover-bg); }
+.chapter-bar:hover { width: 24px; height: 24px; background: var(--chapter-bar-hover-bg); }
 .chapter-bar.active { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
 .chapter-bar.active:hover { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
 .chapter-bar.completed { background: var(--chapter-bar-completed-bg); }
@@ -1597,6 +1597,7 @@ function trackSentence(index) {
         pulseStatValue('statSentencesSeen');
         updateStats();
     }
+    toastBehaviors.onSentenceAdvance();
 }
 
 function trackChapter(chapterId) {
@@ -1689,16 +1690,26 @@ const Toast = (() => {
 // TOAST BEHAVIORS (triggers)
 // ===================================
 const toastBehaviors = (() => {
-    // Track slow-scroll detection
+    // --- Timers & counters ---
     let scrollEventCount = 0;
     let scrollCountTimer = null;
     let idleTimer = null;
-    const IDLE_THRESHOLD = 12000; // 12s of no interaction
-    const SLOW_SCROLL_WINDOW = 4000; // 4s window
-    const SLOW_SCROLL_MIN_EVENTS = 5;
-    let hasInteracted = false;
-    let chapterNudgeSentAt = -1; // which chapter index triggered the chapter-nav toast
 
+    // Fast-navigation: track sentence advances within a rolling window
+    let fastNavTimestamps = [];
+    const FAST_NAV_WINDOW = 3000;      // 3s rolling window
+    const FAST_NAV_THRESHOLD = 8;      // 8 sentence advances in 3s = "flying"
+    const FAST_NAV_GRID_THRESHOLD = 14; // even faster = suggest grid
+    let fastNavGridShownAt = 0;         // sentence index when grid toast last fired
+
+    const IDLE_THRESHOLD = 12000;
+    const SLOW_SCROLL_WINDOW = 4000;
+    const SLOW_SCROLL_MIN_EVENTS = 5;
+
+    let hasInteracted = false;
+    let chapterNudgeSentAt = -1;
+
+    // --- Idle ---
     function resetIdleTimer() {
         hasInteracted = true;
         clearTimeout(idleTimer);
@@ -1718,6 +1729,7 @@ const toastBehaviors = (() => {
         });
     }
 
+    // --- Slow scroll → Split View ---
     function onScrollActivity() {
         resetIdleTimer();
         if (Toast.hasShown('slow-scroll-split')) return;
@@ -1737,6 +1749,47 @@ const toastBehaviors = (() => {
         }
     }
 
+    // --- Fast sentence navigation ---
+    function onSentenceAdvance() {
+        resetIdleTimer();
+
+        const now = Date.now();
+        fastNavTimestamps.push(now);
+        // Prune timestamps outside the rolling window
+        fastNavTimestamps = fastNavTimestamps.filter(t => now - t <= FAST_NAV_WINDOW);
+
+        const pace = fastNavTimestamps.length;
+
+        // Very fast → suggest grid (image overview)
+        if (pace >= FAST_NAV_GRID_THRESHOLD && !Toast.hasShown('fast-nav-grid')) {
+            Toast.show({
+                id: 'fast-nav-grid',
+                icon: '▦',
+                message: 'Moving fast? <span class="toast-accent">Display</span> shows all chapter images at a glance.',
+                actionLabel: 'Open',
+                actionFn: () => toggleImageGrid(),
+                duration: 8000
+            });
+            return; // don't stack with chapter-skip hint
+        }
+
+        // Fast → suggest chapter skip / dropdown
+        if (pace >= FAST_NAV_THRESHOLD && !Toast.hasShown('fast-nav-chapter-skip')) {
+            const isMobile = window.innerWidth <= 768 || state.isTouch;
+            Toast.show({
+                id: 'fast-nav-chapter-skip',
+                icon: '⏭',
+                message: isMobile
+                    ? 'Skimming? Long-press the <span class="toast-accent">arrow buttons</span> to jump a whole chapter.'
+                    : 'Skimming? Use <span class="toast-accent">← →</span> to skip chapters, or browse the chapter menu.',
+                actionLabel: 'Chapters',
+                actionFn: () => toggleChapterDropdown(),
+                duration: 8000
+            });
+        }
+    }
+
+    // --- Chapter crossing ---
     function onChapterAdvance(chapterIndex) {
         resetIdleTimer();
 
@@ -1747,7 +1800,7 @@ const toastBehaviors = (() => {
             setTimeout(() => brand.classList.remove('chapter-pulse'), 1800);
         }
 
-        // After visiting 2+ chapters without using chapter skip, hint at it
+        // After 2+ chapters read without using chapter jump, hint at it
         if (!Toast.hasShown('chapter-nav-hint') && state.chaptersRead.size >= 2 && chapterNudgeSentAt !== chapterIndex) {
             chapterNudgeSentAt = chapterIndex;
             const isMobile = window.innerWidth <= 768 || state.isTouch;
@@ -1769,13 +1822,12 @@ const toastBehaviors = (() => {
     }
 
     function init() {
-        // Start idle timer after a short delay to let page settle
         setTimeout(() => {
             idleTimer = setTimeout(onIdle, IDLE_THRESHOLD);
         }, 3000);
     }
 
-    return { onScrollActivity, onChapterAdvance, onBracketOpened, resetIdleTimer, init };
+    return { onScrollActivity, onSentenceAdvance, onChapterAdvance, onBracketOpened, resetIdleTimer, init };
 })();
 
 
