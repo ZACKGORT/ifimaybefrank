@@ -1132,6 +1132,25 @@ body.grid-open .grid-close-hotspot { display: block; }
     * { animation: none !important; transition: none !important; }
 }
 
+    /* H key: hide all UI chrome, leaving only the reading surface */
+    body.ui-hidden .header,
+    body.ui-hidden .scroll-progress,
+    body.ui-hidden .left-rail,
+    body.ui-hidden #statsWidget,
+    body.ui-hidden #keyboardLegend,
+    body.ui-hidden .scroll-hint {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    body:not(.ui-hidden) .header,
+    body:not(.ui-hidden) .scroll-progress,
+    body:not(.ui-hidden) .left-rail,
+    body:not(.ui-hidden) #statsWidget,
+    body:not(.ui-hidden) #keyboardLegend,
+    body:not(.ui-hidden) .scroll-hint {
+        transition: opacity 0.3s ease;
+    }
     </style>
 </head>
 <body>
@@ -1146,7 +1165,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
     </div>
 
-    <div class="interaction-hint" id="interactionHint">Move by touch</div>
+
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1283,7 +1302,7 @@ body.grid-open .grid-close-hotspot { display: block; }
     </div>
 
     <div class="scroll-hint" aria-hidden="true">
-        <div class="scroll-hint-icon"></div>
+
         <span class="scroll-hint-text">Scroll · Left / Right / Up / Down · SPC / ENT / SHFT / ESC</span>
     </div>
 
@@ -2834,6 +2853,14 @@ function toggleLayout() {
     highlightSentence(state.currentSentenceIndex);
 }
 
+function showUI() {
+    document.body.classList.remove('ui-hidden');
+}
+
+function toggleUIVisibility() {
+    document.body.classList.toggle('ui-hidden');
+}
+
 function toggleTheme() {
     const body = document.body;
     // Add a transitioning flag so grain/edge-blur don't flash during the swap
@@ -2948,8 +2975,10 @@ function initializeKeyboardControls() {
         else if (e.key === 'Shift') { e.preventDefault(); toggleLayout(); }
         else if (e.key === 'l') toggleLayout();
         else if (e.key.toLowerCase() === 't') toggleTheme();
+        else if (e.key.toLowerCase() === 'h') { e.preventDefault(); toggleUIVisibility(); }
         else if (e.key === 'Home') { e.preventDefault(); resetToBeginning(); }
         else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
+            if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
             closeChapterDropdown();
             if (isGridOpen()) { toggleImageGrid(); cursor.element.classList.remove('close-mode'); }
             else if (Utils.$('#rotateWarning').style.display === 'flex') { Utils.$('#rotateWarning').style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); }
