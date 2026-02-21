@@ -1148,8 +1148,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         pointer-events: auto;
     }
     body.ui-hidden .ui-hidden-hotspot { display: block; }
-
-    /* Focus mode — hides UI + suppresses images, mobile hold-to-read */
+    /* Focus Mode */
     body.focus-mode .header,
     body.focus-mode .scroll-progress,
     body.focus-mode .left-rail,
@@ -1177,7 +1176,6 @@ body.grid-open .grid-close-hotspot { display: block; }
         50%       { box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
     }
     body.focus-mode .sentence.active { animation: focusPulse 1.8s ease-in-out infinite; }
-
     </style>
 </head>
 <body>
@@ -1361,7 +1359,7 @@ const state = {
     currentChapterIndex: 0,
     allSentenceElements: [],
     chapterStartIndices: [],
-    subchapterStartIndices: [], // [{sentenceIndex, title}]
+    subchapterStartIndices: [],
     gridImages: [],
     mouseX: 0,
     mouseY: 0,
@@ -1399,18 +1397,16 @@ const chapters = [
     { id: 8, title: "About", startText: "Currently I'm seeking my next" },
     { id: 9, title: "Conclusion", startText: "Beyond the work, there's music" },
     { id: 10, title: "Extras", startText: "You can find my music on SoundCloud" }
-];
+]
 
 const imageMap = {
     'burn and turn': 'https://i.ibb.co/Y7wVfbfK/DSC08212.webp',
     'content churn': 'https://i.ibb.co/MD923R2f/DSC08254.webp',
-    
     'void': 'https://i.ibb.co/MZbMqsT/6039d4bbb15be328fc33b54d-IMG-6478.jpg',
     'paused': 'https://i.ibb.co/BjZQ8KG/2322060064540385797-5144774570.jpg',
     'intentional': 'https://i.ibb.co/m5sNTvYX/603a967916b10d5bef5a6dd8-ZAX02712-1.webp',
     'beat': 'https://i.ibb.co/twyPzFZf/ZAX01304.webp',
     'moment to movement': 'https://i.ibb.co/gMDT38J5/IMG-20200527-221611-475.jpg',
-
     'I loathe to be so bold': 'https://i.ibb.co/0yjJ4j8L/603a967a5dc3e982f571b744-ZAX00968.webp',
     'my own way': 'https://i.ibb.co/bHsf63Q/2269150474215204867-5144774570.jpg',
     'conviction counters': 'https://i.ibb.co/bjCjbfbT/603a93efdfd184c21ef2d238-IMG-3352.webp',
@@ -1418,18 +1414,15 @@ const imageMap = {
     'my impetus': 'https://i.ibb.co/ym4M89VT/1-sq-USg-c1x-GQx-Zd-QS4-L7f-Sw.webp',
     'my innovations': 'https://i.ibb.co/r2nhMymB/1-Dkcm-PIZj6ro-ZML4w2k-Nk-Mw.webp',
     'eyes and mind': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp',
-
     'building something': 'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg',
     'proof of concept': 'https://i.ibb.co/9HzBPc7Y/603a93eea83b1aab7a98c35b-DSC08228.webp',
     'But first': 'https://i.ibb.co/9HWqZ86P/603a95edd9a3b56723de7edc-DSC00910.webp',
-
     'Zack': 'https://i.ibb.co/NZ0y6Hn/2272303929273225747-5144774570.jpg',
     'left-handed': 'https://i.ibb.co/Kp0wZtgT/ZAX01496.jpg',
     'self-taught': 'https://i.ibb.co/52Cm4Cf/63bc58fccaee2352e1c9b36d-Embedded-Image-3.jpg',
     'artist & craftsman': 'https://i.ibb.co/DDFpj6Dm/ZAX03810.jpg',
     'dreamer': 'https://i.ibb.co/hqCtdrS/ZAX02263.jpg',
     'to discover': 'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg',
-
     'built my first computer': 'https://i.ibb.co/fdxZdwwC/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp',
     'pirated copies': 'https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp',
     'study at university': 'https://i.ibb.co/gbVdcLRq/hands-by-zackgort-dckl0r-375w-2x.jpg',
@@ -1438,51 +1431,40 @@ const imageMap = {
     'what I saw around me': 'https://i.ibb.co/8LXV5fSP/1-mn-DJg-S7ab-Si-Pjlzk2-Bxk-TA.webp',
     'studied typography': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'client work': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
-
     'reading books': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'examining magazines': 'https://i.ibb.co/9mcrj9tg/1-h9lj-VOzz-RT-Irakga-DSWv-Q.webp',
     'faux website concepts': 'https://i.ibb.co/DHHzHw8G/1-pu-HZ09-ELFPd-Aa-MK0-HAxq-Q.webp',
     'Craigslist post': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
     'cover letter': 'https://i.ibb.co/mg5GQc5/1-lm5-BUxr0d-Dq73b-Woi3vy4w.webp',
     'formal education': 'https://i.ibb.co/WpPWpTwN/Oaks-2.webp',
-
     'Turn5 Inc': 'https://i.ibb.co/nNdHf3zM/1-dt-Ggr-Sm7am-TRi-5j-QMVe-Iw.webp',
     'where you wear the hat you want': 'https://i.ibb.co/XfC5FTbn/IMG-20200505-222710-446.webp',
     'Canon Rebel': 'https://i.ibb.co/W42LZmDK/ZAX01271.jpg',
     'Charged with designing': 'https://i.ibb.co/fG0dXSr0/1-m7-Hfhu-QO4-Ugr1-Vte-Zf6it-A.webp',
-    
     'package design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
     'catalogue design': 'https://i.ibb.co/KJsXgPv/1-dy-MNhi-XFPWPe9og0-dbv-Q.webp',
-    
     'product photographer': 'https://i.ibb.co/C38FHDx9/1-FYt-Vic-HKj-LDPLW2rcn-J1u-A.webp',
     'OEM quality': 'https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp',
     'Photographing and retouching': 'https://i.ibb.co/w581TnW/1-ktn-HKT8-Zg-IADpbe-Byv2bqg.webp',
     'Pivot to web': 'https://i.ibb.co/sv8nw0Dp/1-rqzz-Cscn-OIL96-Vm-Ln0v7d-A.webp',
     'We designed everything from ground-up': 'https://i.ibb.co/QdmJdXh/AM-wire.jpg',
-    
     'email and ads': 'https://i.ibb.co/vxXJ7fSV/1-rqzz-Cscn-OIL96-Vm-Ln0v7d-A.webp',
     'user testing': 'https://i.ibb.co/fG0dXSr0/1-m7-Hfhu-QO4-Ugr1-Vte-Zf6it-A.webp',
     'forty million per year': 'https://i.ibb.co/YTKt6LcS/IMG-20210515-151006.webp',
-
-    
     'city life': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
     'Leadnomics': 'https://i.ibb.co/ZG6v0p5/image-10.png',
     'multiple verticals': 'https://i.ibb.co/KLPDrZQ/image-5-Copy.png',
     'payday loans': 'https://i.ibb.co/k2svMNFv/603d10120fba838e599b6b5e-IMG-1563.webp',
     'catastrophic financial decisions': 'https://i.ibb.co/7JX2kx7T/DSC08804.jpg',
     'pay and perks': 'https://i.ibb.co/5jqqSwp/Cx-BW-h-GXg-AQt-K2m.jpg',
-    
     'conversion rate': 'https://i.ibb.co/N3Sj82y/6463e2dfb2d84c89977adcf7-IMG-20200204-185021-01.jpg',
     'Business bides by imperative': 'https://i.ibb.co/PG3F2y6D/vermont-509.jpg',
-
     'completely comminuted clavicle': 'https://i.ibb.co/Z1NBn9Px/clavicle.webp',
-    'downtime': 'https://i.ibb.co/pvJvGhnt/ZAX02330-1.webp', 
-    'Karma': 'https://i.ibb.co/h1yDszfq/2863797725928703996-5144774570.webp', 
-    'I think so': 'https://i.ibb.co/BHKQwjNL/life.webp', 
-    
+    'downtime': 'https://i.ibb.co/pvJvGhnt/ZAX02330-1.webp',
+    'Karma': 'https://i.ibb.co/h1yDszfq/2863797725928703996-5144774570.webp',
+    'I think so': 'https://i.ibb.co/BHKQwjNL/life.webp',
     'interactive haiku': 'https://i.ibb.co/27BznHGJ/1-BNs-Ch8k1bclj-KMu1-KN-g.gif',
     'Enter #agencylife': 'https://i.ibb.co/twJMjr51/IMG-20150924-142223609.webp',
-    
     'One Sixty Over Ninety': 'https://i.ibb.co/5gGkM1yF/1-a-QOv-TWfv-Awf6m7-oy-Zy-Gy-A.webp',
     'Interactive Department': 'https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp',
     'longer nights': 'https://i.ibb.co/yBcGXrQc/IMG-20150415-134735718.webp',
@@ -1494,51 +1476,40 @@ const imageMap = {
     'novel': 'https://i.ibb.co/k2CCgp95/1-b8ad-Q-Cb-L1-YXoe6o-Fs4t-SQ.webp',
     'considered': 'https://i.ibb.co/pBYP6wt8/1-HXIU3nxu-ZGq-Ne-Ef3-Wv-Lf-MQ.webp',
     'I had a hand': 'https://i.ibb.co/rR74bLkf/1-o-XV3b-GDEf-TKoh-Ue-ICCjc1-A.webp',
-    
-
     'O3 World': 'https://i.ibb.co/LXmyD2hq/IMG-20170104-184947-650.webp',
     'digital product shop': 'https://i.ibb.co/Swf714Sd/o3.webp',
     'agile in nature': 'https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp',
     'scrum led': 'https://i.ibb.co/mr7gnpTg/1-y-GJCqkzizxa-Uxk3-R5-DCD8g.webp',
-
     'daily stand-ups': 'https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp',
     'Lean UX': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
     'we workshopped': 'https://i.ibb.co/ZW3j6T1/Photo-Selects-Sketch-Prep-1-1-Houghton-Nav.jpg',
     'we wireframed': 'https://i.ibb.co/Dg9fM8q8/1-Tut-Ce-PQB0b-SCo-Mf-MTWJb-Q.webp',
     'we shipped': 'https://i.ibb.co/v4q7TbDZ/1-t-Yd-DX2-Ql-VLw-XI7gm3ev-MLw.webp',
-
     'Downtown from Fishtown was Workarea': 'https://i.ibb.co/mjt5Myw/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp',
-    'napkin sketches': '    https://i.ibb.co/ZzCTQbWf/1-e-SNZnvlr-UJAz-AL1-Jx-T0-ZHQ.webp',
-    
+    'napkin sketches': 'https://i.ibb.co/ZzCTQbWf/1-e-SNZnvlr-UJAz-AL1-Jx-T0-ZHQ.webp',
     'Five Foot Gorilla': 'https://i.ibb.co/mjt5Myw/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp',
     'proprietary SaaS': 'https://i.ibb.co/Y49DcPw2/1-KE8g-FA6w4wud1u-DAr-A4-Yv-Q.webp',
     'reframe': 'https://i.ibb.co/C3fQ63NH/vermont-500.jpg',
-    
     'Enter FlightPath': 'https://i.ibb.co/3xrYxxR/ZAX09787.jpg',
     'Hello, New York City': 'https://i.ibb.co/HpnrrYMR/2269419019461331921-5144774570.webp',
     'emerging from bankruptcy': 'https://i.ibb.co/7N4r6FF5/603d0b8b04655c6fd42d2253-DSC08281.jpg',
     'They needed my help': 'https://i.ibb.co/N6hxQ0RG/1-k-SDc-GT46-VQM6-Kk25-SPr-Acg.webp',
     'influence': 'https://i.ibb.co/2KG97tH/63bc73fb17c4cf8bb0731b4f-IMG-20220717-004144-444.webp',
-    'confidence': 'https://i.ibb.co/xHcVc0k/63bc73fb6521f9025bdacc8c-IMG-20220719-182310-414.webp',    
-    'I had agency': 'https://i.ibb.co/gTrCrJd/6463e0a86edfa1bd8ed7ed78-IMG-20220625-231733-173.webp',    
+    'confidence': 'https://i.ibb.co/xHcVc0k/63bc73fb6521f9025bdacc8c-IMG-20220719-182310-414.webp',
+    'I had agency': 'https://i.ibb.co/gTrCrJd/6463e0a86edfa1bd8ed7ed78-IMG-20220625-231733-173.webp',
     'WCAG': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
-
     'Commuting': 'https://i.ibb.co/23WVc0PW/tunnel-ANIMATION.gif',
     'Up and out': 'https://i.ibb.co/LdDMT8zw/pennstation.webp',
     'Sunrise and Sunset': 'https://i.ibb.co/chqNfQGJ/skylinephilly.webp',
     'skylines': 'https://i.ibb.co/cK6Nywxq/skyline.webp',
     'wear & tear': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
     'killing it': 'https://i.ibb.co/21QjMR93/commute.webp',
-
     'found love': 'https://i.ibb.co/gtfnzmc/6463db5b885de5f0e9c14019-IMG-20190918-010900-01-1.jpg',
-
-    
     'From Workarea to LiveArea': 'https://i.ibb.co/mSR1GDc/2309287483437628607-5144774570.jpg',
     'world worked': 'https://i.ibb.co/HVt8q9Q/63bc58fdd5af3c7496ddc47b-Embedded-Image-18.jpg',
     'Once familiar faces faded': 'https://i.ibb.co/LQyhkV7/2421291975296513469-5144774570.jpg',
     'bandwidth': 'https://i.ibb.co/5pYQjBh/ZAX04125.jpg',
     'The show must go on': 'https://i.ibb.co/8cFGqNB/6463c90009f6d464ffca5fe3-wellbeaight.jpg',
-    
     'Cards Against Bad UX': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
     'jargon-laden spreadsheets': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
     'single-sided meetings': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
@@ -1619,7 +1590,7 @@ const imageMap = {
     'photographs': 'https://i.ibb.co/tP1YpWFG/1-f-R6-Yh5w77l-Iv-Sg-R4ldzj-TA.webp',
     'AI': 'https://i.ibb.co/DDw627yH/1-A-KU6r-Bmxccz-M6m1-Hxdkg.webp',
     'uplift imagination': 'https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp'
-};
+}
 
 const phraseRegexMap = new Map();
 Object.keys(imageMap).forEach(phrase => {
@@ -1666,11 +1637,11 @@ Sure, this was risky, but wholly worth it. Here, I had influence. With that, cam
 ### From Midtown to Uptown.
 From Workarea to LiveArea. From IC to Manager — I owned the UX process for a gamut of B2B & B2C brands [via the SalesForce E-commerce platform] Our agency process followed the familiar ideation & creation process, but my biggest win was in workshopping. 
 
-### COVID.
-Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. But business is busyness; the show must go on. 
-
 ### Workshopping.
 After several rounds of our client becoming increasingly overwhelmed and frustrated with unfamiliar process, I crafted "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
+
+### COVID.
+Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. But business is busyness; the show must go on. 
 
 ### West Coast Vibes.
 At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema. We didn't have time for perfection, but we successfully modernized and optimized their online experience.
@@ -1698,7 +1669,7 @@ Beyond the work, there's music. I play guitar left-handed. I take photographs of
 I'm not worried about AI taking our jobs. My talent is presenting ideas that uplift imagination. I do this with capable hands. [I think different]
 
 ### Connect.
-You can find my music on SoundCloud. My photography lives on Instagram. My full portfolio is at zackgort.com. Thanks for reading one sentence at a time.`;
+You can find my music on SoundCloud. My photography lives on Instagram. My full portfolio is at zackgort.com. Thanks for reading one sentence at a time.`
 
 
 // ===================================
@@ -2457,7 +2428,6 @@ function goToChapter(chapterId) {
 }
 
 function getStops() {
-    // Merge chapter and subchapter start indices into a sorted list of stops
     const chapterStops = state.chapterStartIndices
         .filter(idx => idx >= 0)
         .map((sentenceIndex, i) => ({ sentenceIndex, type: 'chapter', id: i }));
@@ -2470,21 +2440,14 @@ function nextChapter() {
     const cur = state.currentSentenceIndex;
     const stops = getStops();
     const next = stops.find(s => s.sentenceIndex > cur);
-    if (next) {
-        state.currentSentenceIndex = next.sentenceIndex;
-        highlightSentence(next.sentenceIndex);
-    }
+    if (next) { state.currentSentenceIndex = next.sentenceIndex; highlightSentence(next.sentenceIndex); }
 }
 
 function previousChapter() {
     const cur = state.currentSentenceIndex;
     const stops = getStops();
-    // Find the last stop strictly before current (skip if we're already at a stop boundary)
     const prev = [...stops].reverse().find(s => s.sentenceIndex < cur);
-    if (prev) {
-        state.currentSentenceIndex = prev.sentenceIndex;
-        highlightSentence(prev.sentenceIndex);
-    }
+    if (prev) { state.currentSentenceIndex = prev.sentenceIndex; highlightSentence(prev.sentenceIndex); }
 }
 
 // ===================================
@@ -2861,7 +2824,6 @@ function render() {
             const el = document.createElement('div');
             el.className = 'subchapter-break';
             el.innerHTML = `<span class="subchapter-title">${part.title}</span>`;
-            // Record so next/prev navigation can jump to this subchapter
             state.subchapterStartIndices.push({ sentenceIndex: sentenceCount, title: part.title });
             fragment.appendChild(el);
         } else if (part.type === 'bullet') {
@@ -2931,7 +2893,31 @@ function render() {
 // ===================================
 // CONTEXT MENU
 // ===================================
+function initializeContextMenu() {
+    // Suppress browser right-click context menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
+    // Mobile: long press on stream → open chapter dropdown
+    const streamEl = Utils.$('#stream');
+    if (streamEl) {
+        let lpTimer = null;
+        let lpMoved = false;
+        streamEl.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break, button, a')) return;
+            lpMoved = false;
+            lpTimer = setTimeout(() => {
+                lpTimer = null;
+                if (!lpMoved) {
+                    if (!isDropdownOpen()) toggleChapterDropdown();
+                    if (navigator.vibrate) navigator.vibrate(40);
+                }
+            }, CONFIG.LONG_PRESS_DURATION);
+        }, { passive: true });
+        streamEl.addEventListener('touchmove',   () => { lpMoved = true; if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } }, { passive: true });
+        streamEl.addEventListener('touchend',    () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } }, { passive: true });
+        streamEl.addEventListener('touchcancel', () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } }, { passive: true });
+    }
+}
 
 // ===================================
 // LAYOUT & THEME
@@ -2955,32 +2941,19 @@ function toggleUIVisibility() {
 function enterFocusMode() {
     document.body.classList.add('focus-mode');
     hideImage();
-    Toast.show({
-        id: 'focus-mode-on',
-        icon: '◻',
-        message: '<span class="toast-accent">Focus Mode</span> — interface hidden, images suspended.',
-        duration: 2500,
-        force: true,
-        banner: true
-    });
+    Toast.show({ id: 'focus-mode-on', message: 'Focus Mode — interface hidden, images suspended', duration: 2500, banner: true, force: true });
 }
 
 function exitFocusMode() {
     document.body.classList.remove('focus-mode');
-    Toast.show({
-        id: 'focus-mode-off',
-        icon: '◼',
-        message: 'Focus Mode <span class="toast-accent">off</span>.',
-        duration: 1800,
-        force: true,
-        banner: true
-    });
+    Toast.show({ id: 'focus-mode-off', message: 'Focus Mode off', duration: 1800, banner: true, force: true });
 }
 
 function toggleFocusMode() {
     if (document.body.classList.contains('focus-mode')) exitFocusMode();
     else enterFocusMode();
 }
+
 
 function toggleTheme() {
     const body = document.body;
@@ -3106,8 +3079,8 @@ function initializeKeyboardControls() {
         else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFocusMode(); }
         else if (e.key === 'Home') { e.preventDefault(); resetToBeginning(); }
         else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
-            if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
             if (document.body.classList.contains('focus-mode')) { exitFocusMode(); return; }
+            if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
             closeChapterDropdown();
             if (isGridOpen()) { toggleImageGrid(); cursor.element.classList.remove('close-mode'); }
             else if (Utils.$('#rotateWarning').style.display === 'flex') { Utils.$('#rotateWarning').style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); }
@@ -3164,8 +3137,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     detectTouch();
     initializeAccessibility();
+    initializeContextMenu();
     initializeCloseHotspots();
-    document.addEventListener('contextmenu', e => e.preventDefault());
     initializeKeyboardControls();
     initializeInteractionHint();
     
@@ -3275,36 +3248,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats(); // Initialize stats display
     updateCursor();
     updateParallax();
-
-    // Long press anywhere on stream (mobile + desktop) → toggle UI visibility
-    const streamForLongPress = Utils.$('#stream');
-    if (streamForLongPress) {
-        let lpTimer = null;
-        let lpMoved = false;
-
-        const lpStart = (e) => {
-            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break, button, a')) return;
-            lpMoved = false;
-            lpTimer = setTimeout(() => {
-                lpTimer = null;
-                if (!lpMoved) {
-                    toggleUIVisibility();
-                    if (navigator.vibrate) navigator.vibrate(40);
-                }
-            }, CONFIG.LONG_PRESS_DURATION);
-        };
-        const lpMove  = () => { lpMoved = true; if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
-        const lpEnd   = () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
-
-        streamForLongPress.addEventListener('touchstart', lpStart, { passive: true });
-        streamForLongPress.addEventListener('touchmove',  lpMove,  { passive: true });
-        streamForLongPress.addEventListener('touchend',   lpEnd,   { passive: true });
-        streamForLongPress.addEventListener('touchcancel',lpEnd,   { passive: true });
-        // Desktop: mousedown longpress
-        streamForLongPress.addEventListener('mousedown', lpStart);
-        document.addEventListener('mousemove', lpMove);
-        document.addEventListener('mouseup',   lpEnd);
-    }
     
     document.body.classList.add(`layout-${state.layoutMode}`);
     
