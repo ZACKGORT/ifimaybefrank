@@ -426,7 +426,9 @@ body.layout-split .mobile-right-rail { display: none !important; }
     }
     .mode-drag-handle { display: none; }
     .mode-key#modeKeyF,
-    .mode-key#modeKeyH { display: none; }
+    .mode-key#modeKeyH,
+    .mode-key#modeKeyC,
+    .mode-key#modeKeySpace { display: none; }
     .mode-key {
         width: 32px;
         height: 32px;
@@ -1453,9 +1455,17 @@ body.focus-mode .hover-image { opacity: 0 !important; }
 
         <div class="mode-cluster" id="modeCluster" title="Drag to move" aria-label="Mode controls">
             <div class="mode-drag-handle">⋮⋮</div>
-            <button class="mode-key" id="modeKeySpace" aria-label="Toggle image grid (Space)" title="Space — Image Grid">
+            <button class="mode-key" id="modeKeySpace" aria-label="Next sentence (Space)" title="Space — Next Sentence">
                 <span class="mode-key-label">SPC</span>
+                <span class="mode-key-desc">Next</span>
+            </button>
+            <button class="mode-key" id="modeKeyG" aria-label="Toggle image grid (G)" title="G — Image Grid">
+                <span class="mode-key-label">G</span>
                 <span class="mode-key-desc">Grid</span>
+            </button>
+            <button class="mode-key" id="modeKeyC" aria-label="Toggle chapter menu (C)" title="C — Chapters">
+                <span class="mode-key-label">C</span>
+                <span class="mode-key-desc">Chapters</span>
             </button>
             <button class="mode-key" id="modeKeyF" aria-label="Toggle focus mode (F)" title="F — Focus Mode">
                 <span class="mode-key-label">F</span>
@@ -3285,13 +3295,13 @@ function initializeCloseHotspots() {
 function initializeKeyboardControls() {
     const getBtnForKey = (key) => {
         if (key === 'ArrowUp' || key === 'k' || key === 'Backspace') return Utils.$('#prevSentenceBtn');
-        if (key === 'ArrowDown' || key === 'j') return Utils.$('#nextSentenceBtn');
+        if (key === 'ArrowDown' || key === 'j' || key === ' ' || key === 'Space') return Utils.$('#nextSentenceBtn');
         return null;
     };
     // Also flash HUD buttons on key press for visual feedback
     const getHudBtnForKey = (key) => {
         if (key === 'ArrowUp' || key === 'k' || key === 'Backspace' || key === 'ArrowLeft') return Utils.$('#hudPrevBtn');
-        if (key === 'ArrowDown' || key === 'j' || key === 'ArrowRight') return Utils.$('#hudNextBtn');
+        if (key === 'ArrowDown' || key === 'j' || key === ' ' || key === 'Space' || key === 'ArrowRight') return Utils.$('#hudNextBtn');
         return null;
     };
     // Get keyboard legend key element for highlighting
@@ -3315,7 +3325,9 @@ function initializeKeyboardControls() {
             keyElement.style.borderColor = 'var(--accent)';
         }
         
-        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); toggleImageGrid(); }
+        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); nextSentence(); }
+        else if (e.key.toLowerCase() === 'g') { e.preventDefault(); toggleImageGrid(); }
+        else if (e.key.toLowerCase() === 'c') { e.preventDefault(); toggleChapterDropdown(); }
         else if (e.key === 'Backspace') { e.preventDefault(); previousSentence(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); nextChapter(); }
         else if (e.key === 'ArrowLeft') { e.preventDefault(); previousChapter(); }
@@ -3463,7 +3475,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modeCluster) {
         makeDraggable(modeCluster, { useRight: true, useBottom: false });
 
-        Utils.$('#modeKeySpace').addEventListener('click', (e) => { e.stopPropagation(); toggleImageGrid(); });
+        Utils.$('#modeKeySpace').addEventListener('click', (e) => { e.stopPropagation(); nextSentence(); });
+        Utils.$('#modeKeyG').addEventListener('click', (e) => { e.stopPropagation(); toggleImageGrid(); });
+        Utils.$('#modeKeyC').addEventListener('click', (e) => { e.stopPropagation(); toggleChapterDropdown(); });
         Utils.$('#modeKeyF').addEventListener('click', (e) => { e.stopPropagation(); toggleFocusMode(); });
         Utils.$('#modeKeyH').addEventListener('click', (e) => { e.stopPropagation(); toggleUIVisibility(); });
         Utils.$('#modeKeyT').addEventListener('click', (e) => { e.stopPropagation(); toggleTheme(); });
@@ -3473,7 +3487,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function syncModeCluster() {
             Utils.$('#modeKeyF').classList.toggle('mode-active', document.body.classList.contains('focus-mode'));
             Utils.$('#modeKeyH').classList.toggle('mode-active', document.body.classList.contains('ui-hidden'));
-            Utils.$('#modeKeySpace').classList.toggle('mode-active', isGridOpen());
+            Utils.$('#modeKeyG').classList.toggle('mode-active', isGridOpen());
+            Utils.$('#modeKeyC').classList.toggle('mode-active', isDropdownOpen());
             const isLayered = document.body.classList.contains('layout-layered');
             Utils.$('#modeKeyL').classList.toggle('mode-active', !isLayered);
         }
@@ -3501,7 +3516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toast: mark that user has used keyboard or nav buttons (not scroll-only)
     document.addEventListener('keydown', (e) => {
-        const navKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
+        const navKeys = ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
         if (navKeys.includes(e.key) || navKeys.includes(e.code)) toastBehaviors.onKeyOrButton();
         else toastBehaviors.onKeyOrButton(); // any keypress resets idle
     }, { passive: true });
