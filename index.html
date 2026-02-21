@@ -1165,6 +1165,35 @@ body.grid-open .grid-close-hotspot { display: block; }
         pointer-events: auto;
     }
     body.ui-hidden .ui-hidden-hotspot { display: block; }
+
+    /* Focus mode — hides UI + suppresses images, mobile hold-to-read */
+    body.focus-mode .header,
+    body.focus-mode .scroll-progress,
+    body.focus-mode .left-rail,
+    body.focus-mode #statsWidget,
+    body.focus-mode #keyboardLegend {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    body.focus-mode .image-layer,
+    body.focus-mode .hover-image,
+    body.focus-mode .edge-blur,
+    body.focus-mode .vignette {
+        opacity: 0 !important;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    body.focus-mode.image-active .sentence:not(.active) {
+        opacity: var(--sentence-dimmed-opacity) !important;
+        color: var(--sentence-dimmed-color) !important;
+    }
+    body.focus-mode .sentence.active { text-shadow: none; }
+    @keyframes focusPulse {
+        0%, 100% { box-shadow: 0 2px 0 0 var(--accent); }
+        50%       { box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
+    }
+    body.focus-mode .sentence.active { animation: focusPulse 1.8s ease-in-out infinite; }
     </style>
 </head>
 <body>
@@ -1357,6 +1386,7 @@ const state = {
     currentChapterIndex: 0,
     allSentenceElements: [],
     chapterStartIndices: [],
+    subchapterStartIndices: [], // [{sentenceIndex, title}]
     gridImages: [],
     mouseX: 0,
     mouseY: 0,
@@ -1378,6 +1408,7 @@ const state = {
 
 const cursor = { x: 0, y: 0, targetX: 0, targetY: 0, element: null, currentImageElement: null };
 const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, y: 0, targetX: 0, targetY: 0 } };
+
 
 // ===================================
 // DATA
@@ -2441,14 +2472,35 @@ function goToChapter(chapterId) {
     }
 }
 
+function getStops() {
+    // Merge chapter and subchapter start indices into a sorted list of stops
+    const chapterStops = state.chapterStartIndices
+        .filter(idx => idx >= 0)
+        .map((sentenceIndex, i) => ({ sentenceIndex, type: 'chapter', id: i }));
+    const subchapterStops = state.subchapterStartIndices
+        .map(s => ({ sentenceIndex: s.sentenceIndex, type: 'subchapter', title: s.title }));
+    return [...chapterStops, ...subchapterStops].sort((a, b) => a.sentenceIndex - b.sentenceIndex);
+}
+
 function nextChapter() {
-    const currentChapter = getCurrentChapter();
-    if (currentChapter < chapters.length - 1) goToChapter(currentChapter + 1);
+    const cur = state.currentSentenceIndex;
+    const stops = getStops();
+    const next = stops.find(s => s.sentenceIndex > cur);
+    if (next) {
+        state.currentSentenceIndex = next.sentenceIndex;
+        highlightSentence(next.sentenceIndex);
+    }
 }
 
 function previousChapter() {
-    const currentChapter = getCurrentChapter();
-    if (currentChapter > 0) goToChapter(currentChapter - 1);
+    const cur = state.currentSentenceIndex;
+    const stops = getStops();
+    // Find the last stop strictly before current (skip if we're already at a stop boundary)
+    const prev = [...stops].reverse().find(s => s.sentenceIndex < cur);
+    if (prev) {
+        state.currentSentenceIndex = prev.sentenceIndex;
+        highlightSentence(prev.sentenceIndex);
+    }
 }
 
 // ===================================
@@ -2775,6 +2827,7 @@ function render() {
     state.allSentenceElements = [];
     state.gridImages = [];
     state.chapterStartIndices = new Array(chapters.length).fill(-1);
+    state.subchapterStartIndices = [];
     chapters.forEach(chapter => {
         const index = narrative.indexOf(chapter.startText);
         if (index !== -1) state.chapterStartIndices[chapter.id] = index;
@@ -2824,6 +2877,8 @@ function render() {
             const el = document.createElement('div');
             el.className = 'subchapter-break';
             el.innerHTML = `<span class="subchapter-title">${part.title}</span>`;
+            // Record so next/prev navigation can jump to this subchapter
+            state.subchapterStartIndices.push({ sentenceIndex: sentenceCount, title: part.title });
             fragment.appendChild(el);
         } else if (part.type === 'bullet') {
             const li = document.createElement('div');
@@ -2915,6 +2970,36 @@ function showUI() {
 
 function toggleUIVisibility() {
     document.body.classList.toggle('ui-hidden');
+}
+
+function enterFocusMode() {
+    document.body.classList.add('focus-mode');
+    hideImage();
+    Toast.show({
+        id: 'focus-mode-on',
+        icon: '◻',
+        message: '<span class="toast-accent">Focus Mode</span> — interface hidden, images suspended.',
+        duration: 2500,
+        force: true,
+        banner: true
+    });
+}
+
+function exitFocusMode() {
+    document.body.classList.remove('focus-mode');
+    Toast.show({
+        id: 'focus-mode-off',
+        icon: '◼',
+        message: 'Focus Mode <span class="toast-accent">off</span>.',
+        duration: 1800,
+        force: true,
+        banner: true
+    });
+}
+
+function toggleFocusMode() {
+    if (document.body.classList.contains('focus-mode')) exitFocusMode();
+    else enterFocusMode();
 }
 
 function toggleTheme() {
@@ -3038,9 +3123,11 @@ function initializeKeyboardControls() {
         else if (e.key === 'l') toggleLayout();
         else if (e.key.toLowerCase() === 't') toggleTheme();
         else if (e.key.toLowerCase() === 'h') { e.preventDefault(); toggleUIVisibility(); }
+        else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFocusMode(); }
         else if (e.key === 'Home') { e.preventDefault(); resetToBeginning(); }
         else if (e.key === 'Escape' || e.key.toLowerCase() === 'x') {
             if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
+            if (document.body.classList.contains('focus-mode')) { exitFocusMode(); return; }
             closeChapterDropdown();
             if (isGridOpen()) { toggleImageGrid(); cursor.element.classList.remove('close-mode'); }
             else if (Utils.$('#rotateWarning').style.display === 'flex') { Utils.$('#rotateWarning').style.display = 'none'; cursor.element.classList.remove('close-mode'); if (state.layoutMode === 'split') toggleLayout(); }
@@ -3208,6 +3295,28 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStats(); // Initialize stats display
     updateCursor();
     updateParallax();
+
+    // Mobile: hold anywhere on stream to enter focus mode, release to exit
+    const streamEl = Utils.$('#stream');
+    if (streamEl) {
+        let focusModeTimer = null;
+        streamEl.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break')) return;
+            focusModeTimer = setTimeout(() => {
+                focusModeTimer = null;
+                enterFocusMode();
+                if (navigator.vibrate) navigator.vibrate(40);
+            }, CONFIG.LONG_PRESS_DURATION);
+        }, { passive: true });
+        streamEl.addEventListener('touchend', () => {
+            if (focusModeTimer) { clearTimeout(focusModeTimer); focusModeTimer = null; }
+            else exitFocusMode();
+        }, { passive: true });
+        streamEl.addEventListener('touchcancel', () => {
+            if (focusModeTimer) { clearTimeout(focusModeTimer); focusModeTimer = null; }
+            exitFocusMode();
+        }, { passive: true });
+    }
     
     document.body.classList.add(`layout-${state.layoutMode}`);
     
