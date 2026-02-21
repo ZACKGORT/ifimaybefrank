@@ -729,8 +729,9 @@ body.image-active .sentence.dimmed { opacity: 0.01; color: var(--ink-3); }
     outline-offset: 2px;
     border-radius: 2px;
 }
-/* Sentences get a more tailored focus ring */
-.sentence:focus-visible {
+/* Sentence focus ring — ONLY when navigating by Tab, not arrow keys / scroll / spacebar */
+body:not([data-tab-nav]) .sentence:focus-visible { outline: none; }
+body[data-tab-nav] .sentence:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 2px;
@@ -3458,14 +3459,14 @@ function initializeKeyboardControls() {
             keyElement.style.borderColor = 'var(--accent)';
         }
         
-        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); state.lastNavWasKeyboard = true; nextSentence(); }
+        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); nextSentence(); }
         else if (e.key.toLowerCase() === 'g') { e.preventDefault(); toggleImageGrid(); }
         else if (e.key.toLowerCase() === 'c') { e.preventDefault(); toggleChapterDropdown(); }
-        else if (e.key === 'Backspace') { e.preventDefault(); state.lastNavWasKeyboard = true; previousSentence(); }
+        else if (e.key === 'Backspace') { e.preventDefault(); previousSentence(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); nextChapter(); }
         else if (e.key === 'ArrowLeft') { e.preventDefault(); previousChapter(); }
-        else if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); state.lastNavWasKeyboard = true; nextSentence(); }
-        else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); state.lastNavWasKeyboard = true; previousSentence(); }
+        else if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); nextSentence(); }
+        else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); previousSentence(); }
         else if (e.key === 'Shift') { e.preventDefault(); toggleLayout(); }
         else if (e.key === 'l') toggleLayout();
         else if (e.key.toLowerCase() === 't') toggleTheme();
@@ -3534,6 +3535,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeContextMenu();
     initializeCloseHotspots();
     initializeKeyboardControls();
+
+    // Tab-nav detection — sentence focus ring only shows during Tab navigation
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Tab') document.body.setAttribute('data-tab-nav', '');
+        else document.body.removeAttribute('data-tab-nav');
+    });
+    document.addEventListener('mousedown', () => document.body.removeAttribute('data-tab-nav'));
+    document.addEventListener('touchstart', () => document.body.removeAttribute('data-tab-nav'), { passive: true });
     initializeInteractionHint();
     
     // Initialize draggable widgets using factory
