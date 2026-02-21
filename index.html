@@ -625,24 +625,7 @@ body.hint-shown .interaction-hint { display: none; }
 /* ===================================
    CONTEXT MENU
    =================================== */
-.context-menu { 
-    position: fixed; z-index: calc(var(--z-overlay) + 100); background: var(--surface-raised); 
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
-    border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 0; 
-    min-width: 200px; opacity: 0; transform: scale(0.95); pointer-events: none; 
-    transition: opacity 0.15s ease, transform 0.15s ease; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
-}
-.context-menu.open { opacity: 1; transform: scale(1); pointer-events: auto; }
-.context-menu-item { 
-    display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: var(--ink-2); 
-    font-family: var(--ui-font); font-size: 13px; cursor: pointer; transition: all 0.15s ease; user-select: none; 
-}
-.context-menu-item:hover { background: var(--hover-tint); color: var(--accent); }
-.context-menu-item:active { background: var(--hover-tint-strong); }
-.context-menu-item.context-menu-info { cursor: default; opacity: 0.5; font-size: 11px; padding: 8px 16px; }
-.context-menu-item.context-menu-info:hover { background: transparent; color: var(--ink-2); }
-.ctx-icon { font-size: 16px; width: 20px; text-align: center; }
-.context-menu-divider { height: 1px; background: var(--border); margin: 6px 8px; }
+
 
 /* ===================================
    VISUAL EFFECTS
@@ -1195,94 +1178,12 @@ body.grid-open .grid-close-hotspot { display: block; }
     }
     body.focus-mode .sentence.active { animation: focusPulse 1.8s ease-in-out infinite; }
 
-    /* Read Mode — text-only free scroll, no sentence-step, no images/chrome */
-    body.read-mode .header,
-    body.read-mode .scroll-progress,
-    body.read-mode .left-rail,
-    body.read-mode #statsWidget,
-    body.read-mode #keyboardLegend {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.25s ease;
-    }
-    body.read-mode .image-layer,
-    body.read-mode .hover-image,
-    body.read-mode .edge-blur,
-    body.read-mode .vignette {
-        opacity: 0 !important;
-        pointer-events: none;
-    }
-    body.read-mode .text-layer {
-        overflow-y: auto;
-        height: 100vh;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-    }
-    body.read-mode .sentence {
-        opacity: 1 !important;
-        color: var(--sentence-color) !important;
-        background: none !important;
-        text-shadow: none !important;
-        animation: none !important;
-    }
-    body.read-mode .sentence.active {
-        color: var(--sentence-active-color) !important;
-    }
-    /* Exit read mode tap target — bottom center */
-    .read-mode-exit {
-        display: none;
-        position: fixed;
-        bottom: calc(20px + env(safe-area-inset-bottom));
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: calc(var(--z-ui) + 10);
-        font-family: var(--ui-font);
-        font-size: 10px;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: var(--ink-3);
-        background: var(--surface);
-        border: 1px solid var(--border-strong);
-        border-radius: 20px;
-        padding: 8px 16px;
-        pointer-events: auto;
-        cursor: pointer;
-        opacity: 0.6;
-        transition: opacity 0.2s ease;
-    }
-    body.read-mode .read-mode-exit { display: block; }
-    .read-mode-exit:active { opacity: 1; }
-
-    /* Mobile context menu — bottom-sheet style on small screens */
-    @media (max-width: 768px) {
-        .context-menu {
-            bottom: calc(16px + env(safe-area-inset-bottom));
-            top: auto !important;
-            left: 16px !important;
-            right: 16px !important;
-            width: auto;
-            min-width: unset;
-            transform: translateY(16px) scale(0.98);
-            border-radius: 12px;
-        }
-        .context-menu.open {
-            transform: translateY(0) scale(1);
-        }
-        .context-menu-item { padding: 14px 20px; font-size: 15px; }
-        .ctx-icon { font-size: 18px; }
-    }
     </style>
 </head>
 <body>
-    <div class="context-menu" id="contextMenu" aria-hidden="true">
-        <div class="context-menu-item" id="ctxBackToTop"><span class="ctx-icon">↑</span><span>Back to Top</span></div>
-        <div class="context-menu-divider"></div>
-        <div class="context-menu-item" id="ctxFocusMode"><span class="ctx-icon" id="ctxFocusIcon">◻</span><span id="ctxFocusText">Focus Mode</span></div>
-        <div class="context-menu-item" id="ctxReadMode"><span class="ctx-icon" id="ctxReadIcon">☰</span><span id="ctxReadText">Read Mode</span></div>
-    </div>
 
 
-    <div class="read-mode-exit" id="readModeExit" role="button" aria-label="Exit Read Mode">Tap to exit Read Mode</div>
+
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -3030,102 +2931,7 @@ function render() {
 // ===================================
 // CONTEXT MENU
 // ===================================
-function enterReadMode() {
-    document.body.classList.add('read-mode');
-    hideImage();
-    // Re-enable native touch scrolling on text-layer
-    const textLayer = Utils.$('#textLayer');
-    if (textLayer) textLayer.style.touchAction = 'pan-y';
-}
 
-function exitReadMode() {
-    document.body.classList.remove('read-mode');
-    const textLayer = Utils.$('#textLayer');
-    if (textLayer) textLayer.style.touchAction = '';
-}
-
-function toggleReadMode() {
-    if (document.body.classList.contains('read-mode')) exitReadMode();
-    else enterReadMode();
-}
-
-function initializeContextMenu() {
-    const contextMenu = Utils.$('#contextMenu');
-
-    function showContextMenu() {
-        // Update toggle labels to reflect current state
-        const focusIcon = document.getElementById('ctxFocusIcon');
-        const focusText = document.getElementById('ctxFocusText');
-        const readIcon  = document.getElementById('ctxReadIcon');
-        const readText  = document.getElementById('ctxReadText');
-        const inFocus = document.body.classList.contains('focus-mode');
-        const inRead  = document.body.classList.contains('read-mode');
-        if (focusIcon) focusIcon.textContent = inFocus ? '◼' : '◻';
-        if (focusText) focusText.textContent  = inFocus ? 'Exit Focus Mode' : 'Focus Mode';
-        if (readIcon)  readIcon.textContent   = inRead  ? '✕' : '☰';
-        if (readText)  readText.textContent   = inRead  ? 'Exit Read Mode' : 'Read Mode';
-        contextMenu.classList.add('open');
-        contextMenu.setAttribute('aria-hidden', 'false');
-        // Dismiss on outside tap (one-shot, next tick)
-        setTimeout(() => {
-            document.addEventListener('touchstart', hideContextMenu, { once: true, passive: true });
-            document.addEventListener('mousedown',  hideContextMenu, { once: true });
-        }, 0);
-    }
-
-    function hideContextMenu() {
-        contextMenu.classList.remove('open');
-        contextMenu.setAttribute('aria-hidden', 'true');
-    }
-
-    // Wire menu items
-    document.getElementById('ctxBackToTop')?.addEventListener('click', () => { hideContextMenu(); resetToBeginning(); });
-    document.getElementById('ctxFocusMode')?.addEventListener('click', () => { hideContextMenu(); toggleFocusMode(); });
-    document.getElementById('ctxReadMode')?.addEventListener('click',  () => { hideContextMenu(); toggleReadMode(); });
-
-    // Prevent context menu click from immediately triggering outside-tap dismiss
-    contextMenu.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
-    contextMenu.addEventListener('mousedown',  e => e.stopPropagation());
-
-    // Desktop: suppress right-click
-    document.addEventListener('contextmenu', e => { e.preventDefault(); });
-
-    // Mobile: longpress on stream → show context menu
-    const streamEl = Utils.$('#stream');
-    if (streamEl) {
-        let longPressTimer = null;
-        let touchMoved = false;
-
-        streamEl.addEventListener('touchstart', (e) => {
-            // Skip interactive elements
-            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break, button, a')) return;
-            touchMoved = false;
-            longPressTimer = setTimeout(() => {
-                longPressTimer = null;
-                if (!touchMoved) {
-                    showContextMenu();
-                    if (navigator.vibrate) navigator.vibrate(40);
-                }
-            }, CONFIG.LONG_PRESS_DURATION);
-        }, { passive: true });
-
-        streamEl.addEventListener('touchmove', () => {
-            touchMoved = true;
-            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        }, { passive: true });
-
-        streamEl.addEventListener('touchend', () => {
-            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        }, { passive: true });
-
-        streamEl.addEventListener('touchcancel', () => {
-            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        }, { passive: true });
-    }
-
-    // Read mode exit button
-    document.getElementById('readModeExit')?.addEventListener('click', exitReadMode);
-}
 
 // ===================================
 // LAYOUT & THEME
@@ -3358,8 +3164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     detectTouch();
     initializeAccessibility();
-    initializeContextMenu();
     initializeCloseHotspots();
+    document.addEventListener('contextmenu', e => e.preventDefault());
     initializeKeyboardControls();
     initializeInteractionHint();
     
@@ -3470,7 +3276,35 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCursor();
     updateParallax();
 
-    // Mobile longpress is handled in initializeContextMenu()
+    // Long press anywhere on stream (mobile + desktop) → toggle UI visibility
+    const streamForLongPress = Utils.$('#stream');
+    if (streamForLongPress) {
+        let lpTimer = null;
+        let lpMoved = false;
+
+        const lpStart = (e) => {
+            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break, button, a')) return;
+            lpMoved = false;
+            lpTimer = setTimeout(() => {
+                lpTimer = null;
+                if (!lpMoved) {
+                    toggleUIVisibility();
+                    if (navigator.vibrate) navigator.vibrate(40);
+                }
+            }, CONFIG.LONG_PRESS_DURATION);
+        };
+        const lpMove  = () => { lpMoved = true; if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
+        const lpEnd   = () => { if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; } };
+
+        streamForLongPress.addEventListener('touchstart', lpStart, { passive: true });
+        streamForLongPress.addEventListener('touchmove',  lpMove,  { passive: true });
+        streamForLongPress.addEventListener('touchend',   lpEnd,   { passive: true });
+        streamForLongPress.addEventListener('touchcancel',lpEnd,   { passive: true });
+        // Desktop: mousedown longpress
+        streamForLongPress.addEventListener('mousedown', lpStart);
+        document.addEventListener('mousemove', lpMove);
+        document.addEventListener('mouseup',   lpEnd);
+    }
     
     document.body.classList.add(`layout-${state.layoutMode}`);
     
