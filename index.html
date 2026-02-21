@@ -1393,7 +1393,7 @@ const chapters = [
     { id: 4, title: "Suburbia Startup", startText: "A turning point at Turn5 Inc." },
     { id: 5, title: "#AgencyLife", startText: "One Sixty Over Ninety" },
     { id: 6, title: "The New York Experience", startText: "Enter FlightPath." },
-    { id: 7, title: "Latest & Greatest", startText: "As an aside, I've been building" },
+    { id: 7, title: "Remote, Not Removed", startText: "This is the Whey" },
     { id: 8, title: "About", startText: "Currently I'm seeking my next" },
     { id: 9, title: "Conclusion", startText: "Beyond the work, there's music" },
     { id: 10, title: "Extras", startText: "You can find my music on SoundCloud" }
@@ -1454,7 +1454,7 @@ const imageMap = {
     'city life': 'https://i.ibb.co/zhPSN9QQ/1-6-Cxwk-Ywhhn5-Z-FHINfdp-WA.webp',
     'Leadnomics': 'https://i.ibb.co/ZG6v0p5/image-10.png',
     'multiple verticals': 'https://i.ibb.co/KLPDrZQ/image-5-Copy.png',
-    'payday loans': 'https://i.ibb.co/k2svMNFv/603d10120fba838e599b6b5e-IMG-1563.webp',
+    'payday loans': 'https://i.ibb.co/7N4r6FF5/603d0b8b04655c6fd42d2253-DSC08281.jpg',
     'catastrophic financial decisions': 'https://i.ibb.co/7JX2kx7T/DSC08804.jpg',
     'pay and perks': 'https://i.ibb.co/5jqqSwp/Cx-BW-h-GXg-AQt-K2m.jpg',
     'conversion rate': 'https://i.ibb.co/N3Sj82y/6463e2dfb2d84c89977adcf7-IMG-20200204-185021-01.jpg',
@@ -1492,13 +1492,14 @@ const imageMap = {
     'reframe': 'https://i.ibb.co/C3fQ63NH/vermont-500.jpg',
     'Enter FlightPath': 'https://i.ibb.co/3xrYxxR/ZAX09787.jpg',
     'Hello, New York City': 'https://i.ibb.co/HpnrrYMR/2269419019461331921-5144774570.webp',
-    'emerging from bankruptcy': 'https://i.ibb.co/7N4r6FF5/603d0b8b04655c6fd42d2253-DSC08281.jpg',
+    'emerging from bankruptcy': 'https://i.ibb.co/k2svMNFv/603d10120fba838e599b6b5e-IMG-1563.webp',
+    'Sure, this was risky': 'https://i.ibb.co/DD6wrNzS/603d102dae26b192aef6ab4a-IMG-3023.jpg',
     'They needed my help': 'https://i.ibb.co/N6hxQ0RG/1-k-SDc-GT46-VQM6-Kk25-SPr-Acg.webp',
     'influence': 'https://i.ibb.co/2KG97tH/63bc73fb17c4cf8bb0731b4f-IMG-20220717-004144-444.webp',
     'confidence': 'https://i.ibb.co/xHcVc0k/63bc73fb6521f9025bdacc8c-IMG-20220719-182310-414.webp',
     'I had agency': 'https://i.ibb.co/gTrCrJd/6463e0a86edfa1bd8ed7ed78-IMG-20220625-231733-173.webp',
     'WCAG': 'https://i.ibb.co/WpyqgbYQ/1-9-EZTgvxtt-DXOac-Hz-I9axe-Q.gif',
-    'Commuting': 'https://i.ibb.co/23WVc0PW/tunnel-ANIMATION.gif',
+    'Commuting from Philly': 'https://i.ibb.co/23WVc0PW/tunnel-ANIMATION.gif',
     'Up and out': 'https://i.ibb.co/LdDMT8zw/pennstation.webp',
     'Sunrise and Sunset': 'https://i.ibb.co/chqNfQGJ/skylinephilly.webp',
     'skylines': 'https://i.ibb.co/cK6Nywxq/skyline.webp',
@@ -1510,6 +1511,10 @@ const imageMap = {
     'Once familiar faces faded': 'https://i.ibb.co/LQyhkV7/2421291975296513469-5144774570.jpg',
     'bandwidth': 'https://i.ibb.co/5pYQjBh/ZAX04125.jpg',
     'The show must go on': 'https://i.ibb.co/8cFGqNB/6463c90009f6d464ffca5fe3-wellbeaight.jpg',
+    'more time computing': 'https://i.ibb.co/Xr97WzXX/DSC06055-1.webp',
+    'Camera on': 'https://i.ibb.co/B6vFwH6/zoom-zack.gif',
+    'This is the Whey': 'https://i.ibb.co/09K8Z99/image-624.png',
+
     'Cards Against Bad UX': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
     'jargon-laden spreadsheets': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
     'single-sided meetings': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
@@ -1632,19 +1637,20 @@ Downtown from Fishtown was Workarea, where I worked on a proprietary SaaS platfo
 
 Enter FlightPath. Hello, New York City. Emerging from bankruptcy, the agency served the pharmaceutical sector. [now reduced from a bustling two-floor office in Midtown to a mere ten dedicated employees; with I being one to join them] They needed my help, and this was my foot-in-the-door to the NYC scene. [This was risky. It was not lucrative. Passable at best, but FlightPath was always only ever to be my runway]
 //
-Sure, this was risky, but wholly worth it. Here, I had influence. With that, came confidence. [I worked on rigorous WCAG compliance for our Pharma clients: Merck, Vetsulin, Charter, Organic Girl, Goya, and several non-profits] I had agency at this agency. Commuting from Philly to Manhattan — and back — every business day for a full year. Up and out by five o'clock; home by ten o'clock — maybe. Saw both Sunrise and Sunset every day away from home. Two skylines. Three hours apart. Why? Despite the wear & tear, I was moving forward.
+Sure, this was risky, but I was already in motion. Here, I had influence. With that, came confidence. [I worked on rigorous WCAG compliance for our Pharma clients: Merck, Vetsulin, Charter, Organic Girl, Goya, and several non-profits] I had agency at this agency. Commuting from Philly to Manhattan — and back — every business day for a full year. Up and out by five o'clock; home by ten o'clock — maybe. Saw both Sunrise and Sunset every day away from home. Two skylines. Three hours apart. Why? Despite the wear & tear, I was moving forward.
 
 ### From Midtown to Uptown.
 From Workarea to LiveArea. From IC to Manager — I owned the UX process for a gamut of B2B & B2C brands. [via the Salesforce Commerce Cloud platform] It was the most ownership I had held to date. I ran discovery. I led presentations. I pushed back on scope when scope needed pushing.
 
-### COVID.
-Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. Brainstorming became bullet points in a shared doc. Whiteboarding became a Miro link nobody opened. But business is busyness; the show must go on.
-
 ### Workshopping.
 After several rounds of our client becoming increasingly overwhelmed and frustrated with unfamiliar process, I crafted "Cards Against Bad UX" to help clients empathize with users. [A card game played in workshops to humanize the user and depoliticize the design conversation] By shifting the conversation from features to feelings — from the guest user and content manager, not the executive stakeholder — we saved the contract. Clients don't always know what they want. They always know how something makes them feel.
 
-### West Coast Vibes.
-At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema — restructured, not reskinned. We didn't have time for perfection, but we successfully modernized and optimized their online experience. Sometimes the win is knowing when good is good enough.
+### COVID.
+Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. Brainstorming became bullet points in a shared doc. Whiteboarding became a Miro link nobody opened. But business is busyness; the show must go on.
+
+Less time commuting, more time computing.  Camera on. 2021 was a very busy year. [I had earned WFH priveleges since 2011, so this was nothing new]
+
+This is the Whey. At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema — restructured, not reskinned. We didn't have time for perfection, but we successfully modernized and optimized their online experience. Sometimes the win is knowing when good is good enough.
 
 ### Small Cog in a Huge Wheel.
 At Huge, teams were massive. I was responsible for a single user flow, unaware of what the other twelve designers on the project were doing. To say we were siloed would be an understatement. I learned what I didn't want from a place of work. That is also valuable.
