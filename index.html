@@ -322,6 +322,103 @@ body.layout-split .mobile-right-rail { display: none !important; }
 @media (max-width: 768px) { .keyboard-legend { display: none; } }
 
 /* ===================================
+   MODE CLUSTER WIDGET
+   =================================== */
+.mode-cluster {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px 5px 4px;
+    cursor: grab;
+    user-select: none;
+    pointer-events: auto;
+    touch-action: none;
+    transform: translateZ(0);
+    will-change: transform;
+    isolation: isolate;
+    transition: background 0.35s ease, border-color 0.35s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    position: fixed;
+    top: clamp(14px, 2vh, 24px);
+    right: clamp(16px, 3.5vw, 44px);
+    z-index: var(--z-ui);
+}
+.mode-cluster:active { cursor: grabbing; }
+.mode-drag-handle {
+    font-family: sans-serif;
+    color: var(--ink-3);
+    font-size: 12px;
+    line-height: 1;
+    padding-right: 6px;
+    border-right: 1px solid var(--border);
+    opacity: 0.4;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+    letter-spacing: -3px;
+    margin-right: 2px;
+    flex-shrink: 0;
+}
+.mode-key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+    position: relative;
+    flex-shrink: 0;
+}
+.mode-key:hover {
+    background: var(--hover-tint);
+    border-color: var(--accent);
+}
+.mode-key:active { transform: scale(0.88); }
+.mode-key-label {
+    font-family: var(--ui-font);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+.mode-key-desc {
+    font-family: var(--ui-font);
+    font-size: 7px;
+    color: var(--ink-3);
+    line-height: 1;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.mode-key:hover .mode-key-label { color: var(--accent); }
+.mode-key:hover .mode-key-desc { color: var(--accent); opacity: 0.7; }
+
+/* Active state per mode */
+.mode-key.mode-active {
+    background: var(--hover-tint-strong);
+    border-color: var(--accent);
+}
+.mode-key.mode-active .mode-key-label,
+.mode-key.mode-active .mode-key-desc { color: var(--accent); }
+
+/* Suppress old header-right styles — widget is now standalone */
+.header-right { display: none; }
+
+@media (max-width: 768px) { .mode-cluster { display: none; } }
+
+/* ===================================
    STATS WIDGET (+ MOBILE HUD)
    =================================== */
 @keyframes hudEntrance {
@@ -910,10 +1007,43 @@ body.grid-open .grid-close-hotspot { display: block; }
     transition: width 0.25s, height 0.25s, background-color 0.25s, border-color 0.25s, opacity 0.25s; 
     mix-blend-mode: var(--cursor-blend); will-change: transform;
     opacity: var(--cursor-opacity);
+    overflow: hidden;
 }
 #cursor.hovering { width: 36px; height: 36px; background-color: var(--hover-tint); border-color: var(--accent); }
 #cursor.pointer { width: 14px; height: 14px; background-color: var(--ink); }
 #cursor.has-image { opacity: 0; }
+
+/* Cursor thumbnail — letterbox, focus mode only */
+#cursor-thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    border-radius: 0;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+#cursor.thumb-active {
+    width: 220px;
+    height: 130px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: #000;
+    mix-blend-mode: normal;
+    opacity: 1;
+    transition: width 0.2s cubic-bezier(0.25,1,0.5,1),
+                height 0.2s cubic-bezier(0.25,1,0.5,1),
+                border-radius 0.2s ease,
+                opacity 0.15s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+#cursor.thumb-active #cursor-thumb { opacity: 1; }
+
+/* Suppress background image layer in focus mode — cursor IS the image */
+body.focus-mode .hover-image { opacity: 0 !important; }
 
 /* ===================================
    TOAST NOTIFICATIONS
@@ -1247,7 +1377,7 @@ body.grid-open .grid-close-hotspot { display: block; }
         <div class="grid-content" id="gridContent"></div>
     </div>
 
-    <div id="cursor" aria-hidden="true"></div>
+    <div id="cursor" aria-hidden="true"><img id="cursor-thumb" alt="" aria-hidden="true"></div>
     
     <div class="left-rail">
         <div class="lens-control-container">
@@ -1291,26 +1421,28 @@ body.grid-open .grid-close-hotspot { display: block; }
             </div>
         </div>
 
-        <div class="header-right">
-            <button class="grid-toggle-btn" id="gridToggleBtn" aria-label="Toggle Image Grid">
-                <span>Display</span>
-                <span style="font-size: 1.2em;">▦</span>
+        <div class="mode-cluster" id="modeCluster" title="Drag to move" aria-label="Mode controls">
+            <div class="mode-drag-handle">⋮⋮</div>
+            <button class="mode-key" id="modeKeySpace" aria-label="Toggle image grid (Space)" title="Space — Image Grid">
+                <span class="mode-key-label">SPC</span>
+                <span class="mode-key-desc">Grid</span>
             </button>
-            <div class="layout-toggle">
-                <button id="layoutToggle" class="layout-button" aria-label="Toggle layout mode" title="Switch layout">
-                    <svg class="layout-icon-landscape" style="width: 20px; height: 20px; display: block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="7" width="20" height="10" rx="2"/>
-                    </svg>
-                    <svg class="layout-icon-portrait" style="width: 20px; height: 20px; display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="7" y="2" width="10" height="20" rx="2"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="theme-toggle">
-                <button id="themeToggle" class="theme-button" aria-label="Toggle theme" title="Switch theme: Default → Newspaper → Sport (T)">
-                    <span class="theme-icon">☀️</span>
-                </button>
-            </div>
+            <button class="mode-key" id="modeKeyF" aria-label="Toggle focus mode (F)" title="F — Focus Mode">
+                <span class="mode-key-label">F</span>
+                <span class="mode-key-desc">Focus</span>
+            </button>
+            <button class="mode-key" id="modeKeyH" aria-label="Toggle read mode (H)" title="H — Read Mode">
+                <span class="mode-key-label">H</span>
+                <span class="mode-key-desc">Read</span>
+            </button>
+            <button class="mode-key" id="modeKeyT" aria-label="Toggle theme (T)" title="T — Theme">
+                <span class="mode-key-label">T</span>
+                <span class="mode-key-desc">Theme</span>
+            </button>
+            <button class="mode-key" id="modeKeyL" aria-label="Toggle layout (L)" title="L — Layout">
+                <span class="mode-key-label">L</span>
+                <span class="mode-key-desc">Layout</span>
+            </button>
         </div>
     </header>
 
@@ -2106,14 +2238,47 @@ const toastBehaviors = (() => {
     function onConclusionChapter() { /* removed — replaced by end-of-content CTA */ }
 
     function init() {
-        // Welcome banner
+        // Welcome banner — always shows on page load, cycles through unique hints per session visit
+        const WELCOME_POOL = [
+            {
+                id: 'welcome-banner-0',
+                message: 'Navigate sentence by sentence — or explore <span class="toast-accent">themes</span>, <span class="toast-accent">split view</span>, and the <span class="toast-accent">chapter menu</span> above.'
+            },
+            {
+                id: 'welcome-banner-1',
+                message: 'Click any <span class="toast-accent">[+]</span> annotation to expand it. Each one is a footnote hiding in plain sight.'
+            },
+            {
+                id: 'welcome-banner-2',
+                message: 'Hover over <span class="toast-accent">underlined phrases</span> to surface an image. The text and the picture are the same thought.'
+            },
+            {
+                id: 'welcome-banner-3',
+                message: 'Press <span class="toast-accent">←  →</span> to jump between chapters. Or tap the logo to open the full chapter menu.'
+            },
+            {
+                id: 'welcome-banner-4',
+                message: 'Try <span class="toast-accent">Split View</span> — text on the left, imagery pinned right. Or go full focus with <span class="toast-accent">F</span>.'
+            },
+            {
+                id: 'welcome-banner-5',
+                message: 'The <span class="toast-accent">▦ Display</span> button shows every image in the piece at once. A different way to read the same story.'
+            }
+        ];
+
         setTimeout(() => {
+            // Pick the first unshown welcome hint; if all shown, cycle back to 0 with force
+            const unshown = WELCOME_POOL.filter(w => !Toast.hasShown(w.id));
+            const pick = unshown.length > 0
+                ? unshown[0]
+                : WELCOME_POOL[0];
             Toast.show({
-                id: 'welcome-banner',
+                id: pick.id,
                 icon: '✦',
-                message: 'Navigate sentence by sentence — or explore <span class="toast-accent">themes</span>, <span class="toast-accent">split view</span>, and the <span class="toast-accent">chapter menu</span> above.',
+                message: pick.message,
                 duration: 12000,
                 banner: true,
+                force: unshown.length === 0, // force only when fully cycled
                 onDismiss: () => {}
             });
         }, 1800);
@@ -2403,21 +2568,37 @@ function showImage(imageUrl, triggerElement) {
     state.imageActive = true;
     state.currentTriggerRect = triggerElement.getBoundingClientRect();
     document.body.classList.add('image-active');
-    const hoverImage = Utils.$('#hoverImage');
-    const hoverImageImg = Utils.$('#hoverImageImg');
-    if (state.imageTimeout) clearTimeout(state.imageTimeout);
-    state.imageTimeout = setTimeout(() => {
-        hoverImageImg.onload = () => hoverImage.classList.add('active');
-        hoverImageImg.onerror = () => hoverImage.classList.add('active');
-        hoverImageImg.src = imageUrl;
-    }, CONFIG.IMAGE_HOVER_DELAY);
+
+    const isReadMode = document.body.classList.contains('focus-mode');
+
+    if (isReadMode) {
+        // Cursor thumbnail mode — image follows pointer, bg layer suppressed by CSS
+        const thumb = Utils.$('#cursor-thumb');
+        if (state.imageTimeout) clearTimeout(state.imageTimeout);
+        state.imageTimeout = setTimeout(() => {
+            thumb.onload = () => cursor.element.classList.add('thumb-active');
+            thumb.onerror = () => cursor.element.classList.add('thumb-active');
+            if (thumb.src !== imageUrl) thumb.src = imageUrl;
+            else cursor.element.classList.add('thumb-active');
+        }, CONFIG.IMAGE_HOVER_DELAY);
+    } else {
+        // Normal mode — full background image
+        const hoverImage = Utils.$('#hoverImage');
+        const hoverImageImg = Utils.$('#hoverImageImg');
+        if (state.imageTimeout) clearTimeout(state.imageTimeout);
+        state.imageTimeout = setTimeout(() => {
+            hoverImageImg.onload = () => hoverImage.classList.add('active');
+            hoverImageImg.onerror = () => hoverImage.classList.add('active');
+            hoverImageImg.src = imageUrl;
+        }, CONFIG.IMAGE_HOVER_DELAY);
+    }
 }
 
 function hideImage() {
     const hoverImage = Utils.$('#hoverImage');
     if (state.imageTimeout) clearTimeout(state.imageTimeout);
     hoverImage.classList.remove('active');
-    cursor.element.classList.remove('has-image');
+    cursor.element.classList.remove('has-image', 'thumb-active');
     document.body.classList.remove('image-active');
     state.imageActive = false;
     cursor.currentImageElement = null;
@@ -2963,6 +3144,14 @@ function enterFocusMode() {
 
 function exitFocusMode() {
     document.body.classList.remove('focus-mode');
+    // Tear down cursor thumbnail, re-trigger normal bg image if still hovering
+    if (cursor.element && cursor.element.classList.contains('thumb-active')) {
+        cursor.element.classList.remove('thumb-active');
+        if (cursor.currentImageElement) {
+            const url = cursor.currentImageElement.getAttribute('data-image');
+            if (url) showImage(url, cursor.currentImageElement);
+        }
+    }
     Toast.show({ id: 'focus-mode-off', message: 'Focus Mode off', duration: 1800, banner: true, force: true });
 }
 
@@ -3053,13 +3242,13 @@ function initializeCloseHotspots() {
 function initializeKeyboardControls() {
     const getBtnForKey = (key) => {
         if (key === 'ArrowUp' || key === 'k' || key === 'Backspace') return Utils.$('#prevSentenceBtn');
-        if (key === 'ArrowDown' || key === 'j' || key === ' ' || key === 'Space') return Utils.$('#nextSentenceBtn');
+        if (key === 'ArrowDown' || key === 'j') return Utils.$('#nextSentenceBtn');
         return null;
     };
     // Also flash HUD buttons on key press for visual feedback
     const getHudBtnForKey = (key) => {
         if (key === 'ArrowUp' || key === 'k' || key === 'Backspace' || key === 'ArrowLeft') return Utils.$('#hudPrevBtn');
-        if (key === 'ArrowDown' || key === 'j' || key === ' ' || key === 'Space' || key === 'ArrowRight') return Utils.$('#hudNextBtn');
+        if (key === 'ArrowDown' || key === 'j' || key === 'ArrowRight') return Utils.$('#hudNextBtn');
         return null;
     };
     // Get keyboard legend key element for highlighting
@@ -3083,7 +3272,7 @@ function initializeKeyboardControls() {
             keyElement.style.borderColor = 'var(--accent)';
         }
         
-        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); nextSentence(); }
+        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); toggleImageGrid(); }
         else if (e.key === 'Backspace') { e.preventDefault(); previousSentence(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); nextChapter(); }
         else if (e.key === 'ArrowLeft') { e.preventDefault(); previousChapter(); }
@@ -3222,9 +3411,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Event listeners
     Utils.$('#brandLogo').addEventListener('click', toggleChapterDropdown);
-    Utils.$('#gridToggleBtn').addEventListener('click', toggleImageGrid);
-    Utils.$('#layoutToggle').addEventListener('click', toggleLayout);
-    Utils.$('#themeToggle').addEventListener('click', toggleTheme);
+    Utils.$('#gridToggleBtn')?.addEventListener('click', toggleImageGrid);
+    Utils.$('#layoutToggle')?.addEventListener('click', toggleLayout);
+    Utils.$('#themeToggle')?.addEventListener('click', toggleTheme);
+
+    // Mode cluster buttons
+    const modeCluster = document.getElementById('modeCluster');
+    if (modeCluster) {
+        makeDraggable(modeCluster, { useRight: true, useBottom: false });
+
+        Utils.$('#modeKeySpace').addEventListener('click', (e) => { e.stopPropagation(); toggleImageGrid(); });
+        Utils.$('#modeKeyF').addEventListener('click', (e) => { e.stopPropagation(); toggleFocusMode(); });
+        Utils.$('#modeKeyH').addEventListener('click', (e) => { e.stopPropagation(); toggleUIVisibility(); });
+        Utils.$('#modeKeyT').addEventListener('click', (e) => { e.stopPropagation(); toggleTheme(); });
+        Utils.$('#modeKeyL').addEventListener('click', (e) => { e.stopPropagation(); toggleLayout(); });
+
+        // Sync active states when modes change
+        function syncModeCluster() {
+            Utils.$('#modeKeyF').classList.toggle('mode-active', document.body.classList.contains('focus-mode'));
+            Utils.$('#modeKeyH').classList.toggle('mode-active', document.body.classList.contains('ui-hidden'));
+            Utils.$('#modeKeySpace').classList.toggle('mode-active', isGridOpen());
+            const isLayered = document.body.classList.contains('layout-layered');
+            Utils.$('#modeKeyL').classList.toggle('mode-active', !isLayered);
+        }
+        // Observe body class changes to keep buttons in sync
+        new MutationObserver(syncModeCluster).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        syncModeCluster();
+    }
     Utils.$('#prevSentenceBtn').addEventListener('click', previousSentence);
     Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
     
@@ -3245,7 +3458,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Toast: mark that user has used keyboard or nav buttons (not scroll-only)
     document.addEventListener('keydown', (e) => {
-        const navKeys = ['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
+        const navKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','j','k'];
         if (navKeys.includes(e.key) || navKeys.includes(e.code)) toastBehaviors.onKeyOrButton();
         else toastBehaviors.onKeyOrButton(); // any keypress resets idle
     }, { passive: true });
