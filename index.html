@@ -1123,11 +1123,20 @@ body.grid-open .grid-close-hotspot { display: block; }
     body.ui-hidden .header,
     body.ui-hidden .scroll-progress,
     body.ui-hidden .left-rail,
-    body.ui-hidden #statsWidget,
     body.ui-hidden #keyboardLegend {
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.3s ease;
+    }
+    /* statsWidget fades but nav buttons stay live in ui-hidden mode */
+    body.ui-hidden #statsWidget {
+        opacity: 0.08;
+        transition: opacity 0.3s ease;
+    }
+    body.ui-hidden #statsWidget #hudPrevBtn,
+    body.ui-hidden #statsWidget #hudNextBtn {
+        opacity: 1;
+        pointer-events: auto;
     }
     body:not(.ui-hidden) .header,
     body:not(.ui-hidden) .scroll-progress,
@@ -1346,7 +1355,7 @@ const CONFIG = {
     PARALLAX_DAMPING: 0.1,
     SCROLL_THRESHOLD: 30,
     SCROLL_COOLDOWN: 100,
-    LONG_PRESS_DURATION: 500,
+    LONG_PRESS_DURATION: 300,
     FLICK_THRESHOLD: 50
 };
 
@@ -2724,8 +2733,6 @@ function handleTouchEnd(e) {
     const touchEndY = e.changedTouches[0].clientY;
     const deltaY = state.touchStartY - touchEndY;
     if (Math.abs(deltaY) > CONFIG.FLICK_THRESHOLD) {
-        // Any scroll gesture restores hidden UI
-        if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
         state.scrollCooldownActive = true;
         if (deltaY > 0) nextSentence(); else previousSentence();
         setTimeout(() => { state.scrollCooldownActive = false; }, CONFIG.SCROLL_COOLDOWN);
