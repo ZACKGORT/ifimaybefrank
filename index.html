@@ -1637,11 +1637,11 @@ Sure, this was risky, but wholly worth it. Here, I had influence. With that, cam
 ### From Midtown to Uptown.
 From Workarea to LiveArea. From IC to Manager — I owned the UX process for a gamut of B2B & B2C brands [via the SalesForce E-commerce platform] Our agency process followed the familiar ideation & creation process, but my biggest win was in workshopping. 
 
-### Workshopping.
-After several rounds of our client becoming increasingly overwhelmed and frustrated with unfamiliar process, I crafted "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
-
 ### COVID.
 Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. But business is busyness; the show must go on. 
+
+### Workshopping.
+After several rounds of our client becoming increasingly overwhelmed and frustrated with unfamiliar process, I crafted "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
 
 ### West Coast Vibes.
 At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema. We didn't have time for perfection, but we successfully modernized and optimized their online experience.
@@ -2716,6 +2716,8 @@ function handleTouchEnd(e) {
     const touchEndY = e.changedTouches[0].clientY;
     const deltaY = state.touchStartY - touchEndY;
     if (Math.abs(deltaY) > CONFIG.FLICK_THRESHOLD) {
+        // Any scroll gesture restores hidden UI
+        if (document.body.classList.contains('ui-hidden')) { showUI(); return; }
         state.scrollCooldownActive = true;
         if (deltaY > 0) nextSentence(); else previousSentence();
         setTimeout(() => { state.scrollCooldownActive = false; }, CONFIG.SCROLL_COOLDOWN);
@@ -2897,7 +2899,7 @@ function initializeContextMenu() {
     // Suppress browser right-click context menu
     document.addEventListener('contextmenu', e => e.preventDefault());
 
-    // Mobile: long press on stream → open chapter dropdown
+    // Mobile: long press on stream → hide UI; any scroll gesture restores it
     const streamEl = Utils.$('#stream');
     if (streamEl) {
         let lpTimer = null;
@@ -2908,7 +2910,7 @@ function initializeContextMenu() {
             lpTimer = setTimeout(() => {
                 lpTimer = null;
                 if (!lpMoved) {
-                    if (!isDropdownOpen()) toggleChapterDropdown();
+                    document.body.classList.add('ui-hidden');
                     if (navigator.vibrate) navigator.vibrate(40);
                 }
             }, CONFIG.LONG_PRESS_DURATION);
