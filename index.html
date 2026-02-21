@@ -1194,21 +1194,95 @@ body.grid-open .grid-close-hotspot { display: block; }
         50%       { box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
     }
     body.focus-mode .sentence.active { animation: focusPulse 1.8s ease-in-out infinite; }
+
+    /* Read Mode — text-only free scroll, no sentence-step, no images/chrome */
+    body.read-mode .header,
+    body.read-mode .scroll-progress,
+    body.read-mode .left-rail,
+    body.read-mode #statsWidget,
+    body.read-mode #keyboardLegend {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    body.read-mode .image-layer,
+    body.read-mode .hover-image,
+    body.read-mode .edge-blur,
+    body.read-mode .vignette {
+        opacity: 0 !important;
+        pointer-events: none;
+    }
+    body.read-mode .text-layer {
+        overflow-y: auto;
+        height: 100vh;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    body.read-mode .sentence {
+        opacity: 1 !important;
+        color: var(--sentence-color) !important;
+        background: none !important;
+        text-shadow: none !important;
+        animation: none !important;
+    }
+    body.read-mode .sentence.active {
+        color: var(--sentence-active-color) !important;
+    }
+    /* Exit read mode tap target — bottom center */
+    .read-mode-exit {
+        display: none;
+        position: fixed;
+        bottom: calc(20px + env(safe-area-inset-bottom));
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: calc(var(--z-ui) + 10);
+        font-family: var(--ui-font);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
+        border-radius: 20px;
+        padding: 8px 16px;
+        pointer-events: auto;
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+    body.read-mode .read-mode-exit { display: block; }
+    .read-mode-exit:active { opacity: 1; }
+
+    /* Mobile context menu — bottom-sheet style on small screens */
+    @media (max-width: 768px) {
+        .context-menu {
+            bottom: calc(16px + env(safe-area-inset-bottom));
+            top: auto !important;
+            left: 16px !important;
+            right: 16px !important;
+            width: auto;
+            min-width: unset;
+            transform: translateY(16px) scale(0.98);
+            border-radius: 12px;
+        }
+        .context-menu.open {
+            transform: translateY(0) scale(1);
+        }
+        .context-menu-item { padding: 14px 20px; font-size: 15px; }
+        .ctx-icon { font-size: 18px; }
+    }
     </style>
 </head>
 <body>
     <div class="context-menu" id="contextMenu" aria-hidden="true">
-        <div class="context-menu-item" id="ctxNextChapter"><span class="ctx-icon">→</span><span>Next Chapter</span></div>
-        <div class="context-menu-item" id="ctxPrevChapter"><span class="ctx-icon">←</span><span>Previous Chapter</span></div>
+        <div class="context-menu-item" id="ctxBackToTop"><span class="ctx-icon">↑</span><span>Back to Top</span></div>
         <div class="context-menu-divider"></div>
-        <div class="context-menu-item" id="ctxResetProgress"><span class="ctx-icon">↑</span><span>Back to Top</span></div>
-        <div class="context-menu-item" id="ctxToggleTheme"><span class="ctx-icon" id="ctxThemeIcon">⚡</span><span id="ctxThemeText">Sport Theme</span></div>
-        <div class="context-menu-divider"></div>
-        <div class="context-menu-item" id="ctxCopyLink"><span class="ctx-icon">🔗</span><span>Copy Link</span></div>
-        <div class="context-menu-item" id="ctxShare"><span class="ctx-icon">↗</span><span>Share</span></div>
+        <div class="context-menu-item" id="ctxFocusMode"><span class="ctx-icon" id="ctxFocusIcon">◻</span><span id="ctxFocusText">Focus Mode</span></div>
+        <div class="context-menu-item" id="ctxReadMode"><span class="ctx-icon" id="ctxReadIcon">☰</span><span id="ctxReadText">Read Mode</span></div>
     </div>
 
 
+    <div class="read-mode-exit" id="readModeExit" role="button" aria-label="Exit Read Mode">Tap to exit Read Mode</div>
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
     <div class="close-hotspot grid-close-hotspot" id="gridCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
     <div class="close-hotspot split-close-hotspot" id="splitCloseHotspot" aria-label="Move cursor here to close (top-right corner)"></div>
@@ -1409,7 +1483,6 @@ const state = {
 const cursor = { x: 0, y: 0, targetX: 0, targetY: 0, element: null, currentImageElement: null };
 const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, y: 0, targetX: 0, targetY: 0 } };
 
-
 // ===================================
 // DATA
 // ===================================
@@ -1556,11 +1629,16 @@ const imageMap = {
     'wear & tear': 'https://i.ibb.co/3YTzmTm1/1-XT2ea-L5pv1yb49r-o-Jq-Ao-A.webp',
     'killing it': 'https://i.ibb.co/21QjMR93/commute.webp',
 
-    
-    'From Workarea to LiveArea': 'https://i.ibb.co/DPyhP1T7/603d100d889053cc334ee5fc-IMG-2083.webp',
-    
+    'found love': 'https://i.ibb.co/gtfnzmc/6463db5b885de5f0e9c14019-IMG-20190918-010900-01-1.jpg',
 
-    'Cards Against Bad UX': 'https://i.ibb.co/KxyvFKmq/1-P4-Gyqav-HMmzp-A-Ehqy9g-w.webp',
+    
+    'From Workarea to LiveArea': 'https://i.ibb.co/mSR1GDc/2309287483437628607-5144774570.jpg',
+    'world worked': 'https://i.ibb.co/HVt8q9Q/63bc58fdd5af3c7496ddc47b-Embedded-Image-18.jpg',
+    'Once familiar faces faded': 'https://i.ibb.co/LQyhkV7/2421291975296513469-5144774570.jpg',
+    'bandwidth': 'https://i.ibb.co/5pYQjBh/ZAX04125.jpg',
+    'The show must go on': 'https://i.ibb.co/8cFGqNB/6463c90009f6d464ffca5fe3-wellbeaight.jpg',
+    
+    'Cards Against Bad UX': 'https://i.ibb.co/jv7dC3hH/1-m-Zdgz7y-Elh7n-WKuu-S8-XZ2g.webp',
     'jargon-laden spreadsheets': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
     'single-sided meetings': 'https://i.ibb.co/PRpwWXQ/1-a9to-Sr99x6-Nt-E5-YC7b-Gnzw.webp',
     'As a shopper': 'https://i.ibb.co/6Jf5xj5D/1-Gx-Z4jd-EHO3-IWmhx-Tr-Dff-CA.webp',
@@ -1680,13 +1758,18 @@ O3 World was an elevating experience. A digital product shop in the heart of Fis
 ### A Bona Fide Dev Shop.
 Downtown from Fishtown was Workarea, where I worked on a proprietary SaaS platform. We skipped high-fidelity mockups for napkin sketches and direct collaboration with developers. We were a dev-shop through and through. We built things better, faster, smarter. The company sold, requiring I reframe my reproach .
 
-
 Enter FlightPath. Hello, New York City. Emerging from bankruptcy, the agency served the pharmaceutical sector [now reduced from a bustling two-floor office in Midtown to a mere ten dedicated employees; with I being one to join them] They needed my help, and this was my foot-in-the-door to the NYC scene. [This was risky. It was not lucrative. Passable at best, but FlightPath was always only ever to be my runway]
 //
 Sure, this was risky, but wholly worth it. Here, I had influence. With that, came confidence. [I worked on rigorous WCAG compliance for our Pharma clients: Merck, Vetsulin, Charter, Organic Girl, Goya, and several non-profits] I had agency at this agency. Commuting from Philly to Manhattan — and back — every business day for a full year. Up and out by five o'clock; home by ten o'clock — Maybe?. Saw both Sunrise and Sunset every day away from home. Two skylines three hours apart. Why? Despite the wear & tear, I was moving forward.
 
 ### From Midtown to Uptown.
-From Workarea to LiveArea. From IC to Manager — I owned the UX process for a gamut of B2B & B2C brands [via the SalesForce E-commerce platform] There was your usual ideation & creation process, but my biggest win was in workshopping. After several rounds of our client becoming increasingly overwhelmed and frustrated, [Imagine being a master of your domain, and some agency comes in telling you what you need] I created "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
+From Workarea to LiveArea. From IC to Manager — I owned the UX process for a gamut of B2B & B2C brands [via the SalesForce E-commerce platform] Our agency process followed the familiar ideation & creation process, but my biggest win was in workshopping. 
+
+### COVID.
+Something shifted as the world worked through the COVID pandemic. Once familiar faces faded behind canceled cameras. Voices muffled, or on mute. But business is busyness; the show must go on. 
+
+### Workshopping.
+After several rounds of our client becoming increasingly overwhelmed and frustrated with unfamiliar process, I crafted "Cards Against Bad UX" to help clients empathize with users. By shifting the conversation to the guest user and content manager, we saved the contract.
 
 ### West Coast Vibes.
 At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema. We didn't have time for perfection, but we successfully modernized and optimized their online experience.
@@ -2947,10 +3030,101 @@ function render() {
 // ===================================
 // CONTEXT MENU
 // ===================================
+function enterReadMode() {
+    document.body.classList.add('read-mode');
+    hideImage();
+    // Re-enable native touch scrolling on text-layer
+    const textLayer = Utils.$('#textLayer');
+    if (textLayer) textLayer.style.touchAction = 'pan-y';
+}
+
+function exitReadMode() {
+    document.body.classList.remove('read-mode');
+    const textLayer = Utils.$('#textLayer');
+    if (textLayer) textLayer.style.touchAction = '';
+}
+
+function toggleReadMode() {
+    if (document.body.classList.contains('read-mode')) exitReadMode();
+    else enterReadMode();
+}
+
 function initializeContextMenu() {
     const contextMenu = Utils.$('#contextMenu');
-    function hideContextMenu() { contextMenu.classList.remove('open'); contextMenu.setAttribute('aria-hidden', 'true'); }
+
+    function showContextMenu() {
+        // Update toggle labels to reflect current state
+        const focusIcon = document.getElementById('ctxFocusIcon');
+        const focusText = document.getElementById('ctxFocusText');
+        const readIcon  = document.getElementById('ctxReadIcon');
+        const readText  = document.getElementById('ctxReadText');
+        const inFocus = document.body.classList.contains('focus-mode');
+        const inRead  = document.body.classList.contains('read-mode');
+        if (focusIcon) focusIcon.textContent = inFocus ? '◼' : '◻';
+        if (focusText) focusText.textContent  = inFocus ? 'Exit Focus Mode' : 'Focus Mode';
+        if (readIcon)  readIcon.textContent   = inRead  ? '✕' : '☰';
+        if (readText)  readText.textContent   = inRead  ? 'Exit Read Mode' : 'Read Mode';
+        contextMenu.classList.add('open');
+        contextMenu.setAttribute('aria-hidden', 'false');
+        // Dismiss on outside tap (one-shot, next tick)
+        setTimeout(() => {
+            document.addEventListener('touchstart', hideContextMenu, { once: true, passive: true });
+            document.addEventListener('mousedown',  hideContextMenu, { once: true });
+        }, 0);
+    }
+
+    function hideContextMenu() {
+        contextMenu.classList.remove('open');
+        contextMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    // Wire menu items
+    document.getElementById('ctxBackToTop')?.addEventListener('click', () => { hideContextMenu(); resetToBeginning(); });
+    document.getElementById('ctxFocusMode')?.addEventListener('click', () => { hideContextMenu(); toggleFocusMode(); });
+    document.getElementById('ctxReadMode')?.addEventListener('click',  () => { hideContextMenu(); toggleReadMode(); });
+
+    // Prevent context menu click from immediately triggering outside-tap dismiss
+    contextMenu.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    contextMenu.addEventListener('mousedown',  e => e.stopPropagation());
+
+    // Desktop: suppress right-click
     document.addEventListener('contextmenu', e => { e.preventDefault(); });
+
+    // Mobile: longpress on stream → show context menu
+    const streamEl = Utils.$('#stream');
+    if (streamEl) {
+        let longPressTimer = null;
+        let touchMoved = false;
+
+        streamEl.addEventListener('touchstart', (e) => {
+            // Skip interactive elements
+            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break, button, a')) return;
+            touchMoved = false;
+            longPressTimer = setTimeout(() => {
+                longPressTimer = null;
+                if (!touchMoved) {
+                    showContextMenu();
+                    if (navigator.vibrate) navigator.vibrate(40);
+                }
+            }, CONFIG.LONG_PRESS_DURATION);
+        }, { passive: true });
+
+        streamEl.addEventListener('touchmove', () => {
+            touchMoved = true;
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        }, { passive: true });
+
+        streamEl.addEventListener('touchend', () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        }, { passive: true });
+
+        streamEl.addEventListener('touchcancel', () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        }, { passive: true });
+    }
+
+    // Read mode exit button
+    document.getElementById('readModeExit')?.addEventListener('click', exitReadMode);
 }
 
 // ===================================
@@ -3296,27 +3470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCursor();
     updateParallax();
 
-    // Mobile: hold anywhere on stream to enter focus mode, release to exit
-    const streamEl = Utils.$('#stream');
-    if (streamEl) {
-        let focusModeTimer = null;
-        streamEl.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.bracket-trigger, .image-trigger, .chapter-break, .subchapter-break')) return;
-            focusModeTimer = setTimeout(() => {
-                focusModeTimer = null;
-                enterFocusMode();
-                if (navigator.vibrate) navigator.vibrate(40);
-            }, CONFIG.LONG_PRESS_DURATION);
-        }, { passive: true });
-        streamEl.addEventListener('touchend', () => {
-            if (focusModeTimer) { clearTimeout(focusModeTimer); focusModeTimer = null; }
-            else exitFocusMode();
-        }, { passive: true });
-        streamEl.addEventListener('touchcancel', () => {
-            if (focusModeTimer) { clearTimeout(focusModeTimer); focusModeTimer = null; }
-            exitFocusMode();
-        }, { passive: true });
-    }
+    // Mobile longpress is handled in initializeContextMenu()
     
     document.body.classList.add(`layout-${state.layoutMode}`);
     
