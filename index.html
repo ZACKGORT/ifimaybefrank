@@ -692,6 +692,64 @@ body.image-active .sentence.active { opacity: 1; color: var(--sentence-active-co
 body.image-active .sentence.dimmed { opacity: 0.01; color: var(--ink-3); }
 
 /* ===================================
+   ACCESSIBILITY
+   =================================== */
+.sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+.skip-link {
+    position: fixed;
+    top: -100%;
+    left: 16px;
+    z-index: 99999;
+    background: var(--accent);
+    color: var(--bg-color);
+    font-family: var(--ui-font);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: top 0.15s ease;
+    outline: none;
+}
+.skip-link:focus { top: 16px; }
+
+/* Focus visible ring — all interactive elements */
+:focus { outline: none; }
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+/* Sentences get a more tailored focus ring */
+.sentence:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+/* Image triggers keyboard focus */
+.image-trigger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 1px;
+    color: var(--accent);
+}
+/* Bracket triggers */
+.bracket-trigger:focus-visible {
+    outline: 2px solid var(--bracket-hover);
+    outline-offset: 2px;
+    border-radius: 1px;
+}
+
+/* ===================================
    BASE STYLES
    =================================== */
 *, *::before, *::after { box-sizing: border-box; }
@@ -859,7 +917,20 @@ body.theme-transitioning::after {
 /* ===================================
    IMAGE TRIGGERS & HOVER
    =================================== */
-.image-trigger { position: relative; text-decoration: none; border-bottom: 1px dotted var(--accent); cursor: help; transition: all 0.2s ease; opacity: 0.9; }
+.image-trigger {
+    all: unset;
+    position: relative;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent);
+    cursor: help;
+    transition: all 0.2s ease;
+    opacity: 0.9;
+    display: inline;
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+}
 .image-trigger:hover { color: var(--accent); border-bottom-style: solid; opacity: 1; }
 .hover-image { 
     position: absolute; z-index: 1; pointer-events: none; opacity: 0; 
@@ -1349,6 +1420,10 @@ body.focus-mode .hover-image { opacity: 0 !important; }
     </style>
 </head>
 <body>
+    <!-- Skip navigation for keyboard/AT users -->
+    <a href="#stream" class="skip-link">Skip to content</a>
+    <!-- Screen reader live announcer for sentence navigation -->
+    <div id="srAnnouncer" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
 
 
@@ -1489,7 +1564,7 @@ body.focus-mode .hover-image { opacity: 0 !important; }
     <div class="edge-blur" aria-hidden="true"></div>
     <div class="vignette" aria-hidden="true"></div>
 
-    <div class="scroll-progress" aria-label="Navigation controls">
+    <nav class="scroll-progress" aria-label="Chapter navigation">
         <button class="nav-button prev-sentence" id="prevSentenceBtn" title="Previous Sentence (↑/k)" aria-label="Previous Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>
         </button>
@@ -1497,9 +1572,9 @@ body.focus-mode .hover-image { opacity: 0 !important; }
         <button class="nav-button next-sentence" id="nextSentenceBtn" title="Next Sentence (↓/j)" aria-label="Next Sentence">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
         </button>
-    </div>
+    </nav>
 
-    <main class="curved">
+    <main class="curved" id="main-content">
         <div class="parallax-container">
             <div id="imageLayer" class="image-layer">
                 <div id="hoverImage" class="hover-image" role="tooltip" aria-hidden="true">
@@ -1557,7 +1632,8 @@ const state = {
     bracketsOpened: 0,
     chaptersRead: new Set(),
     // Chapter-break dropdown opener tracking
-    chapterBreakOpener: null
+    chapterBreakOpener: null,
+    lastNavWasKeyboard: false
 };
 
 const cursor = { x: 0, y: 0, targetX: 0, targetY: 0, element: null, currentImageElement: null };
@@ -2600,7 +2676,7 @@ function wrapImageTriggers(text) {
     let wrapped = text;
     for (const [phrase, url] of Object.entries(imageMap)) {
         const regex = phraseRegexMap.get(phrase);
-        if (regex) wrapped = wrapped.replace(regex, `<span class="image-trigger" data-image="${url}">$&</span>`);
+        if (regex) wrapped = wrapped.replace(regex, `<button class="image-trigger" data-image="${url}" aria-label="View image: $&" type="button">$&</button>`);
     }
     return wrapped;
 }
@@ -2713,10 +2789,27 @@ function previousSentence() {
 function highlightSentence(index) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
-    state.allSentenceElements.forEach(s => { s.classList.remove('active'); s.classList.add('dimmed'); s.style.opacity = ''; });
+    state.allSentenceElements.forEach(s => {
+        s.classList.remove('active');
+        s.classList.add('dimmed');
+        s.style.opacity = '';
+        s.removeAttribute('aria-current');
+    });
     sentence.classList.add('active');
     sentence.classList.remove('dimmed');
-    
+    sentence.setAttribute('aria-current', 'true');
+
+    // Announce to screen readers
+    const announcer = document.getElementById('srAnnouncer');
+    if (announcer) {
+        const text = sentence.textContent.trim();
+        announcer.textContent = '';
+        requestAnimationFrame(() => { announcer.textContent = text; });
+    }
+
+    // Move focus to sentence if navigating via keyboard (not mouse)
+    if (state.lastNavWasKeyboard) sentence.focus({ preventScroll: true });
+
     // Track stats
     trackSentence(index);
     trackChapter(getCurrentChapter());
@@ -2921,7 +3014,7 @@ function buildImageGrid() {
             imagesByChapter[chapter.id].forEach(imgData => {
                 const item = document.createElement('div');
                 item.className = 'grid-image-item';
-                item.innerHTML = `<img src="${imgData.url}" loading="lazy" alt="Grid preview"><div class="grid-image-caption"><span class="caption-text">${imgData.text}</span></div>`;
+                item.innerHTML = `<img src="${imgData.url}" loading="lazy" alt="${imgData.text.replace(/"/g, '&quot;')}"><div class="grid-image-caption"><span class="caption-text">${imgData.text}</span></div>`;
                 item.addEventListener('click', () => { toggleImageGrid(); state.currentSentenceIndex = imgData.index; highlightSentence(imgData.index); });
                 grid.appendChild(item);
             });
@@ -3050,6 +3143,9 @@ function render() {
             span.className = 'sentence';
             span.dataset.sentenceIndex = sentenceCount;
             span.style.cursor = 'pointer';
+            span.setAttribute('tabindex', '0');
+            span.setAttribute('role', 'button');
+            span.setAttribute('aria-label', `Sentence ${sentenceCount + 1}: ${part.text.replace(/<[^>]+>/g, '')}`);
             for (const [phrase, url] of Object.entries(imageMap)) {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
@@ -3057,6 +3153,9 @@ function render() {
             span.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(span.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
             span.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             span.addEventListener('click', () => { state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
+            span.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); }
+            });
             state.allSentenceElements.push(span);
             sentenceCount++;
             fragment.appendChild(span);
@@ -3076,13 +3175,19 @@ function render() {
             li.className = 'sentence bullet-item';
             li.dataset.sentenceIndex = sentenceCount;
             li.style.cursor = 'pointer';
+            li.setAttribute('tabindex', '0');
+            li.setAttribute('role', 'button');
+            li.setAttribute('aria-label', `Sentence ${sentenceCount + 1}: ${part.text.replace(/<[^>]+>/g, '')}`);
             for (const [phrase, url] of Object.entries(imageMap)) {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
-            li.innerHTML = '<span class="bullet-marker">•</span> ' + wrapImageTriggers(part.text);
+            li.innerHTML = '<span class="bullet-marker" aria-hidden="true">•</span> ' + wrapImageTriggers(part.text);
             li.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
             li.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); }
+            });
             state.allSentenceElements.push(li);
             sentenceCount++;
             fragment.appendChild(li);
@@ -3091,13 +3196,19 @@ function render() {
             li.className = 'sentence numbered-bullet-item';
             li.dataset.sentenceIndex = sentenceCount;
             li.style.cursor = 'pointer';
+            li.setAttribute('tabindex', '0');
+            li.setAttribute('role', 'button');
+            li.setAttribute('aria-label', `Sentence ${sentenceCount + 1}: ${part.text.replace(/<[^>]+>/g, '')}`);
             for (const [phrase, url] of Object.entries(imageMap)) {
                 if (part.text.includes(phrase)) { state.gridImages.push({ index: sentenceCount, text: part.text, url: url, chapterId: currentActiveChapter }); break; }
             }
-            li.innerHTML = `<span class="numbered-marker">${part.number}.</span> ` + wrapImageTriggers(part.text);
+            li.innerHTML = `<span class="numbered-marker" aria-hidden="true">${part.number}.</span> ` + wrapImageTriggers(part.text);
             li.addEventListener('mouseenter', () => { if (state.isTouch) return; const index = parseInt(li.dataset.sentenceIndex); state.allSentenceElements.forEach((s, i) => { s.style.opacity = i === index ? '0.7' : '0.25'; }); }, { passive: true });
             li.addEventListener('mouseleave', () => { if (state.isTouch) return; state.allSentenceElements.forEach(s => s.style.opacity = ''); }, { passive: true });
             li.addEventListener('click', () => { state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); });
+            li.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); state.currentSentenceIndex = parseInt(li.dataset.sentenceIndex); highlightSentence(state.currentSentenceIndex); }
+            });
             state.allSentenceElements.push(li);
             sentenceCount++;
             fragment.appendChild(li);
@@ -3107,6 +3218,8 @@ function render() {
             trigger.textContent = '[+]';
             const contentId = `bracket-content-${part.id}`;
             trigger.setAttribute('aria-controls', contentId);
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.setAttribute('aria-label', 'Expand annotation');
             const content = document.createElement('span');
             content.className = 'bracket-content';
             content.id = contentId;
@@ -3114,6 +3227,8 @@ function render() {
             trigger.addEventListener('click', () => {
                 const isExpanded = content.classList.toggle('visible');
                 trigger.textContent = isExpanded ? '[−]' : '[+]';
+                trigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                trigger.setAttribute('aria-label', isExpanded ? 'Collapse annotation' : 'Expand annotation');
                 trigger.classList.toggle('expanded');
                 if (isExpanded) { state.expandedBrackets.add(part.id); trackBracketOpen(); }
                 else state.expandedBrackets.delete(part.id);
@@ -3133,6 +3248,24 @@ function render() {
         if (trigger) { const imageUrl = trigger.getAttribute('data-image'); if (imageUrl) showImage(imageUrl, trigger); }
     }, { passive: true });
     streamEl.addEventListener('mouseout', e => { if (e.target.closest('.image-trigger')) hideImage(); }, { passive: true });
+
+    // Keyboard and focus access for image triggers
+    streamEl.addEventListener('focusin', e => {
+        const trigger = e.target.closest('.image-trigger');
+        if (trigger) { const imageUrl = trigger.getAttribute('data-image'); if (imageUrl) showImage(imageUrl, trigger); }
+    }, { passive: true });
+    streamEl.addEventListener('focusout', e => {
+        if (e.target.closest('.image-trigger')) hideImage();
+    }, { passive: true });
+    streamEl.addEventListener('keydown', e => {
+        const trigger = e.target.closest('.image-trigger');
+        if (trigger && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            const imageUrl = trigger.getAttribute('data-image');
+            if (imageUrl) showImage(imageUrl, trigger);
+        }
+        if (e.key === 'Escape' && state.imageActive) { e.preventDefault(); hideImage(); }
+    });
 }
 
 // ===================================
@@ -3325,14 +3458,14 @@ function initializeKeyboardControls() {
             keyElement.style.borderColor = 'var(--accent)';
         }
         
-        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); nextSentence(); }
+        if (e.key === 'Space' || e.code === 'Space') { e.preventDefault(); state.lastNavWasKeyboard = true; nextSentence(); }
         else if (e.key.toLowerCase() === 'g') { e.preventDefault(); toggleImageGrid(); }
         else if (e.key.toLowerCase() === 'c') { e.preventDefault(); toggleChapterDropdown(); }
-        else if (e.key === 'Backspace') { e.preventDefault(); previousSentence(); }
+        else if (e.key === 'Backspace') { e.preventDefault(); state.lastNavWasKeyboard = true; previousSentence(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); nextChapter(); }
         else if (e.key === 'ArrowLeft') { e.preventDefault(); previousChapter(); }
-        else if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); nextSentence(); }
-        else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); previousSentence(); }
+        else if (e.key === 'ArrowDown' || e.key === 'j') { e.preventDefault(); state.lastNavWasKeyboard = true; nextSentence(); }
+        else if (e.key === 'ArrowUp' || e.key === 'k') { e.preventDefault(); state.lastNavWasKeyboard = true; previousSentence(); }
         else if (e.key === 'Shift') { e.preventDefault(); toggleLayout(); }
         else if (e.key === 'l') toggleLayout();
         else if (e.key.toLowerCase() === 't') toggleTheme();
@@ -3496,8 +3629,8 @@ document.addEventListener('DOMContentLoaded', () => {
         new MutationObserver(syncModeCluster).observe(document.body, { attributes: true, attributeFilter: ['class'] });
         syncModeCluster();
     }
-    Utils.$('#prevSentenceBtn').addEventListener('click', previousSentence);
-    Utils.$('#nextSentenceBtn').addEventListener('click', nextSentence);
+    Utils.$('#prevSentenceBtn').addEventListener('click', () => { state.lastNavWasKeyboard = false; previousSentence(); });
+    Utils.$('#nextSentenceBtn').addEventListener('click', () => { state.lastNavWasKeyboard = false; nextSentence(); });
     
     document.addEventListener('click', e => {
         if (!Utils.$('#brandLogo').contains(e.target) && !Utils.$('#chapterDropdown').contains(e.target) && !e.target.closest('.chapter-break')) closeChapterDropdown();
