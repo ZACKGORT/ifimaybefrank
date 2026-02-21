@@ -902,13 +902,14 @@ body.theme-transitioning::after {
     background: var(--surface-raised); 
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
     border: 1px solid var(--border); border-radius: 6px; padding: 6px 0; 
-    opacity: 0; visibility: hidden; transform: translateY(-8px); 
-    transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.2s, transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.2s; 
     z-index: var(--z-dropdown); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); 
     max-height: 70vh; display: flex; flex-direction: column; 
     touch-action: none;
+    transform: none;
 }
-.chapter-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.chapter-dropdown.open { opacity: 1; visibility: visible; }
 .chapter-dropdown.dragging { 
     transition: none !important; 
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
@@ -2426,87 +2427,94 @@ function initializeDraggableDropdown() {
 
     let isDragging = false;
     let startX, startY, initLeft, initTop;
-    let hasBeenDragged = false;
 
-    function anchorToViewport() {
-        // On first drag, switch from CSS-anchored to pixel-anchored position
-        if (!hasBeenDragged) {
-            const rect = dropdown.getBoundingClientRect();
-            dropdown.style.left = rect.left + 'px';
-            dropdown.style.top = rect.top + 'px';
-            hasBeenDragged = true;
+    // Canonical pixel position — null means "use CSS default"
+    let pinnedLeft = null;
+    let pinnedTop = null;
+
+    function applyPinnedPosition() {
+        if (pinnedLeft !== null && pinnedTop !== null) {
+            dropdown.style.left = pinnedLeft + 'px';
+            dropdown.style.top  = pinnedTop  + 'px';
         }
     }
 
     function clampDropdown(left, top) {
-        const rect = dropdown.getBoundingClientRect();
-        const w = rect.width || 280;
-        const h = rect.height || 300;
+        const w = dropdown.offsetWidth  || 260;
+        const h = dropdown.offsetHeight || 300;
         const margin = 8;
-        left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
-        top = Math.max(margin, Math.min(top, window.innerHeight - h - margin));
+        left = Math.max(margin, Math.min(left, window.innerWidth  - w - margin));
+        top  = Math.max(margin, Math.min(top,  window.innerHeight - h - margin));
         return [left, top];
     }
 
-    // Mouse drag
-    header.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        e.stopPropagation(); // prevent brand toggle from firing
-        anchorToViewport();
+    function startDrag(clientX, clientY) {
+        // Snapshot current rendered position into pixels on first drag
+        if (pinnedLeft === null) {
+            const rect = dropdown.getBoundingClientRect();
+            pinnedLeft = rect.left;
+            pinnedTop  = rect.top;
+            dropdown.style.left = pinnedLeft + 'px';
+            dropdown.style.top  = pinnedTop  + 'px';
+        }
         isDragging = true;
         dropdown.classList.add('dragging');
-        startX = e.clientX; startY = e.clientY;
-        initLeft = parseInt(dropdown.style.left, 10);
-        initTop = parseInt(dropdown.style.top, 10);
-    });
+        startX = clientX; startY = clientY;
+        initLeft = pinnedLeft;
+        initTop  = pinnedTop;
+    }
 
-    document.addEventListener('mousemove', (e) => {
+    function moveDrag(clientX, clientY) {
         if (!isDragging) return;
-        const newLeft = initLeft + (e.clientX - startX);
-        const newTop = initTop + (e.clientY - startY);
-        const [cl, ct] = clampDropdown(newLeft, newTop);
+        const [cl, ct] = clampDropdown(
+            initLeft + (clientX - startX),
+            initTop  + (clientY - startY)
+        );
+        pinnedLeft = cl;
+        pinnedTop  = ct;
         dropdown.style.left = cl + 'px';
-        dropdown.style.top = ct + 'px';
-    });
+        dropdown.style.top  = ct + 'px';
+    }
 
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            dropdown.classList.remove('dragging');
-        }
-    });
+    function endDrag() {
+        if (!isDragging) return;
+        isDragging = false;
+        dropdown.classList.remove('dragging');
+    }
 
-    // Touch drag
-    let tStartX, tStartY;
+    // Apply pinned position every time the dropdown opens
+    dropdown.addEventListener('transitionend', () => {
+        if (dropdown.classList.contains('open')) applyPinnedPosition();
+    });
+    // Also apply immediately on open in case transition is skipped
+    const observer = new MutationObserver(() => {
+        if (dropdown.classList.contains('open')) applyPinnedPosition();
+    });
+    observer.observe(dropdown, { attributes: true, attributeFilter: ['class'] });
+
+    // Mouse
+    header.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startDrag(e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', (e) => { if (isDragging) moveDrag(e.clientX, e.clientY); });
+    document.addEventListener('mouseup', endDrag);
+
+    // Touch
     header.addEventListener('touchstart', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        anchorToViewport();
-        isDragging = true;
-        dropdown.classList.add('dragging');
         const t = e.touches[0];
-        tStartX = t.clientX; tStartY = t.clientY;
-        initLeft = parseInt(dropdown.style.left, 10);
-        initTop = parseInt(dropdown.style.top, 10);
+        startDrag(t.clientX, t.clientY);
     }, { passive: false });
-
     document.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         if (e.cancelable) e.preventDefault();
         const t = e.touches[0];
-        const newLeft = initLeft + (t.clientX - tStartX);
-        const newTop = initTop + (t.clientY - tStartY);
-        const [cl, ct] = clampDropdown(newLeft, newTop);
-        dropdown.style.left = cl + 'px';
-        dropdown.style.top = ct + 'px';
+        moveDrag(t.clientX, t.clientY);
     }, { passive: false });
-
-    document.addEventListener('touchend', () => {
-        if (isDragging) {
-            isDragging = false;
-            dropdown.classList.remove('dragging');
-        }
-    });
+    document.addEventListener('touchend', endDrag);
 }
 
 // ===================================
