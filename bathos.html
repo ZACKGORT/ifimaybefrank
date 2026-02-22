@@ -2234,10 +2234,11 @@ const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, 
 // DATA
 // ===================================
 const chapters = [
-    { id: 0, title: "Begin", startText: "Begin anywhere" },
-    { id: 1, title: "The Pause", startText: "The pause is not empty" },
-    { id: 2, title: "How It Works", startText: "Type a sentence below" },
-    { id: 3, title: "Now Delete This", startText: "Write something true instead" }
+    { id: 0, title: "Arrival", startText: "That feeling of arrival" },
+    { id: 1, title: "The Pause", startText: "Most tools don’t honor that moment" },
+    { id: 2, title: "The Format", startText: "This format was built inside that pause" },
+    { id: 3, title: "That Rhythm", startText: "That rhythm has a name" },
+    { id: 4, title: "Begin", startText: "You’re here now" }
 ]
 
 const imageMap = {
@@ -2319,7 +2320,12 @@ const imageMap = {
     'leaving for the last time': 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=1200&q=80',
     'find its shape': 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80',
     'write something true': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80',
-    'the format will hold it': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80'
+    'the format will hold it': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80',
+    'feeling of arrival': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+    'pause after the period': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80',
+    'small surgery': 'https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=1200&q=80',
+    'cursor blinking': 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&q=80',
+    'write one sentence': 'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=1200&q=80'
 }
 const phraseRegexMap = new Map();
 Object.keys(imageMap).forEach(phrase => {
@@ -2327,36 +2333,41 @@ Object.keys(imageMap).forEach(phrase => {
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
 });
 
-const narrative = `Begin anywhere.
+const narrative = `That feeling of arrival.
 
-A thought. A memory. Something you almost said out loud.
+It happens at the end of a sentence. [Not the beginning. Not somewhere in the middle. At the period — the moment the thought closes and becomes a thing.]
 
-Write it down. One sentence. [Just one. The next one will come.]
+You know it as a reader. A sentence lands. Something shifts. You sit with it before the next one comes.
 
-Then pause.//
+You know it as a writer too — maybe better.
 
-### The pause is not empty.
-It is where the sentence lands.
+The period is the decision. [Not the word. Not the sentence. The full stop. The moment you commit to what you just said.]//
 
-It is where you decide if it is true.
+### Most tools don’t honor that moment.
+They give you a cursor blinking past it. A word count that doesn’t care where you stopped. A paragraph that swallows the period whole and keeps going.
 
-It is where the reader arrives — one step behind you, carried by what you just left them.//
+They were built for output. Writing isn’t output.
 
-### This is how it works.
-Type a sentence below. Press Enter. Watch it join the piece above.
+Writing is the pause after the period. The reread. The small surgery. The moment you realize the true sentence was the one before the one you just wrote.//
 
-Double-click any sentence to go back and change it.
+### This format was built inside that pause.
+You write a sentence. You place the period. The sentence enters the piece and becomes real. [Not a draft. Not a line in a document. A thing that exists, one at a time, in the order you meant.]
 
-Map an image to a phrase using IMG. [The image and the word will arrive together, or not at all.]
+Then you stop. You reflect. You rewrite. You reject. You arrive at the next true thing.
 
-Add a note with [ ]. [Like this. The thing you almost didn’t say.]
+Then you write it down and end it with a period.//
 
-That is everything. [The rest is writing.]//
+### That rhythm has a name.
+The drop from the elevated to the plain. The sentence after the profound one. The one that just tells the truth.
 
-### Now delete this.
-Write something true instead.
+Bathos. [Lowercase. It belongs to every writer who has ever stopped after a period and started again.]//
 
-The format will hold it.`
+### You’re here now.
+Write one sentence.
+
+End it with a period.
+
+The format will do the rest.`
 
 
 // ===================================
