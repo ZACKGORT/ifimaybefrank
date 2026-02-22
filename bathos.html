@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Seven people. Seven reasons. One format that gives every story the weight it deserves.">
-    <meta name="author" content="BATHOS">
+    <meta name="description" content="A writing platform built on one idea: the sentence that lands changes everything.">
+    <meta name="author" content="Rriva">
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ifimaybefrank.com/proof">
-    <meta property="og:title" content="BATHOS — Proof of Concept">
-    <meta property="og:description" content="Seven people. Seven reasons. One format that gives every story the weight it deserves.">
+    <meta property="og:title" content="Bathos — Write one sentence at a time">
+    <meta property="og:description" content="A writing platform built on one idea: the sentence that lands changes everything.">
     <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="BATHOS — Proof of Concept">
+    <meta property="twitter:title" content="Bathos — Write one sentence at a time">
     <meta property="twitter:description" content="Seven people. Seven reasons. One format.">
     <meta property="twitter:image" content="https://ifimaybefrank.com/og-image.jpg">
     
-    <title>BATHOS — Proof of Concept</title>
+    <title>Bathos — Write one sentence at a time</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1762,7 +1762,37 @@ body.compose-mode .mode-key.reader-key { display: none; }
 }
 .imagemap-grid-item:hover .item-phrase { opacity: 1; }
 
-/* Bracket quick-insert */
+/* Upload placeholder */
+.compose-upload-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.12);
+    color: var(--ink-3);
+    cursor: not-allowed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 2px;
+    opacity: 0.45;
+    transition: opacity 0.15s ease;
+    position: relative;
+}
+.compose-upload-placeholder:hover { opacity: 0.6; }
+.compose-upload-placeholder svg { width: 15px; height: 15px; }
+.compose-upload-label {
+    font-family: var(--ui-font);
+    font-size: 7px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1;
+}
+
+
 .compose-bracket-btn {
     font-family: var(--ui-font);
     font-size: 10px;
@@ -1799,7 +1829,7 @@ body.compose-mode { padding-bottom: 0; }
 }
     </style>
 </head>
-<body>
+<body class="theme-newspaper">
     <!-- Skip navigation for keyboard/AT users -->
     <a href="#stream" class="skip-link">Skip to content</a>
     <!-- Screen reader live announcer for sentence navigation -->
@@ -1920,6 +1950,10 @@ body.compose-mode { padding-bottom: 0; }
                 aria-label="Compose sentence"
                 spellcheck="true"
             ></textarea>
+            <button class="compose-upload-placeholder" id="composeUpload" aria-label="Image upload — coming soon" title="Image upload — coming soon" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span class="compose-upload-label">Soon</span>
+            </button>
             <button class="compose-commit" id="composeCommit" aria-label="Commit sentence" disabled>
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
@@ -1954,7 +1988,7 @@ body.compose-mode { padding-bottom: 0; }
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>BATHOS — Proof</span>
+                <span>Bathos</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -2107,14 +2141,10 @@ const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, 
 // DATA
 // ===================================
 const chapters = [
-    { id: 0, title: "Before We Begin", startText: "Not every story needs a platform" },
-    { id: 1, title: "The Student", startText: "She wrote the first draft" },
-    { id: 2, title: "The Professional Academic", startText: "He has published forty-one papers" },
-    { id: 3, title: "The Music Teacher", startText: "She hands her student a PDF" },
-    { id: 4, title: "The Small Agency", startText: "The case study begins with a lie" },
-    { id: 5, title: "The Large Agency", startText: "They have won every award" },
-    { id: 6, title: "The Individual", startText: "He does not think of himself as a writer" },
-    { id: 7, title: "The Creator", startText: "She found BATHOS at two in the morning" }
+    { id: 0, title: "Begin", startText: "Begin anywhere" },
+    { id: 1, title: "The Pause", startText: "The pause is not empty" },
+    { id: 2, title: "How It Works", startText: "Type a sentence below" },
+    { id: 3, title: "Now Delete This", startText: "Write something true instead" }
 ]
 
 const imageMap = {
@@ -2189,7 +2219,14 @@ const imageMap = {
     'transported rather than informed': 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1200&q=80',
     'hide UI mode': 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
     'readership': 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1200&q=80',
-    'proof of concept': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80'
+    'proof of concept': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80',
+
+    // ── Blank state / onboarding ──
+    'carry an image': 'https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=1200&q=80',
+    'leaving for the last time': 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=1200&q=80',
+    'find its shape': 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&q=80',
+    'write something true': 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=1200&q=80',
+    'the format will hold it': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80'
 }
 const phraseRegexMap = new Map();
 Object.keys(imageMap).forEach(phrase => {
@@ -2197,84 +2234,36 @@ Object.keys(imageMap).forEach(phrase => {
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
 });
 
-const narrative = `Not every story needs a platform. [Most of them get one anyway \u2014 a post, a thread, a photo dump, a caption. The format has already been chosen for you before you have decided you have something to say.] Some stories need weight. Some ideas need room. Some people have been waiting for a format that meets them at the level of what they actually lived, not the level of what the feed can accommodate.//
-This is BATHOS. [rhymes with 'river'] A place where the sentence-by-sentence format is not a constraint \u2014 it is the point. The image and the word arrive together, or not at all. The reader cannot skip. The writer cannot hide. The architecture of attention changes everything that happens inside it.//
-Seven people. Seven reasons this matters. We begin with them, not with us.//
+const narrative = `Begin anywhere.
 
-She wrote the first draft in one sitting and knew it was the best thing she had ever written. [Then she opened her laptop to share it. She had three options: post it, publish it, or thread it. All three felt wrong. All three would flatten it.]
-She was writing a personal essay about her grandmother's hands. [Specifically, about what it meant to watch them stop working \u2014 first the sewing, then the cooking, then the gestures mid-sentence that used to mean: wait, I remember.]
-Every platform told her to post it. She did not want to post it. She wanted it to land.
-The college application deadline was in nine days. [She was seventeen. She already knew more about loss than most adults she had met.]
-She found BATHOS at midnight. [She cannot explain why the format made sense immediately. Something about one line at a time \u2014 the way it slowed her down without asking her to.]
-She stopped writing for an audience and started writing toward a moment.
-By the end she had something real to say \u2014 not because the content changed, but because the format demands it. [Every sentence had to mean something. There was nowhere to coast.]
-She submitted it. The admissions officer later said it was the most memorable essay she had read in eleven years.
+A thought. A memory. Something you almost said out loud.
 
-### Why it works for students.
-The sentence-by-sentence format forces intentionality. It removes the paragraph as a hiding place. It turns reading into a kind of witnessing \u2014 the image and the word arrive together, and neither apologizes for the other.
+Write it down. One sentence. [Just one. The next one will come.]
 
-He has published forty-one papers. [Thirty-seven of them in journals that twelve people read. He is not bitter about this. He is simply aware of it, the way you are aware of a ceiling.] He is a philosopher of systems \u2014 he thinks in arguments that require nineteen steps, and each step depends on the one before it.
-He has never known how to write for people who did not already know the territory. Not because he talks down to them, but because he does not know how to enter an argument that is already in progress.
-His wife has been asking him to explain his work to her for twelve years. She has not been able to follow it. [She has a PhD in chemistry. She is not unsophisticated.]
-He found BATHOS the way academics find most things \u2014 obliquely, through a footnote in someone else's work.
-The format did something he did not expect: it forced him to write each sentence as if it had to carry a reader across a single step in the argument \u2014 no more, no less.
-Dense thinking walkable. [That is the phrase he uses now when he describes BATHOS to his colleagues. They look at him with the particular skepticism academics reserve for anything that sounds like it might reach more people.]
-He wrote a piece about path dependence in institutional economics and sent it to his wife. She read it in one sitting. She said: I finally understand what you do. [He sat with that for a very long time.]
+Then pause.//
 
-### Why it works for academics.
-Dense thinking does not need to be dumbed down. It needs to be made walkable. The felt context that academic prose strips out \u2014 the image layer provides it back, without editorializing.
+### The pause is not empty.
+It is where the sentence lands.
 
-She hands her student a PDF handout every time a new piece enters the curriculum. [The PDF has nine pages. Her student has never read past the second page. She knows this and has not found a way around it.]
-She has been teaching piano for twenty-two years. She loves the history behind the music \u2014 where it was written, what the composer was feeling, what was happening in the world when the notes were first put to paper.
-She teaches the Goldberg Variations every autumn. [Bach wrote them, allegedly, for an insomniac count who needed something to fill his sleepless nights. She finds this unbearably beautiful \u2014 the idea that some of the most perfect music ever composed was essentially a lullaby for a very tired aristocrat.]
-The student arrives at the lesson and can play the notes. [She is technically excellent. She does not yet understand what she is playing.] There is a gap between the notes and the meaning, and the PDF has never closed it.
-She built a BATHOS piece over a weekend. [She did not think of herself as a writer. She does now.] One movement at a time. Each sentence a fact or a feeling. Each image a portrait, a manuscript page, or a concert hall.
-The student arrived at the lesson. She had not read the PDF. She had read the BATHOS piece three times.
-She said: I feel like I already know this music. That is a different kind of preparation.
+It is where you decide if it is true.
 
-### Why it works for music teachers.
-The image layer provides what a PDF cannot. History does not live in bullet points. It lives in faces, rooms, instruments, light. A photograph of the manuscript page does more work than a paragraph about the manuscript page.
+It is where the reader arrives — one step behind you, carried by what you just left them.//
 
-The case study begins with a lie. [Not a dishonest lie \u2014 a structural one. Challenge. Approach. Solution. Results. This is how it happened, in retrospect, with the parts that required rethinking quietly removed.]
-They are a six-person agency. They do good work \u2014 the kind built on real thinking and real iteration and real trust. They hate writing case studies, and they need them more than anything else in their business development.
-The prospective client reads the PDF and sees the outcome. [They do not see the client call that changed everything. They do not see the sketch on a napkin at nine-thirty on a Tuesday evening when the team finally understood what the problem actually was.]
-They do not see the moment the data came back wrong. [They do not see how that willingness to be wrong was the thing that made the final work true.]
-They built a BATHOS piece about one project. Walking a prospective client through that story sentence by sentence, image by image, was a completely different pitch than a PDF.
-The prospective client arrived at the outcome having felt the process. They signed the contract. The agency did not change the work \u2014 they changed how the work arrived.
-Trust is different after that. [The client came into the relationship having already been inside the way this agency thinks. There was no trust-building period. There was just: yes, I know you.]
+### This is how it works.
+Type a sentence below. Press Enter. Watch it join the piece above.
 
-### Why it works for small agencies.
-The real story \u2014 the sketch on a napkin, the wrong turn, the moment it clicked \u2014 is the thing that builds trust. A prospective client who has been inside that story arrives at the outcome already convinced. Not by credentials. By experience.
+Double-click any sentence to go back and change it.
 
-They have won every award there is to win. [They have the statues on the shelf. They have the credentials pages. They have the slide deck that begins with a logo wall so dense it requires a moment to locate the ones you recognize.] They have too much to prove, and all of it gets flattened.
-They know the capabilities deck does not move anyone. It reassures people who are already convinced. [It does nothing for the client relationship that actually matters \u2014 the one in the specific room, for the specific project, with the specific stakes.]
-They built a BATHOS piece about one campaign. [One campaign. The one that almost failed. The one that required them to rebuild the brief from scratch in week three because the brief had been wrong.] Not for their website. For a meeting. For a room.
-They sent it the day before as a link, not a deck. The client read it the night before. They showed up differently. They asked different questions. They were inside the work, not evaluating it from outside.
-One thing, deeply \u2014 for the client relationship that actually matters. The format signals that they thought carefully about how to present this, which is itself a demonstration of the thing they are selling.
+Map an image to a phrase using IMG. [The image and the word will arrive together, or not at all.]
 
-### Why it works for large agencies.
-The large agency problem is not lack of work \u2014 it is lack of intimacy. Everything gets flattened into award submissions and credentials pages. BATHOS is the format for telling the story of one thing, for one client, with care.
+Add a note with [ ]. [Like this. The thing you almost didn’t say.]
 
-He does not think of himself as a writer. [He has thought of himself as many things \u2014 a traveler, a father, a person who survived something he does not talk about often.] He has a story that deserves more than a photo dump and more than a blog post.
-He went somewhere after he lost someone. [He did not go to grieve. He went because she had always wanted to go and never had, and he could not think of another reason to be anywhere in particular.] He took photographs. He wrote nothing down.
-He came home with four hundred photographs and the feeling that something had happened to him that he did not have words for yet.
-He found BATHOS because a friend sent him a piece someone had written. He read it twice. He read it a third time. He did not finish the third read because he started crying and could not explain why.
-He is not a writer and he knows it. But the format is forgiving \u2014 short sentences, one at a time, each one only has to do one job. The image carries what the words cannot.
-He spent a Sunday writing. He ended up with something that felt like a real artifact of his actual experience \u2014 not the documented version, not the posted version, but the thing that happened.
-He sent it to his kids to read. His son said: Dad, I feel like I was there. He had not expected that to matter as much as it did.
+That is everything. [The rest is writing.]//
 
-### Why it works for everyone.
-BATHOS is not a platform for writers. It is a platform for people who have something real to say and need a format that meets them at the level of their actual experience. The sentence-by-sentence structure is forgiving. The image carries what the words cannot. The result feels like a real artifact of a life, not a post about a life.
+### Now delete this.
+Write something true instead.
 
-She found BATHOS at two in the morning while rewriting a paragraph that had been wrong for six weeks. [She knew it was wrong. She had been trying to end it the way essays are supposed to end \u2014 with a turn, an insight, a closing of the loop.] She wanted the ending to open something, not close it.
-She understood what the format was doing architecturally within the first ten minutes. [This is the thing about writers who think about form: they cannot encounter a new form without immediately running it through their hands, feeling where it gives and where it holds.]
-She writes for the sentence-by-sentence reveal now. She constructs pieces where each aBATHOSl is intentional \u2014 where the image and the sentence create meaning together that neither creates alone.
-She uses hide UI mode as the intended reading experience, not a feature. [She sends the link with the note: press H. Just read. She does not explain further.] Her readership has learned to expect transportation, not information.
-She is closer to installation than essay now. [Her last piece had forty-two sentences and eleven images. Two sentences were a single word. She is very proud of those two sentences. They did more work than any other two sentences she has written.]
-She does not write essays anymore. She makes pieces. Her readers come to her work the way people go to certain rooms \u2014 not to be told something, but to be inside something.
-She is the proof of concept. Not because she has the most followers \u2014 but because she understands what the format is doing and uses it with full intention.
-She attracted every other person on this list simply by making work that could not have existed anywhere else. The student found her work before she found BATHOS. The academic linked to one of her pieces in a footnote. The music teacher uses her approach as a model.
-That is how a format becomes a culture. Not through features. Through proof of concept that attracts everyone else on the list.`
+The format will hold it.`
 
 
 // ===================================
@@ -2477,7 +2466,7 @@ const toastBehaviors = (() => {
             id: 'amb-chapters',
             icon: '📖',
             message: () => isMobile()
-                ? 'Tap <span class="toast-accent">BATHOS — Proof</span> to jump between chapters.'
+                ? 'Tap <span class="toast-accent">Bathos</span> to jump between chapters.'
                 : 'Click the logo to open the <span class="toast-accent">chapter menu</span> — or use ← →.',
             actionLabel: 'Chapters',
             actionFn: () => toggleChapterDropdown()
@@ -2677,7 +2666,7 @@ const toastBehaviors = (() => {
         Toast.show({
             id: 'end-cta',
             icon: '✦',
-            message: 'That\'s the proof. Seven people, one format. <span class="toast-accent">BATHOS</span> — coming soon.',
+            message: 'You\'ve reached the end of the demo. Ready to write? <span class="toast-accent">Delete this</span> and begin.',
             actionLabel: 'Learn more →',
             actionFn: () => window.open('https://ifimaybefrank.com', '_blank'),
             duration: 12000,
@@ -4044,6 +4033,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize toast system
     toastBehaviors.init();
+
+    // Sync theme icon to match default newspaper theme
+    const themeIconEl = Utils.$('.theme-icon');
+    if (themeIconEl) themeIconEl.textContent = '📖';
 
     // Rail bell button — cycles through ambient pool, force-shows even if already seen
     const toastRailBtn = document.getElementById('toastRailBtn');
