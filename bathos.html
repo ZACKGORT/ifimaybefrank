@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="A writing platform built on one idea: the sentence that lands changes everything.">
-    <meta name="author" content="Rriva">
+    <meta name="description" content="Write one sentence at a time. The period is the decision. Bathos — a writing platform built around the pause.">
+    <meta name="author" content="Bathos">
     
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ifimaybefrank.com/proof">
+    <meta property="og:url" content="https://bathos.io">
+    <link rel="canonical" href="https://bathos.io">
     <meta property="og:title" content="Bathos — Write one sentence at a time">
-    <meta property="og:description" content="A writing platform built on one idea: the sentence that lands changes everything.">
+    <meta property="og:description" content="Write one sentence at a time. The period is the decision. Bathos — a writing platform built around the pause.">
     <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
@@ -1910,6 +1911,39 @@ body.compose-mode { padding-bottom: 0; }
     .imagemap-picker { padding: 60px 16px 24px; }
     .imagemap-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
 }
+
+/* Chapter dropdown footer */
+.chapter-dropdown-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+.dropdown-copyright {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    text-transform: uppercase;
+}
+.dropdown-readme {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+.dropdown-readme:hover {
+    opacity: 1;
+    color: var(--accent);
+}
     </style>
 </head>
 <body class="theme-newspaper">
@@ -2090,6 +2124,10 @@ body.compose-mode { padding-bottom: 0; }
                     <h3>Chapters</h3>
                 </div>
                 <ul class="chapter-dropdown-list" id="chapterDropdownList"></ul>
+                <div class="chapter-dropdown-footer">
+                    <span class="dropdown-copyright">&copy; 2026 Bathos&trade;</span>
+                    <a class="dropdown-readme" href="https://ifimaybefrank.com/read" target="_blank" rel="noopener">Read me</a>
+                </div>
             </div>
         </div>
 
@@ -3174,7 +3212,7 @@ function getCurrentChapter() {
 
 function goToChapter(chapterId) {
     const startIndex = state.chapterStartIndices[chapterId];
-    if (startIndex !== undefined) {
+    if (startIndex !== undefined && startIndex >= 0) {
         state.currentSentenceIndex = startIndex;
         highlightSentence(startIndex);
         closeChapterDropdown();
