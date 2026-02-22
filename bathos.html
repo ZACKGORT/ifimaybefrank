@@ -1427,7 +1427,8 @@ body.focus-mode .hover-image { opacity: 0 !important; }
 .compose-toggle {
     position: fixed;
     bottom: 20px;
-    left: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: var(--z-ui);
     width: 32px;
     height: 32px;
@@ -1447,37 +1448,95 @@ body.focus-mode .hover-image { opacity: 0 !important; }
     background: var(--hover-tint);
     border-color: var(--accent);
     color: var(--accent);
-    transform: scale(1.08);
+    transform: translateX(-50%) scale(1.08);
 }
 .compose-toggle.active {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--bg-color);
+    transform: translateX(-50%);
 }
 .compose-toggle svg { width: 14px; height: 14px; fill: currentColor; }
 
-/* Compose bar — lower third */
+/* Compose bar — draggable floating widget */
 .compose-bar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(100% + 40px));
+    width: 600px;
+    max-width: calc(100vw - 48px);
     z-index: calc(var(--z-ui) + 10);
     background: var(--surface-raised);
-    border-top: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 16px 24px 20px;
+    padding: 0 0 16px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transform: translateY(100%);
-    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.35s ease;
     pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15);
 }
 body.compose-mode .compose-bar {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
     pointer-events: auto;
+    opacity: 1;
+}
+
+/* Compose drag handle */
+.compose-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    cursor: grab;
+    color: var(--ink-3);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    border-bottom: 1px solid var(--border);
+    border-radius: 10px 10px 0 0;
+    user-select: none;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+.compose-drag-handle:hover { opacity: 0.8; cursor: grab; }
+.compose-drag-handle:active { cursor: grabbing; }
+
+/* Padding wrapper for content below drag handle */
+.compose-bar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 20px 0;
+}
+
+/* Mobile: revert to pinned full-width bar */
+@media (max-width: 768px) {
+    .compose-bar {
+        bottom: 0;
+        left: 0 !important;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        transform: translateY(100%) !important;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        box-shadow: none;
+        padding: 0 0 12px;
+    }
+    body.compose-mode .compose-bar {
+        transform: translateY(0) !important;
+    }
+    .compose-drag-handle { display: none; }
+    .compose-bar-inner { padding: 10px 16px 0; }
 }
 
 /* Compose header row */
@@ -1604,10 +1663,9 @@ body.compose-mode .compose-bar {
     flex-shrink: 0;
 }
 
-/* Compose mode — push stream up */
+/* Compose mode — no padding push needed, widget floats */
 body.compose-mode .parallax-container {
-    padding-bottom: 160px;
-    transition: padding-bottom 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    padding-bottom: 0;
 }
 
 /* Editing sentence highlight */
@@ -1762,7 +1820,32 @@ body.compose-mode .mode-key.reader-key { display: none; }
 }
 .imagemap-grid-item:hover .item-phrase { opacity: 1; }
 
-/* Upload placeholder */
+/* HUD compose button */
+.hud-compose-btn {
+    display: none; /* desktop: hidden, shown via media query */
+    color: var(--ink-3);
+    transition: color 0.15s ease, background 0.15s ease;
+}
+.hud-compose-btn.active {
+    color: var(--accent);
+    background: var(--hover-tint);
+}
+
+/* HUD nav group — prev/next side by side */
+.hud-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+@media (max-width: 768px) {
+    /* Show compose in HUD on mobile */
+    .hud-compose-btn { display: flex; }
+    /* Hide standalone compose toggle on mobile */
+    .compose-toggle { display: none; }
+}
+
+
 .compose-upload-placeholder {
     width: 44px;
     height: 44px;
@@ -1866,8 +1949,9 @@ body.compose-mode { padding-bottom: 0; }
 
     <div id="statsWidget" class="stats-widget" title="Drag to move" aria-label="Reading stats and navigation">
         <div class="stats-drag-handle">⋮⋮</div>
-        <button class="hud-nav-btn" id="hudPrevBtn" aria-label="Previous Sentence" title="Previous (long-press for prev chapter)">
-            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+        <!-- Compose button — mobile HUD only -->
+        <button class="hud-nav-btn hud-compose-btn" id="hudComposeBtn" aria-label="Toggle compose mode" title="Compose">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
         </button>
         <div class="hud-divider"></div>
         <div class="stats-group">
@@ -1888,9 +1972,15 @@ body.compose-mode { padding-bottom: 0; }
             </div>
         </div>
         <div class="hud-divider"></div>
-        <button class="hud-nav-btn" id="hudNextBtn" aria-label="Next Sentence" title="Next (long-press for next chapter)">
-            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-        </button>
+        <!-- Nav grouped together -->
+        <div class="hud-nav-group">
+            <button class="hud-nav-btn" id="hudPrevBtn" aria-label="Previous Sentence" title="Previous (long-press for prev chapter)">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            </button>
+            <button class="hud-nav-btn" id="hudNextBtn" aria-label="Next Sentence" title="Next (long-press for next chapter)">
+                <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </button>
+        </div>
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
@@ -1931,8 +2021,10 @@ body.compose-mode { padding-bottom: 0; }
         <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
     </button>
 
-    <!-- Compose bar -->
+    <!-- Compose bar — floating widget -->
     <div class="compose-bar" id="composeBar" aria-label="Compose">
+        <div class="compose-drag-handle" id="composeDragHandle">⋮⋮</div>
+        <div class="compose-bar-inner">
         <div class="compose-header">
             <span class="compose-label">Compose</span>
             <div style="display:flex;gap:8px;align-items:center;">
@@ -1969,6 +2061,7 @@ body.compose-mode { padding-bottom: 0; }
             <div class="compose-hint-divider"></div>
             <span class="compose-hint" id="composeWordCount">0 words · 0 sentences</span>
         </div>
+        </div><!-- /.compose-bar-inner -->
     </div>
 
     <!-- Image map picker overlay -->
@@ -4121,11 +4214,12 @@ document.addEventListener('DOMContentLoaded', () => {
             compose.active = true;
             document.body.classList.add('compose-mode');
             toggle.classList.add('active');
+            const hudCompose = document.getElementById('hudComposeBtn');
+            if (hudCompose) hudCompose.classList.add('active');
             populateChapterSelect();
             updateWordCount();
             syncWriterStats();
             setTimeout(() => { input.focus(); }, 350);
-            // Update cluster active state
             syncComposeCluster();
         }
 
@@ -4134,7 +4228,8 @@ document.addEventListener('DOMContentLoaded', () => {
             compose.editingIndex = -1;
             document.body.classList.remove('compose-mode');
             toggle.classList.remove('active');
-            // Remove editing highlight from any sentence
+            const hudCompose = document.getElementById('hudComposeBtn');
+            if (hudCompose) hudCompose.classList.remove('active');
             Utils.$$('.sentence.editing').forEach(s => s.classList.remove('editing'));
             syncComposeCluster();
         }
@@ -4144,6 +4239,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         toggle.addEventListener('click', toggleCompose);
+
+        // HUD compose button (mobile)
+        const hudCompose = document.getElementById('hudComposeBtn');
+        if (hudCompose) hudCompose.addEventListener('click', toggleCompose);
 
         // ── Input state ──
         input.addEventListener('input', () => {
@@ -4522,6 +4621,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+    })();
+
+    // Make compose bar draggable on desktop
+    (function() {
+        const composeBar = document.getElementById('composeBar');
+        const handle = document.getElementById('composeDragHandle');
+        if (!composeBar || !handle) return;
+
+        let isDragging = false;
+        let startX, startY, startLeft, startBottom;
+
+        function getPos() {
+            const rect = composeBar.getBoundingClientRect();
+            startLeft = rect.left;
+            startBottom = window.innerHeight - rect.bottom;
+        }
+
+        function applyDragPos(left, bottom) {
+            const rect = composeBar.getBoundingClientRect();
+            const w = rect.width || 600;
+            const h = rect.height || 160;
+            const margin = 8;
+            left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+            bottom = Math.max(margin, Math.min(bottom, window.innerHeight - h - margin));
+            composeBar.style.left = left + 'px';
+            composeBar.style.bottom = bottom + 'px';
+            composeBar.style.transform = 'none';
+        }
+
+        handle.addEventListener('mousedown', (e) => {
+            if (window.innerWidth <= 768) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            getPos();
+            composeBar.style.transition = 'opacity 0.35s ease';
+            handle.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = startY - e.clientY;
+            applyDragPos(startLeft + dx, startBottom + dy);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            handle.style.cursor = 'grab';
+            composeBar.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease';
+        });
     })();
 
 });
