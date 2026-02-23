@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="If I may be frank — a portfolio reading experience by Zack Gort.">
+    <meta name="description" content="For Wolfgang.">
     <meta name="author" content="Zack Gort">
     
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ifimaybefrank.com">
     <link rel="canonical" href="https://ifimaybefrank.com">
-    <meta property="og:title" content="If I May Be Frank — Zack Gort">
-    <meta property="og:description" content="If I may be frank — a portfolio reading experience by Zack Gort.">
+    <meta property="og:title" content="Wolfgang">
+    <meta property="og:description" content="For Wolfgang.">
     <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="If I May Be Frank — Zack Gort">
-    <meta property="twitter:description" content="Seven people. Seven reasons. One format.">
+    <meta property="twitter:title" content="Wolfgang">
+    <meta property="twitter:description" content="For Wolfgang.">
     <meta property="twitter:image" content="https://ifimaybefrank.com/og-image.jpg">
     
-    <title>Bathos</title>
+    <title>Wolfgang</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -2113,7 +2113,7 @@ body.compose-mode { padding-bottom: 0; }
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>Bathos</span>
+                <span>If I May Be Frank</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -2123,8 +2123,8 @@ body.compose-mode { padding-bottom: 0; }
                 </div>
                 <ul class="chapter-dropdown-list" id="chapterDropdownList"></ul>
                 <div class="chapter-dropdown-footer">
-                    <span class="dropdown-copyright">&copy; 2026 Bathos&trade;</span>
-                    <a class="dropdown-readme" href="https://bathos.io/read" target="_blank" rel="noopener">Read me</a>
+                    <span class="dropdown-copyright">&copy; 2026 Zack Gort</span>
+                    
                 </div>
             </div>
         </div>
@@ -2277,25 +2277,22 @@ let composeActive = false; // module-level flag so highlightSentence can read it
 // DATA
 // ===================================
 const chapters = [
-    { id: 0, title: "My Sweet Wolfgang", startText: "This is for Wolfgang" }
+    { id: 0, title: "Wolfgang", startText: "This is for Wolfgang" }
 ]
 
 const imageMap = {
     'every story': 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200&q=80',
     'weight it deserves': 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1200&q=80',
-
+    'Wolfgang': 'https://i.ibb.co/Q86g6LC/3128133825639913845-5144774570.jpg',
+    'Wolfie': 'https://i.ibb.co/Q86g6LC/3128133825639913845-5144774570.jpg',
 }
-
 const phraseRegexMap = new Map();
 Object.keys(imageMap).forEach(phrase => {
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
 });
 
-const narrative = `This is for Wolfgang. [a very good boy] Sweet Wolfgang as his first name. Wolfie for short.
-
-
-`
+const narrative = `This is for Wolfgang. [a very good boy] Sweet Wolfgang as his first name. Wolfie for short.`
 
 // ===================================
 // UTILITY FUNCTIONS
@@ -2497,7 +2494,7 @@ const toastBehaviors = (() => {
             id: 'amb-chapters',
             icon: '📖',
             message: () => isMobile()
-                ? 'Tap <span class="toast-accent">Bathos</span> to jump between chapters.'
+                ? 'Tap <span class="toast-accent">Wolfgang</span> to jump between chapters.'
                 : 'Click the logo to open the <span class="toast-accent">chapter menu</span> — or use ← →.',
             actionLabel: 'Chapters',
             actionFn: () => toggleChapterDropdown()
@@ -2697,10 +2694,10 @@ const toastBehaviors = (() => {
         Toast.show({
             id: 'end-cta',
             icon: '✦',
-            message: 'You\'ve reached the end of the demo. Ready to write? <span class="toast-accent">Delete this</span> and begin.',
-            actionLabel: 'Learn more →',
-            actionFn: () => window.open('https://ifimaybefrank.com', '_blank'),
-            duration: 12000,
+            message: 'You\'ve reached the end of the plot.',
+            actionLabel: 'Clear the Plot',
+            actionFn: () => clearThePlot(),
+            duration: 0,
             banner: true,
             onDismiss: () => setRailDot(false)
         });
@@ -3737,6 +3734,36 @@ function initializeContextMenu() {
 // ===================================
 // LAYOUT & THEME
 // ===================================
+function clearThePlot() {
+    const stream = document.querySelector('#stream');
+    if (!stream) return;
+    stream.style.transition = 'opacity 0.2s ease-out';
+    stream.style.opacity = '0';
+    setTimeout(() => {
+        stream.innerHTML = '';
+        state.allSentenceElements = [];
+        state.gridImages = [];
+        state.chapterStartIndices = new Array(chapters.length).fill(-1);
+        state.subchapterStartIndices = [];
+        state.currentSentenceIndex = -1;
+        state.sentencesSeen = new Set();
+        state.bracketsOpened = 0;
+        state.chaptersRead = new Set();
+        updateStats();
+        updateChapterProgress();
+        buildChapterDropdown();
+        stream.style.transition = 'opacity 0.2s ease-in';
+        stream.style.opacity = '1';
+        const input = document.getElementById('composeInput');
+        if (input) input.placeholder = 'Write that thought.';
+        document.body.classList.add('compose-mode');
+        const toggle = document.getElementById('composeToggle');
+        if (toggle) toggle.classList.add('active');
+        setTimeout(() => { if (input) input.focus(); }, 350);
+        toastBehaviors.setRailDot(false);
+    }, 200);
+}
+
 function toggleLayout() {
     state.layoutMode = state.layoutMode === 'layered' ? 'split' : 'layered';
     document.body.classList.remove('layout-layered', 'layout-split');
