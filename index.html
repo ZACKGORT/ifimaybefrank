@@ -1086,81 +1086,6 @@ body.grid-open .grid-close-hotspot { display: block; }
 .grid-image-item:hover .grid-image-caption { opacity: 1; }
 .caption-text { color: #fff; text-shadow: 0 0 20px rgba(0,0,0,0.5); background: rgba(0, 0, 0, 0.85); padding: 8px 12px; border-radius: 4px; font-family: var(--body-font); font-size: 16px; line-height: 1.4; }
 
-
-/* ===================================
-   GRID UPLOAD BAR
-   =================================== */
-.grid-upload-bar {
-    position: relative;
-    top: 0;
-    z-index: calc(var(--z-overlay) + 5);
-    background: var(--grid-overlay-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 5vw;
-    flex-shrink: 0;
-}
-.grid-empty-state {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--ui-font);
-    font-size: 11px;
-    color: var(--ink-3);
-    letter-spacing: 0.08em;
-    opacity: 0.4;
-}
-.grid-upload-zone {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border: 1px dashed var(--border-strong);
-    border-radius: 6px;
-    padding: 14px 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    max-width: 1600px;
-    margin: 0 auto;
-}
-.grid-upload-zone:hover,
-.grid-upload-zone.drag-over {
-    border-color: var(--accent);
-    background: var(--hover-tint);
-}
-.grid-upload-zone svg {
-    width: 18px;
-    height: 18px;
-    stroke: var(--ink-3);
-    flex-shrink: 0;
-    transition: stroke 0.2s ease;
-}
-.grid-upload-zone:hover svg,
-.grid-upload-zone.drag-over svg { stroke: var(--accent); }
-.grid-upload-label {
-    font-family: var(--ui-font);
-    font-size: 11px;
-    color: var(--ink-2);
-    letter-spacing: 0.06em;
-    flex-shrink: 0;
-}
-.grid-upload-accent { color: var(--accent); }
-.grid-upload-hint {
-    font-family: var(--ui-font);
-    font-size: 9px;
-    color: var(--ink-3);
-    letter-spacing: 0.04em;
-    opacity: 0.6;
-}
-.grid-upload-zone.uploading { opacity: 0.5; pointer-events: none; }
-
-/* Adjust grid-content top padding since upload bar is now sticky */
-.grid-content { padding-top: 40px; }
-
-@media (max-width: 768px) {
-    .grid-upload-bar { padding: 12px 4vw; }
-    .grid-upload-hint { display: none; }
-}
-
 /* ===================================
    CUSTOM CURSOR
    =================================== */
@@ -1802,9 +1727,7 @@ body.compose-mode .mode-key.reader-key { display: none; }
     position: fixed;
     inset: 0;
     z-index: calc(var(--z-ui) + 20);
-    background: var(--grid-overlay-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(0,0,0,0.92);
     display: none;
     flex-direction: column;
     align-items: center;
@@ -1869,33 +1792,6 @@ body.compose-mode .mode-key.reader-key { display: none; }
     transition: filter 0.15s ease;
 }
 .imagemap-url-confirm:hover { filter: brightness(1.1); }
-.imagemap-upload-zone {
-    width: 100%;
-    max-width: 900px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border: 1px dashed var(--border-strong);
-    border-radius: 4px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: var(--ui-font);
-    font-size: 10px;
-    color: var(--ink-3);
-    letter-spacing: 0.06em;
-}
-.imagemap-upload-zone:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
-.imagemap-upload-zone svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    transition: stroke 0.2s ease;
-}
-.imagemap-upload-zone:hover svg { stroke: var(--accent); }
 .imagemap-picker-close {
     position: absolute;
     top: 24px;
@@ -2120,14 +2016,6 @@ body.compose-mode { padding-bottom: 0; }
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
-        <div class="grid-upload-bar" id="gridUploadBar">
-            <label class="grid-upload-zone" id="gridUploadZone" for="gridUploadInput">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span class="grid-upload-label">Drop images or <span class="grid-upload-accent">browse</span></span>
-                <span class="grid-upload-hint">Uploaded images appear in the grid and can be mapped to any phrase</span>
-                <input type="file" id="gridUploadInput" accept="image/*" multiple style="display:none;">
-            </label>
-        </div>
         <div class="grid-content" id="gridContent"></div>
     </div>
 
@@ -2216,21 +2104,16 @@ body.compose-mode { padding-bottom: 0; }
             <div class="imagemap-picker-phrase" id="imagemapPickerPhrase">Select a phrase to map</div>
         </div>
         <div class="imagemap-picker-input-row">
-            <input type="url" class="imagemap-url-input" id="imagemapUrlInput" placeholder="Paste image URL — or upload below" />
+            <input type="url" class="imagemap-url-input" id="imagemapUrlInput" placeholder="Paste image URL — or pick from library below" />
             <button class="imagemap-url-confirm" id="imagemapUrlConfirm">Map it</button>
         </div>
-        <label class="imagemap-upload-zone" id="imagemapUploadZone" title="Upload image from device">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Upload from device</span>
-            <input type="file" id="imagemapUploadInput" accept="image/*" style="display:none;">
-        </label>
         <div class="imagemap-grid" id="imagemapGrid"></div>
     </div>
     
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>Wolfgang</span>
+                <span>If I May Be Frank</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -2394,7 +2277,7 @@ let composeActive = false; // module-level flag so highlightSentence can read it
 // DATA
 // ===================================
 const chapters = [
-    { id: 0, title: "Wolfgang", startText: "This is for Wolfgang" }
+
 ]
 
 const imageMap = {
@@ -2409,7 +2292,16 @@ Object.keys(imageMap).forEach(phrase => {
     phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
 });
 
-const narrative = `This is for Wolfgang. [a very good boy] Sweet Wolfgang as his first name. Wolfie for short.`
+const narrative = `
+
+###:The Sweetest.
+This is my Wolfgang. [a very good boy] Sweet Wolfgang as his first name ["as", not was] . Wolfie for short [standing stoutly at yay-high]. A sweet heart. My sweetie. No, no — oh, ok. "Good Boy!"
+
+###: Happy-Go-Lucky. 
+
+
+
+`
 
 // ===================================
 // UTILITY FUNCTIONS
@@ -3506,48 +3398,10 @@ function buildImageGrid() {
     const content = Utils.$('#gridContent');
     content.innerHTML = '';
     const imagesByChapter = {};
-    const uploadedImages = [];
     state.gridImages.forEach(imgData => {
-        if (imgData.uploaded) {
-            uploadedImages.push(imgData);
-        } else {
-            if (!imagesByChapter[imgData.chapterId]) imagesByChapter[imgData.chapterId] = [];
-            imagesByChapter[imgData.chapterId].push(imgData);
-        }
+        if (!imagesByChapter[imgData.chapterId]) imagesByChapter[imgData.chapterId] = [];
+        imagesByChapter[imgData.chapterId].push(imgData);
     });
-
-    const hasAny = uploadedImages.length > 0 || Object.keys(imagesByChapter).length > 0;
-    if (!hasAny) {
-        content.innerHTML = '<div class="grid-empty-state">Upload images above — they\'ll appear here</div>';
-    }
-
-    // Uploaded images section
-    if (uploadedImages.length > 0) {
-        const section = document.createElement('div');
-        section.className = 'grid-chapter-section';
-        section.innerHTML = `<div class="grid-chapter-title">Uploaded</div>`;
-        const grid = document.createElement('div');
-        grid.className = 'grid-images-container';
-        uploadedImages.forEach(imgData => {
-            const item = document.createElement('div');
-            item.className = 'grid-image-item';
-            item.innerHTML = `<img src="${imgData.url}" loading="lazy" alt="${imgData.text.replace(/"/g, '&quot;')}"><div class="grid-image-caption"><span class="caption-text">${imgData.text}</span></div>`;
-            item.addEventListener('click', () => {
-                // Open imagemap picker with this image pre-loaded
-                const pickerInput = document.getElementById('imagemapUrlInput');
-                const pickerPhrase = document.getElementById('imagemapPickerPhrase');
-                if (pickerInput) pickerInput.value = imgData.url;
-                if (pickerPhrase) pickerPhrase.textContent = `"${imgData.text}"`;
-                toggleImageGrid();
-                const picker = document.getElementById('imagemapPicker');
-                if (picker) { picker.classList.add('open'); picker.setAttribute('aria-hidden', 'false'); }
-            });
-            grid.appendChild(item);
-        });
-        section.appendChild(grid);
-        content.appendChild(section);
-    }
-
     chapters.forEach(chapter => {
         if (imagesByChapter[chapter.id] && imagesByChapter[chapter.id].length > 0) {
             const section = document.createElement('div');
@@ -4013,85 +3867,6 @@ function setupLongPress(buttonId, normalAction, longPressAction) {
 }
 
 // ===================================
-// GRID IMAGE UPLOAD
-// ===================================
-function initializeGridUpload() {
-    const zone = document.getElementById('gridUploadZone');
-    const input = document.getElementById('gridUploadInput');
-    if (!zone || !input) return;
-
-    function handleFiles(files) {
-        if (!files || files.length === 0) return;
-        zone.classList.add('uploading');
-        let loaded = 0;
-        Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) { loaded++; return; }
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                const dataUrl = ev.target.result;
-                // Derive phrase from filename
-                const phrase = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').toLowerCase();
-                // Add to imageMap and phraseRegexMap
-                imageMap[phrase] = dataUrl;
-                const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                phraseRegexMap.set(phrase, new RegExp(`\\b${escaped}\\b`, 'gi'));
-                // Add to gridImages so it appears in grid immediately
-                state.gridImages.push({
-                    index: -1,
-                    text: phrase,
-                    url: dataUrl,
-                    chapterId: state.currentChapterIndex || 0,
-                    uploaded: true
-                });
-                loaded++;
-                if (loaded === files.length) {
-                    zone.classList.remove('uploading');
-                    buildImageGrid();
-                    Toast.show({
-                        id: `grid-upload-${Date.now()}`,
-                        icon: '🖼',
-                        message: `${files.length === 1 ? `"<span class="toast-accent">${phrase}</span>" added` : `${files.length} images added`} — hover a phrase to use`,
-                        duration: 5000,
-                        force: true
-                    });
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // File input change
-    input.addEventListener('change', (e) => {
-        handleFiles(e.target.files);
-        input.value = ''; // reset so same file can be re-uploaded
-    });
-
-    // Drag and drop
-    zone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        zone.classList.add('drag-over');
-    });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        handleFiles(e.dataTransfer.files);
-    });
-
-    // Also wire overlay-level drag to activate the zone
-    const overlay = document.getElementById('imageGridOverlay');
-    if (overlay) {
-        overlay.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
-        overlay.addEventListener('dragleave', (e) => { if (!overlay.contains(e.relatedTarget)) zone.classList.remove('drag-over'); });
-        overlay.addEventListener('drop', (e) => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            handleFiles(e.dataTransfer.files);
-        });
-    }
-}
-
-// ===================================
 // CLOSE HOTSPOTS
 // ===================================
 function initializeCloseHotspots() {
@@ -4242,7 +4017,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeAccessibility();
     initializeContextMenu();
     initializeCloseHotspots();
-    initializeGridUpload();
     initializeKeyboardControls();
 
     // Tab-nav detection — sentence focus ring only shows during Tab navigation
@@ -4467,7 +4241,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlInput   = document.getElementById('imagemapUrlInput');
         const urlConfirm = document.getElementById('imagemapUrlConfirm');
         const imgGrid    = document.getElementById('imagemapGrid');
-        const uploadInput = document.getElementById('imagemapUploadInput');
         const clusterBracket = document.getElementById('composeKeyBracket');
         const clusterSection = document.getElementById('composeKeySubchapter');
         const clusterBreak   = document.getElementById('composeKeyBreak');
@@ -4997,31 +4770,6 @@ document.addEventListener('DOMContentLoaded', () => {
             picker.setAttribute('aria-hidden', 'true');
             compose.editingPhrase = null;
             if (compose.active) setTimeout(() => input.focus(), 100);
-        }
-
-        // ── Image file upload in picker ──
-        if (uploadInput) {
-            uploadInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const dataUrl = ev.target.result;
-                    const phrase = compose.editingPhrase;
-                    applyImageMap(dataUrl);
-                    urlInput.value = '';
-                    closeImagePicker();
-                    Toast.show({
-                        id: `upload-${Date.now()}`,
-                        icon: '🖼',
-                        message: `Image mapped to <span class="toast-accent">${phrase}</span>`,
-                        duration: 4000,
-                        force: true
-                    });
-                };
-                reader.readAsDataURL(file);
-                uploadInput.value = '';
-            });
         }
 
         function applyImageMap(url) {
