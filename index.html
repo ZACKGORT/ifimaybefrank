@@ -26,7 +26,7 @@
 /* ===================================
    CSS VARIABLES & THEMES
    =================================== */
-:root {
+   :root {
     /* ── Palette ── */
     --bg-color: #000000;
     --ink: #ffffff;
@@ -427,7 +427,6 @@ body.layout-split .mobile-right-rail { display: none !important; }
     }
     .mode-drag-handle { display: none; }
     .mode-key#modeKeyF,
-    .mode-key#modeKeyH,
     .mode-key#modeKeyC,
     .mode-key#modeKeySpace { display: none; }
     .mode-key {
@@ -1832,6 +1831,16 @@ body.compose-mode .mode-key.reader-key { display: none; }
     background: var(--hover-tint);
 }
 
+/* HUD compose exit button — mobile only, compose mode only */
+.hud-compose-exit {
+    display: none;
+    color: var(--ink-3);
+    transition: color 0.15s ease, background 0.15s ease;
+}
+body.compose-mode .hud-compose-exit {
+    color: var(--accent);
+}
+
 /* HUD nav group — prev/next side by side */
 .hud-nav-group {
     display: flex;
@@ -1842,6 +1851,10 @@ body.compose-mode .mode-key.reader-key { display: none; }
 @media (max-width: 768px) {
     /* Show compose in HUD on mobile */
     .hud-compose-btn { display: flex; }
+    /* Show exit button in compose mode on mobile */
+    body.compose-mode .hud-compose-exit { display: flex; }
+    /* Hide compose toggle button when in compose (exit replaces it) */
+    body.compose-mode .hud-compose-btn { display: none; }
     /* Hide standalone compose toggle on mobile */
     .compose-toggle { display: none; }
 }
@@ -1894,6 +1907,28 @@ body.compose-mode .mode-key.reader-key { display: none; }
     border-color: var(--accent);
     color: var(--accent);
     background: var(--hover-tint);
+}
+
+/* Mobile-only close button inside compose bar */
+.compose-close-mobile {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--ink-3);
+    font-family: var(--ui-font);
+    font-size: 11px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+.compose-close-mobile:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+@media (max-width: 768px) {
+    .compose-close-mobile { display: block; }
 }
 
 /* Writer stats morph */
@@ -1987,6 +2022,10 @@ body.compose-mode { padding-bottom: 0; }
         <button class="hud-nav-btn hud-compose-btn" id="hudComposeBtn" aria-label="Toggle compose mode" title="Compose">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
         </button>
+        <!-- Compose exit button — mobile only, visible only in compose mode -->
+        <button class="hud-nav-btn hud-compose-exit" id="hudComposeExit" aria-label="Exit compose mode" title="Exit Compose">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
         <div class="hud-divider"></div>
         <div class="stats-group">
             <div class="stat-item">
@@ -2065,6 +2104,8 @@ body.compose-mode { padding-bottom: 0; }
                 <select class="compose-chapter-select" id="composeChapterSelect" aria-label="Select chapter">
                 </select>
                 <button class="compose-bracket-btn" id="composeBracketBtn" title="Insert bracket annotation">[+] Annotate</button>
+                <!-- Mobile-only close button — desktop uses Escape or the pencil toggle -->
+                <button class="compose-close-mobile" id="composeMobileClose" aria-label="Exit compose mode" title="Exit Compose">✕</button>
             </div>
         </div>
         <div class="compose-input-row">
@@ -2115,7 +2156,7 @@ body.compose-mode { padding-bottom: 0; }
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>frankly</span>
+                <span>Bathos</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -2125,7 +2166,7 @@ body.compose-mode { padding-bottom: 0; }
                 </div>
                 <ul class="chapter-dropdown-list" id="chapterDropdownList"></ul>
                 <div class="chapter-dropdown-footer">
-                    <span class="dropdown-copyright">&copy; 2026 ifimaybefrank.com</span>
+                    <span class="dropdown-copyright">&copy; 2026 Bathos&trade;</span>
                     <a class="dropdown-readme" href="https://ifimaybefrank.com/read" target="_blank" rel="noopener">Read me</a>
                 </div>
             </div>
@@ -2215,7 +2256,6 @@ body.compose-mode { padding-bottom: 0; }
             </div>
         </div>
     </main>
-
     <script>
 // ===================================
 // IFIMAYBEFRANK - Complete JavaScript
@@ -2767,7 +2807,7 @@ const toastBehaviors = (() => {
             id: 'amb-chapters',
             icon: '📖',
             message: () => isMobile()
-                ? 'Tap <span class="toast-accent">frank</span> to jump between chapters.'
+                ? 'Tap <span class="toast-accent">Bathos</span> to jump between chapters.'
                 : 'Click the logo to open the <span class="toast-accent">chapter menu</span> — or use ← →.',
             actionLabel: 'Chapters',
             actionFn: () => toggleChapterDropdown()
@@ -4427,7 +4467,14 @@ document.addEventListener('DOMContentLoaded', () => {
             populateChapterSelect();
             updateWordCount();
             syncWriterStats();
-            setTimeout(() => { input.focus(); }, 350);
+            setTimeout(() => {
+                input.focus();
+                // On mobile, push HUD above the compose bar
+                if (window.innerWidth <= 768) {
+                    const barH = bar.getBoundingClientRect().height;
+                    statsWidget.style.bottom = `calc(${barH}px + 12px + env(safe-area-inset-bottom))`;
+                }
+            }, 350);
             syncComposeCluster();
         }
 
@@ -4439,6 +4486,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const hudCompose = document.getElementById('hudComposeBtn');
             if (hudCompose) hudCompose.classList.remove('active');
             Utils.$$('.sentence.editing').forEach(s => s.classList.remove('editing'));
+            // Restore HUD position on mobile
+            if (window.innerWidth <= 768) {
+                statsWidget.style.bottom = 'calc(16px + env(safe-area-inset-bottom))';
+            }
             syncComposeCluster();
         }
 
@@ -4452,11 +4503,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const hudCompose = document.getElementById('hudComposeBtn');
         if (hudCompose) hudCompose.addEventListener('click', toggleCompose);
 
+        // Mobile close button inside compose bar
+        const mobileClose = document.getElementById('composeMobileClose');
+        if (mobileClose) mobileClose.addEventListener('click', exitCompose);
+
         // ── Input state ──
         input.addEventListener('input', () => {
             const val = input.value.trim();
             commit.disabled = val.length === 0;
             updateWordCount();
+            // Keep HUD above compose bar as it grows
+            if (window.innerWidth <= 768 && compose.active) {
+                const barH = bar.getBoundingClientRect().height;
+                statsWidget.style.bottom = `calc(${barH}px + 12px + env(safe-area-inset-bottom))`;
+            }
             // Auto-resize
             input.style.height = 'auto';
             input.style.height = Math.min(input.scrollHeight, 180) + 'px';
@@ -4480,8 +4540,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ── Commit sentence ──
         function commitSentence() {
-            const raw = input.value.trim();
+            let raw = input.value.trim();
             if (!raw) return;
+
+            // Auto-punctuate: add period if sentence doesn't end with punctuation
+            // (skip for special syntax: subchapter, line break)
+            if (!raw.startsWith('### ') && raw !== '//' && raw !== '/') {
+                if (!/[.!?…]$/.test(raw)) raw += '.';
+            }
 
             const stream = Utils.$('#stream');
             if (!stream) return;
