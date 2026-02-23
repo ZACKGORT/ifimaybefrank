@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="An anti-scroll manifesto. A portfolio that makes you read one sentence at a time. Sentence-based navigation meets parallax storytelling.">
+    <meta name="description" content="If I may be frank — a portfolio reading experience by Zack Gort.">
     <meta name="author" content="Zack Gort">
     
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ifimaybefrank.com/">
-    <meta property="og:title" content="IFIMAYBEFRANK - Zack Gort">
-    <meta property="og:description" content="What if reading on the web felt intentional? A sentence-based narrative interface.">
+    <meta property="og:url" content="https://ifimaybefrank.com">
+    <link rel="canonical" href="https://ifimaybefrank.com">
+    <meta property="og:title" content="If I May Be Frank — Zack Gort">
+    <meta property="og:description" content="If I may be frank — a portfolio reading experience by Zack Gort.">
     <meta property="og:image" content="https://ifimaybefrank.com/og-image.jpg">
 
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="IFIMAYBEFRANK - Zack Gort">
-    <meta property="twitter:description" content="An anti-scroll manifesto. One sentence at a time.">
+    <meta property="twitter:title" content="If I May Be Frank — Zack Gort">
+    <meta property="twitter:description" content="Seven people. Seven reasons. One format.">
     <meta property="twitter:image" content="https://ifimaybefrank.com/og-image.jpg">
     
-    <title>IFIMAYBEFRANK - Zack Gort</title>
+    <title>If I May Be Frank — Zack Gort</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,500;0,600;1,400&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1418,9 +1419,534 @@ body.focus-mode .hover-image { opacity: 0 !important; }
         50%       { box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
     }
     body.focus-mode .sentence.active { animation: focusPulse 1.8s ease-in-out infinite; }
+
+/* ===================================
+   COMPOSE MODE
+   =================================== */
+
+/* Compose toggle button — bottom left of left rail */
+.compose-toggle {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-ui);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--ink-3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+.compose-toggle:hover {
+    background: var(--hover-tint);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateX(-50%) scale(1.08);
+}
+.compose-toggle.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-color);
+    transform: translateX(-50%);
+}
+.compose-toggle svg { width: 14px; height: 14px; fill: currentColor; }
+
+/* Compose bar — draggable floating widget */
+.compose-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(100% + 40px));
+    width: 600px;
+    max-width: calc(100vw - 48px);
+    z-index: calc(var(--z-ui) + 10);
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1),
+                opacity 0.35s ease;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15);
+}
+body.compose-mode .compose-bar {
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+    opacity: 1;
+}
+
+/* Compose drag handle */
+.compose-drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    cursor: grab;
+    color: var(--ink-3);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    border-bottom: 1px solid var(--border);
+    border-radius: 10px 10px 0 0;
+    user-select: none;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+.compose-drag-handle:hover { opacity: 0.8; cursor: grab; }
+.compose-drag-handle:active { cursor: grabbing; }
+
+/* Padding wrapper for content below drag handle */
+.compose-bar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 20px 0;
+}
+
+/* Mobile: revert to pinned full-width bar */
+@media (max-width: 768px) {
+    .compose-bar {
+        bottom: 0;
+        left: 0 !important;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        transform: translateY(100%) !important;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        box-shadow: none;
+        padding: 0 0 12px;
+    }
+    body.compose-mode .compose-bar {
+        transform: translateY(0) !important;
+    }
+    .compose-drag-handle { display: none; }
+    .compose-bar-inner { padding: 10px 16px 0; }
+}
+
+/* Compose header row */
+.compose-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.compose-label {
+    font-family: var(--ui-font);
+    font-size: 9px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    opacity: 0.6;
+}
+.compose-chapter-select {
+    font-family: var(--ui-font);
+    font-size: 9px;
+    color: var(--ink-2);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+.compose-chapter-select:focus,
+.compose-chapter-select:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.compose-chapter-select option {
+    background: #0a0a0a;
+    color: var(--ink);
+}
+
+/* Input row */
+.compose-input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+.compose-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-family: var(--body-font);
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--ink);
+    outline: none;
+    resize: none;
+    min-height: 52px;
+    max-height: 180px;
+    line-height: 1.6;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    caret-color: var(--accent);
+    overflow-y: auto;
+}
+.compose-input::placeholder {
+    color: var(--ink-3);
+    opacity: 0.5;
+}
+.compose-input:focus {
+    border-color: rgba(218,165,32,0.4);
+    background: rgba(255,255,255,0.06);
+}
+
+/* Commit button */
+.compose-commit {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: var(--accent);
+    border: none;
+    color: var(--bg-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+.compose-commit:hover { transform: scale(1.06); filter: brightness(1.1); }
+.compose-commit:active { transform: scale(0.94); }
+.compose-commit svg { width: 18px; height: 18px; fill: currentColor; }
+.compose-commit:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+/* Compose footer hints */
+.compose-hints {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+.compose-hint {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.06em;
+    opacity: 0.5;
+    white-space: nowrap;
+}
+.compose-hint kbd {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 1px 4px;
+    color: var(--ink-2);
+}
+.compose-hint-divider {
+    width: 1px;
+    height: 10px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+/* Compose mode — no padding push needed, widget floats */
+body.compose-mode .parallax-container {
+    padding-bottom: 0;
+}
+
+/* Editing sentence highlight */
+.sentence.editing {
+    outline: 1px solid rgba(218,165,32,0.5);
+    outline-offset: 4px;
+    border-radius: 2px;
+    background: rgba(218,165,32,0.04) !important;
+}
+
+/* New sentence animation */
+@keyframes sentenceEnter {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.sentence.just-added {
+    animation: sentenceEnter 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Compose mode — mode cluster writer keys */
+.mode-key.compose-key { display: none; }
+body.compose-mode .mode-key.compose-key { display: flex; }
+body.compose-mode .mode-key.reader-key { display: none; }
+
+/* Image map picker overlay */
+.imagemap-picker {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-ui) + 20);
+    background: rgba(0,0,0,0.92);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 80px 40px 40px;
+    gap: 24px;
+    overflow-y: auto;
+}
+.imagemap-picker.open { display: flex; }
+.imagemap-picker-header {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.imagemap-picker-title {
+    font-family: var(--ui-font);
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+.imagemap-picker-phrase {
+    font-family: var(--body-font);
+    font-size: 20px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+}
+.imagemap-picker-input-row {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    gap: 8px;
+}
+.imagemap-url-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    color: var(--ink);
+    outline: none;
+    caret-color: var(--accent);
+    transition: border-color 0.2s ease;
+}
+.imagemap-url-input:focus { border-color: rgba(218,165,32,0.4); }
+.imagemap-url-input::placeholder { color: var(--ink-3); opacity: 0.5; }
+.imagemap-url-confirm {
+    padding: 10px 18px;
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    color: var(--bg-color);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+.imagemap-url-confirm:hover { filter: brightness(1.1); }
+.imagemap-picker-close {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    background: none;
+    border: none;
+    color: var(--ink-3);
+    font-family: var(--ui-font);
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.15s ease;
+}
+.imagemap-picker-close:hover { color: var(--accent); }
+.imagemap-grid {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+.imagemap-grid-item {
+    aspect-ratio: 4/3;
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    position: relative;
+}
+.imagemap-grid-item:hover {
+    border-color: var(--accent);
+    transform: scale(1.02);
+}
+.imagemap-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.imagemap-grid-item .item-phrase {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0,0,0,0.7);
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-2);
+    padding: 4px 6px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.imagemap-grid-item:hover .item-phrase { opacity: 1; }
+
+/* HUD compose button */
+.hud-compose-btn {
+    display: none; /* desktop: hidden, shown via media query */
+    color: var(--ink-3);
+    transition: color 0.15s ease, background 0.15s ease;
+}
+.hud-compose-btn.active {
+    color: var(--accent);
+    background: var(--hover-tint);
+}
+
+/* HUD nav group — prev/next side by side */
+.hud-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+@media (max-width: 768px) {
+    /* Show compose in HUD on mobile */
+    .hud-compose-btn { display: flex; }
+    /* Hide standalone compose toggle on mobile */
+    .compose-toggle { display: none; }
+}
+
+
+.compose-upload-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed rgba(255,255,255,0.12);
+    color: var(--ink-3);
+    cursor: not-allowed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 2px;
+    opacity: 0.45;
+    transition: opacity 0.15s ease;
+    position: relative;
+}
+.compose-upload-placeholder:hover { opacity: 0.6; }
+.compose-upload-placeholder svg { width: 15px; height: 15px; }
+.compose-upload-label {
+    font-family: var(--ui-font);
+    font-size: 7px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1;
+}
+
+
+.compose-bracket-btn {
+    font-family: var(--ui-font);
+    font-size: 10px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--ink-3);
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+}
+.compose-bracket-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--hover-tint);
+}
+
+/* Writer stats morph */
+body.compose-mode #statSentencesSeen::after { content: ''; }
+.stat-label-writer { display: none; }
+body.compose-mode .stat-label-reader { display: none; }
+body.compose-mode .stat-label-writer { display: block; }
+
+/* Compose mode body offset for fixed bar */
+body.compose-mode { padding-bottom: 0; }
+
+@media (max-width: 768px) {
+    .compose-bar { padding: 12px 16px 16px; }
+    .compose-input { font-size: 16px; }
+    .imagemap-picker { padding: 60px 16px 24px; }
+    .imagemap-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+}
+
+/* Chapter dropdown footer */
+.chapter-dropdown-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+.dropdown-copyright {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    text-transform: uppercase;
+}
+.dropdown-readme {
+    font-family: var(--ui-font);
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+.dropdown-readme:hover {
+    opacity: 1;
+    color: var(--accent);
+}
     </style>
 </head>
-<body>
+<body class="theme-newspaper">
     <!-- Skip navigation for keyboard/AT users -->
     <a href="#stream" class="skip-link">Skip to content</a>
     <!-- Screen reader live announcer for sentence navigation -->
@@ -1457,28 +1983,38 @@ body.focus-mode .hover-image { opacity: 0 !important; }
 
     <div id="statsWidget" class="stats-widget" title="Drag to move" aria-label="Reading stats and navigation">
         <div class="stats-drag-handle">⋮⋮</div>
-        <button class="hud-nav-btn" id="hudPrevBtn" aria-label="Previous Sentence" title="Previous (long-press for prev chapter)">
-            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+        <!-- Compose button — mobile HUD only -->
+        <button class="hud-nav-btn hud-compose-btn" id="hudComposeBtn" aria-label="Toggle compose mode" title="Compose">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
         </button>
         <div class="hud-divider"></div>
         <div class="stats-group">
             <div class="stat-item">
                 <span class="stat-value" id="statSentencesSeen">1</span>
-                <span class="stat-label">Sentences</span>
+                <span class="stat-label stat-label-reader">Sentences</span>
+                <span class="stat-label stat-label-writer">Written</span>
             </div>
             <div class="stat-item">
                 <span class="stat-value" id="statBracketsOpened">0</span>
-                <span class="stat-label">Brackets</span>
+                <span class="stat-label stat-label-reader">Brackets</span>
+                <span class="stat-label stat-label-writer">Notes</span>
             </div>
             <div class="stat-item">
                 <span class="stat-value" id="statChaptersRead">1</span>
-                <span class="stat-label">Chapters</span>
+                <span class="stat-label stat-label-reader">Chapters</span>
+                <span class="stat-label stat-label-writer">Chapters</span>
             </div>
         </div>
         <div class="hud-divider"></div>
-        <button class="hud-nav-btn" id="hudNextBtn" aria-label="Next Sentence" title="Next (long-press for next chapter)">
-            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-        </button>
+        <!-- Nav grouped together -->
+        <div class="hud-nav-group">
+            <button class="hud-nav-btn" id="hudPrevBtn" aria-label="Previous Sentence" title="Previous (long-press for prev chapter)">
+                <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            </button>
+            <button class="hud-nav-btn" id="hudNextBtn" aria-label="Next Sentence" title="Next (long-press for next chapter)">
+                <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+            </button>
+        </div>
     </div>
 
     <div class="image-grid-overlay" id="imageGridOverlay" aria-hidden="true">
@@ -1513,11 +2049,73 @@ body.focus-mode .hover-image { opacity: 0 !important; }
             </div>
         </div>
     </div>
+
+    <!-- Compose toggle -->
+    <button class="compose-toggle" id="composeToggle" title="Toggle compose mode" aria-label="Toggle compose mode">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    </button>
+
+    <!-- Compose bar — floating widget -->
+    <div class="compose-bar" id="composeBar" aria-label="Compose">
+        <div class="compose-drag-handle" id="composeDragHandle">⋮⋮</div>
+        <div class="compose-bar-inner">
+        <div class="compose-header">
+            <span class="compose-label">Compose</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <select class="compose-chapter-select" id="composeChapterSelect" aria-label="Select chapter">
+                </select>
+                <button class="compose-bracket-btn" id="composeBracketBtn" title="Insert bracket annotation">[+] Annotate</button>
+            </div>
+        </div>
+        <div class="compose-input-row">
+            <textarea
+                class="compose-input"
+                id="composeInput"
+                placeholder="Write a sentence. Press Enter or ↵ to commit it to the piece."
+                rows="2"
+                aria-label="Compose sentence"
+                spellcheck="true"
+            ></textarea>
+            <button class="compose-upload-placeholder" id="composeUpload" aria-label="Image upload — coming soon" title="Image upload — coming soon" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                <span class="compose-upload-label">Soon</span>
+            </button>
+            <button class="compose-commit" id="composeCommit" aria-label="Commit sentence" disabled>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+        <div class="compose-hints">
+            <span class="compose-hint"><kbd>Enter</kbd> commit sentence</span>
+            <div class="compose-hint-divider"></div>
+            <span class="compose-hint"><kbd>Shift+Enter</kbd> line break</span>
+            <div class="compose-hint-divider"></div>
+            <span class="compose-hint"><kbd>###</kbd> subchapter</span>
+            <div class="compose-hint-divider"></div>
+            <span class="compose-hint"><kbd>↑↓</kbd> navigate piece</span>
+            <div class="compose-hint-divider"></div>
+            <span class="compose-hint" id="composeWordCount">0 words · 0 sentences</span>
+        </div>
+        </div><!-- /.compose-bar-inner -->
+    </div>
+
+    <!-- Image map picker overlay -->
+    <div class="imagemap-picker" id="imagemapPicker" aria-hidden="true">
+        <button class="imagemap-picker-close" id="imagemapPickerClose">✕ Close</button>
+        <div class="imagemap-picker-header">
+            <div class="imagemap-picker-title">Map image to phrase</div>
+            <div class="imagemap-picker-phrase" id="imagemapPickerPhrase">Select a phrase to map</div>
+        </div>
+        <div class="imagemap-picker-input-row">
+            <input type="url" class="imagemap-url-input" id="imagemapUrlInput" placeholder="Paste image URL — or pick from library below" />
+            <button class="imagemap-url-confirm" id="imagemapUrlConfirm">Map it</button>
+        </div>
+        <div class="imagemap-grid" id="imagemapGrid"></div>
+    </div>
     
     <header class="header">
         <div class="brand-container">
             <div class="brand" id="brandLogo" aria-label="Open chapter menu">
-                <span>If I May Be Frank</span>
+                <span>frankly</span>
                 <span class="brand-dropdown-icon">▼</span>
             </div>
             <div class="chapter-dropdown" id="chapterDropdown" aria-hidden="true">
@@ -1526,38 +2124,68 @@ body.focus-mode .hover-image { opacity: 0 !important; }
                     <h3>Chapters</h3>
                 </div>
                 <ul class="chapter-dropdown-list" id="chapterDropdownList"></ul>
+                <div class="chapter-dropdown-footer">
+                    <span class="dropdown-copyright">&copy; 2026 ifimaybefrank.com</span>
+                    <a class="dropdown-readme" href="https://ifimaybefrank.com/read" target="_blank" rel="noopener">Read me</a>
+                </div>
             </div>
         </div>
 
         <div class="mode-cluster" id="modeCluster" title="Drag to move" aria-label="Mode controls">
             <div class="mode-drag-handle">⋮⋮</div>
-            <button class="mode-key" id="modeKeySpace" aria-label="Next sentence (Space)" title="Space — Next Sentence">
+            <!-- Reader keys -->
+            <button class="mode-key reader-key" id="modeKeySpace" aria-label="Next sentence (Space)" title="Space — Next Sentence">
                 <span class="mode-key-label">SPC</span>
                 <span class="mode-key-desc">Next</span>
             </button>
-            <button class="mode-key" id="modeKeyG" aria-label="Toggle image grid (G)" title="G — Image Grid">
+            <button class="mode-key reader-key" id="modeKeyG" aria-label="Toggle image grid (G)" title="G — Image Grid">
                 <span class="mode-key-label">G</span>
                 <span class="mode-key-desc">Grid</span>
             </button>
-            <button class="mode-key" id="modeKeyC" aria-label="Toggle chapter menu (C)" title="C — Chapters">
+            <button class="mode-key reader-key" id="modeKeyC" aria-label="Toggle chapter menu (C)" title="C — Chapters">
                 <span class="mode-key-label">C</span>
                 <span class="mode-key-desc">Chapters</span>
             </button>
-            <button class="mode-key" id="modeKeyF" aria-label="Toggle focus mode (F)" title="F — Focus Mode">
+            <button class="mode-key reader-key" id="modeKeyF" aria-label="Toggle focus mode (F)" title="F — Focus Mode">
                 <span class="mode-key-label">F</span>
                 <span class="mode-key-desc">Focus</span>
             </button>
-            <button class="mode-key" id="modeKeyH" aria-label="Toggle read mode (H)" title="H — Read Mode">
+            <button class="mode-key reader-key" id="modeKeyH" aria-label="Toggle read mode (H)" title="H — Read Mode">
                 <span class="mode-key-label">H</span>
                 <span class="mode-key-desc">Read</span>
             </button>
-            <button class="mode-key" id="modeKeyT" aria-label="Toggle theme (T)" title="T — Theme">
+            <button class="mode-key reader-key" id="modeKeyT" aria-label="Toggle theme (T)" title="T — Theme">
                 <span class="mode-key-label">T</span>
                 <span class="mode-key-desc">Theme</span>
             </button>
-            <button class="mode-key" id="modeKeyL" aria-label="Toggle layout (L)" title="L — Layout">
+            <button class="mode-key reader-key" id="modeKeyL" aria-label="Toggle layout (L)" title="L — Layout">
                 <span class="mode-key-label">L</span>
                 <span class="mode-key-desc">Layout</span>
+            </button>
+            <!-- Writer keys (compose mode only) -->
+            <button class="mode-key compose-key" id="composeKeyBracket" aria-label="Insert annotation [+]" title="Insert bracket annotation">
+                <span class="mode-key-label">[ ]</span>
+                <span class="mode-key-desc">Note</span>
+            </button>
+            <button class="mode-key compose-key" id="composeKeySubchapter" aria-label="Insert subchapter break" title="Insert subchapter ###">
+                <span class="mode-key-label">###</span>
+                <span class="mode-key-desc">Section</span>
+            </button>
+            <button class="mode-key compose-key" id="composeKeyBreak" aria-label="Insert line break //" title="Insert line break //">
+                <span class="mode-key-label">//</span>
+                <span class="mode-key-desc">Break</span>
+            </button>
+            <button class="mode-key compose-key" id="composeKeyImage" aria-label="Map image to phrase" title="Map image to phrase">
+                <span class="mode-key-label">IMG</span>
+                <span class="mode-key-desc">Map</span>
+            </button>
+            <button class="mode-key compose-key reader-key" id="modeKeyTCompose" aria-label="Toggle theme (T)" title="T — Theme">
+                <span class="mode-key-label">T</span>
+                <span class="mode-key-desc">Theme</span>
+            </button>
+            <button class="mode-key compose-key" id="composeKeyDelete" aria-label="Delete active sentence" title="Delete active sentence">
+                <span class="mode-key-label">DEL</span>
+                <span class="mode-key-desc">Delete</span>
             </button>
         </div>
     </header>
@@ -1918,16 +2546,9 @@ Something shifted as the world worked through the COVID pandemic. Once familiar 
 
 Less time commuting, more time computing.  Camera on. 2021 was a very busy year. [I had earned WFH priveleges since 2011, so this was nothing new]
 
-This is the Whey. At Elva Design Group, I led discovery for GNC. Management wanted to shake things up. We designed a mobile-first navigation schema — restructured, not reskinned. We didn't have time for perfection, but we successfully modernized and optimized their online experience. Sometimes the win is knowing when good is good enough.
+This is the Whey. For a fast-scrolling case-study, find your way to: zackgort.com. GNC (E-comm) & BNY MELLON (FinTech) [Case study: zackgort.com]
 
-### Small Cog in a Huge Wheel.
-At Huge, teams were massive. I was responsible for a single user flow, unaware of what the other twelve designers on the project were doing. To say we were siloed would be an understatement. I learned what I didn't want from a place of work. That is also valuable.
-
-### From the 62nd of the One World Trade Center.
-At Code and Theory, I was hired as a Senior Designer with sights on ACD. I quickly proved my worth. [Within three weeks I was running client calls solo] But leadership churn and a revolving door of priorities made it a disorienting experience. I acted as a Directly Responsible Individual for UX and strategy across multiple workstreams simultaneously. I learned hard lessons about large agencies — chief among them: visibility matters as much as output.
-
-### Hello from Agency Row.
-Enter Publicis Sapient. I spent a year working on Digital Transformation for BNY Mellon. I became the de facto Team Lead, driving exhaustive research, client workshops, and weekly readouts to senior stakeholders. [I was not hired as a lead. I became one because no one else stepped up.] I secured a contract extension through documented impact. Despite my consistent presence and hard work, I was laid off in a round of cuts. I was just a number on a spreadsheet. [It stings less when you understand that enterprise agencies run on utilization rates, not merit]
+//The logos get bigger from here — literally. Huge (Sentral). Code and Theory — from sixty-two floors up in One World Trade, working on TikTok For Business. Publicis Sapient — a year embedded in Digital Transformation for BNY Mellon, where I became the de facto lead because someone had to be. [I was not hired as one. I became one.] Each engagement taught me something. Some taught me what I wanted. Some taught me what I didn't. I kept the lessons either way. [Deep dive lives at zackgort.com]
 
 ### Down But Not Out.
 Come on baby, let's do the twist. I pivoted to low voltage networking. [Bear with me] I learned to terminate an RJ45 in 30–45 seconds. I run cables, install security systems, and manage cable management in commercial and residential settings. It requires specific twist parity and a steady hand. I'm using different parts of my brain — the same brain that once wireframed enterprise banking platforms. [Humility is a hell of a teacher] I still have mouths to feed. I keep moving.
@@ -2146,7 +2767,7 @@ const toastBehaviors = (() => {
             id: 'amb-chapters',
             icon: '📖',
             message: () => isMobile()
-                ? 'Tap <span class="toast-accent">If I May Be Frank</span> to jump between chapters.'
+                ? 'Tap <span class="toast-accent">frank</span> to jump between chapters.'
                 : 'Click the logo to open the <span class="toast-accent">chapter menu</span> — or use ← →.',
             actionLabel: 'Chapters',
             actionFn: () => toggleChapterDropdown()
@@ -2346,9 +2967,9 @@ const toastBehaviors = (() => {
         Toast.show({
             id: 'end-cta',
             icon: '✦',
-            message: 'That\'s everything. Find more at <span class="toast-accent">zackgort.com</span> — or reach out.',
-            actionLabel: 'Portfolio →',
-            actionFn: () => window.open('https://zackgort.com', '_blank'),
+            message: 'You\'ve reached the end of the demo. Ready to write? <span class="toast-accent">Delete this</span> and begin.',
+            actionLabel: 'Learn more →',
+            actionFn: () => window.open('https://ifimaybefrank.com', '_blank'),
             duration: 12000,
             banner: true,
             onDismiss: () => setRailDot(false)
@@ -2750,7 +3371,7 @@ function getCurrentChapter() {
 
 function goToChapter(chapterId) {
     const startIndex = state.chapterStartIndices[chapterId];
-    if (startIndex !== undefined) {
+    if (startIndex !== undefined && startIndex >= 0) {
         state.currentSentenceIndex = startIndex;
         highlightSentence(startIndex);
         closeChapterDropdown();
@@ -3455,6 +4076,17 @@ function initializeKeyboardControls() {
         return null;
     };
     document.addEventListener('keydown', e => {
+        // ── Compose input guard — don't intercept typing ──
+        const active = document.activeElement;
+        const isTyping = active && (
+            active.tagName === 'TEXTAREA' ||
+            active.tagName === 'INPUT' ||
+            active.isContentEditable ||
+            active.id === 'composeInput' ||
+            active.id === 'imagemapUrlInput'
+        );
+        if (isTyping) return;
+
         const btn = getBtnForKey(e.key);
         if (btn) btn.classList.add('active-press');
         const hudBtn = getHudBtnForKey(e.key);
@@ -3703,6 +4335,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize toast system
     toastBehaviors.init();
 
+    // Sync theme icon to match default newspaper theme
+    const themeIconEl = Utils.$('.theme-icon');
+    if (themeIconEl) themeIconEl.textContent = '📖';
+
     // Rail bell button — cycles through ambient pool, force-shows even if already seen
     const toastRailBtn = document.getElementById('toastRailBtn');
     if (toastRailBtn) {
@@ -3729,6 +4365,525 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // ===================================
+    // COMPOSE MODE
+    // ===================================
+    (function initCompose() {
+
+        // ── State ──
+        const compose = {
+            active: false,
+            editingIndex: -1,       // -1 = new sentence, ≥0 = editing existing
+            editingPhrase: null,    // phrase selected for image mapping
+            writerSentences: 0,
+            writerBrackets: 0,
+            writerWords: 0,
+            liveImageMap: {}        // user-added phrase → url mappings
+        };
+
+        // ── Elements ──
+        const toggle     = document.getElementById('composeToggle');
+        const bar        = document.getElementById('composeBar');
+        const input      = document.getElementById('composeInput');
+        const commit     = document.getElementById('composeCommit');
+        const chapterSel = document.getElementById('composeChapterSelect');
+        const wordCount  = document.getElementById('composeWordCount');
+        const bracketBtn = document.getElementById('composeBracketBtn');
+        const picker     = document.getElementById('imagemapPicker');
+        const pickerClose= document.getElementById('imagemapPickerClose');
+        const pickerPhrase = document.getElementById('imagemapPickerPhrase');
+        const urlInput   = document.getElementById('imagemapUrlInput');
+        const urlConfirm = document.getElementById('imagemapUrlConfirm');
+        const imgGrid    = document.getElementById('imagemapGrid');
+        const clusterBracket = document.getElementById('composeKeyBracket');
+        const clusterSection = document.getElementById('composeKeySubchapter');
+        const clusterBreak   = document.getElementById('composeKeyBreak');
+        const clusterImage   = document.getElementById('composeKeyImage');
+        const clusterDelete  = document.getElementById('composeKeyDelete');
+        const clusterTheme   = document.getElementById('modeKeyTCompose');
+
+        // ── Populate chapter select ──
+        function populateChapterSelect() {
+            if (!chapterSel) return;
+            chapterSel.innerHTML = '';
+            chapters.forEach(ch => {
+                const opt = document.createElement('option');
+                opt.value = ch.id;
+                opt.textContent = `${String(ch.id + 1).padStart(2,'0')}. ${ch.title}`;
+                chapterSel.appendChild(opt);
+            });
+            // Default to current chapter
+            chapterSel.value = state.currentChapterIndex || 0;
+        }
+
+        // ── Toggle compose mode ──
+        function enterCompose() {
+            compose.active = true;
+            document.body.classList.add('compose-mode');
+            toggle.classList.add('active');
+            const hudCompose = document.getElementById('hudComposeBtn');
+            if (hudCompose) hudCompose.classList.add('active');
+            populateChapterSelect();
+            updateWordCount();
+            syncWriterStats();
+            setTimeout(() => { input.focus(); }, 350);
+            syncComposeCluster();
+        }
+
+        function exitCompose() {
+            compose.active = false;
+            compose.editingIndex = -1;
+            document.body.classList.remove('compose-mode');
+            toggle.classList.remove('active');
+            const hudCompose = document.getElementById('hudComposeBtn');
+            if (hudCompose) hudCompose.classList.remove('active');
+            Utils.$$('.sentence.editing').forEach(s => s.classList.remove('editing'));
+            syncComposeCluster();
+        }
+
+        function toggleCompose() {
+            if (compose.active) exitCompose(); else enterCompose();
+        }
+
+        toggle.addEventListener('click', toggleCompose);
+
+        // HUD compose button (mobile)
+        const hudCompose = document.getElementById('hudComposeBtn');
+        if (hudCompose) hudCompose.addEventListener('click', toggleCompose);
+
+        // ── Input state ──
+        input.addEventListener('input', () => {
+            const val = input.value.trim();
+            commit.disabled = val.length === 0;
+            updateWordCount();
+            // Auto-resize
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 180) + 'px';
+        });
+
+        function updateWordCount() {
+            const words = input.value.trim().split(/\s+/).filter(Boolean).length;
+            const sentences = state.allSentenceElements.length;
+            if (wordCount) wordCount.textContent = `${words} word${words !== 1 ? 's' : ''} · ${sentences} sentence${sentences !== 1 ? 's' : ''}`;
+        }
+
+        function syncWriterStats() {
+            // Sentences written = total in stream
+            const sentVal = document.getElementById('statSentencesSeen');
+            if (sentVal) {
+                sentVal.textContent = state.allSentenceElements.length;
+                sentVal.classList.add('pulse');
+                setTimeout(() => sentVal.classList.remove('pulse'), 400);
+            }
+        }
+
+        // ── Commit sentence ──
+        function commitSentence() {
+            const raw = input.value.trim();
+            if (!raw) return;
+
+            const stream = Utils.$('#stream');
+            if (!stream) return;
+
+            if (compose.editingIndex >= 0) {
+                // ── Edit existing sentence ──
+                const el = state.allSentenceElements[compose.editingIndex];
+                if (el) {
+                    el.innerHTML = wrapImageTriggers(raw) + ' ';
+                    el.classList.remove('editing');
+                    highlightSentence(compose.editingIndex);
+                }
+                compose.editingIndex = -1;
+                input.value = '';
+                input.style.height = 'auto';
+                commit.disabled = true;
+                updateWordCount();
+                return;
+            }
+
+            // ── Insert new sentence ──
+            // Check for subchapter prefix
+            if (raw.startsWith('### ')) {
+                const title = raw.substring(4).trim();
+                const el = document.createElement('div');
+                el.className = 'subchapter-break';
+                el.innerHTML = `<span class="subchapter-title">${title}</span>`;
+                stream.appendChild(el);
+                input.value = '';
+                input.style.height = 'auto';
+                commit.disabled = true;
+                updateWordCount();
+                return;
+            }
+
+            // Check for line break
+            if (raw === '//' || raw === '/') {
+                const br = document.createElement('span');
+                br.className = 'line-break-spacer';
+                br.innerHTML = raw === '//' ? '<br><br>' : '<br>';
+                stream.appendChild(br);
+                input.value = '';
+                input.style.height = 'auto';
+                commit.disabled = true;
+                updateWordCount();
+                return;
+            }
+
+            // Build sentence element
+            const idx = state.allSentenceElements.length;
+            const span = document.createElement('span');
+            span.className = 'sentence just-added';
+            span.dataset.sentenceIndex = idx;
+            span.style.cursor = 'pointer';
+            span.setAttribute('tabindex', '0');
+            span.setAttribute('role', 'button');
+            span.setAttribute('aria-label', `Sentence ${idx + 1}: ${raw}`);
+
+            // Check if any live imageMap phrases are in this sentence
+            for (const [phrase, url] of Object.entries(compose.liveImageMap)) {
+                if (raw.includes(phrase)) {
+                    imageMap[phrase] = url;
+                    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+                    break;
+                }
+            }
+
+            span.innerHTML = wrapImageTriggers(raw) + ' ';
+
+            // Double-click to edit in compose mode
+            span.addEventListener('dblclick', () => {
+                if (!compose.active) return;
+                beginEdit(parseInt(span.dataset.sentenceIndex));
+            });
+
+            span.addEventListener('mouseenter', () => {
+                if (state.isTouch) return;
+                const index = parseInt(span.dataset.sentenceIndex);
+                state.allSentenceElements.forEach((s, i) => {
+                    s.style.opacity = i === index ? '0.7' : '0.25';
+                });
+            }, { passive: true });
+            span.addEventListener('mouseleave', () => {
+                if (state.isTouch) return;
+                state.allSentenceElements.forEach(s => s.style.opacity = '');
+            }, { passive: true });
+            span.addEventListener('click', () => {
+                state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex);
+                highlightSentence(state.currentSentenceIndex);
+            });
+            span.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (compose.active) { beginEdit(parseInt(span.dataset.sentenceIndex)); return; }
+                    state.currentSentenceIndex = parseInt(span.dataset.sentenceIndex);
+                    highlightSentence(state.currentSentenceIndex);
+                }
+            });
+
+            stream.appendChild(span);
+            state.allSentenceElements.push(span);
+
+            // Remove animation class after it fires
+            setTimeout(() => span.classList.remove('just-added'), 500);
+
+            // Auto-navigate to new sentence
+            state.currentSentenceIndex = idx;
+            highlightSentence(idx);
+
+            // Update chapter dropdown + progress
+            buildChapterDropdown();
+            updateChapterProgress();
+
+            // Update image hover listeners on stream
+            rewireStreamImageListeners();
+
+            compose.writerSentences++;
+            syncWriterStats();
+
+            input.value = '';
+            input.style.height = 'auto';
+            commit.disabled = true;
+            updateWordCount();
+
+            // Scroll new sentence into view
+            span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Re-focus input
+            setTimeout(() => input.focus(), 50);
+        }
+
+        // ── Begin edit ──
+        function beginEdit(index) {
+            const el = state.allSentenceElements[index];
+            if (!el) return;
+            // Clear previous editing state
+            Utils.$$('.sentence.editing').forEach(s => s.classList.remove('editing'));
+            compose.editingIndex = index;
+            el.classList.add('editing');
+            // Put sentence text (without image triggers) into input
+            const plain = el.textContent.replace(/\s+/g, ' ').trim();
+            input.value = plain;
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 180) + 'px';
+            commit.disabled = false;
+            input.focus();
+            input.select();
+            highlightSentence(index);
+        }
+
+        // ── Delete active sentence ──
+        function deleteActiveSentence() {
+            const idx = state.currentSentenceIndex;
+            if (idx < 0 || idx >= state.allSentenceElements.length) return;
+            const el = state.allSentenceElements[idx];
+            if (!el) return;
+            if (!confirm(`Delete sentence ${idx + 1}?`)) return;
+            el.remove();
+            state.allSentenceElements.splice(idx, 1);
+            // Re-index remaining sentences
+            state.allSentenceElements.forEach((s, i) => {
+                s.dataset.sentenceIndex = i;
+                s.setAttribute('aria-label', `Sentence ${i + 1}: ${s.textContent.trim()}`);
+            });
+            const newIdx = Math.min(idx, state.allSentenceElements.length - 1);
+            state.currentSentenceIndex = newIdx;
+            if (newIdx >= 0) highlightSentence(newIdx);
+            buildChapterDropdown();
+            updateChapterProgress();
+            syncWriterStats();
+            updateWordCount();
+        }
+
+        // ── Commit on Enter (not Shift+Enter) ──
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                commitSentence();
+            }
+            // Navigation keys still work in compose mode
+            if (e.key === 'ArrowUp' && e.metaKey) { e.preventDefault(); previousSentence(); }
+            if (e.key === 'ArrowDown' && e.metaKey) { e.preventDefault(); nextSentence(); }
+        });
+
+        commit.addEventListener('click', commitSentence);
+
+        // ── Bracket annotation quick-insert ──
+        function insertBracket() {
+            const pos = input.selectionStart;
+            const val = input.value;
+            const bracketed = val.slice(0, pos) + ' [annotation text] ' + val.slice(pos);
+            input.value = bracketed;
+            // Select "annotation text" for immediate replacement
+            const start = pos + 2;
+            const end = start + 15;
+            input.focus();
+            input.setSelectionRange(start, end);
+            commit.disabled = false;
+        }
+
+        bracketBtn.addEventListener('click', insertBracket);
+        if (clusterBracket) clusterBracket.addEventListener('click', (e) => { e.stopPropagation(); insertBracket(); input.focus(); });
+
+        // ── Subchapter quick-insert ──
+        if (clusterSection) clusterSection.addEventListener('click', (e) => {
+            e.stopPropagation();
+            input.value = '### ';
+            input.focus();
+            commit.disabled = false;
+        });
+
+        // ── Line break quick-insert ──
+        if (clusterBreak) clusterBreak.addEventListener('click', (e) => {
+            e.stopPropagation();
+            input.value = '//';
+            commit.disabled = false;
+            commitSentence();
+        });
+
+        // ── Delete ──
+        if (clusterDelete) clusterDelete.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteActiveSentence();
+        });
+
+        // ── Theme in compose ──
+        if (clusterTheme) clusterTheme.addEventListener('click', (e) => { e.stopPropagation(); toggleTheme(); });
+
+        // ── Image mapping ──
+        function openImagePicker() {
+            // Get selected text in input or active sentence
+            const selectedText = window.getSelection().toString().trim() ||
+                                  input.value.substring(input.selectionStart, input.selectionEnd).trim();
+
+            const phrase = selectedText || (compose.editingIndex >= 0
+                ? state.allSentenceElements[compose.editingIndex]?.textContent.trim().split(' ').slice(0,3).join(' ')
+                : input.value.trim().split(' ').slice(0,3).join(' '));
+
+            compose.editingPhrase = phrase || 'selected phrase';
+            pickerPhrase.textContent = `"${compose.editingPhrase}"`;
+            urlInput.value = '';
+
+            // Populate grid with existing imageMap entries
+            imgGrid.innerHTML = '';
+            const entries = Object.entries(imageMap);
+            if (entries.length === 0) {
+                imgGrid.innerHTML = '<p style="font-family:var(--ui-font);font-size:10px;color:var(--ink-3);letter-spacing:0.06em;grid-column:1/-1;">No images in library yet. Paste a URL above to add one.</p>';
+            } else {
+                entries.forEach(([p, url]) => {
+                    const item = document.createElement('div');
+                    item.className = 'imagemap-grid-item';
+                    item.innerHTML = `<img src="${url}" alt="" loading="lazy"><span class="item-phrase">${p}</span>`;
+                    item.addEventListener('click', () => applyImageMap(url));
+                    imgGrid.appendChild(item);
+                });
+            }
+
+            picker.classList.add('open');
+            picker.setAttribute('aria-hidden', 'false');
+            urlInput.focus();
+        }
+
+        function closeImagePicker() {
+            picker.classList.remove('open');
+            picker.setAttribute('aria-hidden', 'true');
+            compose.editingPhrase = null;
+            if (compose.active) setTimeout(() => input.focus(), 100);
+        }
+
+        function applyImageMap(url) {
+            if (!compose.editingPhrase || !url) return;
+            const phrase = compose.editingPhrase;
+            imageMap[phrase] = url;
+            compose.liveImageMap[phrase] = url;
+            const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+
+            // Re-render the current sentence's image triggers if it contains the phrase
+            const el = state.allSentenceElements[state.currentSentenceIndex];
+            if (el && el.textContent.includes(phrase)) {
+                const plain = el.textContent.replace(/\s+/g, ' ').trim();
+                el.innerHTML = wrapImageTriggers(plain) + ' ';
+                rewireStreamImageListeners();
+                highlightSentence(state.currentSentenceIndex);
+            }
+
+            closeImagePicker();
+            Toast.show({ id: `imgmap-${Date.now()}`, icon: '🖼', message: `Image mapped to "<span class="toast-accent">${phrase.substring(0,30)}</span>"`, duration: 4000, force: true });
+        }
+
+        if (clusterImage) clusterImage.addEventListener('click', (e) => { e.stopPropagation(); openImagePicker(); });
+        pickerClose.addEventListener('click', closeImagePicker);
+        picker.addEventListener('click', (e) => { if (e.target === picker) closeImagePicker(); });
+
+        urlConfirm.addEventListener('click', () => {
+            const url = urlInput.value.trim();
+            if (url) applyImageMap(url);
+        });
+        urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); const url = urlInput.value.trim(); if (url) applyImageMap(url); }
+            if (e.key === 'Escape') closeImagePicker();
+        });
+
+        // ── Rewire stream image listeners after DOM mutations ──
+        function rewireStreamImageListeners() {
+            const streamEl = Utils.$('#stream');
+            if (!streamEl) return;
+            // Remove old delegated listeners by cloning node children — cheaper: just re-trigger on hover
+            // The existing delegated listeners on streamEl already handle .image-trigger via bubbling
+            // Just make sure preloadImages picks up new ones
+            const newUrls = Object.values(compose.liveImageMap);
+            newUrls.forEach(url => { const img = new Image(); img.src = url; });
+        }
+
+        // ── Double-click existing sentences to edit in compose mode ──
+        Utils.$('#stream').addEventListener('dblclick', (e) => {
+            if (!compose.active) return;
+            const sentence = e.target.closest('.sentence');
+            if (!sentence) return;
+            const idx = parseInt(sentence.dataset.sentenceIndex);
+            if (!isNaN(idx)) beginEdit(idx);
+        });
+
+        // ── Sync compose cluster active states ──
+        function syncComposeCluster() {
+            if (clusterImage) clusterImage.classList.toggle('mode-active', !!compose.editingPhrase);
+        }
+
+        // ── Escape closes compose bar ──
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && compose.active && !picker.classList.contains('open')) {
+                exitCompose();
+            }
+            if (e.key === 'Escape' && picker.classList.contains('open')) {
+                closeImagePicker();
+            }
+        });
+
+        // ── Keyboard shortcut: Cmd/Ctrl+E toggles compose ──
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+                e.preventDefault();
+                toggleCompose();
+            }
+        });
+
+    })();
+
+    // Make compose bar draggable on desktop
+    (function() {
+        const composeBar = document.getElementById('composeBar');
+        const handle = document.getElementById('composeDragHandle');
+        if (!composeBar || !handle) return;
+
+        let isDragging = false;
+        let startX, startY, startLeft, startBottom;
+
+        function getPos() {
+            const rect = composeBar.getBoundingClientRect();
+            startLeft = rect.left;
+            startBottom = window.innerHeight - rect.bottom;
+        }
+
+        function applyDragPos(left, bottom) {
+            const rect = composeBar.getBoundingClientRect();
+            const w = rect.width || 600;
+            const h = rect.height || 160;
+            const margin = 8;
+            left = Math.max(margin, Math.min(left, window.innerWidth - w - margin));
+            bottom = Math.max(margin, Math.min(bottom, window.innerHeight - h - margin));
+            composeBar.style.left = left + 'px';
+            composeBar.style.bottom = bottom + 'px';
+            composeBar.style.transform = 'none';
+        }
+
+        handle.addEventListener('mousedown', (e) => {
+            if (window.innerWidth <= 768) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            getPos();
+            composeBar.style.transition = 'opacity 0.35s ease';
+            handle.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = startY - e.clientY;
+            applyDragPos(startLeft + dx, startBottom + dy);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            handle.style.cursor = 'grab';
+            composeBar.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease';
+        });
+    })();
+
 });
     </script>
 </body>
