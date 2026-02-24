@@ -3277,26 +3277,25 @@ function previousChapter() {
 function nextSentence() {
     if (state.allSentenceElements.length === 0) return;
     state.currentSentenceIndex = (state.currentSentenceIndex + 1) % state.allSentenceElements.length;
-    highlightSentence(state.currentSentenceIndex);
+    highlightSentence(state.currentSentenceIndex, 1);
 }
 
 function previousSentence() {
     if (state.allSentenceElements.length === 0) return;
     state.currentSentenceIndex = (state.currentSentenceIndex - 1 + state.allSentenceElements.length) % state.allSentenceElements.length;
-    highlightSentence(state.currentSentenceIndex);
+    highlightSentence(state.currentSentenceIndex, -1);
 }
 
-function highlightSentence(index) {
+function highlightSentence(index, dir = 1) {
     const sentence = state.allSentenceElements[index];
     if (!sentence) return;
 
     // Auto-advance past structural elements (chapter/section breaks) during reader navigation
     if (sentence.dataset.structural && !composeActive) {
-        const dir = index >= state.currentSentenceIndex ? 1 : -1;
         const next = index + dir;
         if (next >= 0 && next < state.allSentenceElements.length) {
             state.currentSentenceIndex = next;
-            highlightSentence(next);
+            highlightSentence(next, dir);
             return;
         }
     }
