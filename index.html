@@ -2272,6 +2272,7 @@ let composeActive = false; // module-level flag so highlightSentence can read it
 
 
 
+
 // ===================================
 // DATA
 // ===================================
@@ -2282,8 +2283,6 @@ let composeActive = false; // module-level flag so highlightSentence can read it
 const chapters = [];
 
 const imageMap = {
-
-    
     'This is my Wolfgang': 'https://i.ibb.co/LXR70BTD/wolfieboop.webp',
     'Sweet Wolfgang': 'https://i.ibb.co/Jj1Pc7bs/theabsolutecutestthingihaveeverseen.webp',
     'Chosen name': 'https://i.ibb.co/d0MxCR6m/delicious.webp',
@@ -2293,77 +2292,25 @@ const imageMap = {
     'Woofie-boo': 'https://i.ibb.co/mrsF2PP2/whereiswolfgang.webp',
     'This is his story': 'https://i.ibb.co/wF05mLW2/joyful.webp',
 
-
     'a good origin story': 'https://i.ibb.co/BKymJdYK/itshisworld.webp',
     'One that tells of bravery': 'https://i.ibb.co/3yYzQLjP/braveboy.webp',
     'Of fortitude': 'https://i.ibb.co/twP8m5wP/buildingburgerking.webp',
     'Of rebellion': 'https://i.ibb.co/HTqtChHv/curbyourdog.webp',
     'wagging tail': 'https://i.ibb.co/CknqHpK/happierinnewyork.webp',
     'story of hope': 'https://i.ibb.co/tw52Ly7b/firstfewweekswithwolfgang.webp',
-    '& — poopoo times too': 'https://i.ibb.co/r2gFFwNf/oneofwolfgangsfavoriteplaces.webp',
-    
-    'lost in Queens': 'https://i.ibb.co/Swk4v5Tv/wolfgang000.webp',
+    'poo-poo times too': 'https://i.ibb.co/r2gFFwNf/oneofwolfgangsfavoriteplaces.webp',
+
+    'lost in Queens': 'https://i.ibb.co/DsT5Ppk/lostinqueens.webp',
     'similar soul': 'https://i.ibb.co/BX5RVPg/wolfgangownsallofmyhoodies.webp',
+    'New dad': 'https://i.ibb.co/JjGbm5rh/heydaddy.webp',
+
+    'know without notice': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/welcomehomebuddy.mp4',
+    'but your home': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Latenightstroll.mp4',
     
-
-    'mp4': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/wolfinsheepsclothing.mp4',
-
-
+    
     'left without care': 'https://i.ibb.co/93bMTmpY/newtothis.webp',
-
-
 };
 
-const phraseRegexMap = new Map();
-function buildPhraseRegex(phrase) {
-    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    // Use lookahead/lookbehind instead of \b so phrases starting/ending with
-    // quotes or apostrophes match correctly (\b fails when adjacent to non-word chars).
-    const start = /^\w/.test(phrase) ? '(?<![\\w])' : "(?<![\\w'\"\"])";
-    const end   = /\w$/.test(phrase) ? '(?![\\w])'  : "(?![\\w'\"\"])";
-    return new RegExp(`${start}${escaped}${end}`, 'gi');
-}
-Object.keys(imageMap).forEach(phrase => {
-    phraseRegexMap.set(phrase, buildPhraseRegex(phrase));
-});
-
-const narrative = `
-
-###:The Sweetest.
-
-This is my Wolfgang. [a very good boy] 
-My sweet, "Sweet Wolfgang". [epithet & appellation, Sweet Wolfgang] 
-
-A name not chosen, nor given — it just was. 
-[I just watched him for a few days, walking him without knowing what to call him. We went with the usual human names, goofy names, and commonplace names. None stuck. But, my favorite new artist was Mammoth, a band made by a single multi-hyphenate musician named Wolfgang.]
-
-As "Sweet" as his name. ["sweetie", "sweetheart","sweet baby","my sweet boy"] 
-He was "Wolf" by calling. [born to be]
-Wolfie for short. [standing stoutly at yay-high] 
-Woofie-boo (wherever). [I found my joy] 
-This is his story.
-
-###: The Chronicles of Wolfgang.
-Every hero has a good origin story. 
-A tale told with a wagging tail. 
-One that tells of bravery. 
-Of fortitude. 
-Of rebellion. 
-A story of hope. [] 
-& — poopoo times too.
-
-
-###: Where in the world, is Wolfgang.
-
-When you are lost in Queens with nowhere to go. 
-But you happen across paths of a similar soul.
-Neglected, abandoned, left without care.
-Worry not. Your new daddy is here.
-
-
-
-
-`;
 
 // ===================================
 // UTILITY FUNCTIONS
