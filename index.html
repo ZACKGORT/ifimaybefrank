@@ -2306,9 +2306,9 @@ const imageMap = {
     'know without notice': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/welcomehomebuddy.mp4',
     'but your home': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Latenightstroll.mp4',
     'walk with agency': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Cityboi.mp4',
-
+    'unchained': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Leashlesslove.mp4',
     'But, calories are real': 'https://i.ibb.co/qfBwLrD/comfort1.webp',
-    'Dinner?': 'https://i.ibb.co/qfBwLrD/comfort1.webp',
+    'Dinner': 'https://i.ibb.co/kV6CzpWS/comfort2.webp',
 
 
     
@@ -2366,6 +2366,7 @@ That feeling of belong.
 When you know without notice.[Wolfie, then unnamed, making claim to his new domain — also, freshly bathed because he needed that badly. Old Spice.]
 When you find not your place, but your home.
 You walk with agency.
+You walk unchained knowing you are in good hands.
 But, calories are real. [Dad carried me home]
 "Dinner?"
 
@@ -2538,14 +2539,14 @@ const toastBehaviors = (() => {
         {
             id: 'amb-hide-ui',
             icon: '◻',
-            message: () => 'Press <span class="toast-accent">H</span> to hide the interface — just you and the text.',
-            actionLabel: 'Try it',
+            message: () => 'Press <span class="toast-accent">H</span> to hide the interface.',
+            actionLabel: 'Hide UI',
             actionFn: () => toggleUIVisibility()
         },
         {
             id: 'amb-theme',
             icon: '☀️',
-            message: () => 'Try a different mood — toggle the <span class="toast-accent">theme</span> in the top right.',
+            message: () => 'Change themes with <span class="toast-accent">T</span> in the top right.',
             actionLabel: 'Switch',
             actionFn: () => toggleTheme()
         },
@@ -2553,7 +2554,7 @@ const toastBehaviors = (() => {
             id: 'amb-split',
             icon: '◫',
             message: () => 'Try <span class="toast-accent">Split View</span> — text on the left, imagery on the right.',
-            actionLabel: 'Try it',
+            actionLabel: 'Split it',
             actionFn: () => { if (state.layoutMode === 'layered') toggleLayout(); },
             condition: () => state.layoutMode === 'layered'
         },
