@@ -2287,23 +2287,25 @@ const imageMap = {
     'This is my Wolfgang': 'https://i.ibb.co/LXR70BTD/wolfieboop.webp',
     'Sweet Wolfgang': 'https://i.ibb.co/Jj1Pc7bs/theabsolutecutestthingihaveeverseen.webp',
     'Chosen name': 'https://i.ibb.co/d0MxCR6m/delicious.webp',
-    'As sweet as his name': 'https://i.ibb.co/8L68BJFv/guardian.webp',
-    'Wolf by calling': 'https://i.ibb.co/MxGzxSVk/wolfgang00.webp',
+    'As "Sweet" as his name': 'https://i.ibb.co/8L68BJFv/guardian.webp',
+    'He was "Wolf" by calling': 'https://i.ibb.co/MxGzxSVk/wolfgang00.webp',
     'Wolfie for short': 'https://i.ibb.co/83SsR99/thislittledudeexudedsomuchconfidence.webp',
     'Woofie-boo': 'https://i.ibb.co/mrsF2PP2/whereiswolfgang.webp',
     'This is his story': 'https://i.ibb.co/wF05mLW2/joyful.webp',
 
 
-    'a good origin story': 'https://i.ibb.co/nNJTsKj4/everyherohasagoodoriginstory.webp',
-    'Queens': 'https://i.ibb.co/Swk4v5Tv/wolfgang000.webp',
+    'a good origin story': 'https://i.ibb.co/BKymJdYK/itshisworld.webp',
+    'One that tells of bravery': 'https://i.ibb.co/3yYzQLjP/braveboy.webp',
+    'Of fortitude': 'https://i.ibb.co/twP8m5wP/buildingburgerking.webp',
+    'Of rebellion': 'https://i.ibb.co/HTqtChHv/curbyourdog.webp',
+    'wagging tail': 'https://i.ibb.co/CknqHpK/happierinnewyork.webp',
+    'story of hope': 'https://i.ibb.co/tw52Ly7b/firstfewweekswithwolfgang.webp',
     
-    'sometimes the shitty times too': 'https://i.ibb.co/r2gFFwNf/oneofwolfgangsfavoriteplaces.webp',
+        '& — poopoo times too': 'https://i.ibb.co/r2gFFwNf/oneofwolfgangsfavoriteplaces.webp',
     
 
 
     'mp4': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/wolfinsheepsclothing.mp4',
-
-
 
 
     'his world': 'https://i.ibb.co/BKymJdYK/itshisworld.webp',
@@ -2312,9 +2314,16 @@ const imageMap = {
 };
 
 const phraseRegexMap = new Map();
+function buildPhraseRegex(phrase) {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Use lookahead/lookbehind instead of \b so phrases starting/ending with
+    // quotes or apostrophes match correctly (\b fails when adjacent to non-word chars).
+    const start = /^\w/.test(phrase) ? '(?<![\\w])' : "(?<![\\w'\"\"])";
+    const end   = /\w$/.test(phrase) ? '(?![\\w])'  : "(?![\\w'\"\"])";
+    return new RegExp(`${start}${escaped}${end}`, 'gi');
+}
 Object.keys(imageMap).forEach(phrase => {
-    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+    phraseRegexMap.set(phrase, buildPhraseRegex(phrase));
 });
 
 const narrative = `
@@ -2336,11 +2345,17 @@ This is his story.
 ###: The Chronicles of Wolfgang.
 Every hero has a good origin story. 
 A tale told with a wagging tail. 
-One that tells a story of bravery. Of fortitude. Of hope. & — sometimes the shitty times too.
-You find your place.
-You are welcomed home.
+One that tells of bravery. 
+Of fortitude. 
+Of rebellion. 
+A story of hope [] 
+& — poopoo times too.
+
 
 ###: Where in the world, is Wolfgang.
+
+When you are lost in Queens (https://ibb.co/4ndvDRYP). And you sense a soul. Then you find your place. & find that you are welcomed home.
+
 `;
 
 // ===================================
@@ -3098,11 +3113,21 @@ function parseNarrative(text) {
 // ===================================
 // IMAGE HANDLING
 // ===================================
+function htmlAttrEncode(s) {
+    return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function wrapImageTriggers(text) {
     let wrapped = text;
     for (const [phrase, url] of Object.entries(imageMap)) {
         const regex = phraseRegexMap.get(phrase);
-        if (regex) wrapped = wrapped.replace(regex, `<button class="image-trigger" data-image="${url}" aria-label="View image: $&" type="button">$&</button>`);
+        if (regex) {
+            const safeUrl   = htmlAttrEncode(url);
+            const safeLabel = htmlAttrEncode(phrase);
+            wrapped = wrapped.replace(regex,
+                `<button class="image-trigger" data-image="${safeUrl}" aria-label="View image: ${safeLabel}" type="button">$&</button>`
+            );
+        }
     }
     return wrapped;
 }
@@ -4585,8 +4610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const [phrase, url] of Object.entries(compose.liveImageMap)) {
                 if (raw.includes(phrase)) {
                     imageMap[phrase] = url;
-                    const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+                    phraseRegexMap.set(phrase, buildPhraseRegex(phrase));
                     break;
                 }
             }
@@ -4858,8 +4882,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const phrase = compose.editingPhrase;
             imageMap[phrase] = url;
             compose.liveImageMap[phrase] = url;
-            const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            phraseRegexMap.set(phrase, new RegExp(`\\b${escapedPhrase}\\b`, 'gi'));
+            phraseRegexMap.set(phrase, buildPhraseRegex(phrase));
 
             // Re-render the current sentence's image triggers if it contains the phrase
             const el = state.allSentenceElements[state.currentSentenceIndex];
