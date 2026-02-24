@@ -1142,12 +1142,13 @@ body.focus-mode .hover-image { opacity: 0 !important; }
    =================================== */
 .toast-container {
     position: fixed;
-    bottom: 72px;
-    left: 44px;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: calc(var(--z-ui) + 50);
     display: flex;
-    flex-direction: column-reverse;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     gap: 6px;
     pointer-events: none;
 }
@@ -1169,21 +1170,21 @@ body.focus-mode .hover-image { opacity: 0 !important; }
     pointer-events: auto;
     cursor: pointer;
     opacity: 0;
-    transform: translateX(-6px) scale(0.97);
+    transform: translateY(-8px) scale(0.97);
     transition: opacity 0.25s cubic-bezier(0.25, 1, 0.5, 1),
                 transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     max-width: min(85vw, 340px);
     white-space: normal;
-    text-align: left;
+    text-align: center;
     line-height: 1.5;
 }
 .toast.visible {
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateY(0) scale(1);
 }
 .toast.dismissing {
     opacity: 0;
-    transform: translateX(-4px) scale(0.97);
+    transform: translateY(-6px) scale(0.97);
 }
 
 /* Banner variant */
@@ -1278,14 +1279,10 @@ body.focus-mode .hover-image { opacity: 0 !important; }
 
 @media (max-width: 768px) {
     .toast-container {
-        left: 50%;
-        bottom: 100px;
-        transform: translateX(-50%);
-        align-items: center;
+        top: 64px;
+        bottom: auto;
     }
-    .toast { text-align: center; transform: translateY(12px) scale(0.96); }
-    .toast.visible { transform: translateY(0) scale(1); }
-    .toast.dismissing { transform: translateY(8px) scale(0.97); }
+    .toast { text-align: center; }
 }
 
 /* ===================================
@@ -2150,6 +2147,10 @@ body.compose-mode { padding-bottom: 0; }
                 <span class="mode-key-label">H</span>
                 <span class="mode-key-desc">Read</span>
             </button>
+            <button class="mode-key reader-key" id="modeKeyBrackets" aria-label="Toggle all annotations" title="Toggle all bracket annotations">
+                <span class="mode-key-label">[ ]</span>
+                <span class="mode-key-desc">Notes</span>
+            </button>
             <button class="mode-key reader-key" id="modeKeyT" aria-label="Toggle theme (T)" title="T — Theme">
                 <span class="mode-key-label">T</span>
                 <span class="mode-key-desc">Theme</span>
@@ -2795,7 +2796,7 @@ const toastBehaviors = (() => {
         const WELCOME_POOL = [
             {
                 id: 'welcome-banner-0',
-                message: 'Navigate sentence by sentence — or explore <span class="toast-accent">themes</span>, <span class="toast-accent">split view</span>, and the <span class="toast-accent">chapter menu</span> above.'
+                message: 'Scroll or press <span class="toast-accent">Space / ↑↓</span> to move through it sentence by sentence.'
             },
             {
                 id: 'welcome-banner-1',
@@ -3792,6 +3793,9 @@ function render() {
                 trigger.classList.toggle('expanded');
                 if (isExpanded) { state.expandedBrackets.add(part.id); trackBracketOpen(); }
                 else state.expandedBrackets.delete(part.id);
+                // Keep [ ] button in sync
+                const allExpanded = [...document.querySelectorAll('.bracket-trigger')].every(t => t.classList.contains('expanded'));
+                document.getElementById('modeKeyBrackets')?.classList.toggle('mode-active', allExpanded);
             });
             fragment.appendChild(trigger);
             fragment.appendChild(content);
@@ -3903,21 +3907,27 @@ function showUI() {
 }
 
 function toggleUIVisibility() {
-    const nowHidden = document.body.classList.toggle('ui-hidden');
-    // Expand all bracket annotations when UI hides; collapse when UI restores
-    document.querySelectorAll('.bracket-trigger').forEach(trigger => {
+    document.body.classList.toggle('ui-hidden');
+}
+
+function toggleAllBrackets() {
+    const triggers = document.querySelectorAll('.bracket-trigger');
+    if (!triggers.length) return;
+    // Determine intent: if any are collapsed, expand all; otherwise collapse all
+    const anyCollapsed = [...triggers].some(t => !t.classList.contains('expanded'));
+    triggers.forEach(trigger => {
         const contentId = trigger.getAttribute('aria-controls');
         const content = contentId ? document.getElementById(contentId) : null;
         if (!content) return;
         const isExpanded = content.classList.contains('visible');
-        if (nowHidden && !isExpanded) {
+        if (anyCollapsed && !isExpanded) {
             content.classList.add('visible');
             trigger.textContent = '[−]';
             trigger.setAttribute('aria-expanded', 'true');
             trigger.setAttribute('aria-label', 'Collapse annotation');
             trigger.classList.add('expanded');
             state.expandedBrackets.add(parseInt(contentId.replace('bracket-content-', '')));
-        } else if (!nowHidden && isExpanded) {
+        } else if (!anyCollapsed && isExpanded) {
             content.classList.remove('visible');
             trigger.textContent = '[+]';
             trigger.setAttribute('aria-expanded', 'false');
@@ -3926,6 +3936,9 @@ function toggleUIVisibility() {
             state.expandedBrackets.delete(parseInt(contentId.replace('bracket-content-', '')));
         }
     });
+    // Sync button active state
+    const btn = document.getElementById('modeKeyBrackets');
+    if (btn) btn.classList.toggle('mode-active', !anyCollapsed ? false : true);
 }
 
 function enterFocusMode() {
@@ -4246,6 +4259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Utils.$('#modeKeyH').addEventListener('click', (e) => { e.stopPropagation(); toggleUIVisibility(); });
         Utils.$('#modeKeyT').addEventListener('click', (e) => { e.stopPropagation(); toggleTheme(); });
         Utils.$('#modeKeyL').addEventListener('click', (e) => { e.stopPropagation(); toggleLayout(); });
+        Utils.$('#modeKeyBrackets').addEventListener('click', (e) => { e.stopPropagation(); toggleAllBrackets(); });
 
         // Sync active states when modes change
         function syncModeCluster() {
@@ -4255,6 +4269,9 @@ document.addEventListener('DOMContentLoaded', () => {
             Utils.$('#modeKeyC').classList.toggle('mode-active', isDropdownOpen());
             const isLayered = document.body.classList.contains('layout-layered');
             Utils.$('#modeKeyL').classList.toggle('mode-active', !isLayered);
+            const allExpanded = document.querySelectorAll('.bracket-trigger').length > 0 &&
+                [...document.querySelectorAll('.bracket-trigger')].every(t => t.classList.contains('expanded'));
+            Utils.$('#modeKeyBrackets')?.classList.toggle('mode-active', allExpanded);
         }
         // Observe body class changes to keep buttons in sync
         new MutationObserver(syncModeCluster).observe(document.body, { attributes: true, attributeFilter: ['class'] });
