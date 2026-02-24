@@ -941,7 +941,9 @@ body.theme-transitioning::after {
     will-change: transform, opacity; left: 50%; top: 50%; 
 }
 .hover-image.active { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-.hover-image img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.hover-image img, .hover-image video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.hover-image img { display: block; }
+.hover-image video { display: none; }
 
 /* ===================================
    HEADER
@@ -1621,10 +1623,6 @@ body.compose-mode .compose-bar {
     flex-shrink: 0;
 }
 .compose-close-btn:hover { border-color: var(--accent); color: var(--accent); }
-@media (min-width: 769px) {
-    /* Desktop: hide the ✕ — Escape or pencil toggle handles it */
-    .compose-close-btn { display: none; }
-}
 
 /* Desktop word count inline in header */
 .compose-wordcount-desktop {
@@ -2210,6 +2208,7 @@ body.compose-mode { padding-bottom: 0; }
             <div id="imageLayer" class="image-layer">
                 <div id="hoverImage" class="hover-image" role="tooltip" aria-hidden="true">
                     <img src="" alt="" id="hoverImageImg" loading="lazy">
+                    <video id="hoverImageVideo" muted autoplay loop playsinline preload="none"></video>
                 </div>
             </div>
             <div id="textLayer" class="text-layer">
@@ -3088,9 +3087,13 @@ function wrapImageTriggers(text) {
 }
 
 function preloadImages() {
-    const imageUrls = [...new Set(Object.values(imageMap))];
-    imageUrls.forEach(url => { const img = new Image(); img.src = url; });
+    const urls = [...new Set(Object.values(imageMap))];
+    urls.forEach(url => {
+        if (!url.match(/\.mp4(\?|$)/i)) { const img = new Image(); img.src = url; }
+    });
 }
+
+function isVideo(url) { return url && url.match(/\.mp4(\?|$)/i); }
 
 function showImage(imageUrl, triggerElement) {
     cursor.currentImageElement = triggerElement;
@@ -3101,32 +3104,61 @@ function showImage(imageUrl, triggerElement) {
     const isReadMode = document.body.classList.contains('focus-mode');
 
     if (isReadMode) {
-        // Cursor thumbnail mode — image follows pointer, bg layer suppressed by CSS
         const thumb = Utils.$('#cursor-thumb');
         if (state.imageTimeout) clearTimeout(state.imageTimeout);
         state.imageTimeout = setTimeout(() => {
-            thumb.onload = () => cursor.element.classList.add('thumb-active');
-            thumb.onerror = () => cursor.element.classList.add('thumb-active');
-            if (thumb.src !== imageUrl) thumb.src = imageUrl;
-            else cursor.element.classList.add('thumb-active');
+            if (isVideo(imageUrl)) {
+                // For video in focus mode: show in hover panel instead of cursor thumb
+                const hoverImage = Utils.$('#hoverImage');
+                const hoverImageImg = Utils.$('#hoverImageImg');
+                const hoverImageVideo = Utils.$('#hoverImageVideo');
+                hoverImageImg.style.display = 'none';
+                hoverImageVideo.style.display = 'block';
+                hoverImageVideo.src = imageUrl;
+                hoverImageVideo.load();
+                hoverImageVideo.play().catch(() => {});
+                hoverImage.classList.add('active');
+            } else {
+                thumb.onload = () => cursor.element.classList.add('thumb-active');
+                thumb.onerror = () => cursor.element.classList.add('thumb-active');
+                if (thumb.src !== imageUrl) thumb.src = imageUrl;
+                else cursor.element.classList.add('thumb-active');
+            }
         }, CONFIG.IMAGE_HOVER_DELAY);
     } else {
-        // Normal mode — full background image
         const hoverImage = Utils.$('#hoverImage');
         const hoverImageImg = Utils.$('#hoverImageImg');
+        const hoverImageVideo = Utils.$('#hoverImageVideo');
         if (state.imageTimeout) clearTimeout(state.imageTimeout);
         state.imageTimeout = setTimeout(() => {
-            hoverImageImg.onload = () => hoverImage.classList.add('active');
-            hoverImageImg.onerror = () => hoverImage.classList.add('active');
-            hoverImageImg.src = imageUrl;
+            if (isVideo(imageUrl)) {
+                hoverImageImg.style.display = 'none';
+                hoverImageVideo.style.display = 'block';
+                hoverImageVideo.src = imageUrl;
+                hoverImageVideo.load();
+                hoverImageVideo.play().catch(() => {});
+                hoverImage.classList.add('active');
+            } else {
+                hoverImageImg.style.display = 'block';
+                hoverImageVideo.style.display = 'none';
+                hoverImageVideo.pause();
+                hoverImageVideo.src = '';
+                hoverImageImg.onload = () => hoverImage.classList.add('active');
+                hoverImageImg.onerror = () => hoverImage.classList.add('active');
+                hoverImageImg.src = imageUrl;
+            }
         }, CONFIG.IMAGE_HOVER_DELAY);
     }
 }
 
 function hideImage() {
     const hoverImage = Utils.$('#hoverImage');
+    const hoverImageVideo = Utils.$('#hoverImageVideo');
     if (state.imageTimeout) clearTimeout(state.imageTimeout);
     hoverImage.classList.remove('active');
+    if (hoverImageVideo) { hoverImageVideo.pause(); hoverImageVideo.src = ''; hoverImageVideo.style.display = 'none'; }
+    const hoverImageImg = Utils.$('#hoverImageImg');
+    if (hoverImageImg) hoverImageImg.style.display = 'block';
     cursor.element.classList.remove('has-image', 'thumb-active');
     document.body.classList.remove('image-active');
     state.imageActive = false;
@@ -3432,7 +3464,11 @@ function buildImageGrid() {
             imagesByChapter[chapter.id].forEach(imgData => {
                 const item = document.createElement('div');
                 item.className = 'grid-image-item';
-                item.innerHTML = `<img src="${imgData.url}" loading="lazy" alt="${imgData.text.replace(/"/g, '&quot;')}"><div class="grid-image-caption"><span class="caption-text">${imgData.text}</span></div>`;
+                const isVid = imgData.url.match(/\.mp4(\?|$)/i);
+                const mediaEl = isVid
+                    ? `<video src="${imgData.url}" muted autoplay loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;opacity:0.9;transition:opacity 0.3s ease;"></video>`
+                    : `<img src="${imgData.url}" loading="lazy" alt="${imgData.text.replace(/"/g, '&quot;')}">`;
+                item.innerHTML = `${mediaEl}<div class="grid-image-caption"><span class="caption-text">${imgData.text}</span></div>`;
                 item.addEventListener('click', () => { toggleImageGrid(); state.currentSentenceIndex = imgData.index; highlightSentence(imgData.index); });
                 grid.appendChild(item);
             });
@@ -4774,7 +4810,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 entries.forEach(([p, url]) => {
                     const item = document.createElement('div');
                     item.className = 'imagemap-grid-item';
-                    item.innerHTML = `<img src="${url}" alt="" loading="lazy"><span class="item-phrase">${p}</span>`;
+                    const isVid = url.match(/\.mp4(\?|$)/i);
+                    const mediaEl = isVid
+                        ? `<video src="${url}" muted autoplay loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:4px;"></video>`
+                        : `<img src="${url}" alt="" loading="lazy">`;
+                    item.innerHTML = `${mediaEl}<span class="item-phrase">${p}</span>`;
                     item.addEventListener('click', () => applyImageMap(url));
                     imgGrid.appendChild(item);
                 });
@@ -4834,7 +4874,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // The existing delegated listeners on streamEl already handle .image-trigger via bubbling
             // Just make sure preloadImages picks up new ones
             const newUrls = Object.values(compose.liveImageMap);
-            newUrls.forEach(url => { const img = new Image(); img.src = url; });
+            newUrls.forEach(url => { if (!url.match(/\.mp4(\?|$)/i)) { const img = new Image(); img.src = url; } });
         }
 
         // ── Double-click existing sentences to edit in compose mode ──
