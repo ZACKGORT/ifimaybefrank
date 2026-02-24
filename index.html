@@ -2270,9 +2270,6 @@ const parallax = { text: { x: 0, y: 0, targetX: 0, targetY: 0 }, image: { x: 0, 
 let composeActive = false; // module-level flag so highlightSentence can read it
 
 
-
-
-
 // ===================================
 // DATA
 // ===================================
@@ -2307,9 +2304,59 @@ const imageMap = {
     'know without notice': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/welcomehomebuddy.mp4',
     'but your home': 'https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Latenightstroll.mp4',
     
-    
     'left without care': 'https://i.ibb.co/93bMTmpY/newtothis.webp',
 };
+
+const phraseRegexMap = new Map();
+function buildPhraseRegex(phrase) {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const start = /^\w/.test(phrase) ? '(?<![\\w])' : "(?<![\\w'\"])";
+    const end   = /\w$/.test(phrase) ? '(?![\\w])'  : "(?![\\w'\"])";
+    return new RegExp(`${start}${escaped}${end}`, 'gi');
+}
+Object.keys(imageMap).forEach(phrase => {
+    phraseRegexMap.set(phrase, buildPhraseRegex(phrase));
+});
+
+const narrative = `
+
+###:The Sweetest.
+
+This is my Wolfgang.[a very good boy] 
+My sweet, "Sweet Wolfgang".[epithet & appellation, Sweet Wolfgang] 
+
+A name not chosen, nor given — it just was.
+[I just watched him for a few days, walking him without knowing what to call him. We went with the usual human names, goofy names, and commonplace names. None stuck. But, my favorite new artist was Mammoth, a band made by a single multi-hyphenate musician named Wolfgang.]
+
+As "Sweet" as his name.["sweetie", "sweetheart","sweet baby","my sweet boy"] 
+He was "Wolf" by calling.[born to be]
+Wolfie for short.[standing stoutly at yay-high] 
+Woofie-boo (wherever).[I found my joy] 
+This is his story.
+
+###: The Chronicles of Wolfgang.
+Every hero has a good origin story. 
+A tale told with a wagging tail. 
+One that tells of bravery. 
+Of fortitude. 
+Of rebellion. 
+A story of hope.[] 
+And, poo-poo times too.
+
+
+###: Where in the world, is Wolfgang.
+When you are lost in Queens with nowhere to go. 
+But you happen across paths of a similar soul.
+Neglected, abandoned, left without care.
+New Dad, new day; now gone is despair.
+
+###:Welcome Home, Wolfgang
+That feeling of belong. 
+When you know without notice.[Wolfie, then unnamed, making claim to his new domain — also, freshly bathed because he needed that badly. Old Spice.]
+When you find not your place, but your home.
+
+
+`;
 
 
 // ===================================
