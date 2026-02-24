@@ -2277,39 +2277,25 @@ let composeActive = false; // module-level flag so highlightSentence can read it
 // DATA
 // ===================================
 
+// ===================================
+// template    '': '',
+
 const chapters = [];
 
 const imageMap = {
 
-    'A wolf by calling': 'https://i.ibb.co/Q86g6LC/3128133825639913845-5144774570.jpg',
-    'This is Wolfgang': 'https://i.ibb.co/Q86g6LC/3128133825639913845-5144774570.jpg',
-    'He makes his own rules': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/curbyourdog.webp',
+    
+    'This is my Wolfgang': 'https://i.ibb.co/Q86g6LC/3128133825639913845-5144774570.jpg',
+    'first name, Sweet': 'https://i.ibb.co/ZRH2xfpx/vet-trip.webp',
+    'Chosen name': 'https://i.ibb.co/9HkZnDDn/wolfgangserenade.webp',
+    'Sweet as his name': 'https://i.ibb.co/8L68BJFv/guardian.webp',
+    'Wolf by calling': 'https://i.ibb.co/MxGzxSVk/wolfgang00.webp',
+    'Wolfie for short': 'https://i.ibb.co/83SsR99/thislittledudeexudedsomuchconfidence.webp',
+    'Woofie-boo': 'https://i.ibb.co/mrsF2PP2/whereiswolfgang.webp',
 
-    'every hero has a good origin story': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/everyherohasagoodoriginstory.webp',
-    'at this moment I decided he was mine': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/atthismomentidecidedhewasmine.webp',
-    'brave boy': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/braveboy.webp',
-    
-    'cat\'s house': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/catshouse.webp',
-    'couch surfing': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/couchsurfing.webp',
-    'calming anywhere': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/calminganywhere.webp',
-    'become the pillow': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/donthidebehindpillowbecomepillow.webp',
-    
-    'daily drip': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/dailydrip.webp',
-    'beef dinner in gravy': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/beefdinneringravy.webp',
-    'deer steak, he did not eat it': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/deersteakhedidnoteatit.webp',
-    'at least the gravy is good': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/atleastthegravyisgood.webp',
-    'dinner for Wolfgang': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/dinnerforwolfgang.webp',
-    
-    'impromptu camping adventure': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/dadhastogotoameetingsimpromptucampingadventure.webp',
+    'wherever we may be': 'https://i.ibb.co/Swk4v5Tv/wolfgang000.webp',
 
-    'building Burger King': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/buildingburgerking.webp',
-    'Burger King indeed': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/burgerkingindeed.webp',
-    'drive thru luxury suite': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/drivethruluxurysuite.webp',
-    
-    'angel': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/angel987654.webp',
-    'classic Wolfgang': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/classicwolfgang65.webp',
-    'elephant by Wolfgang': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/elephantbywolfgang.webp',
-    'fireside favorites': 'https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/99d87403f91a0dbc60190bf0d162393592763a39/images/firesidefavorites.webp'
+
 };
 
 const phraseRegexMap = new Map();
@@ -2320,20 +2306,19 @@ Object.keys(imageMap).forEach(phrase => {
 
 const narrative = `
 
-
 ###:The Sweetest.
 
 This is my Wolfgang. [a very good boy] 
 First name, Sweet. [My sweet Sweet Wolfgang] 
-Chosen name, Wolfgang. [as wonderful as he may be]
-Sweet as his name. ["as", not was] 
-Wolfgang by calling. [born to be]
+Chosen name — well: [a wonderful warrior]
+Sweet as his name. ["sweetie", "sweetheart","sweet baby","my sweet boy"] 
+Wolf by calling. [born to be]
 Wolfie for short. [standing stoutly at yay-high] 
-Woofie-boo (in private). [my joy] 
+Woofie-boo (wherever). [my joy] 
+This is Wolfgang's story.
 
-
-###: Curb Yourself 
-Okay. Wolfie makes his own rules. 
+###: Where in the world, is Wolfgang.
+Every hero has a good origin story.
 
 
 `;
