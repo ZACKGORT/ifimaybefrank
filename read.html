@@ -1116,88 +1116,116 @@ body.ch-7 { --hud-bg: rgba(248,236,240,0.97); --hud-ink: #200810; --hud-ink-2: #
 
 /* ── NARRATIVE IFRAME TRIGGER ───────────────────────────────────────────── */
 .narrative-site-trigger {
-  display: none; /* shown by JS at the right sentence */
+  display: none;
   position: fixed;
-  left: 50%; bottom: 0;
-  transform: translateX(-50%) translateY(100%);
-  width: min(540px, calc(100vw - 360px));
+  right: 320px;          /* flush against the left edge of the right rail */
+  bottom: 80px;          /* floats above the nav widget zone */
+  width: 240px;          /* compact — fidget-scale, not full-width */
   z-index: 8900;
-  transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), opacity 0.4s ease;
+  transform: translateX(12px);
   opacity: 0;
   pointer-events: none;
+  transition: transform 0.38s cubic-bezier(0.25,1,0.5,1), opacity 0.35s ease;
 }
 .narrative-site-trigger.nst-visible {
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(0);
   opacity: 1;
   pointer-events: auto;
 }
 .nst-chrome {
   background: var(--hud-bg);
   border: 1px solid var(--hud-border);
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 -8px 48px rgba(0,0,0,0.35), 0 -2px 8px rgba(0,0,0,0.12);
+  box-shadow: -6px 6px 32px rgba(0,0,0,0.32), -1px 2px 8px rgba(0,0,0,0.12);
 }
 .nst-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 16px 8px;
+  padding: 8px 10px 7px;
   border-bottom: 1px solid var(--hud-border);
   background: var(--hud-bg);
 }
-.nst-bar-left { display: flex; align-items: center; gap: 10px; }
-.nst-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.nst-bar-left { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
+.nst-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 .nst-label {
-  font-family: var(--ui); font-size: 7px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--hud-accent);
+  font-family: var(--ui); font-size: 6px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--hud-accent); flex-shrink: 0;
 }
 .nst-url {
-  font-family: var(--ui); font-size: 9px; letter-spacing: 0.06em;
+  font-family: var(--ui); font-size: 8px; letter-spacing: 0.04em;
   color: var(--hud-ink); font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.nst-actions { display: flex; gap: 6px; align-items: center; }
+.nst-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
 .nst-btn {
-  font-family: var(--ui); font-size: 7px; letter-spacing: 0.12em;
-  text-transform: uppercase; padding: 4px 9px;
+  font-family: var(--ui); font-size: 6px; letter-spacing: 0.10em;
+  text-transform: uppercase; padding: 3px 7px;
   border: 1px solid var(--hud-border); border-radius: 3px;
   background: none; color: var(--hud-ink-2); cursor: pointer;
-  transition: all 0.14s;
+  transition: all 0.14s; white-space: nowrap; text-decoration: none; display: inline-flex;
 }
 .nst-btn:hover { border-color: var(--hud-accent); color: var(--hud-accent); }
 .nst-btn.nst-visit { color: var(--hud-accent); border-color: var(--hud-accent); background: var(--accent-l); }
 .nst-btn.nst-visit:hover { background: var(--accent); color: #fff; }
-.nst-btn.nst-dismiss { font-size: 10px; padding: 3px 7px; }
+.nst-btn.nst-dismiss { font-size: 9px; padding: 2px 5px; }
 .nst-frame-shell {
-  position: relative; width: 100%; padding-top: 56.25%;
+  position: relative; width: 100%; padding-top: 62.5%; /* ~5:3 for compact view */
   background: #000; overflow: hidden;
 }
 .nst-frame-shell iframe {
   position: absolute; top: 0; left: 0;
-  width: 1280px; height: 720px;
-  border: none; pointer-events: none;
+  width: 1280px; height: 800px;
+  border: none;
+  pointer-events: auto;   /* ← interactive — user can fidget with site */
   opacity: 0; transition: opacity 0.5s ease;
   transform-origin: top left;
 }
 .nst-frame-shell iframe.nst-loaded { opacity: 1; }
-.nst-frame-overlay {
-  position: absolute; inset: 0; z-index: 5;
-  background: transparent; cursor: pointer;
-}
+/* No overlay blocking interaction — removed entirely for interactive mode */
 .nst-desc {
-  padding: 10px 16px 12px;
-  font-family: var(--disp); font-weight: 300; font-size: 12px;
-  line-height: 1.5; color: var(--hud-ink-2);
+  padding: 8px 10px 10px;
+  font-family: var(--disp); font-weight: 300; font-size: 10px;
+  line-height: 1.45; color: var(--hud-ink-2);
   border-top: 1px solid var(--hud-border);
 }
+
+/* ── MOBILE: ghost above touchpoint, compact trigger ── */
 @media (max-width: 760px) {
+  /* Narrative trigger: compact sheet from bottom, not full-width */
   .narrative-site-trigger {
-    width: 100%; left: 0; transform: translateX(0) translateY(100%);
-    border-radius: 0;
+    right: auto;
+    left: 12px;
+    bottom: 90px;        /* above mobile nav */
+    width: calc(100vw - 24px);
+    max-width: 320px;
+    transform: translateY(12px);
+    border-radius: 8px;
   }
   .narrative-site-trigger.nst-visible {
-    transform: translateX(0) translateY(0);
+    transform: translateY(0);
   }
-  #rr-site-ghost, #rr-ch-ghost { display: none; }
+  .nst-chrome { border-radius: 8px; }
+
+  /* Site ghost: positioned above the touchpoint, clamped to viewport */
+  #rr-site-ghost {
+    right: auto;
+    left: 12px;
+    /* top set dynamically by JS on mobile — above finger */
+    width: calc(100vw - 24px);
+    max-width: 280px;
+    transform: translateY(-6px);
+  }
+  #rr-site-ghost.visible { transform: translateY(0); }
+
+  /* Chapter ghost: same treatment */
+  #rr-ch-ghost {
+    right: auto;
+    left: 12px;
+    width: calc(100vw - 24px);
+    max-width: 240px;
+    transform: translateY(-6px);
+  }
+  #rr-ch-ghost.visible { transform: translateY(0); }
 }
 
 /* li-theme overrides for panel guide */
@@ -3115,7 +3143,7 @@ body.dark-ask #ask-interstitial { opacity: 1; pointer-events: auto; }
       </div>
     </div>
     <div class="nst-frame-shell" id="nst-frame-shell">
-      <div class="nst-frame-overlay" id="nst-frame-overlay"></div>
+      <!-- iframe injected by JS — interactive, pointer-events: auto -->
     </div>
     <div class="nst-desc" id="nst-desc"></div>
   </div>
@@ -6120,7 +6148,8 @@ var GRID_SITES = [
   { url: 'https://wolfie.love/job',     label: 'wolfie.love/job',    tag: 'Engagement'          },
   { url: 'https://wolfie.love/real',    label: 'wolfie.love/real',   tag: 'Professional'        },
   { url: 'https://wolfie.love/dash',    label: 'wolfie.love/dash',   tag: 'Narrative Analytics' },
-
+  { url: 'https://intoview.pro/home',   label: 'intoview.pro',       tag: 'Creative Sandbox'    },
+  { url: 'https://emdash.click',        label: 'emdash.click',       tag: 'Writing Tool'        },
 ];
 var sitesGridOpen  = false;
 var sitesGridBuilt = false;
@@ -6468,26 +6497,38 @@ document.addEventListener('keydown', function(e) {
 
   function isMob() { return window.innerWidth <= 760; }
 
-  // ── Position ghost vertically centered on its source element ──
-  function positionGhost(ghost, sourceEl) {
-    if (!sourceEl) return;
-    var rect = sourceEl.getBoundingClientRect();
-    var gh   = ghost.offsetHeight || 120;
-    var top  = rect.top + rect.height / 2 - gh / 2;
-    top = Math.max(68, Math.min(top, window.innerHeight - gh - 16));
-    ghost.style.top = top + 'px';
+  // ── Position ghost — desktop: vertically centered on source; mobile: above touchpoint ──
+  function positionGhost(ghost, sourceEl, touchY) {
+    if (!sourceEl && touchY === undefined) return;
+    var gh = ghost.offsetHeight || 120;
+    if (isMob()) {
+      // On mobile: place above the touch Y, clamped so top stays in viewport
+      var refY = touchY !== undefined ? touchY : (sourceEl ? sourceEl.getBoundingClientRect().top : window.innerHeight * 0.6);
+      var top = refY - gh - 16; // 16px clearance above finger
+      top = Math.max(8, Math.min(top, window.innerHeight - gh - 8));
+      ghost.style.top = top + 'px';
+    } else {
+      // Desktop: center vertically on source element
+      var rect = sourceEl.getBoundingClientRect();
+      var top  = rect.top + rect.height / 2 - gh / 2;
+      top = Math.max(68, Math.min(top, window.innerHeight - gh - 16));
+      ghost.style.top = top + 'px';
+    }
   }
 
   // ── Site ghost ──
   function showSiteGhost(tab, url) {
-    if (isMob() || !siteGhost) return;
+    showSiteGhostAt(tab, url, undefined);
+  }
+  function showSiteGhostAt(tab, url, touchY) {
+    if (!siteGhost) return;
     clearTimeout(siteTimer);
     var meta = SITE_META[url] || { label: 'Site', url: url, tag: 'Visit', desc: '' };
     document.getElementById('rrg-label').textContent = meta.label;
     document.getElementById('rrg-url').textContent   = meta.url;
     document.getElementById('rrg-desc').textContent  = meta.desc;
     document.getElementById('rrg-tag').textContent   = meta.tag + ' ↗';
-    positionGhost(siteGhost, tab);
+    positionGhost(siteGhost, tab, touchY);
     siteGhost.classList.add('visible');
     siteGhost.setAttribute('aria-hidden', 'false');
   }
@@ -6501,12 +6542,15 @@ document.addEventListener('keydown', function(e) {
 
   // ── Chapter ghost ──
   function showChGhost(btn, chData) {
-    if (isMob() || !chGhost) return;
+    showChGhostAt(btn, chData, undefined);
+  }
+  function showChGhostAt(btn, chData, touchY) {
+    if (!chGhost) return;
     clearTimeout(chTimer);
     document.getElementById('rrch-num').textContent   = chData.num;
     document.getElementById('rrch-title').textContent = chData.title;
     document.getElementById('rrch-sub').textContent   = chData.sub || '';
-    positionGhost(chGhost, btn);
+    positionGhost(chGhost, btn, touchY);
     chGhost.classList.add('visible');
     chGhost.setAttribute('aria-hidden', 'false');
   }
@@ -6541,6 +6585,11 @@ document.addEventListener('keydown', function(e) {
         if (!site) return;
         tab.addEventListener('mouseenter', function() { showSiteGhost(tab, site.url); });
         tab.addEventListener('mouseleave', function() { hideSiteGhost(120); });
+        tab.addEventListener('touchstart', function(e) {
+          var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+          showSiteGhostAt(tab, site.url, ty);
+        }, { passive: true });
+        tab.addEventListener('touchend', function() { hideSiteGhost(2400); });
       });
     });
     observer.observe(tabsEl, { childList: true });
@@ -6552,6 +6601,11 @@ document.addEventListener('keydown', function(e) {
       if (!site) return;
       tab.addEventListener('mouseenter', function() { showSiteGhost(tab, site.url); });
       tab.addEventListener('mouseleave', function() { hideSiteGhost(120); });
+      tab.addEventListener('touchstart', function(e) {
+        var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+        showSiteGhostAt(tab, site.url, ty);
+      }, { passive: true });
+      tab.addEventListener('touchend', function() { hideSiteGhost(2400); });
     });
     // Keep ghost open when hovering it
     if (siteGhost) {
@@ -6572,6 +6626,11 @@ document.addEventListener('keydown', function(e) {
         if (!ch) return;
         btn.addEventListener('mouseenter', function() { showChGhost(btn, ch); });
         btn.addEventListener('mouseleave', function() { hideChGhost(120); });
+        btn.addEventListener('touchstart', function(e) {
+          var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+          showChGhostAt(btn, ch, ty);
+        }, { passive: true });
+        btn.addEventListener('touchend', function() { hideChGhost(2400); });
       });
     });
     observer.observe(listEl, { childList: true });
@@ -6583,6 +6642,11 @@ document.addEventListener('keydown', function(e) {
       if (!ch) return;
       btn.addEventListener('mouseenter', function() { showChGhost(btn, ch); });
       btn.addEventListener('mouseleave', function() { hideChGhost(120); });
+      btn.addEventListener('touchstart', function(e) {
+        var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+        showChGhostAt(btn, ch, ty);
+      }, { passive: true });
+      btn.addEventListener('touchend', function() { hideChGhost(2400); });
     });
     if (chGhost) {
       chGhost.addEventListener('mouseenter', function() { clearTimeout(chTimer); });
@@ -6629,7 +6693,6 @@ document.addEventListener('keydown', function(e) {
   var nstVisit    = document.getElementById('nst-visit');
   var nstDesc     = document.getElementById('nst-desc');
   var nstShell    = document.getElementById('nst-frame-shell');
-  var nstOverlay  = document.getElementById('nst-frame-overlay');
   var nstDismiss  = document.getElementById('nst-dismiss');
   if (!nstPanel) return;
 
@@ -6641,13 +6704,13 @@ document.addEventListener('keydown', function(e) {
 
   function scaleNstFrame(frame) {
     if (!nstShell) return;
-    var w = nstShell.offsetWidth  || 480;
-    var h = nstShell.offsetHeight || 270;
-    var s = Math.min(w / 1280, h / 720);
+    var w = nstShell.offsetWidth  || 240;
+    var h = nstShell.offsetHeight || 150;
+    var s = Math.min(w / 1280, h / 800);
     frame.style.transform       = 'scale(' + s + ')';
     frame.style.transformOrigin = 'top left';
     frame.style.width           = '1280px';
-    frame.style.height          = '720px';
+    frame.style.height          = '800px';
   }
 
   function loadNstFrame(url) {
@@ -6712,14 +6775,6 @@ document.addEventListener('keydown', function(e) {
 
   // Dismiss button
   nstDismiss.addEventListener('click', function() { hideNst(true); });
-
-  // Click overlay = open site in new tab
-  if (nstOverlay) {
-    nstOverlay.addEventListener('click', function() {
-      if (currentUrl) window.open(currentUrl, '_blank', 'noopener');
-    });
-    nstOverlay.style.cursor = 'pointer';
-  }
 
   // Re-scale on resize
   window.addEventListener('resize', function() {
