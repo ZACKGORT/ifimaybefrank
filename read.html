@@ -6731,7 +6731,7 @@ document.addEventListener('keydown', function(e) {
         scaleNstFrame(frame);
       };
       // Insert before overlay
-      nstShell.insertBefore(frame, nstOverlay);
+      nstShell.appendChild(frame);
       iframeCache[url] = frame;
       scaleNstFrame(frame);
     }
