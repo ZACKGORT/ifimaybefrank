@@ -2691,17 +2691,20 @@ body.dark-ask #ask-interstitial { opacity: 1; pointer-events: auto; }
   <button class="cw-trigger" id="cw-trigger" aria-haspopup="true" aria-expanded="false">
     <span class="cw-trigger-label">Chapter</span>
     <span class="cw-trigger-sep">&middot;</span>
-    <span class="cw-trigger-name" id="cw-current-name">Zack Gort</span>
+    <span class="cw-trigger-name" id="cw-current-name">The Problem</span>
     <span class="cw-trigger-arrow">&#9662;</span>
   </button>
   <div class="cw-dropdown" role="menu" id="cw-dropdown">
-    <button class="cw-item active" data-ch="1" role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-name">Introduction</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="2" role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-name">GNC</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="3" role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-name">BNY Mellon</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="4" role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-name">The Work</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="5" role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-name">Who I Am</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="6" role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-name">wolfie.life</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="7" role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-name">Connect</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item active" data-ch="1"  role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-name">The Problem We Refuse</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="2"  role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-name">The Sentence as Unit</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="3"  role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-name">Ambient, Not Decorative</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="4"  role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-name">Three Layers, One Node</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="5"  role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-name">The Author's Contract</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="6"  role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-name">The Reader's Right</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="7"  role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-name">The Medium is the Argument</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="8"  role="menuitem"><span class="cw-item-num">08</span><span class="cw-item-name">One Engine, Every Domain</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="9"  role="menuitem"><span class="cw-item-num">09</span><span class="cw-item-name">Against Templates</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item"        data-ch="10" role="menuitem"><span class="cw-item-num">10</span><span class="cw-item-name">The Conviction</span><span class="cw-item-dot"></span></button>
   </div>
 </div>
 
@@ -3431,12 +3434,11 @@ function scheduleAutoFlow(n) {
 }
 
 function updatePanelService(ch) {
-  document.querySelectorAll('.service-row').forEach(function(row) {
-    row.classList.toggle('current', parseInt(row.dataset.service) === ch);
-  });
+  // Sync the chapter guide panel active state
+  if (window._pgSyncChapter) window._pgSyncChapter(ch);
 }
 
-var CH_NAMES = ['', 'Introduction', 'GNC', 'BNY Mellon', 'The Work', 'Who I Am', 'wolfie.life', 'Connect'];
+var CH_NAMES = ['', 'The Problem', 'The Sentence', 'Ambient', 'Three Layers', 'Author\'s Contract', 'Reader\'s Right', 'The Medium', 'One Engine', 'Templates', 'The Conviction'];
 var CH_FIRST = {};
 navigable.forEach(function(el, i) {
   var ch = parseInt(el.dataset.ch || 1);
@@ -5974,70 +5976,52 @@ document.addEventListener('keydown', function(e) {
 (function initChapterGuidePanel() {
 
   var PANEL_SITES = [
-    { url: 'https://wolfie.love',        label: 'wolfie.love',       tag: 'Platform'            },
-    { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat',  tag: 'Prompt Craft'        },
-    { url: 'https://wolfie.life',        label: 'wolfie.life',       tag: 'Studio'              },
-    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'E-commerce'          },
-    { url: 'https://wolfie.love/job',    label: 'wolfie.love/job',   tag: 'Engagement'          },
-    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Professional'        },
-    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Analytics'           },
-    { url: 'https://intoview.pro/home',  label: 'intoview.pro',      tag: 'Creative Sandbox'    },
-    { url: 'https://emdash.click',       label: 'emdash.click',      tag: 'Writing Tool'        },
+    { url: 'https://wolfie.love',        label: 'wolfie.love',       tag: 'Platform'         },
+    { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat',  tag: 'Prompt Craft'     },
+    { url: 'https://wolfie.life',        label: 'wolfie.life',       tag: 'Studio'           },
+    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'E-commerce'       },
+    { url: 'https://wolfie.love/job',    label: 'wolfie.love/job',   tag: 'Engagement'       },
+    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Professional'     },
+    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Analytics'        },
+    { url: 'https://intoview.pro/home',  label: 'intoview.pro',      tag: 'Creative Sandbox' },
+    { url: 'https://emdash.click',       label: 'emdash.click',      tag: 'Writing Tool'     },
   ];
 
   var activeSiteIdx = 0;
-  var iframeCache = {}; // url -> iframe element
-  var activeChIdx = 0;
+  var iframeCache = {};
+
+  // ── Expose sync hook — called directly by updatePanelService(ch) ──
+  window._pgSyncChapter = function(ch) {
+    var list = document.getElementById('pg-chapter-list');
+    if (!list) return;
+    var items = list.querySelectorAll('.pg-ch-item');
+    items.forEach(function(el) {
+      el.classList.toggle('active', parseInt(el.dataset.ch) === ch);
+      if (parseInt(el.dataset.ch) === ch) {
+        // Scroll the active item into view within the panel
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  };
 
   // ── Build chapter list ──
   function buildChapterList() {
     var list = document.getElementById('pg-chapter-list');
     if (!list || typeof CHAPTERS === 'undefined') return;
     list.innerHTML = '';
-    CHAPTERS.forEach(function(ch, i) {
+    CHAPTERS.forEach(function(ch) {
       var btn = document.createElement('button');
-      btn.className = 'pg-ch-item' + (i === 0 ? ' active' : '');
+      btn.className = 'pg-ch-item' + (ch.ch === 1 ? ' active' : '');
+      btn.dataset.ch = ch.ch;
       btn.innerHTML =
         '<span class="pg-ch-num">' + ch.num + '</span>' +
         '<span class="pg-ch-name">' + ch.title + '</span>';
       btn.addEventListener('click', function() {
-        // Navigate to first sentence of this chapter
-        var target = document.querySelector('[data-ch="' + ch.ch + '"]');
-        if (target) {
-          var idx = parseInt(target.dataset.idx);
-          if (!isNaN(idx) && typeof goTo === 'function') goTo(idx);
-        }
-        setActiveChapter(i);
+        var target = CH_FIRST[ch.ch];
+        if (target !== undefined && typeof goTo === 'function') goTo(target);
       });
       list.appendChild(btn);
     });
-  }
-
-  function setActiveChapter(idx) {
-    activeChIdx = idx;
-    var items = document.querySelectorAll('.pg-ch-item');
-    items.forEach(function(el, i) { el.classList.toggle('active', i === idx); });
-  }
-
-  // Hook into goTo to sync active chapter
-  document.addEventListener('DOMContentLoaded', function() {
-    var _origGoTo = window.goTo;
-    if (_origGoTo) {
-      window.goTo = function(n, opts) {
-        _origGoTo.call(this, n, opts);
-        syncChapterFromCurrent();
-      };
-    }
-  });
-
-  function syncChapterFromCurrent() {
-    if (typeof navigable === 'undefined' || typeof current === 'undefined') return;
-    var el = navigable[current];
-    if (!el) return;
-    var ch = parseInt(el.dataset.ch) || 1;
-    if (typeof CHAPTERS === 'undefined') return;
-    var idx = CHAPTERS.findIndex(function(c) { return c.ch === ch; });
-    if (idx >= 0 && idx !== activeChIdx) setActiveChapter(idx);
   }
 
   // ── Build site tabs ──
@@ -6058,7 +6042,17 @@ document.addEventListener('keydown', function(e) {
     });
   }
 
-  // ── Load iframe preview ──
+  // ── Scale iframe to fit shell ──
+  function scaleFrame(frame, shell) {
+    if (!shell || !frame) return;
+    var w = shell.offsetWidth  || 276;
+    var h = shell.offsetHeight || 172;
+    var s = Math.min(w / 1280, h / 800);
+    frame.style.transform = 'scale(' + s + ')';
+    frame.style.transformOrigin = 'top left';
+  }
+
+  // ── Load/show iframe preview ──
   function loadSitePreview(idx) {
     activeSiteIdx = idx;
     var site = PANEL_SITES[idx];
@@ -6079,74 +6073,54 @@ document.addEventListener('keydown', function(e) {
     if (visitLink) visitLink.href = site.url;
     if (visitUrl)  visitUrl.textContent = site.label;
 
-    // Swap iframe — cache them so no re-load
+    // Overlay click → open site
+    var overlay = document.getElementById('pg-preview-overlay');
+    if (overlay) {
+      overlay.onclick = function() { window.open(site.url, '_blank', 'noopener'); };
+      overlay.style.cursor = 'pointer';
+    }
+
+    // Iframe: cache to avoid reloads, pointer-events none (overlay handles all clicks)
     var shell = document.getElementById('pg-preview-frame-shell');
     if (!shell) return;
 
-    // Hide all cached iframes
     Object.values(iframeCache).forEach(function(f) { f.style.display = 'none'; });
 
     if (iframeCache[site.url]) {
       iframeCache[site.url].style.display = 'block';
+      scaleFrame(iframeCache[site.url], shell);
     } else {
       var frame = document.createElement('iframe');
       frame.src = site.url;
       frame.setAttribute('loading', 'lazy');
+      // allow interaction but overlay captures all clicks → redirects to site
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation');
-      frame.setAttribute('referrerpolicy', 'no-referrer');
-      frame.style.pointerEvents = 'none'; // overlay handles clicks
+      frame.style.cssText = 'position:absolute;top:0;left:0;width:1280px;height:800px;border:none;pointer-events:none;opacity:0;transition:opacity 0.4s ease;';
       frame.onload = function() {
-        frame.classList.add('pg-iframe-loaded');
+        frame.style.opacity = '1';
         scaleFrame(frame, shell);
       };
       shell.appendChild(frame);
       iframeCache[site.url] = frame;
       scaleFrame(frame, shell);
     }
-
-    // Click anywhere on the preview opens the site
-    var overlay = document.getElementById('pg-preview-overlay');
-    if (overlay) {
-      overlay.onclick = function() { window.open(site.url, '_blank', 'noopener'); };
-      overlay.style.cursor = 'pointer';
-    }
-  }
-
-  function scaleFrame(frame, shell) {
-    if (!shell) return;
-    var w = shell.offsetWidth || 276;
-    var h = shell.offsetHeight || 172;
-    var sx = w / 1280;
-    var sy = h / 800;
-    var s = Math.min(sx, sy);
-    frame.style.transform = 'scale(' + s + ')';
-    frame.style.transformOrigin = 'top left';
-    frame.style.width  = '1280px';
-    frame.style.height = '800px';
   }
 
   // Re-scale on resize
   window.addEventListener('resize', function() {
     var shell = document.getElementById('pg-preview-frame-shell');
     if (!shell) return;
-    Object.values(iframeCache).forEach(function(f) { scaleFrame(f, shell); });
+    Object.values(iframeCache).forEach(function(f) {
+      if (f.style.display !== 'none') scaleFrame(f, shell);
+    });
   });
 
-  // ── Init ──
-  document.addEventListener('DOMContentLoaded', function() {
-    buildChapterList();
-    buildSiteTabs();
-    loadSitePreview(0);
-
-    // Sync chapter on scroll/navigate
-    var _orig = window.goTo;
-    if (_orig) {
-      window.goTo = function(n, opts) {
-        _orig.call(this, n, opts);
-        setTimeout(syncChapterFromCurrent, 40);
-      };
-    }
-  });
+  // ── Init on DOM ready ──
+  buildChapterList();
+  buildSiteTabs();
+  loadSitePreview(0);
+  // Sync initial chapter state
+  window._pgSyncChapter(1);
 
 })();
 
