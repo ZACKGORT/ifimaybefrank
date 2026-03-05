@@ -951,17 +951,18 @@ body.ch-7 { --hud-bg: rgba(248,236,240,0.97); --hud-ink: #200810; --hud-ink-2: #
   width: 1280px; height: 800px;
   border: none;
   transform-origin: top left;
-  pointer-events: none; /* default: no pointer; overlay handles click */
+  pointer-events: auto;
   opacity: 0; transition: opacity 0.4s ease;
 }
 .pg-preview-frame-shell iframe.pg-iframe-loaded { opacity: 1; }
 
-/* overlay — transparent click target that opens the link */
+/* overlay — sits behind iframe now; visit button still accessible via nst-bar */
 .pg-preview-overlay {
-  position: absolute; inset: 0; z-index: 10;
+  position: absolute; inset: 0; z-index: 0;
   display: flex; align-items: flex-end; justify-content: flex-end;
   padding: 10px;
   background: transparent;
+  pointer-events: none;
   transition: background 0.2s;
 }
 .pg-preview-wrap:hover .pg-preview-overlay {
@@ -1007,6 +1008,226 @@ body.ch-7 { --hud-bg: rgba(248,236,240,0.97); --hud-ink: #200810; --hud-ink-2: #
 }
 .pg-footer a { color: var(--accent); text-decoration: none; }
 .pg-footer a:hover { text-decoration: underline; }
+
+/* ── ENHANCED CHAPTER JUMP LINKS ────────────────────────────────────────── */
+.pg-ch-item {
+  position: relative;
+}
+.pg-ch-item::after {
+  content: '→';
+  font-family: var(--ui); font-size: 8px; color: var(--accent);
+  opacity: 0; margin-left: auto; flex-shrink: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  transform: translateX(-4px);
+}
+.pg-ch-item:hover::after { opacity: 1; transform: translateX(0); }
+.pg-ch-item.active::after { content: '◆'; opacity: 0.5; transform: none; }
+
+/* ── GHOST OVERLAY FOR RIGHT RAIL NODE GROUPS ───────────────────────────── */
+/* Site node ghost */
+#rr-site-ghost {
+  position: fixed;
+  right: 328px;
+  top: 50%;
+  transform: translateY(-50%) translateX(8px);
+  width: 260px;
+  z-index: 9200;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.25,1,0.5,1);
+}
+#rr-site-ghost.visible {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+.rr-ghost-inner {
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 36px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.12);
+}
+.rr-ghost-accent { height: 2px; background: var(--accent); width: 100%; }
+.rr-ghost-body { padding: 14px 18px 16px; display: flex; flex-direction: column; gap: 8px; }
+.rr-ghost-label {
+  font-family: var(--ui); font-size: 7px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--hud-accent); margin-bottom: 2px;
+}
+.rr-ghost-url {
+  font-family: var(--ui); font-size: 10px; letter-spacing: 0.06em;
+  color: var(--hud-ink); font-weight: 700;
+}
+.rr-ghost-desc {
+  font-family: var(--disp); font-weight: 300; font-size: 12px;
+  line-height: 1.5; color: var(--hud-ink-2);
+}
+.rr-ghost-tag {
+  display: inline-block;
+  font-family: var(--ui); font-size: 7px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--hud-accent);
+  border: 1px solid var(--hud-accent); border-radius: 10px;
+  padding: 2px 8px; opacity: 0.7;
+}
+.rr-ghost-cta {
+  font-family: var(--ui); font-size: 8px; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--hud-ink-3);
+  margin-top: 4px;
+}
+
+/* Chapter ghost overlay */
+#rr-ch-ghost {
+  position: fixed;
+  right: 328px;
+  z-index: 9200;
+  width: 220px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.25,1,0.5,1);
+  transform: translateX(6px);
+}
+#rr-ch-ghost.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.rr-ch-ghost-inner {
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.10);
+  backdrop-filter: blur(20px);
+}
+.rr-ch-ghost-num {
+  font-family: var(--disp); font-weight: 900; font-size: 28px;
+  color: transparent; -webkit-text-stroke: 1px var(--hud-ink-3);
+  line-height: 1; margin-bottom: 4px;
+}
+.rr-ch-ghost-title {
+  font-family: var(--disp); font-weight: 700; font-size: 13px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--hud-ink); margin-bottom: 4px;
+}
+.rr-ch-ghost-sub {
+  font-family: var(--ui); font-size: 8px; letter-spacing: 0.10em;
+  color: var(--hud-accent); opacity: 0.8;
+}
+.rr-ch-ghost-jump {
+  font-family: var(--ui); font-size: 7px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--hud-ink-3);
+  margin-top: 8px; border-top: 1px solid var(--hud-border); padding-top: 8px;
+}
+
+/* ── NARRATIVE IFRAME TRIGGER ───────────────────────────────────────────── */
+.narrative-site-trigger {
+  display: none;
+  position: fixed;
+  right: 320px;          /* flush against the left edge of the right rail */
+  bottom: 80px;          /* floats above the nav widget zone */
+  width: 240px;          /* compact — fidget-scale, not full-width */
+  z-index: 8900;
+  transform: translateX(12px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.38s cubic-bezier(0.25,1,0.5,1), opacity 0.35s ease;
+}
+.narrative-site-trigger.nst-visible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.nst-chrome {
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: -6px 6px 32px rgba(0,0,0,0.32), -1px 2px 8px rgba(0,0,0,0.12);
+}
+.nst-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px 7px;
+  border-bottom: 1px solid var(--hud-border);
+  background: var(--hud-bg);
+}
+.nst-bar-left { display: flex; align-items: center; gap: 7px; min-width: 0; overflow: hidden; }
+.nst-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.nst-label {
+  font-family: var(--ui); font-size: 6px; letter-spacing: 0.20em;
+  text-transform: uppercase; color: var(--hud-accent); flex-shrink: 0;
+}
+.nst-url {
+  font-family: var(--ui); font-size: 8px; letter-spacing: 0.04em;
+  color: var(--hud-ink); font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nst-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.nst-btn {
+  font-family: var(--ui); font-size: 6px; letter-spacing: 0.10em;
+  text-transform: uppercase; padding: 3px 7px;
+  border: 1px solid var(--hud-border); border-radius: 3px;
+  background: none; color: var(--hud-ink-2); cursor: pointer;
+  transition: all 0.14s; white-space: nowrap; text-decoration: none; display: inline-flex;
+}
+.nst-btn:hover { border-color: var(--hud-accent); color: var(--hud-accent); }
+.nst-btn.nst-visit { color: var(--hud-accent); border-color: var(--hud-accent); background: var(--accent-l); }
+.nst-btn.nst-visit:hover { background: var(--accent); color: #fff; }
+.nst-btn.nst-dismiss { font-size: 9px; padding: 2px 5px; }
+.nst-frame-shell {
+  position: relative; width: 100%; padding-top: 62.5%; /* ~5:3 for compact view */
+  background: #000; overflow: hidden;
+}
+.nst-frame-shell iframe {
+  position: absolute; top: 0; left: 0;
+  width: 1280px; height: 800px;
+  border: none;
+  pointer-events: auto;   /* ← interactive — user can fidget with site */
+  opacity: 0; transition: opacity 0.5s ease;
+  transform-origin: top left;
+}
+.nst-frame-shell iframe.nst-loaded { opacity: 1; }
+/* No overlay blocking interaction — removed entirely for interactive mode */
+.nst-desc {
+  padding: 8px 10px 10px;
+  font-family: var(--disp); font-weight: 300; font-size: 10px;
+  line-height: 1.45; color: var(--hud-ink-2);
+  border-top: 1px solid var(--hud-border);
+}
+
+/* ── MOBILE: ghost above touchpoint, compact trigger ── */
+@media (max-width: 760px) {
+  /* Narrative trigger: compact sheet from bottom, not full-width */
+  .narrative-site-trigger {
+    right: auto;
+    left: 12px;
+    bottom: 90px;        /* above mobile nav */
+    width: calc(100vw - 24px);
+    max-width: 320px;
+    transform: translateY(12px);
+    border-radius: 8px;
+  }
+  .narrative-site-trigger.nst-visible {
+    transform: translateY(0);
+  }
+  .nst-chrome { border-radius: 8px; }
+
+  /* Site ghost: positioned above the touchpoint, clamped to viewport */
+  #rr-site-ghost {
+    right: auto;
+    left: 12px;
+    /* top set dynamically by JS on mobile — above finger */
+    width: calc(100vw - 24px);
+    max-width: 280px;
+    transform: translateY(-6px);
+  }
+  #rr-site-ghost.visible { transform: translateY(0); }
+
+  /* Chapter ghost: same treatment */
+  #rr-ch-ghost {
+    right: auto;
+    left: 12px;
+    width: calc(100vw - 24px);
+    max-width: 240px;
+    transform: translateY(-6px);
+  }
+  #rr-ch-ghost.visible { transform: translateY(0); }
+}
 
 /* li-theme overrides for panel guide */
 body.li-theme .pg-title { color: #191919; }
@@ -1080,17 +1301,21 @@ body.li-theme .pg-preview-wrap:hover { border-color: #0a66c2; }
   transform: translateX(-50%) scaleY(0.88); transform-origin: top center;
   background: var(--hud-bg); border: 1px solid var(--hud-border);
   border-radius: 10px; backdrop-filter: blur(24px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12); padding: 6px; min-width: 190px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12); padding: 6px; min-width: 260px;
+  max-height: calc(100vh - 160px); overflow-y: auto;
   opacity: 0; transition: opacity .16s ease, transform .16s cubic-bezier(0.34,1.4,0.64,1);
 }
 #chapter-widget.open .cw-dropdown { opacity: 1; pointer-events: auto; transform: translateX(-50%) scaleY(1); }
-.cw-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; cursor: none; transition: background .1s; border: none; background: none; width: 100%; text-align: left; }
+.cw-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 7px; cursor: none; transition: background .1s; border: none; background: none; width: 100%; text-align: left; }
 .cw-item:hover { background: rgba(0,0,0,0.05); }
 .cw-item.active { background: rgba(0,0,0,0.04); }
-.cw-item-num { font-family: var(--ui); font-weight: 700; font-size: 8px; color: var(--hud-accent); min-width: 18px; }
-.cw-item-name { font-family: var(--ui); font-size: 9px; color: var(--hud-ink-2); letter-spacing: 0.06em; text-transform: uppercase; }
+.cw-item-num { font-family: var(--ui); font-weight: 700; font-size: 8px; color: var(--hud-accent); min-width: 18px; flex-shrink: 0; align-self: flex-start; padding-top: 1px; }
+.cw-item-col { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.cw-item-name { font-family: var(--ui); font-size: 9px; color: var(--hud-ink-2); letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2; }
+.cw-item-sub { font-family: var(--ui); font-size: 7px; color: var(--hud-ink-3); letter-spacing: 0.04em; line-height: 1.3; opacity: 0.75; }
 .cw-item.active .cw-item-name { color: var(--hud-ink); font-weight: 700; }
-.cw-item-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--hud-accent); margin-left: auto; opacity: 0; transition: opacity .15s; flex-shrink: 0; }
+.cw-item.active .cw-item-sub { opacity: 1; color: var(--hud-accent); }
+.cw-item-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--hud-accent); margin-left: auto; opacity: 0; transition: opacity .15s; flex-shrink: 0; align-self: center; }
 .cw-item.active .cw-item-dot { opacity: 1; }
 
 /* ── Canvas photo grid overlay ── */
@@ -2691,17 +2916,20 @@ body.dark-ask #ask-interstitial { opacity: 1; pointer-events: auto; }
   <button class="cw-trigger" id="cw-trigger" aria-haspopup="true" aria-expanded="false">
     <span class="cw-trigger-label">Chapter</span>
     <span class="cw-trigger-sep">&middot;</span>
-    <span class="cw-trigger-name" id="cw-current-name">Zack Gort</span>
+    <span class="cw-trigger-name" id="cw-current-name">The Problem We Refuse</span>
     <span class="cw-trigger-arrow">&#9662;</span>
   </button>
   <div class="cw-dropdown" role="menu" id="cw-dropdown">
-    <button class="cw-item active" data-ch="1" role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-name">Introduction</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="2" role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-name">GNC</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="3" role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-name">BNY Mellon</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="4" role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-name">The Work</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="5" role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-name">Who I Am</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="6" role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-name">wolfie.life</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item" data-ch="7" role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-name">Connect</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item active" data-ch="1" role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-col"><span class="cw-item-name">The Problem We Refuse</span><span class="cw-item-sub">Standardisation was mistaken for quality</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="2" role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-col"><span class="cw-item-name">The Sentence as Unit</span><span class="cw-item-sub">The atom of meaning · typed intent</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="3" role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-col"><span class="cw-item-name">Ambient, Not Decorative</span><span class="cw-item-sub">Visual change as meaning, not noise</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="4" role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-col"><span class="cw-item-name">Three Layers, One Node</span><span class="cw-item-sub">Foundation · Art · Data</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="5" role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-col"><span class="cw-item-name">The Author's Contract</span><span class="cw-item-sub">Say only what is worth the space</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="6" role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-col"><span class="cw-item-name">The Reader's Right</span><span class="cw-item-sub">Pace · Context · Escape</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="7" role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-col"><span class="cw-item-name">The Medium is the Argument</span><span class="cw-item-sub">Form chosen because it is correct</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="8" role="menuitem"><span class="cw-item-num">08</span><span class="cw-item-col"><span class="cw-item-name">One Engine, Every Domain</span><span class="cw-item-sub">One system · every vertical</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="9" role="menuitem"><span class="cw-item-num">09</span><span class="cw-item-col"><span class="cw-item-name">Against Templates</span><span class="cw-item-sub">Templates are borrowed voice</span></span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="10" role="menuitem"><span class="cw-item-num">10</span><span class="cw-item-col"><span class="cw-item-name">The Conviction</span><span class="cw-item-sub">wolfie.love · wolfie.life · Made with care</span></span><span class="cw-item-dot"></span></button>
   </div>
 </div>
 
@@ -2883,6 +3111,50 @@ body.dark-ask #ask-interstitial { opacity: 1; pointer-events: auto; }
     <button id="sites-grid-close" onclick="closeSitesGrid()">&#x2715; Close</button>
   </div>
   <div id="sites-grid-tiles"></div>
+</div>
+
+<!-- ── RIGHT RAIL SITE GHOST ── -->
+<div id="rr-site-ghost" aria-hidden="true">
+  <div class="rr-ghost-inner">
+    <div class="rr-ghost-accent"></div>
+    <div class="rr-ghost-body">
+      <div class="rr-ghost-label" id="rrg-label">Platform</div>
+      <div class="rr-ghost-url" id="rrg-url">wolfie.love</div>
+      <div class="rr-ghost-desc" id="rrg-desc">The operating platform for Entro.</div>
+      <div class="rr-ghost-tag" id="rrg-tag">Visit &#8599;</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── RIGHT RAIL CHAPTER GHOST ── -->
+<div id="rr-ch-ghost" aria-hidden="true">
+  <div class="rr-ch-ghost-inner">
+    <div class="rr-ch-ghost-num" id="rrch-num">01</div>
+    <div class="rr-ch-ghost-title" id="rrch-title">Introduction</div>
+    <div class="rr-ch-ghost-sub" id="rrch-sub"></div>
+    <div class="rr-ch-ghost-jump">Click to jump &#8594; this chapter</div>
+  </div>
+</div>
+
+<!-- ── NARRATIVE SITE TRIGGER PANEL ── -->
+<div class="narrative-site-trigger" id="nst-panel" aria-hidden="true">
+  <div class="nst-chrome">
+    <div class="nst-bar">
+      <div class="nst-bar-left">
+        <div class="nst-dot"></div>
+        <span class="nst-label" id="nst-label">Live Site</span>
+        <span class="nst-url" id="nst-url">wolfie.love</span>
+      </div>
+      <div class="nst-actions">
+        <a class="nst-btn nst-visit" id="nst-visit" href="#" target="_blank" rel="noopener">Open &#8599;</a>
+        <button class="nst-btn nst-dismiss" id="nst-dismiss" title="Dismiss">&#x2715;</button>
+      </div>
+    </div>
+    <div class="nst-frame-shell" id="nst-frame-shell">
+      <!-- iframe injected by JS — interactive, pointer-events: auto -->
+    </div>
+    <div class="nst-desc" id="nst-desc"></div>
+  </div>
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -3436,7 +3708,7 @@ function updatePanelService(ch) {
   });
 }
 
-var CH_NAMES = ['', 'Introduction', 'GNC', 'BNY Mellon', 'The Work', 'Who I Am', 'wolfie.life', 'Connect'];
+var CH_NAMES = ['', 'The Problem We Refuse', 'The Sentence as Unit', 'Ambient, Not Decorative', 'Three Layers, One Node', "The Author's Contract", "The Reader's Right", 'The Medium is the Argument', 'One Engine, Every Domain', 'Against Templates', 'The Conviction'];
 var CH_FIRST = {};
 navigable.forEach(function(el, i) {
   var ch = parseInt(el.dataset.ch || 1);
@@ -5975,12 +6247,13 @@ document.addEventListener('keydown', function(e) {
 
   var PANEL_SITES = [
     { url: 'https://wolfie.love',        label: 'wolfie.love',       tag: 'Platform'            },
+    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Dispatch · Data'     },
+    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Real Estate'         },
+    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'Commerce'            },
+    { url: 'https://ifimaybefrank.com',  label: 'ifimaybefrank.com', tag: 'Frank · Manifesto'   },
     { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat',  tag: 'Prompt Craft'        },
     { url: 'https://wolfie.life',        label: 'wolfie.life',       tag: 'Studio'              },
-    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'E-commerce'          },
     { url: 'https://wolfie.love/job',    label: 'wolfie.love/job',   tag: 'Engagement'          },
-    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Professional'        },
-    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Analytics'           },
     { url: 'https://intoview.pro/home',  label: 'intoview.pro',      tag: 'Creative Sandbox'    },
     { url: 'https://emdash.click',       label: 'emdash.click',      tag: 'Writing Tool'        },
   ];
@@ -5997,6 +6270,7 @@ document.addEventListener('keydown', function(e) {
     CHAPTERS.forEach(function(ch, i) {
       var btn = document.createElement('button');
       btn.className = 'pg-ch-item' + (i === 0 ? ' active' : '');
+      btn.title = 'Jump to: ' + ch.title;
       btn.innerHTML =
         '<span class="pg-ch-num">' + ch.num + '</span>' +
         '<span class="pg-ch-name">' + ch.title + '</span>';
@@ -6005,7 +6279,12 @@ document.addEventListener('keydown', function(e) {
         var target = document.querySelector('[data-ch="' + ch.ch + '"]');
         if (target) {
           var idx = parseInt(target.dataset.idx);
-          if (!isNaN(idx) && typeof goTo === 'function') goTo(idx);
+          // Try to find the first NAVIGABLE sentence for this chapter via CH_FIRST
+          if (typeof CH_FIRST !== 'undefined' && CH_FIRST[ch.ch] !== undefined) {
+            goTo(CH_FIRST[ch.ch]);
+          } else if (!isNaN(idx) && typeof goTo === 'function') {
+            goTo(idx);
+          }
         }
         setActiveChapter(i);
       });
@@ -6092,9 +6371,9 @@ document.addEventListener('keydown', function(e) {
       var frame = document.createElement('iframe');
       frame.src = site.url;
       frame.setAttribute('loading', 'lazy');
-      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation');
+      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals');
       frame.setAttribute('referrerpolicy', 'no-referrer');
-      frame.style.pointerEvents = 'none'; // overlay handles clicks
+      frame.style.pointerEvents = 'auto'; // interactive
       frame.onload = function() {
         frame.classList.add('pg-iframe-loaded');
         scaleFrame(frame, shell);
@@ -6145,6 +6424,419 @@ document.addEventListener('keydown', function(e) {
         _orig.call(this, n, opts);
         setTimeout(syncChapterFromCurrent, 40);
       };
+    }
+  });
+
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── RIGHT RAIL GHOST OVERLAYS ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+(function initRightRailGhosts() {
+
+  // ── SITE DATA — enriched descriptions for Entro context ──
+  var SITE_META = {
+    'https://wolfie.love': {
+      label: 'Platform',
+      url:   'wolfie.love',
+      tag:   'Core Hub',
+      desc:  'The master platform — the unified face of Entro\'s ecosystem. Every vertical anchors here.',
+    },
+    'https://wolfie.love/dash': {
+      label: 'Dispatch · Analytics',
+      url:   'wolfie.love/dash',
+      tag:   'Data Intelligence',
+      desc:  'Dispatch: Entro\'s analytical nerve center. Unique, precise data that syncs perfectly with operations — insight no dashboard can replicate.',
+    },
+    'https://wolfie.love/real': {
+      label: 'Real Estate',
+      url:   'wolfie.love/real',
+      tag:   'Property Vertical',
+      desc:  'Entro\'s professional real estate arm — connecting the platform to property, hospitality, and place.',
+    },
+    'https://wolfie.love/shop': {
+      label: 'Commerce',
+      url:   'wolfie.love/shop',
+      tag:   'E-Commerce',
+      desc:  'The commerce layer — products, merch, and direct revenue flowing through the same engine.',
+    },
+    'https://ifimaybefrank.com': {
+      label: 'If I May Be Frank',
+      url:   'ifimaybefrank.com',
+      tag:   'Manifesto',
+      desc:  'One sentence, honestly stated. The conviction behind everything Entro builds — Frank\'s founding manifesto.',
+    },
+    'https://wolfie.love/claude': {
+      label: 'Chat Interface',
+      url:   'wolfie.love/chat',
+      tag:   'Prompt Craft',
+      desc:  'AI-native interface — conversational intelligence baked into the platform layer.',
+    },
+    'https://wolfie.life': {
+      label: 'Studio',
+      url:   'wolfie.life',
+      tag:   'Creative Studio',
+      desc:  'The creative and production studio operating within the wolfie ecosystem.',
+    },
+    'https://wolfie.love/job': {
+      label: 'Engagement',
+      url:   'wolfie.love/job',
+      tag:   'Talent & Work',
+      desc:  'Opportunities and engagement — how people connect with and work inside the platform.',
+    },
+    'https://intoview.pro/home': {
+      label: 'Intoview',
+      url:   'intoview.pro',
+      tag:   'Creative Sandbox',
+      desc:  'An experimental environment for pitch, preview, and presentation.',
+    },
+    'https://emdash.click': {
+      label: 'Em Dash',
+      url:   'emdash.click',
+      tag:   'Writing Tool',
+      desc:  'A focused writing tool — precision for the sentence-first methodology.',
+    },
+  };
+
+  var siteGhost  = document.getElementById('rr-site-ghost');
+  var chGhost    = document.getElementById('rr-ch-ghost');
+  var siteTimer  = null;
+  var chTimer    = null;
+
+  function isMob() { return window.innerWidth <= 760; }
+
+  // ── Position ghost — desktop: vertically centered on source; mobile: above touchpoint ──
+  function positionGhost(ghost, sourceEl, touchY) {
+    if (!sourceEl && touchY === undefined) return;
+    var gh = ghost.offsetHeight || 120;
+    if (isMob()) {
+      // On mobile: place above the touch Y, clamped so top stays in viewport
+      var refY = touchY !== undefined ? touchY : (sourceEl ? sourceEl.getBoundingClientRect().top : window.innerHeight * 0.6);
+      var top = refY - gh - 16; // 16px clearance above finger
+      top = Math.max(8, Math.min(top, window.innerHeight - gh - 8));
+      ghost.style.top = top + 'px';
+    } else {
+      // Desktop: anchor to upper third of viewport, nudged toward the source element
+      var rect = sourceEl ? sourceEl.getBoundingClientRect() : null;
+      var anchor = rect ? rect.top + rect.height / 2 : window.innerHeight * 0.35;
+      // Bias toward upper portion — weight 60% toward upper-third, 40% toward source
+      var upperThird = window.innerHeight * 0.28;
+      var top = upperThird * 0.55 + anchor * 0.45 - gh / 2;
+      top = Math.max(68, Math.min(top, window.innerHeight * 0.55 - gh / 2));
+      ghost.style.top = top + 'px';
+    }
+  }
+
+  // ── Site ghost ──
+  function showSiteGhost(tab, url) {
+    showSiteGhostAt(tab, url, undefined);
+  }
+  function showSiteGhostAt(tab, url, touchY) {
+    if (!siteGhost) return;
+    clearTimeout(siteTimer);
+    var meta = SITE_META[url] || { label: 'Site', url: url, tag: 'Visit', desc: '' };
+    document.getElementById('rrg-label').textContent = meta.label;
+    document.getElementById('rrg-url').textContent   = meta.url;
+    document.getElementById('rrg-desc').textContent  = meta.desc;
+    document.getElementById('rrg-tag').textContent   = meta.tag + ' ↗';
+    positionGhost(siteGhost, tab, touchY);
+    siteGhost.classList.add('visible');
+    siteGhost.setAttribute('aria-hidden', 'false');
+  }
+  function hideSiteGhost(delay) {
+    siteTimer = setTimeout(function() {
+      if (!siteGhost) return;
+      siteGhost.classList.remove('visible');
+      siteGhost.setAttribute('aria-hidden', 'true');
+    }, delay || 120);
+  }
+
+  // ── Chapter ghost ──
+  function showChGhost(btn, chData) {
+    showChGhostAt(btn, chData, undefined);
+  }
+  function showChGhostAt(btn, chData, touchY) {
+    if (!chGhost) return;
+    clearTimeout(chTimer);
+    document.getElementById('rrch-num').textContent   = chData.num;
+    document.getElementById('rrch-title').textContent = chData.title;
+    document.getElementById('rrch-sub').textContent   = chData.sub || '';
+    positionGhost(chGhost, btn, touchY);
+    chGhost.classList.add('visible');
+    chGhost.setAttribute('aria-hidden', 'false');
+  }
+  function hideChGhost(delay) {
+    chTimer = setTimeout(function() {
+      if (!chGhost) return;
+      chGhost.classList.remove('visible');
+      chGhost.setAttribute('aria-hidden', 'true');
+    }, delay || 120);
+  }
+
+  // ── Wire site tab hover ghosts ──
+  function wireSiteTabGhosts() {
+    var PANEL_SITES = [
+      { url: 'https://wolfie.love',        label: 'wolfie.love'      },
+      { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat' },
+      { url: 'https://wolfie.life',        label: 'wolfie.life'      },
+      { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop' },
+      { url: 'https://wolfie.love/job',    label: 'wolfie.love/job'  },
+      { url: 'https://wolfie.love/real',   label: 'wolfie.love/real' },
+      { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash' },
+      { url: 'https://intoview.pro/home',  label: 'intoview.pro'     },
+      { url: 'https://emdash.click',       label: 'emdash.click'     },
+    ];
+    var tabsEl = document.getElementById('pg-site-tabs');
+    if (!tabsEl) return;
+    var observer = new MutationObserver(function() {
+      tabsEl.querySelectorAll('.pg-tab').forEach(function(tab, i) {
+        if (tab._ghostWired) return;
+        tab._ghostWired = true;
+        var site = PANEL_SITES[i];
+        if (!site) return;
+        tab.addEventListener('mouseenter', function() { showSiteGhost(tab, site.url); });
+        tab.addEventListener('mouseleave', function() { hideSiteGhost(120); });
+        tab.addEventListener('touchstart', function(e) {
+          var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+          showSiteGhostAt(tab, site.url, ty);
+        }, { passive: true });
+        tab.addEventListener('touchend', function() { hideSiteGhost(2400); });
+      });
+    });
+    observer.observe(tabsEl, { childList: true });
+    // Also wire immediately if tabs already built
+    tabsEl.querySelectorAll('.pg-tab').forEach(function(tab, i) {
+      if (tab._ghostWired) return;
+      tab._ghostWired = true;
+      var site = PANEL_SITES[i];
+      if (!site) return;
+      tab.addEventListener('mouseenter', function() { showSiteGhost(tab, site.url); });
+      tab.addEventListener('mouseleave', function() { hideSiteGhost(120); });
+      tab.addEventListener('touchstart', function(e) {
+        var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+        showSiteGhostAt(tab, site.url, ty);
+      }, { passive: true });
+      tab.addEventListener('touchend', function() { hideSiteGhost(2400); });
+    });
+    // Keep ghost open when hovering it
+    if (siteGhost) {
+      siteGhost.addEventListener('mouseenter', function() { clearTimeout(siteTimer); });
+      siteGhost.addEventListener('mouseleave', function() { hideSiteGhost(120); });
+    }
+  }
+
+  // ── Wire chapter list hover ghosts ──
+  function wireChapterGhosts() {
+    var listEl = document.getElementById('pg-chapter-list');
+    if (!listEl || typeof CHAPTERS === 'undefined') return;
+    var observer = new MutationObserver(function() {
+      listEl.querySelectorAll('.pg-ch-item').forEach(function(btn, i) {
+        if (btn._chGhostWired) return;
+        btn._chGhostWired = true;
+        var ch = CHAPTERS[i];
+        if (!ch) return;
+        btn.addEventListener('mouseenter', function() { showChGhost(btn, ch); });
+        btn.addEventListener('mouseleave', function() { hideChGhost(120); });
+        btn.addEventListener('touchstart', function(e) {
+          var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+          showChGhostAt(btn, ch, ty);
+        }, { passive: true });
+        btn.addEventListener('touchend', function() { hideChGhost(2400); });
+      });
+    });
+    observer.observe(listEl, { childList: true });
+    // Wire immediately
+    listEl.querySelectorAll('.pg-ch-item').forEach(function(btn, i) {
+      if (btn._chGhostWired) return;
+      btn._chGhostWired = true;
+      var ch = CHAPTERS[i];
+      if (!ch) return;
+      btn.addEventListener('mouseenter', function() { showChGhost(btn, ch); });
+      btn.addEventListener('mouseleave', function() { hideChGhost(120); });
+      btn.addEventListener('touchstart', function(e) {
+        var ty = e.touches[0] ? e.touches[0].clientY : undefined;
+        showChGhostAt(btn, ch, ty);
+      }, { passive: true });
+      btn.addEventListener('touchend', function() { hideChGhost(2400); });
+    });
+    if (chGhost) {
+      chGhost.addEventListener('mouseenter', function() { clearTimeout(chTimer); });
+      chGhost.addEventListener('mouseleave', function() { hideChGhost(120); });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    wireSiteTabGhosts();
+    wireChapterGhosts();
+    // Re-wire after a beat to catch dynamically built lists
+    setTimeout(function() {
+      wireSiteTabGhosts();
+      wireChapterGhosts();
+    }, 800);
+  });
+  // Fallback if DOMContentLoaded already fired
+  setTimeout(function() {
+    wireSiteTabGhosts();
+    wireChapterGhosts();
+  }, 400);
+
+})();
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── NARRATIVE IFRAME TRIGGERS ─────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+(function initNarrativeTriggers() {
+
+  // ── Map: chapter number → site to feature when that chapter activates ──
+  // Triggers fire when the reader lands on the FIRST sentence of these chapters.
+  var CHAPTER_TRIGGERS = {
+    1:  { url: 'https://wolfie.love',       label: 'Platform',        urlDisplay: 'wolfie.love',       desc: 'The platform unifying every vertical — the face of Entro\'s complete ecosystem.' },
+    3:  { url: 'https://wolfie.love/dash',  label: 'Dispatch · Data', urlDisplay: 'wolfie.love/dash',  desc: 'Dispatch is Entro\'s analytical arm — delivering unique, precise insight that syncs perfectly with all operations.' },
+    5:  { url: 'https://ifimaybefrank.com', label: 'Frank\'s Manifesto', urlDisplay: 'ifimaybefrank.com', desc: 'One sentence, honestly stated. The conviction at the foundation of everything Entro builds.' },
+    7:  { url: 'https://wolfie.love/real',  label: 'Real Estate',     urlDisplay: 'wolfie.love/real',  desc: 'The professional property arm — connecting Entro\'s platform to hospitality, real estate, and place.' },
+    9:  { url: 'https://wolfie.love/shop',  label: 'Commerce',        urlDisplay: 'wolfie.love/shop',  desc: 'E-commerce flowing through the same engine — products and direct revenue unified with the platform.' },
+    10: { url: 'https://wolfie.love',       label: 'Conviction',      urlDisplay: 'wolfie.love',       desc: 'The complete platform. Every sentence in this manifesto leads here.' },
+  };
+
+  var nstPanel    = document.getElementById('nst-panel');
+  var nstLabel    = document.getElementById('nst-label');
+  var nstUrl      = document.getElementById('nst-url');
+  var nstVisit    = document.getElementById('nst-visit');
+  var nstDesc     = document.getElementById('nst-desc');
+  var nstShell    = document.getElementById('nst-frame-shell');
+  var nstDismiss  = document.getElementById('nst-dismiss');
+  if (!nstPanel) return;
+
+  var iframeCache  = {};
+  var currentUrl   = null;
+  var triggerTimer = null;
+  var dismissedChs = new Set(); // chapters the user has dismissed — don't re-show
+  var lastShownCh  = null;
+
+  function scaleNstFrame(frame) {
+    if (!nstShell) return;
+    var w = nstShell.offsetWidth  || 240;
+    var h = nstShell.offsetHeight || 150;
+    var s = Math.min(w / 1280, h / 800);
+    frame.style.transform       = 'scale(' + s + ')';
+    frame.style.transformOrigin = 'top left';
+    frame.style.width           = '1280px';
+    frame.style.height          = '800px';
+  }
+
+  function loadNstFrame(url) {
+    // Hide all cached frames
+    Object.values(iframeCache).forEach(function(f) { f.style.display = 'none'; });
+    if (iframeCache[url]) {
+      iframeCache[url].style.display = 'block';
+      scaleNstFrame(iframeCache[url]);
+    } else {
+      var frame = document.createElement('iframe');
+      frame.src = url;
+      frame.setAttribute('loading', 'lazy');
+      frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals');
+      frame.setAttribute('referrerpolicy', 'no-referrer');
+      frame.style.pointerEvents = 'auto';
+      frame.onload = function() {
+        frame.classList.add('nst-loaded');
+        scaleNstFrame(frame);
+      };
+      // Insert before overlay
+      nstShell.appendChild(frame);
+      iframeCache[url] = frame;
+      scaleNstFrame(frame);
+    }
+  }
+
+  function showNst(ch, trigger) {
+    if (dismissedChs.has(ch)) return;
+    if (lastShownCh === ch) return;
+    lastShownCh = ch;
+    currentUrl  = trigger.url;
+
+    nstLabel.textContent = trigger.label;
+    nstUrl.textContent   = trigger.urlDisplay;
+    nstVisit.href        = trigger.url;
+    nstDesc.textContent  = trigger.desc;
+
+    loadNstFrame(trigger.url);
+
+    nstPanel.style.display = 'block';
+    nstPanel.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        nstPanel.classList.add('nst-visible');
+      });
+    });
+
+    // Auto-dismiss after 12 seconds
+    clearTimeout(triggerTimer);
+    triggerTimer = setTimeout(function() { hideNst(false); }, 12000);
+  }
+
+  function hideNst(dismissed) {
+    clearTimeout(triggerTimer);
+    nstPanel.classList.remove('nst-visible');
+    if (dismissed && lastShownCh !== null) dismissedChs.add(lastShownCh);
+    setTimeout(function() {
+      nstPanel.style.display = 'none';
+      nstPanel.setAttribute('aria-hidden', 'true');
+    }, 420);
+  }
+
+  // Dismiss button
+  nstDismiss.addEventListener('click', function() { hideNst(true); });
+
+  // Re-scale on resize
+  window.addEventListener('resize', function() {
+    Object.values(iframeCache).forEach(function(f) {
+      if (f.style.display !== 'none') scaleNstFrame(f);
+    });
+  });
+
+  // ── Hook into goTo to fire triggers ──
+  var _triggerGoTo = window.goTo;
+  var lastTriggerCh = null;
+
+  function checkTrigger(n) {
+    if (typeof navigable === 'undefined') return;
+    var el = navigable[n];
+    if (!el) return;
+    var ch = parseInt(el.dataset.ch) || 1;
+    if (ch === lastTriggerCh) return; // only on chapter change
+    lastTriggerCh = ch;
+    var trigger = CHAPTER_TRIGGERS[ch];
+    if (trigger) {
+      // Small delay so the chapter palette shift settles first
+      clearTimeout(triggerTimer);
+      triggerTimer = setTimeout(function() { showNst(ch, trigger); }, 900);
+    } else {
+      hideNst(false);
+    }
+  }
+
+  // Wrap goTo immediately (it may be called before DOMContentLoaded)
+  var _origGoToForTrigger = window.goTo;
+  if (_origGoToForTrigger) {
+    window.goTo = function(n, opts) {
+      _origGoToForTrigger.call(this, n, opts);
+      setTimeout(function() { checkTrigger(n); }, 80);
+    };
+  }
+
+  // Also re-wrap after DOMContentLoaded in case narrative is re-rendered
+  document.addEventListener('DOMContentLoaded', function() {
+    var g = window.goTo;
+    window.goTo = function(n, opts) {
+      g.call(this, n, opts);
+      setTimeout(function() { checkTrigger(n); }, 80);
+    };
+  });
+
+  // Escape key dismisses
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && nstPanel.classList.contains('nst-visible')) {
+      hideNst(true);
     }
   });
 
