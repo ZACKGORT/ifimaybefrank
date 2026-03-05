@@ -2691,20 +2691,17 @@ body.dark-ask #ask-interstitial { opacity: 1; pointer-events: auto; }
   <button class="cw-trigger" id="cw-trigger" aria-haspopup="true" aria-expanded="false">
     <span class="cw-trigger-label">Chapter</span>
     <span class="cw-trigger-sep">&middot;</span>
-    <span class="cw-trigger-name" id="cw-current-name">The Problem</span>
+    <span class="cw-trigger-name" id="cw-current-name">Zack Gort</span>
     <span class="cw-trigger-arrow">&#9662;</span>
   </button>
   <div class="cw-dropdown" role="menu" id="cw-dropdown">
-    <button class="cw-item active" data-ch="1"  role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-name">The Problem We Refuse</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="2"  role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-name">The Sentence as Unit</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="3"  role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-name">Ambient, Not Decorative</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="4"  role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-name">Three Layers, One Node</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="5"  role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-name">The Author's Contract</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="6"  role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-name">The Reader's Right</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="7"  role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-name">The Medium is the Argument</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="8"  role="menuitem"><span class="cw-item-num">08</span><span class="cw-item-name">One Engine, Every Domain</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="9"  role="menuitem"><span class="cw-item-num">09</span><span class="cw-item-name">Against Templates</span><span class="cw-item-dot"></span></button>
-    <button class="cw-item"        data-ch="10" role="menuitem"><span class="cw-item-num">10</span><span class="cw-item-name">The Conviction</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item active" data-ch="1" role="menuitem"><span class="cw-item-num">01</span><span class="cw-item-name">Introduction</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="2" role="menuitem"><span class="cw-item-num">02</span><span class="cw-item-name">GNC</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="3" role="menuitem"><span class="cw-item-num">03</span><span class="cw-item-name">BNY Mellon</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="4" role="menuitem"><span class="cw-item-num">04</span><span class="cw-item-name">The Work</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="5" role="menuitem"><span class="cw-item-num">05</span><span class="cw-item-name">Who I Am</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="6" role="menuitem"><span class="cw-item-num">06</span><span class="cw-item-name">wolfie.life</span><span class="cw-item-dot"></span></button>
+    <button class="cw-item" data-ch="7" role="menuitem"><span class="cw-item-num">07</span><span class="cw-item-name">Connect</span><span class="cw-item-dot"></span></button>
   </div>
 </div>
 
@@ -3434,11 +3431,12 @@ function scheduleAutoFlow(n) {
 }
 
 function updatePanelService(ch) {
-  // Sync the chapter guide panel active state
-  if (window._pgSyncChapter) window._pgSyncChapter(ch);
+  document.querySelectorAll('.service-row').forEach(function(row) {
+    row.classList.toggle('current', parseInt(row.dataset.service) === ch);
+  });
 }
 
-var CH_NAMES = ['', 'The Problem', 'The Sentence', 'Ambient', 'Three Layers', 'Author\'s Contract', 'Reader\'s Right', 'The Medium', 'One Engine', 'Templates', 'The Conviction'];
+var CH_NAMES = ['', 'Introduction', 'GNC', 'BNY Mellon', 'The Work', 'Who I Am', 'wolfie.life', 'Connect'];
 var CH_FIRST = {};
 navigable.forEach(function(el, i) {
   var ch = parseInt(el.dataset.ch || 1);
@@ -4482,6 +4480,7 @@ const narrative = `
 img:17
 [label] Wolfgang &amp; Co &middot; wolfie.love &middot; Manifesto
 img:18
+@@darkchapter
 [poster] The sentence is the **interface.**
 img:15
 [body] Somewhere in the last fifteen years, the web made a deal it shouldn&rsquo;t have. It traded strangeness for scalability. Personality for performance. Voice for velocity.
@@ -4502,6 +4501,7 @@ img:18
 img:4
 [label] The Sentence &middot; Atom of Meaning
 img:4
+@@darkchapter
 [poster] The sentence is the **atom.**
 img:5
 [body] Every content system &mdash; every CMS, every page builder, every design tool &mdash; operates on the same implicit assumption: the page is the unit. You fill the page. You scroll through the page. You leave the page.
@@ -4524,6 +4524,7 @@ img:6
 img:16
 [label] Ambient Design &middot; Environment as Meaning
 img:0
+@@darkchapter
 [poster] This is not a **theme.** It is a room.
 img:16
 [body] Most interfaces use visual change as decoration. An animation plays. A colour shifts. A transition fires. These changes say nothing &mdash; they are visual noise in the costume of polish.
@@ -4542,6 +4543,7 @@ img:2
 img:103
 [label] Architecture &middot; Foundation &middot; Art &middot; Data
 img:104
+@@darkchapter
 [poster] Three layers. **One** sentence.
 img:7
 [body] Every sentence in this system is simultaneously three things. Not sequentially &mdash; not foundation first, then art, then data. All three, at once, composited on the same atom of content.
@@ -4564,6 +4566,7 @@ img:102
 img:89
 [label] Authorship &middot; The Discipline of the Form
 img:84
+@@darkchapter
 [poster] Say only what is **worth the space.**
 img:85
 [body] When you write for this system, you accept a constraint: your content will be read in sequence. Not scanned. Not jumped through. Not scrolled past in three seconds. *Read.*
@@ -4607,6 +4610,7 @@ img:18
 img:13
 [label] Origin &middot; Form &middot; Content &middot; Proof
 img:17
+@@darkchapter
 [poster] wolfie.love began as a **memorial.**
 img:18
 [body] A dog died. His person needed to write about it. The obvious choice was a blog post, or a Medium article, or a quiet Instagram caption. Instead, the person built an interface.
@@ -4647,6 +4651,7 @@ img:17
 img:13
 [label] Templates &middot; Voice &middot; Borrowed vs. Found
 img:17
+@@darkchapter
 [poster] Templates are **borrowed voice.**
 img:18
 [body] A template is a bet that your content is interchangeable with someone else&rsquo;s. Sometimes that bet is correct &mdash; a terms of service page, a checkout flow, an error state. These things are best served by convention.
@@ -4666,6 +4671,7 @@ img:18
 img:17
 [label] Wolfgang &amp; Co &middot; The Conviction &middot; wolfie.love
 img:18
+@@darkchapter
 [poster] Form is always already **argument.**
 img:19
 [body] We believe the web is a reading medium that has mostly forgotten how to ask to be read. Asking for a reader&rsquo;s full attention &mdash; one sentence at a time, in sequence &mdash; is not a limitation. It is a form of respect.
@@ -5968,52 +5974,70 @@ document.addEventListener('keydown', function(e) {
 (function initChapterGuidePanel() {
 
   var PANEL_SITES = [
-    { url: 'https://wolfie.love',        label: 'wolfie.love',       tag: 'Platform'         },
-    { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat',  tag: 'Prompt Craft'     },
-    { url: 'https://wolfie.life',        label: 'wolfie.life',       tag: 'Studio'           },
-    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'E-commerce'       },
-    { url: 'https://wolfie.love/job',    label: 'wolfie.love/job',   tag: 'Engagement'       },
-    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Professional'     },
-    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Analytics'        },
-    { url: 'https://intoview.pro/home',  label: 'intoview.pro',      tag: 'Creative Sandbox' },
-    { url: 'https://emdash.click',       label: 'emdash.click',      tag: 'Writing Tool'     },
+    { url: 'https://wolfie.love',        label: 'wolfie.love',       tag: 'Platform'            },
+    { url: 'https://wolfie.love/claude', label: 'wolfie.love/chat',  tag: 'Prompt Craft'        },
+    { url: 'https://wolfie.life',        label: 'wolfie.life',       tag: 'Studio'              },
+    { url: 'https://wolfie.love/shop',   label: 'wolfie.love/shop',  tag: 'E-commerce'          },
+    { url: 'https://wolfie.love/job',    label: 'wolfie.love/job',   tag: 'Engagement'          },
+    { url: 'https://wolfie.love/real',   label: 'wolfie.love/real',  tag: 'Professional'        },
+    { url: 'https://wolfie.love/dash',   label: 'wolfie.love/dash',  tag: 'Analytics'           },
+    { url: 'https://intoview.pro/home',  label: 'intoview.pro',      tag: 'Creative Sandbox'    },
+    { url: 'https://emdash.click',       label: 'emdash.click',      tag: 'Writing Tool'        },
   ];
 
   var activeSiteIdx = 0;
-  var iframeCache = {};
-
-  // ── Expose sync hook — called directly by updatePanelService(ch) ──
-  window._pgSyncChapter = function(ch) {
-    var list = document.getElementById('pg-chapter-list');
-    if (!list) return;
-    var items = list.querySelectorAll('.pg-ch-item');
-    items.forEach(function(el) {
-      el.classList.toggle('active', parseInt(el.dataset.ch) === ch);
-      if (parseInt(el.dataset.ch) === ch) {
-        // Scroll the active item into view within the panel
-        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      }
-    });
-  };
+  var iframeCache = {}; // url -> iframe element
+  var activeChIdx = 0;
 
   // ── Build chapter list ──
   function buildChapterList() {
     var list = document.getElementById('pg-chapter-list');
     if (!list || typeof CHAPTERS === 'undefined') return;
     list.innerHTML = '';
-    CHAPTERS.forEach(function(ch) {
+    CHAPTERS.forEach(function(ch, i) {
       var btn = document.createElement('button');
-      btn.className = 'pg-ch-item' + (ch.ch === 1 ? ' active' : '');
-      btn.dataset.ch = ch.ch;
+      btn.className = 'pg-ch-item' + (i === 0 ? ' active' : '');
       btn.innerHTML =
         '<span class="pg-ch-num">' + ch.num + '</span>' +
         '<span class="pg-ch-name">' + ch.title + '</span>';
       btn.addEventListener('click', function() {
-        var target = CH_FIRST[ch.ch];
-        if (target !== undefined && typeof goTo === 'function') goTo(target);
+        // Navigate to first sentence of this chapter
+        var target = document.querySelector('[data-ch="' + ch.ch + '"]');
+        if (target) {
+          var idx = parseInt(target.dataset.idx);
+          if (!isNaN(idx) && typeof goTo === 'function') goTo(idx);
+        }
+        setActiveChapter(i);
       });
       list.appendChild(btn);
     });
+  }
+
+  function setActiveChapter(idx) {
+    activeChIdx = idx;
+    var items = document.querySelectorAll('.pg-ch-item');
+    items.forEach(function(el, i) { el.classList.toggle('active', i === idx); });
+  }
+
+  // Hook into goTo to sync active chapter
+  document.addEventListener('DOMContentLoaded', function() {
+    var _origGoTo = window.goTo;
+    if (_origGoTo) {
+      window.goTo = function(n, opts) {
+        _origGoTo.call(this, n, opts);
+        syncChapterFromCurrent();
+      };
+    }
+  });
+
+  function syncChapterFromCurrent() {
+    if (typeof navigable === 'undefined' || typeof current === 'undefined') return;
+    var el = navigable[current];
+    if (!el) return;
+    var ch = parseInt(el.dataset.ch) || 1;
+    if (typeof CHAPTERS === 'undefined') return;
+    var idx = CHAPTERS.findIndex(function(c) { return c.ch === ch; });
+    if (idx >= 0 && idx !== activeChIdx) setActiveChapter(idx);
   }
 
   // ── Build site tabs ──
@@ -6034,17 +6058,7 @@ document.addEventListener('keydown', function(e) {
     });
   }
 
-  // ── Scale iframe to fit shell ──
-  function scaleFrame(frame, shell) {
-    if (!shell || !frame) return;
-    var w = shell.offsetWidth  || 276;
-    var h = shell.offsetHeight || 172;
-    var s = Math.min(w / 1280, h / 800);
-    frame.style.transform = 'scale(' + s + ')';
-    frame.style.transformOrigin = 'top left';
-  }
-
-  // ── Load/show iframe preview ──
+  // ── Load iframe preview ──
   function loadSitePreview(idx) {
     activeSiteIdx = idx;
     var site = PANEL_SITES[idx];
@@ -6065,54 +6079,74 @@ document.addEventListener('keydown', function(e) {
     if (visitLink) visitLink.href = site.url;
     if (visitUrl)  visitUrl.textContent = site.label;
 
-    // Overlay click → open site
-    var overlay = document.getElementById('pg-preview-overlay');
-    if (overlay) {
-      overlay.onclick = function() { window.open(site.url, '_blank', 'noopener'); };
-      overlay.style.cursor = 'pointer';
-    }
-
-    // Iframe: cache to avoid reloads, pointer-events none (overlay handles all clicks)
+    // Swap iframe — cache them so no re-load
     var shell = document.getElementById('pg-preview-frame-shell');
     if (!shell) return;
 
+    // Hide all cached iframes
     Object.values(iframeCache).forEach(function(f) { f.style.display = 'none'; });
 
     if (iframeCache[site.url]) {
       iframeCache[site.url].style.display = 'block';
-      scaleFrame(iframeCache[site.url], shell);
     } else {
       var frame = document.createElement('iframe');
       frame.src = site.url;
       frame.setAttribute('loading', 'lazy');
-      // allow interaction but overlay captures all clicks → redirects to site
       frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation');
-      frame.style.cssText = 'position:absolute;top:0;left:0;width:1280px;height:800px;border:none;pointer-events:none;opacity:0;transition:opacity 0.4s ease;';
+      frame.setAttribute('referrerpolicy', 'no-referrer');
+      frame.style.pointerEvents = 'none'; // overlay handles clicks
       frame.onload = function() {
-        frame.style.opacity = '1';
+        frame.classList.add('pg-iframe-loaded');
         scaleFrame(frame, shell);
       };
       shell.appendChild(frame);
       iframeCache[site.url] = frame;
       scaleFrame(frame, shell);
     }
+
+    // Click anywhere on the preview opens the site
+    var overlay = document.getElementById('pg-preview-overlay');
+    if (overlay) {
+      overlay.onclick = function() { window.open(site.url, '_blank', 'noopener'); };
+      overlay.style.cursor = 'pointer';
+    }
+  }
+
+  function scaleFrame(frame, shell) {
+    if (!shell) return;
+    var w = shell.offsetWidth || 276;
+    var h = shell.offsetHeight || 172;
+    var sx = w / 1280;
+    var sy = h / 800;
+    var s = Math.min(sx, sy);
+    frame.style.transform = 'scale(' + s + ')';
+    frame.style.transformOrigin = 'top left';
+    frame.style.width  = '1280px';
+    frame.style.height = '800px';
   }
 
   // Re-scale on resize
   window.addEventListener('resize', function() {
     var shell = document.getElementById('pg-preview-frame-shell');
     if (!shell) return;
-    Object.values(iframeCache).forEach(function(f) {
-      if (f.style.display !== 'none') scaleFrame(f, shell);
-    });
+    Object.values(iframeCache).forEach(function(f) { scaleFrame(f, shell); });
   });
 
-  // ── Init on DOM ready ──
-  buildChapterList();
-  buildSiteTabs();
-  loadSitePreview(0);
-  // Sync initial chapter state
-  window._pgSyncChapter(1);
+  // ── Init ──
+  document.addEventListener('DOMContentLoaded', function() {
+    buildChapterList();
+    buildSiteTabs();
+    loadSitePreview(0);
+
+    // Sync chapter on scroll/navigate
+    var _orig = window.goTo;
+    if (_orig) {
+      window.goTo = function(n, opts) {
+        _orig.call(this, n, opts);
+        setTimeout(syncChapterFromCurrent, 40);
+      };
+    }
+  });
 
 })();
 
