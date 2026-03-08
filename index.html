@@ -1184,64 +1184,80 @@ header:hover #header-overlay { opacity: 1; pointer-events: auto; transform: tran
   min-height: calc(100vh - 52px); position: relative;
 }
 
-/* sentences */
+/* sentences — typographic treatment matched to the manifesto */
 .sentence {
   display: block; position: relative;
   padding: 5px 0;
   transition: opacity 0.4s ease, color 0.4s ease;
   opacity: 0.08;
 }
+/* POSTER — manifesto headline treatment: Bebas Neue / Barlow Condensed, cinematic scale */
 .sentence.poster {
-  font-family: var(--disp); font-weight: 900;
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-weight: 900;
   font-size: clamp(52px,7.5vw,100px);
-  line-height: 0.88; letter-spacing: -0.03em; text-transform: uppercase; padding: 4px 0;
-  max-width: 560px;
+  line-height: 0.88; letter-spacing: 0.005em; text-transform: uppercase; padding: 4px 0;
+  max-width: 580px;
 }
 .sentence.poster .ac { color: var(--accent); }
-.sentence.poster .dim { color: var(--ink-2); font-weight: 300; font-style: italic; }
+/* dim in poster = manifesto's .mf-hero-headline em — italic serif accent */
+.sentence.poster .dim {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-style: italic; font-weight: 400; color: var(--ink-2);
+}
+/* BODY — manifesto .mf-txt-body treatment: Barlow sans, comfortable reading */
 .sentence.body {
-  font-family: var(--disp); font-weight: 300;
-  font-size: clamp(17px,2.2vw,24px); line-height: 1.45;
-  letter-spacing: 0.005em; color: var(--ink-2); max-width: 560px;
-}font-weight: 300; font-style: italic; }
-.sentence.body {
-  font-family: var(--disp); font-weight: 300;
-  font-size: clamp(17px,2.2vw,24px); line-height: 1.45;
+  font-family: 'Barlow', system-ui, sans-serif; font-weight: 400;
+  font-size: clamp(13px,1.1vw,16px); line-height: 1.8;
   letter-spacing: 0.005em; color: var(--ink-2); max-width: 560px;
 }
-.sentence.body .em { font-style: italic; font-weight: 700; color: var(--ink); }
+/* em in body = manifesto's bold italic inline accent */
+.sentence.body .em {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-style: italic; font-weight: 700; color: var(--ink);
+}
+/* PULL — manifesto .mf-txt-lede / .mf-txt-pull: Libre Baskerville, italic serif */
 .sentence.pull {
-  font-family: var(--disp); font-weight: 300;
-  font-size: clamp(20px,2.6vw,34px);
-  line-height: 1.2; letter-spacing: 0.01em;
-  color: var(--ink-2); max-width: 480px; padding: 8px 0;
-  border-left: 1px solid var(--ink-3); padding-left: 20px; opacity: 0.88;
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-style: italic; font-weight: 400;
+  font-size: clamp(18px,2.2vw,30px);
+  line-height: 1.45; letter-spacing: 0.005em;
+  color: var(--ink); max-width: 520px; padding: 8px 0 8px 24px;
+  border-left: 3px solid var(--accent);
 }
 .sentence.pull .ac { color: var(--accent); }
+/* SPEC — keep monospace utility feel, echoing manifesto's condensed metadata style */
 .sentence.spec {
-  font-family: var(--ui); font-size: 10px;
-  letter-spacing: 0.06em; color: var(--ink-3);
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 600;
+  font-size: clamp(10px,0.9vw,13px);
+  letter-spacing: 0.10em; text-transform: uppercase; color: var(--ink-3);
   display: flex; align-items: baseline; gap: 14px; padding: 3px 0;
 }
 .sentence.spec .spec-key {
-  text-transform: uppercase; letter-spacing: 0.14em; font-size: 8px;
-  color: var(--ink-3); min-width: 96px; flex-shrink: 0;
+  letter-spacing: 0.22em; font-size: clamp(8px,0.75vw,10px);
+  color: var(--accent); min-width: 96px; flex-shrink: 0;
 }
-.sentence.spec .spec-val { color: var(--ink-2); }
+.sentence.spec .spec-val {
+  font-family: 'Barlow', system-ui, sans-serif; font-weight: 400;
+  font-size: clamp(11px,1vw,14px); letter-spacing: 0.02em;
+  text-transform: none; color: var(--ink-2);
+}
+/* LABEL — manifesto eyebrow treatment: Barlow sans, wide tracking, accent */
 .sentence.label {
-  font-family: var(--ui); font-size: 7px;
-  letter-spacing: 0.26em; text-transform: uppercase;
-  color: var(--accent); padding: 12px 0 4px; opacity: 0.7;
+  font-family: 'Barlow', system-ui, sans-serif; font-size: clamp(9px,0.85vw,11px);
+  font-weight: 700; letter-spacing: 0.42em; text-transform: uppercase;
+  color: var(--accent); padding: 16px 0 4px; opacity: 0.8;
 }
-.sentence.break { padding: 10px 0; opacity: 0.4; }
+/* BREAK — manifesto .mf-ch-divider style: accent gradient rule */
+.sentence.break { padding: 14px 0; opacity: 0.5; }
 .sentence.break::before {
-  content: ''; display: block; width: 28px; height: 2px; background: var(--ink-3);
+  content: ''; display: block; width: 32px; height: 1px;
+  background: linear-gradient(to right, var(--accent), transparent);
 }
 .sentence.cta-sentence { padding: 28px 0 8px; }
 
 /* states */
 .sentence.active { opacity: 1; }
-.sentence.active.body { color: var(--ink); }
+.sentence.active.body { color: var(--ink); font-family: 'Barlow', system-ui, sans-serif; }
 .sentence.active.pull { color: var(--ink); }
 .sentence.active.spec .spec-val { color: var(--ink); }
 .sentence.revealed { opacity: 0.30; }
@@ -1697,7 +1713,7 @@ body.ch-7 { --hud-bg: rgba(248,236,240,0.97); --hud-ink: #200810; --hud-ink-2: #
   .nw-action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .nw-cell-value { display: flex; align-items: center; justify-content: center; line-height: 1; }
   .nw-action-label { display: flex; align-items: center; justify-content: center; }
-  .sentence.poster { font-size: clamp(40px,11vw,72px); }
+  .sentence.poster { font-size: clamp(40px,11vw,72px); letter-spacing: 0.005em; }
   .sentence.poster.active::before { left: -16px; }
   #header-overlay { grid-template-columns: 1fr 1fr; }
   .ho-cell:nth-child(2) { border-right: none; }
@@ -3013,20 +3029,17 @@ body.raw-theme #cursor { display: none !important; }
 
 /* Image layer — postcard treatment ── */
 body.raw-theme #image-layer {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
+  display: none;
 }
 /* Kill the full-bleed veil — postcards have their own border */
 body.raw-theme #image-layer::after { display: none !important; }
 
-/* Each image becomes a postcard — centered, fixed card size, white border, faint shadow */
+/* Each image becomes a postcard — centered in the right zone */
 body.raw-theme #image-layer img {
   position: absolute;
   inset: auto;
-  width: clamp(220px, 28vw, 380px);
-  height: clamp(160px, 20vw, 280px);
+  width: clamp(260px, 32vw, 440px);
+  height: clamp(190px, 23vw, 320px);
   object-fit: cover;
   object-position: center 40%;
   opacity: 0;
@@ -3034,9 +3047,9 @@ body.raw-theme #image-layer img {
   transition: opacity 0.55s ease;
   border: 10px solid #ffffff;
   outline: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.12);
+  box-shadow: 2px 3px 14px rgba(0,0,0,0.14);
   border-radius: 0;
-  /* center in viewport */
+  /* centered within the right zone */
   top: 50%;
   left: 50%;
   translate: -50% -50%;
