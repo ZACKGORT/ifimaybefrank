@@ -652,7 +652,7 @@ header::after {
 
 .toc-head {
   font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--ink); opacity: 0.5;
+  text-transform: uppercase; color: var(--ink-4);
   margin-bottom: 16px; padding-bottom: 8px;
   border-bottom: 1px solid var(--rule);
   display: flex; align-items: center; justify-content: space-between;
@@ -665,23 +665,22 @@ header::after {
 }
 .toc-ch-name {
   font-family: var(--f-disp); font-size: 15px; font-weight: 600;
-  font-style: italic; color: var(--ink); opacity: 0.75; line-height: 1.2;
-  cursor: pointer; transition: opacity 0.14s, color 0.14s; display: block;
+  font-style: italic; color: var(--ink-2); line-height: 1.2;
+  cursor: pointer; transition: color 0.14s; display: block;
 }
-.toc-ch-name:hover { opacity: 1; color: var(--red); }
-.toc-ch.active .toc-ch-name { opacity: 1; color: var(--ink); }
+.toc-ch-name:hover { color: var(--red); }
+.toc-ch.active .toc-ch-name { color: var(--ink); }
 .toc-ch.active .toc-ch-num { color: var(--red); }
 .toc-ch-nodes { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
 .toc-node-item {
-  font-family: var(--f-ui); font-size: 10px; letter-spacing: 0.04em;
-  color: var(--ink); opacity: 0.6;
-  padding: 3px 0 3px 10px;
+  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.04em;
+  color: var(--ink-4); padding: 2px 0 2px 10px;
   border-left: 1px solid var(--rule);
-  cursor: pointer; transition: opacity 0.12s, border-color 0.12s;
+  cursor: pointer; transition: color 0.12s, border-color 0.12s;
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
-.toc-node-item:hover { opacity: 1; border-left-color: var(--gold); }
-.toc-node-item.active { opacity: 1; color: var(--red); border-left-color: var(--red); }
+.toc-node-item:hover { color: var(--ink-2); border-left-color: var(--gold); }
+.toc-node-item.active { color: var(--red); border-left-color: var(--red); }
 
 .toc-footer {
   flex-shrink: 0; padding: 12px 16px;
@@ -1285,22 +1284,6 @@ header::after {
 #float-scroll-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-l); }
 #float-scroll-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-l); }
 
-/* ─── MOBILE SCROLL FOB ──────────────────────────────────────────────── */
-#scroll-fob {
-  display: none;
-  position: fixed; top: 64px; right: 14px; z-index: 8400;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: var(--paper-2); border: 1px solid var(--rule-2);
-  box-shadow: 0 2px 10px var(--shadow);
-  align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.14s, border-color 0.14s, transform 0.14s;
-  font-size: 17px; color: var(--ink-3);
-  -webkit-tap-highlight-color: transparent;
-}
-#scroll-fob:active { transform: scale(0.92); background: var(--paper-3); }
-#scroll-fob.active { border-color: var(--gold); color: var(--gold); background: var(--gold-l); }
-@media (max-width: 720px) { #scroll-fob { display: flex; } }
-
 body.free-scroll #page-scroll { overflow-y: auto; }
 body.free-scroll .sentence { opacity: 0.65 !important; transform: none !important; transition: opacity 0.2s; }
 body.free-scroll .sentence:hover { opacity: 1 !important; }
@@ -1622,7 +1605,6 @@ body.mood-dark      { --paper:#1a1614; --paper-2:#221e1b; --paper-3:#2a2420; --i
 
 /* ─── FULL-VIEWPORT PANEL OVERLAY SYSTEM ─────────────────────────────── */
 /* Panels become full-screen overlays when toggled */
-@media (max-width: 720px) {
 .panel-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -1648,7 +1630,6 @@ body.mood-dark      { --paper:#1a1614; --paper-2:#221e1b; --paper-3:#2a2420; --i
 .panel-overlay.panel-open {
   transform: translateX(0) !important;
   pointer-events: auto;
-}
 }
 
 /* Close button for overlays */
@@ -1826,24 +1807,6 @@ body.panel-compose-open #panel-backdrop {
 #compose-panel.arrange-expanded #compose-body { display: none !important; }
 #compose-panel.arrange-expanded #arrange-view { display: flex !important; }
 
-/* ─── VIEW MODE WIDGET ───────────────────────────────────────────────── */
-#view-widget {
-  display: inline-flex; align-items: center; gap: 1px;
-  background: var(--paper-3); border: 1px solid var(--rule-2);
-  border-radius: 3px; padding: 2px;
-  cursor: grab; user-select: none;
-  position: relative; z-index: 100;
-}
-#view-widget.dragging { cursor: grabbing; position: fixed; z-index: 9000; box-shadow: 0 4px 20px var(--shadow); }
-.vw-btn {
-  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.10em;
-  text-transform: uppercase; background: none; border: none;
-  color: var(--ink-3); padding: 4px 9px; cursor: pointer;
-  border-radius: 2px; transition: all 0.12s; white-space: nowrap;
-}
-.vw-btn:hover { color: var(--ink); background: var(--paper-2); }
-.vw-btn.active { background: var(--ink); color: var(--paper); }
-
 #image-layer {
   position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
 }
@@ -1970,7 +1933,7 @@ body.panel-compose-open #panel-backdrop {
 <div id="panel-backdrop" onclick="closeAllPanels()"></div>
 
 <!-- ─── APP ─────────────────────────────────────────────────────────── -->
-<div id="app" class="no-toc">
+<div id="app">
 
   <header id="main-header">
     <div class="wordmark">
@@ -1988,13 +1951,11 @@ body.panel-compose-open #panel-backdrop {
         <button class="h-undo-btn" id="btn-undo" onclick="histUndo()" title="Undo (Ctrl+Z)" disabled>↩</button>
         <button class="h-undo-btn" id="btn-redo" onclick="histRedo()" title="Redo (Ctrl+Y)" disabled>↪</button>
       </div>
+      <button class="h-btn" id="btn-toc"  onclick="toggleToc()"     title="Table of contents">☰ Contents</button>
+      <button class="h-btn" id="btn-compose" onclick="toggleCompose()" title="Compose panel">✏ Compose</button>
       <button class="h-btn" id="btn-toc-mobile"  onclick="openPanelOverlay('toc')"     title="Contents">☰</button>
       <button class="h-btn" id="btn-compose-mobile" onclick="openPanelOverlay('compose')" title="Compose">✏</button>
-      <div id="view-widget" title="Drag to reposition">
-        <button class="vw-btn" id="vw-read"  onclick="setViewMode('read')">Read</button>
-        <button class="vw-btn" id="vw-write" onclick="setViewMode('write')">Write</button>
-        <button class="vw-btn" id="vw-both"  onclick="setViewMode('both')">Both</button>
-      </div>
+      <button class="h-btn" id="btn-read" onclick="toggleReading()" title="Preview mode (p)">⊡ Preview</button>
       <button class="h-btn" id="btn-export" onclick="exportRaw()">↗ Export</button>
       <button class="h-btn" id="btn-keys"  onclick="toggleKeys()">? Keys</button>
     </div>
@@ -2031,7 +1992,6 @@ body.panel-compose-open #panel-backdrop {
   </div>
 
   <div id="page-wrap">
-    <button id="scroll-fob" onclick="toggleFreeScroll()" title="Toggle free scroll" aria-label="Toggle free scroll">⇅</button>
     <button id="float-scroll-btn" onclick="toggleFreeScroll()" title="Right-click also toggles">
       <span>⇅</span>
       <span id="fsb-label">Step mode</span>
@@ -2610,7 +2570,7 @@ function renderPage() {
   updateNav(); updateToc(); updateChapterLabel();
 }
 
-function applyReveal(upTo, forceScroll) {
+function applyReveal(upTo) {
   pvReveal = upTo;
   pvEls.forEach((el, s) => {
     el.classList.remove('active','past','revealed');
@@ -2639,7 +2599,7 @@ function applyReveal(upTo, forceScroll) {
   document.querySelectorAll('.line-num').forEach((ln, idx) => ln.classList.toggle('active', idx === upTo));
   const total = pvEls.length;
   document.getElementById('reading-progress-bar').style.width = Math.min(total ? ((upTo+1)/total)*100 : 0, 100) + '%';
-  if (pvEls[upTo] && (!freeScroll || forceScroll)) pvEls[upTo].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (pvEls[upTo] && !freeScroll) pvEls[upTo].scrollIntoView({ behavior: 'smooth', block: 'center' });
   // ambient image
   const activeImgEl = pvEls[upTo];
   if (typeof setImage === 'function') {
@@ -2653,7 +2613,7 @@ function applyReveal(upTo, forceScroll) {
   document.querySelectorAll('.toc-node-item').forEach(el => { el.classList.toggle('active', parseInt(el.dataset.sidx) === upTo); });
 }
 
-function goTo(n, forceScroll) { if(n<0)n=0; if(n>=pvEls.length)n=pvEls.length-1; applyReveal(n, forceScroll); }
+function goTo(n) { if(n<0)n=0; if(n>=pvEls.length)n=pvEls.length-1; applyReveal(n); }
 function next()  { goTo(pvReveal + 1); }
 function prev()  { goTo(pvReveal - 1); }
 
@@ -2692,7 +2652,7 @@ function updateToc() {
       const ch = document.createElement('div'); ch.className = 'toc-ch';
       ch.innerHTML = `<div class="toc-ch-num">Chapter · ${String(n.num||chCount).padStart(2,'0')}</div>`;
       const name = document.createElement('span'); name.className = 'toc-ch-name'; name.textContent = n.title||'Untitled';
-      name.onclick = () => { const si = pageIdxOfNode(nidx+1); if(si>=0)goTo(si,true); else goTo(0,true); };
+      name.onclick = () => { const si = pageIdxOfNode(nidx+1); if(si>=0)goTo(si); else goTo(0); };
       ch.appendChild(name);
       const nodeList = document.createElement('div'); nodeList.className = 'toc-ch-nodes';
       ch.appendChild(nodeList); body.appendChild(ch); currentChEl = nodeList; return;
@@ -2703,7 +2663,7 @@ function updateToc() {
     item.dataset.sidx = pvEls.findIndex((e,_) => parseInt(e.dataset.nidx) === nidx);
     const txt = n.content || (n.key ? `${n.key} :: ${n.val}` : n.type);
     item.textContent = txt.length > 34 ? txt.slice(0,32)+'…' : txt;
-    item.onclick = () => { const si = pageIdxOfNode(nidx); if(si>=0)goTo(si,true); };
+    item.onclick = () => { const si = pageIdxOfNode(nidx); if(si>=0)goTo(si); };
     currentChEl.appendChild(item);
   });
 
@@ -3192,94 +3152,38 @@ function exportRaw() {
 }
 
 function toggleToc() {
-  const app = document.getElementById('app');
-  const btn = document.getElementById('btn-toc');
-  const isHidden = app.classList.contains('no-toc');
-  app.classList.toggle('no-toc', !isHidden);
-  if (btn) btn.classList.toggle('active', isHidden);
+  // Use overlay panel instead of grid column collapse
+  if (document.getElementById('toc').classList.contains('panel-open')) {
+    closePanelOverlay('toc');
+    document.getElementById('btn-toc').classList.remove('active');
+  } else {
+    openPanelOverlay('toc');
+    document.getElementById('btn-toc').classList.add('active');
+  }
 }
 function toggleCompose() {
-  const app = document.getElementById('app');
-  const btn = document.getElementById('btn-compose');
-  const isHidden = app.classList.contains('no-comp');
-  app.classList.toggle('no-comp', !isHidden);
-  if (btn) btn.classList.toggle('active', isHidden);
+  const cp = document.getElementById('compose-panel');
+  if (cp.classList.contains('panel-open')) {
+    closePanelOverlay('compose');
+    const b = document.getElementById('btn-compose'); if (b) b.classList.remove('active');
+  } else {
+    openPanelOverlay('compose');
+    const b = document.getElementById('btn-compose'); if (b) b.classList.add('active');
+  }
 }
 function toggleReading() {
   readMode = !readMode;
   document.getElementById('app').classList.toggle('reading', readMode);
-  if (document.getElementById('btn-read')) document.getElementById('btn-read').classList.toggle('active', readMode);
+  document.getElementById('btn-read').classList.toggle('active', readMode);
 }
-
-// ── View mode widget ──────────────────────────────────────────────────
-let _viewMode = 'write';
-function setViewMode(mode) {
-  _viewMode = mode;
-  const app = document.getElementById('app');
-  app.classList.remove('no-toc', 'no-comp', 'reading');
-  readMode = false;
-  if (mode === 'read')  { app.classList.add('no-comp'); }
-  if (mode === 'write') { app.classList.add('no-toc'); }
-  document.querySelectorAll('.vw-btn').forEach(b => b.classList.remove('active'));
-  const active = document.getElementById('vw-' + mode);
-  if (active) active.classList.add('active');
-}
-
-(function() {
-  const w = document.getElementById('view-widget');
-  let dragging = false, ox = 0, oy = 0, startX = 0, startY = 0, moved = false;
-  w.addEventListener('pointerdown', e => {
-    if (e.target.classList.contains('vw-btn')) return;
-    dragging = true; moved = false;
-    const r = w.getBoundingClientRect();
-    ox = e.clientX - r.left; oy = e.clientY - r.top;
-    startX = e.clientX; startY = e.clientY;
-    w.setPointerCapture(e.pointerId);
-  });
-  window.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    if (Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) > 4) moved = true;
-    if (!moved) return;
-    if (!w.classList.contains('dragging')) { const r = w.getBoundingClientRect(); w.style.width = r.width + 'px'; }
-    w.classList.add('dragging');
-    w.style.left = (e.clientX - ox) + 'px';
-    w.style.top  = (e.clientY - oy) + 'px';
-  });
-  window.addEventListener('pointerup', () => {
-    if (!dragging) return;
-    dragging = false;
-    w.classList.remove('dragging');
-    if (moved) { w.style.position = 'fixed'; w.style.zIndex = '9000'; }
-    else { w.style.width = ''; }
-  });
-})();
-
-setViewMode('write');
-
 function toggleKeys() { document.getElementById('key-help').classList.toggle('show'); }
 
 function toggleFreeScroll() {
   freeScroll = !freeScroll;
   document.body.classList.toggle('free-scroll', freeScroll);
   const btn = document.getElementById('float-scroll-btn');
-  if (btn) btn.classList.toggle('active', freeScroll);
-  const fsbl = document.getElementById('fsb-label');
-  if (fsbl) fsbl.textContent = freeScroll ? 'Step mode' : 'Free scroll';
-  const fob = document.getElementById('scroll-fob');
-  if (fob) fob.classList.toggle('active', freeScroll);
-
-  if (!freeScroll && pvEls.length > 0) {
-    // Find the node closest to the center of the viewport
-    const mid = window.innerHeight / 2;
-    let closest = 0, closestDist = Infinity;
-    pvEls.forEach((el, i) => {
-      const r = el.getBoundingClientRect();
-      const dist = Math.abs(r.top + r.height / 2 - mid);
-      if (dist < closestDist) { closestDist = dist; closest = i; }
-    });
-    pvReveal = closest;
-    applyReveal(pvReveal);
-  }
+  btn.classList.toggle('active', freeScroll);
+  document.getElementById('fsb-label').textContent = freeScroll ? 'Step mode' : 'Free scroll';
 }
 document.getElementById('page-wrap').addEventListener('contextmenu', e => {
   e.preventDefault();
@@ -3884,17 +3788,11 @@ commitChange = function() {
 // ─── SEED — self-portrait ──────────────────────────────────────────────────
 (function seed() {
   nodes = [
-    // ── Ch 01 · Where This Sits ─────────────────────────────────────────────
-    { id:nid(), type:'chapter', num:'01', title:'Where This Sits', mood:'empowered' },
-    { id:nid(), type:'label',   content:'Landscape · Adjacent Tools · New Space', mood:'empowered' },
-    { id:nid(), type:'poster',  content:'Most tools want to be platforms. This one wants to be a posture.', mood:'empowered' },
-    { id:nid(), type:'body',    content:'Notion, Obsidian, Roam, Logseq, Bear, Craft, iA Writer — these are solving the retrieval problem. How do you capture everything, connect it, find it later? The graph, the backlink, the daily note are answers to that question.', mood:'empowered' },
-    { id:nid(), type:'pull',    content:'**reasonably is not solving the retrieval problem.** It is solving the composition problem. Not *how do I find what I thought* — but *how do I think well in the first place*.', mood:'empowered' },
-    { id:nid(), type:'spec',    key:'iA Writer',   val:'Similar typographic seriousness. Linear. No node model, no mood, no reveal engine.' },
-    { id:nid(), type:'spec',    key:'Hemingway',   val:'Sentence-level feedback. Prescriptive, editing-focused. Not compositional.' },
-    { id:nid(), type:'spec',    key:'Scrivener',   val:'Structural writing for long-form fiction. Not thought composition.' },
-    { id:nid(), type:'spec',    key:'reasonably',  val:'None of the above. Something else.' },
-    { id:nid(), type:'body',    content:'The space this might be creating could be called *narrative thinking tools*, or *compositional notebooks*, or *sentence-first editors*. The thesis: the paragraph is not the unit of thought. The sentence is. Every tool built before this one treated the sentence as content inside a container rather than as the container itself.', mood:'empowered' },
+    // ── Ch 01 · What Was Built ──────────────────────────────────────────────
+    { id:nid(), type:'chapter', num:'01', title:'What Was Built', mood:'poignant' },
+    { id:nid(), type:'poster',  content:'A single file. No framework. No server. No build step. The entire product is the file.', mood:'poignant' },
+    { id:nid(), type:'body',    content:'Approximately 1,600 lines of CSS and 1,200 lines of JavaScript, co-located, self-sufficient. It runs in a browser tab and does not phone home. That is not a technical constraint. It is a **philosophical position stated in code**: the tool should be as atomic as the thought it holds.', mood:'poignant' },
+    { id:nid(), type:'pull',    content:'The form *is* the argument. The file *is* the manifesto.', mood:'poignant' },
 
     // ── Ch 02 · The Node ────────────────────────────────────────────────────
     { id:nid(), type:'chapter', num:'02', title:'The Node', mood:'none' },
@@ -3977,10 +3875,16 @@ commitChange = function() {
     { id:nid(), type:'body',    content:'The font system is a semantic layer running beneath the node type system. Both say the same thing through different channels: this thought belongs to a category, the category has a register, the register has a visual form. When typeface and node type align — Cormorant rendering a poster sentence — the signal doubles. The thought arrives twice.', mood:'none' },
 
     // ── Ch 09 · Where This Sits ─────────────────────────────────────────────
-    { id:nid(), type:'chapter', num:'09', title:'What Was Built', mood:'poignant' },
-    { id:nid(), type:'poster',  content:'A single file. No framework. No server. No build step. The entire product is the file.', mood:'poignant' },
-    { id:nid(), type:'body',    content:'Approximately 1,600 lines of CSS and 1,200 lines of JavaScript, co-located, self-sufficient. It runs in a browser tab and does not phone home. That is not a technical constraint. It is a **philosophical position stated in code**: the tool should be as atomic as the thought it holds.', mood:'poignant' },
-    { id:nid(), type:'pull',    content:'The form *is* the argument. The file *is* the manifesto.', mood:'poignant' },
+    { id:nid(), type:'chapter', num:'09', title:'Where This Sits', mood:'empowered' },
+    { id:nid(), type:'label',   content:'Landscape · Adjacent Tools · New Space', mood:'empowered' },
+    { id:nid(), type:'poster',  content:'Most tools want to be platforms. This one wants to be a posture.', mood:'empowered' },
+    { id:nid(), type:'body',    content:'Notion, Obsidian, Roam, Logseq, Bear, Craft, iA Writer — these are solving the retrieval problem. How do you capture everything, connect it, find it later? The graph, the backlink, the daily note are answers to that question.', mood:'empowered' },
+    { id:nid(), type:'pull',    content:'**reasonably is not solving the retrieval problem.** It is solving the composition problem. Not *how do I find what I thought* — but *how do I think well in the first place*.', mood:'empowered' },
+    { id:nid(), type:'spec',    key:'iA Writer',   val:'Similar typographic seriousness. Linear. No node model, no mood, no reveal engine.' },
+    { id:nid(), type:'spec',    key:'Hemingway',   val:'Sentence-level feedback. Prescriptive, editing-focused. Not compositional.' },
+    { id:nid(), type:'spec',    key:'Scrivener',   val:'Structural writing for long-form fiction. Not thought composition.' },
+    { id:nid(), type:'spec',    key:'reasonably',  val:'None of the above. Something else.' },
+    { id:nid(), type:'body',    content:'The space this might be creating could be called *narrative thinking tools*, or *compositional notebooks*, or *sentence-first editors*. The thesis: the paragraph is not the unit of thought. The sentence is. Every tool built before this one treated the sentence as content inside a container rather than as the container itself.', mood:'empowered' },
 
     // ── Ch 10 · Reception ───────────────────────────────────────────────────
     { id:nid(), type:'chapter', num:'10', title:'Reception', mood:'poignant' },
@@ -4202,29 +4106,37 @@ document.getElementById('narrative-root').addEventListener('dblclick', e => {
   };
 
   window.hudActivate = function(mode) {
+    // Deactivate all hud buttons
     document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('hud-' + mode);
     if (btn) btn.classList.add('active');
     hudActive = mode;
 
+    // Close any open overlays first
     const toc = document.getElementById('toc');
     const cp  = document.getElementById('compose-panel');
-    if (toc) { toc.classList.remove('panel-open'); }
-    if (cp)  { cp.classList.remove('panel-open'); }
+    toc.classList.remove('panel-open');
+    cp.classList.remove('panel-open');
     document.body.classList.remove('panel-toc-open', 'panel-compose-open');
+    setTimeout(() => {
+      if (!toc.classList.contains('panel-open')) toc.classList.remove('panel-overlay','panel-right');
+      if (!cp.classList.contains('panel-open'))  cp.classList.remove('panel-overlay','panel-right');
+    }, 320);
 
     if (mode === 'read') {
-      // pure story stream — close everything
-    } else if (mode === 'write') {
-      openPanelOverlay('compose');
-      setTimeout(() => setPanelMode('compose'), 50);
-    } else if (mode === 'file') {
-      openPanelOverlay('compose');
-      setTimeout(() => setPanelMode('arrange'), 50);
+      // Just the reading view — nothing extra
     } else if (mode === 'capture') {
       openCapture();
-      hudActive = 'read';
-      if (btn) { setTimeout(() => { btn.classList.remove('active'); const rb = document.getElementById('hud-read'); if (rb) rb.classList.add('active'); }, 300); }
+      hudActive = 'read'; // snap back after opening
+      if (btn) { setTimeout(() => { btn.classList.remove('active'); document.getElementById('hud-read').classList.add('active'); }, 300); }
+    } else if (mode === 'contents') {
+      openPanelOverlay('toc');
+    } else if (mode === 'compose') {
+      openPanelOverlay('compose');
+      setTimeout(() => setPanelMode('compose'), 50);
+    } else if (mode === 'arrange') {
+      openPanelOverlay('compose');
+      setTimeout(() => setPanelMode('arrange'), 50);
     }
   };
 
@@ -4527,21 +4439,29 @@ document.addEventListener('keydown', e => {
 <!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <div id="mobile-hud">
   <div class="hud-inner">
-    <button class="hud-btn active" id="hud-read" onclick="hudActivate('read')">
+    <button class="hud-btn active" id="hud-read"    onclick="hudActivate('read')">
       <span class="hud-icon">⊡</span>
       <span class="hud-label">Read</span>
-    </button>
-    <button class="hud-btn" id="hud-write" onclick="hudActivate('write')">
-      <span class="hud-icon">✏</span>
-      <span class="hud-label">Write</span>
-    </button>
-    <button class="hud-btn" id="hud-file" onclick="hudActivate('file')">
-      <span class="hud-icon">⠿</span>
-      <span class="hud-label">File</span>
     </button>
     <button class="hud-btn" id="hud-capture" onclick="hudActivate('capture')">
       <span class="hud-icon">●</span>
       <span class="hud-label">Capture</span>
+    </button>
+    <button class="hud-btn" id="hud-contents" onclick="hudActivate('contents')">
+      <span class="hud-icon">☰</span>
+      <span class="hud-label">Contents</span>
+    </button>
+    <button class="hud-btn" id="hud-compose" onclick="hudActivate('compose')">
+      <span class="hud-icon">✏</span>
+      <span class="hud-label">Compose</span>
+    </button>
+    <button class="hud-btn" id="hud-arrange" onclick="hudActivate('arrange')">
+      <span class="hud-icon">⠿</span>
+      <span class="hud-label">Arrange</span>
+    </button>
+    <button class="hud-btn" id="hud-freescroll" onclick="hudToggleFreeScroll()">
+      <span class="hud-icon">⇅</span>
+      <span class="hud-label">Free</span>
     </button>
   </div>
 </div>
