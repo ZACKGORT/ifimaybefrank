@@ -1790,8 +1790,8 @@ body.panel-compose-open #panel-backdrop {
 }
 
 @media (max-width: 1100px) and (min-width: 721px) {
-  #app { grid-template-columns: 0px 1fr var(--rail-w) !important; }
-  #toc { overflow: hidden; pointer-events: none; }
+  #app:not(.toc-pinned) { grid-template-columns: 0px 1fr var(--rail-w) !important; }
+  #app:not(.toc-pinned) #toc { overflow: hidden; pointer-events: none; }
 }
 
 /* ─── PREVIEW MODE — image shows through ─────────────────────────────── */
@@ -1913,6 +1913,67 @@ body.panel-compose-open #panel-backdrop {
 .node-img-btn:hover, .node-img-btn.linked {
   color: var(--gold); border-color: var(--gold);
 }
+/* ─── NODE GHOST OVERLAY ─────────────────────────────────────────────── */
+#node-ghost-overlay {
+  position: fixed;
+  top: 52px; left: 0; bottom: 0;
+  right: var(--rail-w, 280px);
+  z-index: 8000;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0;
+  transition: opacity 0.18s ease;
+  background: rgba(0,0,0,0);
+}
+#node-ghost-overlay.ngo-open {
+  opacity: 1; pointer-events: auto;
+}
+#ngo-backdrop {
+  position: absolute; inset: 0;
+  background: var(--paper);
+  opacity: 0.82;
+}
+#ngo-inner {
+  position: relative; z-index: 1;
+  width: min(600px, 86%);
+  display: flex; flex-direction: column; gap: 10px;
+}
+#ngo-type-pill {
+  font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--gold);
+  align-self: flex-start;
+}
+#ngo-textarea {
+  width: 100%; background: none; border: none; outline: none;
+  resize: none; caret-color: var(--red);
+  color: var(--ink);
+  font-family: var(--f-body); font-weight: 300; font-style: italic;
+  font-size: clamp(22px, 3.4vw, 38px);
+  line-height: 1.38; min-height: 80px; max-height: 60vh;
+  overflow-y: auto;
+}
+#ngo-textarea::placeholder {
+  color: var(--ink-5); font-style: italic;
+}
+#node-ghost-overlay.ngo-type-poster #ngo-textarea  { font-family: var(--f-disp); font-size: clamp(26px,4vw,48px); font-weight: 600; line-height: 1.2; }
+#node-ghost-overlay.ngo-type-body #ngo-textarea    { font-family: var(--f-body); font-size: clamp(20px,2.8vw,32px); font-weight: 300; }
+#node-ghost-overlay.ngo-type-pull #ngo-textarea    { font-family: var(--f-disp); font-size: clamp(20px,2.8vw,34px); font-style: italic; border-left: 2px solid var(--red-m); padding-left: 18px; }
+#node-ghost-overlay.ngo-type-label #ngo-textarea   { font-family: var(--f-ui); font-size: 14px; letter-spacing: 0.2em; text-transform: uppercase; font-style: normal; color: var(--gold); min-height: 28px; }
+#node-ghost-overlay.ngo-type-draft #ngo-textarea   { font-family: var(--f-body); font-size: clamp(20px,2.8vw,32px); opacity: 0.7; }
+#node-ghost-overlay.ngo-type-chapter #ngo-textarea { font-family: var(--f-disp); font-size: clamp(22px,3.2vw,38px); font-weight: 600; font-style: italic; }
+#node-ghost-overlay.ngo-type-spec #ngo-textarea    { font-family: var(--f-ui); font-size: clamp(16px,2vw,24px); letter-spacing: 0.04em; font-style: normal; }
+#ngo-rule {
+  width: 100%; height: 1px;
+  background: linear-gradient(to right, var(--rule-2), transparent);
+}
+#ngo-hint {
+  font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-5);
+  display: flex; gap: 14px;
+}
+#ngo-hint kbd {
+  font-family: var(--f-ui); font-style: normal;
+  color: var(--ink-4); font-size: 7px;
+}
 </style>
 </head>
 <body>
@@ -1929,6 +1990,21 @@ body.panel-compose-open #panel-backdrop {
   <div id="img-grid-hud">
     <div id="img-grid-hud-label">Images<span id="img-grid-mode-label"></span></div>
     <button id="img-grid-close">Close</button>
+  </div>
+</div>
+
+<!-- ─── NODE GHOST OVERLAY ────────────────────────────────────────────── -->
+<div id="node-ghost-overlay">
+  <div id="ngo-backdrop"></div>
+  <div id="ngo-inner">
+    <div id="ngo-type-pill">body</div>
+    <textarea id="ngo-textarea" rows="3" spellcheck="true" placeholder="The thought, plainly stated."></textarea>
+    <div id="ngo-rule"></div>
+    <div id="ngo-hint">
+      <span><kbd>Enter</kbd> commit</span>
+      <span><kbd>Esc</kbd> dismiss</span>
+      <span><kbd>Shift+Enter</kbd> line break</span>
+    </div>
   </div>
 </div>
 
@@ -1970,7 +2046,7 @@ body.panel-compose-open #panel-backdrop {
 <div id="panel-backdrop" onclick="closeAllPanels()"></div>
 
 <!-- ─── APP ─────────────────────────────────────────────────────────── -->
-<div id="app" class="no-toc">
+<div id="app" class="toc-pinned">
 
   <header id="main-header">
     <div class="wordmark">
@@ -3192,11 +3268,22 @@ function exportRaw() {
 }
 
 function toggleToc() {
-  const app = document.getElementById('app');
-  const btn = document.getElementById('btn-toc');
-  const isHidden = app.classList.contains('no-toc');
-  app.classList.toggle('no-toc', !isHidden);
-  if (btn) btn.classList.toggle('active', isHidden);
+  if (window.innerWidth <= 720) {
+    if (document.getElementById('toc').classList.contains('panel-open')) {
+      closePanelOverlay('toc');
+      const b = document.getElementById('btn-toc'); if (b) b.classList.remove('active');
+    } else {
+      openPanelOverlay('toc');
+      const b = document.getElementById('btn-toc'); if (b) b.classList.add('active');
+    }
+  } else {
+    const app = document.getElementById('app');
+    const btn = document.getElementById('btn-toc');
+    const pinned = app.classList.contains('toc-pinned');
+    app.classList.toggle('toc-pinned', !pinned);
+    app.classList.toggle('no-toc', pinned);
+    if (btn) btn.classList.toggle('active', !pinned);
+  }
 }
 function toggleCompose() {
   const app = document.getElementById('app');
@@ -4524,6 +4611,112 @@ document.addEventListener('keydown', e => {
   }
 });
 </script>
+// ─── NODE GHOST OVERLAY ────────────────────────────────────────────────────
+(function() {
+  const overlay   = document.getElementById('node-ghost-overlay');
+  const ngoTA     = document.getElementById('ngo-textarea');
+  const ngoPill   = document.getElementById('ngo-type-pill');
+
+  const TYPE_PLACEHOLDERS = {
+    poster:  'The central declaration.',
+    body:    'The thought, plainly stated.',
+    pull:    'The truest sentence.',
+    label:   'Category · Date',
+    spec:    'key :: value',
+    chapter: 'Chapter title',
+    draft:   'Raw capture…'
+  };
+
+  const TYPE_LABELS = {
+    poster:'poster', body:'body', pull:'pull', label:'label',
+    spec:'spec', chapter:'chapter', draft:'draft'
+  };
+
+  let _ngoSourceInput = null;
+  let _ngoNodeType    = 'body';
+  let _ngoOpen        = false;
+  let _ngoBlurTimer   = null;
+
+  function openNodeGhost(inp, nodeType) {
+    _ngoSourceInput = inp;
+    _ngoNodeType    = nodeType || 'body';
+    _ngoOpen        = true;
+
+    overlay.className = 'ngo-open ngo-type-' + _ngoNodeType;
+    ngoPill.textContent = TYPE_LABELS[_ngoNodeType] || _ngoNodeType;
+    ngoTA.placeholder = TYPE_PLACEHOLDERS[_ngoNodeType] || 'Write…';
+    ngoTA.value = inp.value;
+
+    ngoTA.style.height = 'auto';
+    ngoTA.style.height = Math.min(ngoTA.scrollHeight, window.innerHeight * 0.55) + 'px';
+
+    requestAnimationFrame(() => {
+      ngoTA.focus();
+      ngoTA.setSelectionRange(ngoTA.value.length, ngoTA.value.length);
+    });
+  }
+
+  function closeNodeGhost(refocusSource) {
+    if (!_ngoOpen) return;
+    _ngoOpen = false;
+    overlay.classList.remove('ngo-open');
+    if (refocusSource && _ngoSourceInput) {
+      _ngoSourceInput.focus();
+      _ngoSourceInput.setSelectionRange(_ngoSourceInput.value.length, _ngoSourceInput.value.length);
+    }
+    _ngoSourceInput = null;
+  }
+
+  ngoTA.addEventListener('input', () => {
+    if (!_ngoSourceInput) return;
+    _ngoSourceInput.value = ngoTA.value;
+    _ngoSourceInput.dispatchEvent(new Event('input', { bubbles: true }));
+    ngoTA.style.height = 'auto';
+    ngoTA.style.height = Math.min(ngoTA.scrollHeight, window.innerHeight * 0.55) + 'px';
+  });
+
+  ngoTA.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.preventDefault(); closeNodeGhost(false); }
+    const multiLine = ['body','poster','pull','draft'].includes(_ngoNodeType);
+    if (e.key === 'Enter' && !e.shiftKey && !multiLine) { e.preventDefault(); closeNodeGhost(false); }
+  });
+
+  document.getElementById('ngo-backdrop').addEventListener('mousedown', () => {
+    closeNodeGhost(false);
+  });
+
+  const canvasEl = document.getElementById('node-canvas');
+  if (canvasEl) {
+    canvasEl.addEventListener('focusin', e => {
+      const inp = e.target;
+      if (!inp || inp.tagName !== 'INPUT') return;
+      clearTimeout(_ngoBlurTimer);
+      const card = inp.closest('.n-card');
+      if (!card) return;
+      const badge = card.querySelector('.n-badge');
+      let type = badge ? badge.textContent.trim() : 'body';
+      if (type === 'ch') type = 'chapter';
+      if (type === '?')  type = 'draft';
+      if (inp.classList.contains('n-spec-k')) type = 'spec';
+      openNodeGhost(inp, type);
+    });
+
+    canvasEl.addEventListener('focusout', () => {
+      _ngoBlurTimer = setTimeout(() => {
+        if (!_ngoOpen) return;
+        const active = document.activeElement;
+        if (active && overlay.contains(active)) return;
+        closeNodeGhost(false);
+      }, 120);
+    });
+  }
+
+  overlay.addEventListener('focusin', () => clearTimeout(_ngoBlurTimer));
+
+  window.openNodeGhost  = openNodeGhost;
+  window.closeNodeGhost = closeNodeGhost;
+})();
+
 <!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <div id="mobile-hud">
   <div class="hud-inner">
