@@ -2996,7 +2996,17 @@ function toggleFreeScroll() {
   btn.classList.toggle('active', freeScroll);
   document.getElementById('fsb-label').textContent = freeScroll ? 'Step mode' : 'Free scroll';
 }
-document.getElementById('page-wrap').addEventListener('contextmenu', e => { e.preventDefault(); toggleFreeScroll(); });
+document.getElementById('page-wrap').addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (!freeScroll) {
+    toggleFreeScroll();
+    // Any click anywhere exits free scroll
+    document.addEventListener('click', function exitFree() {
+      if (freeScroll) toggleFreeScroll();
+      document.removeEventListener('click', exitFree);
+    }, { once: true });
+  }
+});
 
 // ── Step-lock: intercept wheel + touch scroll when not in free-scroll mode ──
 (function() {
