@@ -1854,7 +1854,7 @@ body.panel-compose-open #panel-backdrop {
   <div id="page-wrap">
     <button id="float-scroll-btn" onclick="toggleFreeScroll()" title="Right-click also toggles">
       <span>⇅</span>
-      <span id="fsb-label">Right Click</span>
+      <span id="fsb-label">Step mode</span>
     </button>
     <button id="capture-fab" onclick="toggleCapture()" aria-label="Quick capture" title="Quick capture (c)">
       <div class="fab-dot"></div>
@@ -2085,7 +2085,7 @@ body.panel-compose-open #panel-backdrop {
   <div class="kh-row"><span class="kh-key">r</span><span class="kh-desc">Reading mode</span></div>
   <div class="kh-row"><span class="kh-key">t</span><span class="kh-desc">Toggle contents</span></div>
   <div class="kh-row"><span class="kh-key">Double-click sentence</span><span class="kh-desc">Edit in place</span></div>
-  <div class="kh-row"><span class="kh-key">Right-click page</span><span class="kh-desc">Free scroll</span></div>
+  <div class="kh-row"><span class="kh-key">Right-click page</span><span class="kh-desc">Step mode</span></div>
   <div class="kh-row"><span class="kh-key">s / hover header</span><span class="kh-desc">Spine wayfinding</span></div>
   <div class="kh-row"><span class="kh-key">?</span><span class="kh-desc">This help</span></div>
 </div>
@@ -2099,6 +2099,13 @@ body.panel-compose-open #panel-backdrop {
 //   'reasonably'  → reasonably.cc      (dark utility, mono, precise)
 const SITE_THEME = 'frank';
 document.body.classList.toggle('theme-reasonably', SITE_THEME === 'reasonably');
+document.body.classList.add('free-scroll');
+setTimeout(() => {
+  const _fsb = document.getElementById('float-scroll-btn');
+  if (_fsb) _fsb.classList.add('active');
+  const _hfsb = document.getElementById('hud-freescroll');
+  if (_hfsb) _hfsb.classList.add('active');
+}, 0);
 
 (function applyThemeText() {
   if (SITE_THEME === 'reasonably') {
@@ -2206,7 +2213,7 @@ function commitChange() {
 }
 let captureOpen = false;
 let spineOpen = false;
-let freeScroll = false;
+let freeScroll = true;
 
 function nid() { return ++uid; }
 
