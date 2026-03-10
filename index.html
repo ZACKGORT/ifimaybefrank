@@ -3158,7 +3158,22 @@ function addNode(type) {
     if (!card) return;
     card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     const inp = card.querySelector('input.n-ch-title, input.n-input, input.n-spec-k');
-    if (inp) inp.focus();
+    if (!inp) return;
+    inp.focus();
+    // scroll page to new sentence
+    if (type === 'chapter') {
+      const chEl = document.querySelector(`.ch-block[data-ch="${n.num}"]`);
+      if (chEl) chEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      goTo(pvEls.length - 1);
+    }
+    // open ghost overlay
+    if (type !== 'break' && typeof openNodeGhost === 'function') {
+      let ghostType = type;
+      if (ghostType === 'chapter') ghostType = 'chapter';
+      if (inp.classList.contains('n-spec-k')) ghostType = 'spec';
+      openNodeGhost(inp, ghostType);
+    }
   });
 }
 
