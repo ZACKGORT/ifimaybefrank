@@ -411,7 +411,7 @@ header::after {
 }
 @media (max-width: 720px) {
   #capture-panel {
-    bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+    bottom: 56px;
     width: 100vw;
     border-radius: 3px 3px 0 0;
     border-left: none; border-right: none;
@@ -652,7 +652,7 @@ header::after {
 
 .toc-head {
   font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--ink); opacity: 0.5;
+  text-transform: uppercase; color: var(--ink-4);
   margin-bottom: 16px; padding-bottom: 8px;
   border-bottom: 1px solid var(--rule);
   display: flex; align-items: center; justify-content: space-between;
@@ -665,23 +665,22 @@ header::after {
 }
 .toc-ch-name {
   font-family: var(--f-disp); font-size: 15px; font-weight: 600;
-  font-style: italic; color: var(--ink); opacity: 0.75; line-height: 1.2;
-  cursor: pointer; transition: opacity 0.14s, color 0.14s; display: block;
+  font-style: italic; color: var(--ink-2); line-height: 1.2;
+  cursor: pointer; transition: color 0.14s; display: block;
 }
-.toc-ch-name:hover { opacity: 1; color: var(--red); }
-.toc-ch.active .toc-ch-name { opacity: 1; color: var(--ink); }
+.toc-ch-name:hover { color: var(--red); }
+.toc-ch.active .toc-ch-name { color: var(--ink); }
 .toc-ch.active .toc-ch-num { color: var(--red); }
 .toc-ch-nodes { margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
 .toc-node-item {
-  font-family: var(--f-ui); font-size: 10px; letter-spacing: 0.04em;
-  color: var(--ink); opacity: 0.6;
-  padding: 3px 0 3px 10px;
+  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.04em;
+  color: var(--ink-4); padding: 2px 0 2px 10px;
   border-left: 1px solid var(--rule);
-  cursor: pointer; transition: opacity 0.12s, border-color 0.12s;
+  cursor: pointer; transition: color 0.12s, border-color 0.12s;
   overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
-.toc-node-item:hover { opacity: 1; border-left-color: var(--gold); }
-.toc-node-item.active { opacity: 1; color: var(--red); border-left-color: var(--red); }
+.toc-node-item:hover { color: var(--ink-2); border-left-color: var(--gold); }
+.toc-node-item.active { color: var(--red); border-left-color: var(--red); }
 
 .toc-footer {
   flex-shrink: 0; padding: 12px 16px;
@@ -715,18 +714,6 @@ header::after {
 }
 #page-scroll::-webkit-scrollbar { width: 4px; }
 #page-scroll::-webkit-scrollbar-thumb { background: var(--ink-5); border-radius: 2px; }
-
-/* Prevent scrollIntoView from hiding sentences behind the beckon/header zone */
-.sentence, .ch-block {
-  scroll-margin-top: 80px;
-  scroll-margin-bottom: 40px;
-}
-@media (max-width: 720px) {
-  .sentence, .ch-block {
-    scroll-margin-top: 96px;
-    scroll-margin-bottom: 80px;
-  }
-}
 
 .line-num {
   position: absolute; left: 20px;
@@ -1285,24 +1272,11 @@ header::after {
 #reading-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--rule); z-index: 20; }
 #reading-progress-bar { height: 100%; background: var(--red); width: 0; transition: width 0.3s ease; opacity: 0.6; }
 
-/* ─── FREE SCROLL FLOAT ───────────────────────────────────────────────── */
-#float-scroll-btn {
-  position: absolute; top: 39px; right: 16px; z-index: 50;
-  transform: translateY(-50%);
-  background: var(--paper-2); border: 1px solid var(--rule-2);
-  border-radius: 2px; padding: 5px 10px;
-  font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--ink-3); cursor: pointer;
-  transition: all 0.14s; display: flex; align-items: center; gap: 5px;
-}
-#float-scroll-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-l); }
-#float-scroll-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-l); }
-
 /* ─── MOBILE SCROLL FOB ──────────────────────────────────────────────── */
 #scroll-fob {
   display: none;
   position: fixed;
-  top: 102px; /* header(52) + beckon-top(12) + beckon-height(38) */
+  top: 102px;
   right: 14px;
   z-index: 8400;
   width: 28px; height: 28px; border-radius: 50%;
@@ -1322,6 +1296,18 @@ header::after {
   background: var(--gold-l); opacity: 1;
 }
 @media (max-width: 720px) { #scroll-fob { display: flex; } }
+
+/* ─── FREE SCROLL FLOAT ───────────────────────────────────────────────── */
+#float-scroll-btn {
+  position: absolute; top: 14px; right: 16px; z-index: 50;
+  background: var(--paper-2); border: 1px solid var(--rule-2);
+  border-radius: 2px; padding: 5px 10px;
+  font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3); cursor: pointer;
+  transition: all 0.14s; display: flex; align-items: center; gap: 5px;
+}
+#float-scroll-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-l); }
+#float-scroll-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-l); }
 
 body.free-scroll #page-scroll { overflow-y: auto; }
 body.free-scroll .sentence { opacity: 0.65 !important; transform: none !important; transition: opacity 0.2s; }
@@ -1644,7 +1630,6 @@ body.mood-dark      { --paper:#1a1614; --paper-2:#221e1b; --paper-3:#2a2420; --i
 
 /* ─── FULL-VIEWPORT PANEL OVERLAY SYSTEM ─────────────────────────────── */
 /* Panels become full-screen overlays when toggled */
-@media (max-width: 720px) {
 .panel-overlay {
   position: fixed !important;
   inset: 0 !important;
@@ -1670,7 +1655,6 @@ body.mood-dark      { --paper:#1a1614; --paper-2:#221e1b; --paper-3:#2a2420; --i
 .panel-overlay.panel-open {
   transform: translateX(0) !important;
   pointer-events: auto;
-}
 }
 
 /* Close button for overlays */
@@ -1771,18 +1755,18 @@ body.panel-compose-open #panel-backdrop {
 @media (max-width: 720px) {
   #mobile-hud { display: block; }
 
+  #app {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: 1fr !important; /* header is fixed, not in flow */
+    padding-top: 52px; /* push content below fixed header */
+  }
+
   /* Pin header so keyboard / outer scroll can never push it off-screen */
   header {
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 9000;
     height: 52px;
-  }
-
-  #app {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: 1fr !important; /* header is fixed, not in flow */
-    padding-top: 52px; /* push content below fixed header */
   }
   #toc { display: none !important; }
   #page-wrap { grid-column: 1; grid-row: 1; width: 100%; min-width: 0; }
@@ -1821,8 +1805,8 @@ body.panel-compose-open #panel-backdrop {
 }
 
 @media (max-width: 1100px) and (min-width: 721px) {
-  #app:not(.toc-pinned) { grid-template-columns: 0px 1fr var(--rail-w) !important; }
-  #app:not(.toc-pinned) #toc { overflow: hidden; pointer-events: none; }
+  #app { grid-template-columns: 0px 1fr var(--rail-w) !important; }
+  #toc { overflow: hidden; pointer-events: none; }
 }
 
 /* ─── PREVIEW MODE — image shows through ─────────────────────────────── */
@@ -1856,24 +1840,6 @@ body.panel-compose-open #panel-backdrop {
 #app.arrange-full #toc { overflow: hidden; pointer-events: none; }
 #compose-panel.arrange-expanded #compose-body { display: none !important; }
 #compose-panel.arrange-expanded #arrange-view { display: flex !important; }
-
-/* ─── VIEW MODE WIDGET ───────────────────────────────────────────────── */
-#view-widget {
-  display: inline-flex; align-items: center; gap: 1px;
-  background: var(--paper-3); border: 1px solid var(--rule-2);
-  border-radius: 3px; padding: 2px;
-  cursor: grab; user-select: none;
-  position: relative; z-index: 100;
-}
-#view-widget.dragging { cursor: grabbing; position: fixed; z-index: 9000; box-shadow: 0 4px 20px var(--shadow); }
-.vw-btn {
-  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.10em;
-  text-transform: uppercase; background: none; border: none;
-  color: var(--ink-3); padding: 4px 9px; cursor: pointer;
-  border-radius: 2px; transition: all 0.12s; white-space: nowrap;
-}
-.vw-btn:hover { color: var(--ink); background: var(--paper-2); }
-.vw-btn.active { background: var(--ink); color: var(--paper); }
 
 #image-layer {
   position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
@@ -1944,7 +1910,8 @@ body.panel-compose-open #panel-backdrop {
 .node-img-btn:hover, .node-img-btn.linked {
   color: var(--gold); border-color: var(--gold);
 }
-/* ─── NODE GHOST OVERLAY ─────────────────────────────────────────────── */
+
+/* ─── NODE GHOST OVERLAY ──────────────────────────────────────────────── */
 #node-ghost-overlay {
   position: fixed;
   top: 52px; left: 0; bottom: 0;
@@ -2077,7 +2044,7 @@ body.panel-compose-open #panel-backdrop {
 <div id="panel-backdrop" onclick="closeAllPanels()"></div>
 
 <!-- ─── APP ─────────────────────────────────────────────────────────── -->
-<div id="app" class="toc-pinned">
+<div id="app">
 
   <header id="main-header">
     <div class="wordmark">
@@ -2095,13 +2062,11 @@ body.panel-compose-open #panel-backdrop {
         <button class="h-undo-btn" id="btn-undo" onclick="histUndo()" title="Undo (Ctrl+Z)" disabled>↩</button>
         <button class="h-undo-btn" id="btn-redo" onclick="histRedo()" title="Redo (Ctrl+Y)" disabled>↪</button>
       </div>
+      <button class="h-btn" id="btn-toc"  onclick="toggleToc()"     title="Table of contents">☰ Contents</button>
+      <button class="h-btn" id="btn-compose" onclick="toggleCompose()" title="Compose panel">✏ Compose</button>
       <button class="h-btn" id="btn-toc-mobile"  onclick="openPanelOverlay('toc')"     title="Contents">☰</button>
       <button class="h-btn" id="btn-compose-mobile" onclick="openPanelOverlay('compose')" title="Compose">✏</button>
-      <div id="view-widget" title="Drag to reposition">
-        <button class="vw-btn" id="vw-read"  onclick="setViewMode('read')">Read</button>
-        <button class="vw-btn" id="vw-write" onclick="setViewMode('write')">Write</button>
-        <button class="vw-btn" id="vw-both"  onclick="setViewMode('both')">Both</button>
-      </div>
+      <button class="h-btn" id="btn-read" onclick="toggleReading()" title="Preview mode (p)">⊡ Preview</button>
       <button class="h-btn" id="btn-export" onclick="exportRaw()">↗ Export</button>
       <button class="h-btn" id="btn-keys"  onclick="toggleKeys()">? Keys</button>
     </div>
@@ -2390,8 +2355,7 @@ document.body.classList.add('free-scroll');
 setTimeout(() => {
   const _fsb = document.getElementById('float-scroll-btn');
   if (_fsb) _fsb.classList.add('active');
-  const _hfsb = document.getElementById('hud-freescroll');
-  if (_hfsb) _hfsb.classList.add('active');
+  // hud-freescroll not used in frank theme
 }, 0);
 
 (function applyThemeText() {
@@ -2410,13 +2374,15 @@ setTimeout(() => {
     const bp = document.querySelector('.beckon-prompt');
     if (bp) bp.textContent = 'Write the thought as it arrives…';
   } else {
-    document.title = 'if i may be frank · A Thinking Notebook';
+    document.title = 'if i may be frank · A Self-Portrait';
     const wm = document.querySelector('.wordmark');
     if (wm) wm.childNodes[0].textContent = 'if i may be frank';
     const obWm = document.querySelector('.ob-wordmark');
     if (obWm) obWm.textContent = 'if i may be frank';
     const obEd = document.querySelector('.ob-edition');
-    if (obEd) obEd.textContent = 'A Thinking Notebook · Self-Portrait Edition';
+    if (obEd) obEd.textContent = 'A Self-Portrait · In Its Own Hand';
+    const obTg = document.querySelector('.ob-tagline');
+    if (obTg) obTg.innerHTML = 'A tool that believes something.<br>An honest account of what.';
     const obBtn = document.getElementById('ob-btn');
     if (obBtn) obBtn.textContent = 'Read the self-portrait →';
   }
@@ -2675,7 +2641,7 @@ function renderPage() {
       document.querySelectorAll('.n-card').forEach((c, ci) => {
         const active = ci === activeNode;
         c.classList.toggle('active-card', active);
-        if (active) c.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (active) scrollPageTo(c, 'nearest');
       });
     });
 
@@ -2717,47 +2683,6 @@ function renderPage() {
   updateNav(); updateToc(); updateChapterLabel();
 }
 
-
-/* ── scrollPageTo: header-aware scroll for #page-scroll content ── */
-
-function jumpToChapter(chNode) {
-  if (!chNode) return;
-  const num = String(chNode.num || '01').padStart(2, '0');
-  const chBlock = document.querySelector(`.ch-block[data-ch="${num}"]`);
-  const chIdx = nodes.indexOf(chNode);
-  let firstSentSidx = -1;
-  for (let k = chIdx + 1; k < nodes.length; k++) {
-    if (nodes[k] && nodes[k].type === 'chapter') break;
-    const el = document.querySelector(`[data-nidx="${k}"]`);
-    if (el) { firstSentSidx = parseInt(el.dataset.sidx); break; }
-  }
-  if (chBlock) scrollPageTo(chBlock, 'center');
-  if (firstSentSidx >= 0) goTo(firstSentSidx, true);
-  else if (chBlock) requestAnimationFrame(() => scrollPageTo(chBlock, 'center'));
-}
-
-function scrollPageTo(el, block) {
-  if (!el) return;
-  const scroller = document.getElementById('page-scroll');
-  if (!scroller) { el.scrollIntoView({ behavior: 'smooth', block: block || 'center' }); return; }
-  const HEADER_CLEARANCE = 80;   // beckon zone height
-  const FOOTER_CLEARANCE = 60;   // nav zone height
-  const scrollerRect = scroller.getBoundingClientRect();
-  const elRect       = el.getBoundingClientRect();
-  const elTop        = elRect.top  - scrollerRect.top  + scroller.scrollTop;
-  const elBot        = elRect.bottom - scrollerRect.top + scroller.scrollTop;
-  const viewH        = scroller.clientHeight;
-  const target = (block === 'nearest')
-    ? (() => {
-        const visTop = scroller.scrollTop + HEADER_CLEARANCE;
-        const visBot = scroller.scrollTop + viewH - FOOTER_CLEARANCE;
-        if (elTop < visTop) return elTop - HEADER_CLEARANCE - 8;
-        if (elBot > visBot) return elBot - viewH + FOOTER_CLEARANCE + 8;
-        return null; // already visible
-      })()
-    : elTop - HEADER_CLEARANCE - (viewH - HEADER_CLEARANCE - FOOTER_CLEARANCE - elRect.height) / 2;
-  if (target !== null) scroller.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
-}
 function applyReveal(upTo, forceScroll) {
   pvReveal = upTo;
   pvEls.forEach((el, s) => {
@@ -2798,6 +2723,22 @@ function applyReveal(upTo, forceScroll) {
     }
   }
   updateNav(); updateChapterLabel();
+  // Re-highlight active chapter in TOC rail
+  const activeSent = pvEls[upTo];
+  let activeChNum = null;
+  if (activeSent) {
+    let p = activeSent.closest('div') && activeSent.closest('div').previousElementSibling;
+    while (p) {
+      if (p.classList && p.classList.contains('ch-block')) { activeChNum = p.dataset.ch; break; }
+      p = p.previousElementSibling;
+    }
+  }
+  document.querySelectorAll('.toc-ch').forEach(ch => {
+    const numEl = ch.querySelector('.toc-ch-num');
+    if (!numEl) return;
+    const chNumText = numEl.textContent.replace('Chapter · ', '').trim();
+    ch.classList.toggle('active', activeChNum !== null && chNumText === activeChNum);
+  });
   document.querySelectorAll('.toc-node-item').forEach(el => { el.classList.toggle('active', parseInt(el.dataset.sidx) === upTo); });
 }
 
@@ -2808,6 +2749,47 @@ function prev()  { goTo(pvReveal - 1); }
 function updateNav() {
   const total = pvEls.length;
   document.getElementById('nav-counter').textContent = total ? `${pvReveal+1} / ${total}` : '— / —';
+}
+
+/* ── scrollPageTo: header-aware scroll for #page-scroll content ── */
+
+function jumpToChapter(chNode) {
+  if (!chNode) return;
+  const num = String(chNode.num || '01').padStart(2, '0');
+  const chBlock = document.querySelector(`.ch-block[data-ch="${num}"]`);
+  const chIdx = nodes.indexOf(chNode);
+  let firstSentSidx = -1;
+  for (let k = chIdx + 1; k < nodes.length; k++) {
+    if (nodes[k] && nodes[k].type === 'chapter') break;
+    const el = document.querySelector(`[data-nidx="${k}"]`);
+    if (el) { firstSentSidx = parseInt(el.dataset.sidx); break; }
+  }
+  if (chBlock) scrollPageTo(chBlock, 'center');
+  if (firstSentSidx >= 0) goTo(firstSentSidx, true);
+  else if (chBlock) requestAnimationFrame(() => scrollPageTo(chBlock, 'center'));
+}
+
+function scrollPageTo(el, block) {
+  if (!el) return;
+  const scroller = document.getElementById('page-scroll');
+  if (!scroller) { el.scrollIntoView({ behavior: 'smooth', block: block || 'center' }); return; }
+  const HEADER_CLEARANCE = 80;
+  const FOOTER_CLEARANCE = 60;
+  const scrollerRect = scroller.getBoundingClientRect();
+  const elRect       = el.getBoundingClientRect();
+  const elTop        = elRect.top  - scrollerRect.top  + scroller.scrollTop;
+  const elBot        = elRect.bottom - scrollerRect.top + scroller.scrollTop;
+  const viewH        = scroller.clientHeight;
+  const target = (block === 'nearest')
+    ? (() => {
+        const visTop = scroller.scrollTop + HEADER_CLEARANCE;
+        const visBot = scroller.scrollTop + viewH - FOOTER_CLEARANCE;
+        if (elTop < visTop) return elTop - HEADER_CLEARANCE - 8;
+        if (elBot > visBot) return elBot - viewH + FOOTER_CLEARANCE + 8;
+        return null;
+      })()
+    : elTop - HEADER_CLEARANCE - (viewH - HEADER_CLEARANCE - FOOTER_CLEARANCE - elRect.height) / 2;
+  if (target !== null) scroller.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
 }
 
 function updateChapterLabel() {
@@ -2823,7 +2805,7 @@ function updateChapterLabel() {
     }
     prev = prev.previousElementSibling;
   }
-  el.textContent = 'reasonably ▾';
+  el.textContent = 'if i may be frank ▾';
 }
 
 function updateToc() {
@@ -2833,17 +2815,38 @@ function updateToc() {
   body.innerHTML = '';
   let chCount = 0, sentCount = 0;
   let currentChEl = null;
+  let currentChDiv = null;
+
+  // Determine which chapter node is currently active
+  const activeEl = pvEls[pvReveal];
+  let activeChNidx = -1;
+  if (activeEl) {
+    let prev = activeEl.closest('div') && activeEl.closest('div').previousElementSibling;
+    while (prev) {
+      if (prev.classList && prev.classList.contains('ch-block')) {
+        const chNum = prev.dataset.ch;
+        // Find corresponding node index
+        nodes.forEach((n, i) => {
+          if (n.type === 'chapter' && String(n.num||'01').padStart(2,'0') === chNum) activeChNidx = i;
+        });
+        break;
+      }
+      prev = prev.previousElementSibling;
+    }
+  }
 
   nodes.forEach((n, nidx) => {
     if (n.type === 'chapter') {
       chCount++;
-      const ch = document.createElement('div'); ch.className = 'toc-ch';
+      const ch = document.createElement('div');
+      const isActive = nidx === activeChNidx;
+      ch.className = 'toc-ch' + (isActive ? ' active' : '');
       ch.innerHTML = `<div class="toc-ch-num">Chapter · ${String(n.num||chCount).padStart(2,'0')}</div>`;
       const name = document.createElement('span'); name.className = 'toc-ch-name'; name.textContent = n.title||'Untitled';
       name.onclick = () => { jumpToChapter(n); };
       ch.appendChild(name);
       const nodeList = document.createElement('div'); nodeList.className = 'toc-ch-nodes';
-      ch.appendChild(nodeList); body.appendChild(ch); currentChEl = nodeList; return;
+      ch.appendChild(nodeList); body.appendChild(ch); currentChEl = nodeList; currentChDiv = ch; return;
     }
     if (n.type === 'break' || !currentChEl) return;
     sentCount++;
@@ -2857,6 +2860,8 @@ function updateToc() {
 
   countEl.textContent = chCount ? `${chCount} ch` : '—';
   footer.textContent = `${chCount} chapters · ${sentCount} sentences`;
+  // Sync active toc-node-item
+  document.querySelectorAll('.toc-node-item').forEach(el => { el.classList.toggle('active', parseInt(el.dataset.sidx) === pvReveal); });
   renderSpine();
 }
 
@@ -2870,7 +2875,6 @@ const capOrganizer  = document.getElementById('capture-organizer');
 
 let _pendingNodeIdx = -1;
 let _selectedChIdx  = -1;
-let _vpResizeHandler = null;
 
 function openCapture() {
   if (readMode) return;
@@ -2882,30 +2886,15 @@ function openCapture() {
   _pendingNodeIdx = -1; _selectedChIdx = -1;
   document.dispatchEvent(new Event('captureOpened'));
   setTimeout(() => ceTextarea.focus(), 60);
-  if (window.visualViewport && window.innerWidth <= 720) {
-    _vpResizeHandler = () => {
-      const vv = window.visualViewport;
-      const keyboardH = window.innerHeight - vv.height - vv.offsetTop;
-      capturePanel.style.bottom = Math.max(0, keyboardH) + 'px';
-    };
-    window.visualViewport.addEventListener('resize', _vpResizeHandler);
-    window.visualViewport.addEventListener('scroll', _vpResizeHandler);
-  }
 }
 
 function closeCapture() {
   captureOpen = false;
   capturePanel.classList.remove('open');
-  capturePanel.style.bottom = '';
   captureFab.classList.remove('active');
   if (captureBeckon) captureBeckon.classList.remove('active');
   capOrganizer.classList.remove('open');
   _pendingNodeIdx = -1; _selectedChIdx = -1;
-  if (_vpResizeHandler && window.visualViewport) {
-    window.visualViewport.removeEventListener('resize', _vpResizeHandler);
-    window.visualViewport.removeEventListener('scroll', _vpResizeHandler);
-    _vpResizeHandler = null;
-  }
 }
 
 function toggleCapture() { captureOpen ? closeCapture() : openCapture(); }
@@ -3085,7 +3074,7 @@ function organizeInjectIntoChapter(chNodeIdx) {
   closeCapture(); commitChange();
   setTimeout(() => {
     const el = document.querySelector(`[data-nidx="${insertAt}"]`);
-    if (el) { scrollPageTo(el, 'center'); const sidx = parseInt(el.dataset.sidx); if (!isNaN(sidx)) goTo(sidx); setTimeout(() => openSyntaxWidget(insertAt, el), 380); }
+    if (el) { scrollPageTo(el, 'center'); const sidx = parseInt(el.dataset.sidx); if (!isNaN(sidx)) goTo(sidx, true); setTimeout(() => openSyntaxWidget(insertAt, el), 380); }
   }, 80);
 }
 
@@ -3108,7 +3097,7 @@ function organizeAppend() {
   closeCapture();
   setTimeout(() => {
     const el = document.querySelector(`[data-nidx="${idx}"]`);
-    if (el) { scrollPageTo(el, 'center'); const sidx = parseInt(el.dataset.sidx); if (!isNaN(sidx)) goTo(sidx); setTimeout(() => openSyntaxWidget(idx, el), 380); }
+    if (el) { scrollPageTo(el, 'center'); const sidx = parseInt(el.dataset.sidx); if (!isNaN(sidx)) goTo(sidx, true); setTimeout(() => openSyntaxWidget(idx, el), 380); }
   }, 80);
 }
 
@@ -3241,7 +3230,7 @@ function addNode(type) {
   activeNode = nodes.length - 1;
   pvReveal = Math.max(0, pvEls.length);
   if (type === 'break') { commitChange(); } else { renderCanvas(); renderPage(); syncRaw(); renderSpine(); }
-  // Scroll page stream to the new sentence
+  // Scroll the page to the new node
   if (type === 'chapter') {
     requestAnimationFrame(() => {
       const hdr = document.querySelector(`.ch-block[data-ch="${n.num}"]`);
@@ -3253,10 +3242,9 @@ function addNode(type) {
   requestAnimationFrame(() => {
     const card = document.querySelector(`[data-nid="${n.id}"]`);
     if (!card) return;
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    scrollPageTo(card, 'nearest');
     const inp = card.querySelector('input.n-ch-title, input.n-input, input.n-spec-k');
     if (inp) inp.focus();
-    // focusin on the canvas fires openNodeGhost automatically
   });
 }
 
@@ -3366,81 +3354,30 @@ function exportRaw() {
 }
 
 function toggleToc() {
-  if (window.innerWidth <= 720) {
-    if (document.getElementById('toc').classList.contains('panel-open')) {
-      closePanelOverlay('toc');
-      const b = document.getElementById('btn-toc'); if (b) b.classList.remove('active');
-    } else {
-      openPanelOverlay('toc');
-      const b = document.getElementById('btn-toc'); if (b) b.classList.add('active');
-    }
+  // Use overlay panel instead of grid column collapse
+  if (document.getElementById('toc').classList.contains('panel-open')) {
+    closePanelOverlay('toc');
+    document.getElementById('btn-toc').classList.remove('active');
   } else {
-    const app = document.getElementById('app');
-    const btn = document.getElementById('btn-toc');
-    const pinned = app.classList.contains('toc-pinned');
-    app.classList.toggle('toc-pinned', !pinned);
-    app.classList.toggle('no-toc', pinned);
-    if (btn) btn.classList.toggle('active', !pinned);
+    openPanelOverlay('toc');
+    document.getElementById('btn-toc').classList.add('active');
   }
 }
 function toggleCompose() {
-  const app = document.getElementById('app');
-  const btn = document.getElementById('btn-compose');
-  const isHidden = app.classList.contains('no-comp');
-  app.classList.toggle('no-comp', !isHidden);
-  if (btn) btn.classList.toggle('active', isHidden);
+  const cp = document.getElementById('compose-panel');
+  if (cp.classList.contains('panel-open')) {
+    closePanelOverlay('compose');
+    const b = document.getElementById('btn-compose'); if (b) b.classList.remove('active');
+  } else {
+    openPanelOverlay('compose');
+    const b = document.getElementById('btn-compose'); if (b) b.classList.add('active');
+  }
 }
 function toggleReading() {
   readMode = !readMode;
   document.getElementById('app').classList.toggle('reading', readMode);
-  if (document.getElementById('btn-read')) document.getElementById('btn-read').classList.toggle('active', readMode);
+  document.getElementById('btn-read').classList.toggle('active', readMode);
 }
-
-// ── View mode widget ──────────────────────────────────────────────────
-let _viewMode = 'write';
-function setViewMode(mode) {
-  _viewMode = mode;
-  const app = document.getElementById('app');
-  app.classList.remove('no-toc', 'no-comp', 'reading');
-  readMode = false;
-  if (mode === 'read')  { app.classList.add('no-comp'); }
-  if (mode === 'write') { app.classList.add('no-toc'); }
-  document.querySelectorAll('.vw-btn').forEach(b => b.classList.remove('active'));
-  const active = document.getElementById('vw-' + mode);
-  if (active) active.classList.add('active');
-}
-
-(function() {
-  const w = document.getElementById('view-widget');
-  let dragging = false, ox = 0, oy = 0, startX = 0, startY = 0, moved = false;
-  w.addEventListener('pointerdown', e => {
-    if (e.target.classList.contains('vw-btn')) return;
-    dragging = true; moved = false;
-    const r = w.getBoundingClientRect();
-    ox = e.clientX - r.left; oy = e.clientY - r.top;
-    startX = e.clientX; startY = e.clientY;
-    w.setPointerCapture(e.pointerId);
-  });
-  window.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    if (Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) > 4) moved = true;
-    if (!moved) return;
-    if (!w.classList.contains('dragging')) { const r = w.getBoundingClientRect(); w.style.width = r.width + 'px'; }
-    w.classList.add('dragging');
-    w.style.left = (e.clientX - ox) + 'px';
-    w.style.top  = (e.clientY - oy) + 'px';
-  });
-  window.addEventListener('pointerup', () => {
-    if (!dragging) return;
-    dragging = false;
-    w.classList.remove('dragging');
-    if (moved) { w.style.position = 'fixed'; w.style.zIndex = '9000'; }
-    else { w.style.width = ''; }
-  });
-})();
-
-setViewMode('write');
-
 function toggleKeys() { document.getElementById('key-help').classList.toggle('show'); }
 
 function toggleFreeScroll() {
@@ -3590,10 +3527,7 @@ function renderSpine() {
     const ghost = document.createElement('div'); ghost.className = 'spine-ghost';
     ghost.innerHTML = `<div class="sg-mood-bar" style="background:${mc.bar}"></div><div class="sg-ch-num">Chapter · ${String(d.ch.num||ci+1).padStart(2,'0')}</div><div class="sg-ch-title">${d.ch.title||'Untitled'}</div><div class="sg-stats"><div class="sg-stat"><span class="sg-stat-val">${d.sentCount}</span><span class="sg-stat-key">sentences</span></div><div class="sg-stat"><span class="sg-stat-val">${ci+1}</span><span class="sg-stat-key">of ${chapterData.length}</span></div></div>${d.snip?`<div class="sg-snip">${d.snip}${d.snip.length>=80?'…':''}</div>`:''}<span class="sg-mood-tag" style="background:${mc.bar}20;color:${mc.bar};border:1px solid ${mc.bar}40">${mc.tag}</span>`;
     seg.append(bar, num, title, ghost);
-    seg.addEventListener('click', () => {
-      spineOpen = false; document.body.classList.remove('spine-open'); updateSpineBeckon(false);
-      jumpToChapter(d.ch);
-    });
+    seg.addEventListener('click', () => { const si = pageIdxOfNode(d.chIdx+1); if(si>=0)goTo(si); spineOpen=false; document.body.classList.remove('spine-open'); updateSpineBeckon(false); });
     tl.appendChild(seg);
   });
 }
@@ -3634,7 +3568,7 @@ document.addEventListener('keydown', e => {
     if (/^[1-9]$/.test(e.key)) {
       const n = parseInt(e.key);
       const chs = nodes.filter(x => x.type==='chapter');
-      if (chs[n-1]) { jumpToChapter(chs[n-1]); }
+      if (chs[n-1]) { const ci = nodes.indexOf(chs[n-1]); const si = pageIdxOfNode(ci+1); if(si>=0) goTo(si); }
     }
   }
 });
@@ -4069,7 +4003,7 @@ commitChange = function() {
   if (panelMode === 'arrange') renderArrange();
 };
 
-// ─── SEED — self-portrait ──────────────────────────────────────────────────
+// ─── SEED — if i may be frank self-portrait ────────────────────────────────
 (function seed() {
   nodes = [
     // ── Ch 01 · I Built a Tool That Has Opinions ────────────────────────────
@@ -4355,16 +4289,22 @@ document.getElementById('narrative-root').addEventListener('dblclick', e => {
   };
 
   window.hudActivate = function(mode) {
+    // Deactivate all hud buttons
     document.querySelectorAll('.hud-btn').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('hud-' + mode);
     if (btn) btn.classList.add('active');
     hudActive = mode;
 
+    // Close any open overlays first
     const toc = document.getElementById('toc');
     const cp  = document.getElementById('compose-panel');
-    if (toc) { toc.classList.remove('panel-open'); }
-    if (cp)  { cp.classList.remove('panel-open'); }
+    toc.classList.remove('panel-open');
+    cp.classList.remove('panel-open');
     document.body.classList.remove('panel-toc-open', 'panel-compose-open');
+    setTimeout(() => {
+      if (!toc.classList.contains('panel-open')) toc.classList.remove('panel-overlay','panel-right');
+      if (!cp.classList.contains('panel-open'))  cp.classList.remove('panel-overlay','panel-right');
+    }, 320);
 
     if (mode === 'read') {
       // pure story stream — close everything
@@ -4676,7 +4616,7 @@ document.addEventListener('keydown', e => {
     toggleReading();
   }
 });
-</script>
+
 // ─── NODE GHOST OVERLAY ────────────────────────────────────────────────────
 (function() {
   const overlay   = document.getElementById('node-ghost-overlay');
@@ -4733,6 +4673,7 @@ document.addEventListener('keydown', e => {
     _ngoSourceInput = null;
   }
 
+  // Sync ghost → right rail input in real-time
   ngoTA.addEventListener('input', () => {
     if (!_ngoSourceInput) return;
     _ngoSourceInput.value = ngoTA.value;
@@ -4742,21 +4683,30 @@ document.addEventListener('keydown', e => {
   });
 
   ngoTA.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { e.preventDefault(); closeNodeGhost(false); }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeNodeGhost(false);
+    }
     const multiLine = ['body','poster','pull','draft'].includes(_ngoNodeType);
-    if (e.key === 'Enter' && !e.shiftKey && !multiLine) { e.preventDefault(); closeNodeGhost(false); }
+    if (e.key === 'Enter' && !e.shiftKey && !multiLine) {
+      e.preventDefault();
+      closeNodeGhost(false);
+    }
   });
 
+  // Backdrop click closes
   document.getElementById('ngo-backdrop').addEventListener('mousedown', () => {
     closeNodeGhost(false);
   });
 
+  // Wire into node canvas: open ghost when any n-input / n-ch-title / n-spec-k gains focus
   const canvasEl = document.getElementById('node-canvas');
   if (canvasEl) {
     canvasEl.addEventListener('focusin', e => {
       const inp = e.target;
       if (!inp || inp.tagName !== 'INPUT') return;
       clearTimeout(_ngoBlurTimer);
+
       const card = inp.closest('.n-card');
       if (!card) return;
       const badge = card.querySelector('.n-badge');
@@ -4764,6 +4714,7 @@ document.addEventListener('keydown', e => {
       if (type === 'ch') type = 'chapter';
       if (type === '?')  type = 'draft';
       if (inp.classList.contains('n-spec-k')) type = 'spec';
+
       openNodeGhost(inp, type);
     });
 
@@ -4782,7 +4733,8 @@ document.addEventListener('keydown', e => {
   window.openNodeGhost  = openNodeGhost;
   window.closeNodeGhost = closeNodeGhost;
 })();
-
+</script>
+<!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <div id="mobile-hud">
   <div class="hud-inner">
