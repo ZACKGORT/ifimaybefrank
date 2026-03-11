@@ -651,6 +651,7 @@ header::after {
   border-right: 1px solid var(--rule);
   display: flex; flex-direction: column;
   overflow: hidden; min-height: 0;
+  position: relative; z-index: 3000;
 }
 #app.no-toc #toc { overflow: hidden; pointer-events: none; }
 
@@ -1830,7 +1831,7 @@ body.panel-compose-open #panel-backdrop {
   display: none;
 }
 
-@media (max-width: 1100px) and (min-width: 721px) {
+@media (max-width: 900px) and (min-width: 721px) {
   #app { grid-template-columns: 0px 1fr var(--rail-w) !important; }
   #toc { overflow: hidden; pointer-events: none; }
 }
@@ -3488,7 +3489,7 @@ function setViewMode(mode) {
   });
 })();
 
-setViewMode('write');
+setViewMode('both');
 
 function toggleKeys() { document.getElementById('key-help').classList.toggle('show'); }
 
