@@ -452,10 +452,15 @@ header::after {
 #ce-textarea::placeholder { color: var(--ink-5); font-style: italic; }
 
 .cp-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 18px 14px;
+  display: flex; flex-direction: column;
+  padding: 0;
   border-top: 1px solid var(--rule);
-  gap: 12px;
+  gap: 0;
+}
+.cp-footer-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 18px 8px;
+  gap: 10px;
 }
 #ce-charcount {
   font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.08em;
@@ -473,13 +478,30 @@ header::after {
   padding: 1px 5px; border-radius: 2px; color: var(--ink-3);
 }
 #ce-submit {
-  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.14em;
+  display: block; width: 100%;
+  font-family: var(--f-ui); font-size: 11px; letter-spacing: 0.16em;
   text-transform: uppercase; background: var(--ink);
-  color: var(--paper); border: none;
-  padding: 7px 16px; border-radius: 2px; cursor: pointer;
-  transition: background 0.14s; white-space: nowrap; flex-shrink: 0;
+  color: var(--paper); border: none; border-top: 1px solid var(--rule-2);
+  padding: 14px 20px; cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+  text-align: center; white-space: nowrap;
+  position: relative;
 }
-#ce-submit:hover { background: var(--red); }
+#ce-submit::after {
+  content: '  ↵';
+  font-size: 10px; opacity: 0.45; letter-spacing: 0;
+}
+#ce-submit:hover { background: var(--red); color: var(--paper); }
+#ce-submit:active { background: var(--red); transform: scale(0.99); }
+
+@media (max-width: 720px) {
+  #ce-submit {
+    font-size: 13px;
+    padding: 18px 20px;
+    letter-spacing: 0.12em;
+  }
+  .ce-keys { display: none; }
+}
 
 .cp-toolbar {
   display: flex; align-items: center; gap: 2px;
@@ -1925,6 +1947,19 @@ body.panel-compose-open #panel-backdrop {
 #node-ghost-overlay.ngo-open {
   opacity: 1; pointer-events: auto;
 }
+
+/* Ghost overlay active → suppress the quick-capture beckon & fab */
+body.ngo-active #capture-beckon,
+body.ngo-active #capture-fab {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.18s ease;
+}
+body.ngo-active #capture-panel {
+  pointer-events: none;
+  opacity: 0.3;
+  transition: opacity 0.18s ease;
+}
 #ngo-backdrop {
   position: absolute; inset: 0;
   background: var(--paper);
@@ -1963,14 +1998,32 @@ body.panel-compose-open #panel-backdrop {
   width: 100%; height: 1px;
   background: linear-gradient(to right, var(--rule-2), transparent);
 }
+#ngo-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
 #ngo-hint {
   font-family: var(--f-ui); font-size: 7px; letter-spacing: 0.14em;
   text-transform: uppercase; color: var(--ink-5);
-  display: flex; gap: 14px;
+  display: flex; gap: 14px; flex: 1;
 }
 #ngo-hint kbd {
   font-family: var(--f-ui); font-style: normal;
   color: var(--ink-4); font-size: 7px;
+}
+#ngo-submit {
+  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--ink); color: var(--paper);
+  border: none; border-radius: 2px;
+  padding: 7px 16px; cursor: pointer;
+  transition: background 0.14s;
+  white-space: nowrap; flex-shrink: 0;
+}
+#ngo-submit:hover { background: var(--red); }
+#ngo-submit:active { transform: scale(0.97); }
+
+@media (max-width: 720px) {
+  #node-ghost-overlay { display: none !important; }
 }
 </style>
 </head>
@@ -1998,10 +2051,13 @@ body.panel-compose-open #panel-backdrop {
     <div id="ngo-type-pill">body</div>
     <textarea id="ngo-textarea" rows="3" spellcheck="true" placeholder="The thought, plainly stated."></textarea>
     <div id="ngo-rule"></div>
-    <div id="ngo-hint">
-      <span><kbd>Enter</kbd> commit</span>
-      <span><kbd>Esc</kbd> dismiss</span>
-      <span><kbd>Shift+Enter</kbd> line break</span>
+    <div id="ngo-footer">
+      <div id="ngo-hint">
+        <span><kbd>Enter</kbd> commit</span>
+        <span><kbd>Esc</kbd> dismiss</span>
+        <span><kbd>Shift+Enter</kbd> line break</span>
+      </div>
+      <button id="ngo-submit" onclick="ngoCommit()">Commit</button>
     </div>
   </div>
 </div>
@@ -2235,12 +2291,14 @@ body.panel-compose-open #panel-backdrop {
   <textarea id="ce-textarea" rows="3" placeholder="The thought, as it arrives. Don't stop to name it." spellcheck="true"></textarea>
   <div class="cp-fmt-hint" id="cp-fmt-hint"></div>
   <div class="cp-footer">
-    <span id="ce-charcount">0</span>
-    <span class="ce-keys">
-      <span><kbd>Ctrl+↵</kbd> submit</span>
-      <span><kbd>Esc</kbd> close</span>
-    </span>
-    <button id="ce-submit">Submit →</button>
+    <div class="cp-footer-meta">
+      <span id="ce-charcount">0</span>
+      <span class="ce-keys">
+        <span><kbd>Ctrl+↵</kbd> submit</span>
+        <span><kbd>Esc</kbd> close</span>
+      </span>
+    </div>
+    <button id="ce-submit">Commit thought</button>
   </div>
   <div id="capture-organizer">
     <div id="co-mood-beat">
@@ -4648,10 +4706,21 @@ document.addEventListener('keydown', e => {
     _ngoNodeType    = nodeType || 'body';
     _ngoOpen        = true;
 
+    // Suppress quick-capture UI while ghost is active
+    document.body.classList.add('ngo-active');
+    if (typeof closeCapture === 'function' && captureOpen) closeCapture();
+
     overlay.className = 'ngo-open ngo-type-' + _ngoNodeType;
     ngoPill.textContent = TYPE_LABELS[_ngoNodeType] || _ngoNodeType;
     ngoTA.placeholder = TYPE_PLACEHOLDERS[_ngoNodeType] || 'Write…';
     ngoTA.value = inp.value;
+
+    // Update submit button label to match type
+    const submitBtn = document.getElementById('ngo-submit');
+    if (submitBtn) {
+      const multiLine = ['body','poster','pull','draft'].includes(_ngoNodeType);
+      submitBtn.textContent = multiLine ? 'Commit' : 'Set';
+    }
 
     ngoTA.style.height = 'auto';
     ngoTA.style.height = Math.min(ngoTA.scrollHeight, window.innerHeight * 0.55) + 'px';
@@ -4666,12 +4735,22 @@ document.addEventListener('keydown', e => {
     if (!_ngoOpen) return;
     _ngoOpen = false;
     overlay.classList.remove('ngo-open');
+    document.body.classList.remove('ngo-active');
     if (refocusSource && _ngoSourceInput) {
       _ngoSourceInput.focus();
       _ngoSourceInput.setSelectionRange(_ngoSourceInput.value.length, _ngoSourceInput.value.length);
     }
     _ngoSourceInput = null;
   }
+
+  // ngo-submit button — commit and close
+  window.ngoCommit = function() {
+    if (!_ngoOpen || !_ngoSourceInput) { closeNodeGhost(false); return; }
+    // Sync latest textarea value to source input then fire input event
+    _ngoSourceInput.value = ngoTA.value;
+    _ngoSourceInput.dispatchEvent(new Event('input', { bubbles: true }));
+    closeNodeGhost(true);
+  };
 
   // Sync ghost → right rail input in real-time
   ngoTA.addEventListener('input', () => {
@@ -4734,7 +4813,6 @@ document.addEventListener('keydown', e => {
   window.closeNodeGhost = closeNodeGhost;
 })();
 </script>
-<!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <!-- ─── MOBILE BOTTOM HUD ────────────────────────────────────────────── -->
 <div id="mobile-hud">
   <div class="hud-inner">
