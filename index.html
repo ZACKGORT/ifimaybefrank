@@ -484,6 +484,143 @@ header::after {
 #ce-submit:hover { border-color: var(--ink-2); color: var(--ink-2); }
 #ce-submit:active { transform: scale(0.97); }
 
+#ce-parse {
+  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: none; color: var(--ink-3);
+  border: 1px solid var(--rule-2);
+  padding: 5px 11px; border-radius: 2px; cursor: pointer;
+  transition: border-color 0.14s, color 0.14s;
+  white-space: nowrap; flex-shrink: 0;
+}
+#ce-parse:hover { border-color: var(--red); color: var(--red); }
+#ce-parse:active { transform: scale(0.97); }
+
+/* ── Parse review widget ── */
+#parse-widget {
+  display: none;
+  position: fixed;
+  left: 50%; bottom: 480px;
+  transform: translateX(-50%);
+  z-index: 8200;
+  width: min(640px, calc(100vw - 32px));
+  max-height: 44vh;
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  #parse-widget {
+    left: 8px; right: 8px; bottom: 72px;
+    transform: none; width: auto;
+    max-height: 55vh; z-index: 8600;
+  }
+}
+#parse-widget.open { display: flex; flex-direction: column; pointer-events: auto; }
+#parse-panel {
+  background: var(--paper);
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  display: flex; flex-direction: column;
+  max-height: 44vh;
+  overflow: hidden;
+  box-shadow: 0 10px 52px rgba(0,0,0,0.26), 0 2px 8px rgba(0,0,0,0.10);
+}
+.parse-header {
+  padding: 10px 16px 10px 12px;
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+  cursor: grab; user-select: none;
+}
+.parse-header:active { cursor: grabbing; }
+.parse-drag-grip {
+  color: var(--ink-4); font-size: 11px; letter-spacing: -2px;
+  opacity: 0.5; flex-shrink: 0; line-height: 1;
+}
+.parse-header-title {
+  font-family: var(--f-disp); font-size: 15px; color: var(--ink);
+  flex: 1;
+}
+.parse-header-sub {
+  font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-4); flex-shrink: 0;
+}
+.parse-close {
+  background: none; border: 1px solid var(--rule-2); color: var(--ink-3);
+  font-size: 11px; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+}
+.parse-close:hover { border-color: var(--red); color: var(--red); }
+.parse-batch-bar {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 5px;
+  flex-shrink: 0; flex-wrap: wrap;
+  background: var(--paper-2);
+}
+.parse-batch-label {
+  font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--ink-4); margin-right: 2px; font-family: var(--f-ui);
+}
+.parse-batch-btn {
+  font-size: 7px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--f-ui);
+  padding: 3px 9px; border: 1px solid var(--rule-2); border-radius: 20px;
+  color: var(--ink-3); background: none; cursor: pointer; transition: all 0.14s;
+}
+.parse-batch-btn:hover { border-color: var(--red); color: var(--red); }
+.parse-sentences {
+  flex: 1; overflow-y: auto; padding: 0;
+}
+.parse-sentences::-webkit-scrollbar { width: 3px; }
+.parse-sentences::-webkit-scrollbar-thumb { background: var(--rule-2); border-radius: 2px; }
+.parse-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.1s;
+}
+.parse-row:last-child { border-bottom: none; }
+.parse-row:hover { background: var(--paper-2); }
+.parse-row-num {
+  font-size: 7px; letter-spacing: 0.1em; color: var(--ink-4);
+  flex-shrink: 0; min-width: 14px; font-family: var(--f-ui);
+  padding-top: 1px;
+}
+.parse-row-text {
+  flex: 1; font-family: var(--f-body); font-size: 14px;
+  line-height: 1.55; color: var(--ink);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.parse-row-types {
+  display: flex; gap: 3px; flex-shrink: 0;
+}
+.parse-type-btn {
+  font-size: 6px; letter-spacing: 0.12em; text-transform: uppercase;
+  font-family: var(--f-ui);
+  padding: 4px 9px; border: 1px solid var(--rule-2); border-radius: 20px;
+  color: var(--ink-4); background: none; cursor: pointer;
+  transition: all 0.12s; white-space: nowrap;
+}
+.parse-type-btn:hover { border-color: var(--red); color: var(--red); }
+.parse-type-btn.active {
+  color: var(--paper); border-color: var(--red);
+  background: var(--red);
+}
+.parse-footer {
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  background: var(--paper-2);
+}
+.parse-commit-btn {
+  font-family: var(--f-ui); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+  background: var(--red); color: var(--paper); border: none;
+  padding: 9px 20px; border-radius: 2px; cursor: pointer; transition: opacity 0.2s;
+}
+.parse-commit-btn:hover { opacity: 0.82; }
+
 @media (max-width: 720px) {
   .ce-keys { display: none; }
   #ce-submit { font-size: 9px; padding: 7px 13px; }
@@ -2311,6 +2448,7 @@ body.ngo-active #capture-panel {
       <span><kbd>Ctrl+↵</kbd> submit</span>
       <span><kbd>Esc</kbd> close</span>
     </span>
+    <button id="ce-parse" title="Split into typed sentences">parse →</button>
     <button id="ce-submit">submit</button>
   </div>
   <div id="capture-organizer">
@@ -4907,6 +5045,197 @@ document.addEventListener('keydown', e => {
     </button>
   </div>
 </div>
+
+<!-- ── Sentence parse widget ── -->
+<div id="parse-widget">
+  <div id="parse-panel">
+    <div class="parse-header" id="parse-drag-handle">
+      <span class="parse-drag-grip">⋮⋮</span>
+      <div class="parse-header-title">Review sentences</div>
+      <span class="parse-header-sub" id="parse-count">0 sentences</span>
+      <button class="parse-close" onclick="closeParse()">×</button>
+    </div>
+    <div class="parse-batch-bar">
+      <span class="parse-batch-label">Set all →</span>
+      <button class="parse-batch-btn" onclick="batchSetType('body')">body</button>
+      <button class="parse-batch-btn" onclick="batchSetType('poster')">poster</button>
+      <button class="parse-batch-btn" onclick="batchSetType('pull')">pull</button>
+      <button class="parse-batch-btn" onclick="batchSetType('label')">label</button>
+      <button class="parse-batch-btn" onclick="batchSetType('draft')">draft</button>
+    </div>
+    <div class="parse-sentences" id="parse-sentences"></div>
+    <div class="parse-footer">
+      <span style="font-family:var(--f-ui);font-size:7px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-4)">Drag to reposition · Commit routes through organizer</span>
+      <button class="parse-commit-btn" onclick="commitParsed()">Place nodes →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ PARSE PROTOCOL ═══════════════════════════════════════════════════════
+
+let parsedSentences = [];
+
+function submitParse() {
+  const raw = ceTextarea.value.trim();
+  if (!raw) return;
+  parseLongInput(raw);
+}
+
+function parseLongInput(raw) {
+  const sentenceRegex = /[^.!?]*[.!?]+(?:\s|$)/g;
+  const matches = raw.match(sentenceRegex) || [];
+  const joined = matches.join('');
+  const remainder = raw.slice(joined.length).trim();
+  parsedSentences = [
+    ...matches.map(s => ({ text: s.trim(), type: inferType(s.trim()) })),
+    ...(remainder ? [{ text: remainder, type: inferType(remainder) }] : []),
+  ].filter(s => s.text.length > 0);
+  if (!parsedSentences.length) { submitCapture(); return; } // fallback: single node
+  renderParseWidget();
+  document.getElementById('parse-widget').classList.add('open');
+}
+
+function inferType(text) {
+  // Auto-detect spec via :: pattern; otherwise default to body
+  if (text.includes('::')) return 'spec';
+  return 'body';
+}
+
+function renderParseWidget() {
+  const container = document.getElementById('parse-sentences');
+  const countEl   = document.getElementById('parse-count');
+  if (!container) return;
+  const types = ['body', 'poster', 'pull', 'label', 'draft'];
+  container.innerHTML = parsedSentences.map((s, i) => {
+    const typeBtns = types.map(t =>
+      `<button class="parse-type-btn${s.type === t ? ' active' : ''}" onclick="parseSetType(${i},'${t}',this)">${t}</button>`
+    ).join('');
+    return `<div class="parse-row" data-parse-idx="${i}">
+      <div class="parse-row-num">${i + 1}</div>
+      <div class="parse-row-text" title="${s.text.replace(/"/g, '&quot;')}">${s.text}</div>
+      <div class="parse-row-types">${typeBtns}</div>
+    </div>`;
+  }).join('');
+  if (countEl) countEl.textContent = parsedSentences.length + ' sentence' + (parsedSentences.length !== 1 ? 's' : '');
+}
+
+function parseSetType(idx, type, btn) {
+  parsedSentences[idx].type = type;
+  btn.closest('.parse-row').querySelectorAll('.parse-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function batchSetType(type) {
+  parsedSentences.forEach(s => s.type = type);
+  renderParseWidget();
+}
+
+function commitParsed() {
+  if (!parsedSentences.length) return;
+
+  // Clear the textarea now — capture is still open for the organizer
+  ceTextarea.value = '';
+  ceCharcount.textContent = '0';
+  ceCharcount.classList.remove('warm');
+
+  // Push all parsed sentences as flat nodes
+  parsedSentences.forEach((s, i) => {
+    let n;
+    if (s.type === 'spec') {
+      const parts = s.text.split('::');
+      n = { id: nid(), type: 'spec', key: parts[0].trim(), val: (parts[1] || '').trim(), mood: currentMood };
+    } else {
+      n = { id: nid(), type: s.type, content: s.text, mood: currentMood };
+    }
+    nodes.push(n);
+    if (i === parsedSentences.length - 1) _pendingNodeIdx = nodes.length - 1;
+  });
+
+  activeNode = _pendingNodeIdx;
+  pvReveal = Math.max(0, pvEls.length);
+  commitChange();
+
+  // Build a preview string from the first sentence for the organizer header
+  const preview = parsedSentences[0].text.slice(0, 80);
+  parsedSentences = [];
+  closeParse();
+  _showOrganizer(preview);
+}
+
+function closeParse() {
+  const w = document.getElementById('parse-widget');
+  w.classList.remove('open');
+  w.style.left = '';
+  w.style.bottom = '';
+  w.style.transform = '';
+  w.style.top = '';
+}
+
+// ── Parse widget drag ──
+(function() {
+  let dragging = false, ox = 0, oy = 0;
+
+  function onDown(e) {
+    const handle = document.getElementById('parse-drag-handle');
+    if (!handle || !handle.contains(e.target)) return;
+    if (e.target.closest('button')) return;
+    e.preventDefault();
+    dragging = true;
+    const w = document.getElementById('parse-widget');
+    const rect = w.getBoundingClientRect();
+    const cx = e.clientX || (e.touches && e.touches[0].clientX);
+    const cy = e.clientY || (e.touches && e.touches[0].clientY);
+    ox = cx - rect.left;
+    oy = cy - rect.top;
+    w.style.transform = 'none';
+    w.style.left   = rect.left + 'px';
+    w.style.top    = rect.top  + 'px';
+    w.style.bottom = 'auto';
+    document.body.style.userSelect = 'none';
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const cx = e.clientX || (e.touches && e.touches[0].clientX);
+    const cy = e.clientY || (e.touches && e.touches[0].clientY);
+    const w  = document.getElementById('parse-widget');
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const pr = w.getBoundingClientRect();
+    let nx = cx - ox, ny = cy - oy;
+    nx = Math.max(0, Math.min(nx, vw - pr.width));
+    ny = Math.max(0, Math.min(ny, vh - pr.height));
+    w.style.left = nx + 'px';
+    w.style.top  = ny + 'px';
+  }
+
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    document.body.style.userSelect = '';
+  }
+
+  document.addEventListener('mousedown',  onDown,  { passive: false });
+  document.addEventListener('mousemove',  onMove);
+  document.addEventListener('mouseup',    onUp);
+  document.addEventListener('touchstart', onDown,  { passive: false });
+  document.addEventListener('touchmove',  onMove,  { passive: false });
+  document.addEventListener('touchend',   onUp);
+})();
+
+// Wire parse button
+document.getElementById('ce-parse').addEventListener('click', submitParse);
+
+// Also close parse on Escape from textarea
+(function() {
+  const orig = ceTextarea.onkeydown;
+  ceTextarea.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('parse-widget').classList.contains('open')) {
+      e.preventDefault(); closeParse();
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
