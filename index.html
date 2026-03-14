@@ -3634,6 +3634,21 @@ function renderPage() {
       renderNodeText(n, sentence);
       card.appendChild(sentence);
 
+      // Inline thumb — injected after sentence is in card
+      if (n.image) {
+        card.classList.add('node-with-image');
+        var thumb = document.createElement('div');
+        thumb.className = 'note-thumb';
+        var tImg = document.createElement('img');
+        tImg.src = n.image; tImg.alt = '';
+        thumb.appendChild(tImg);
+        var textWrap = document.createElement('div');
+        textWrap.className = 'note-thumb-text';
+        textWrap.appendChild(sentence);
+        card.insertBefore(thumb, card.firstChild);
+        card.appendChild(textWrap);
+      }
+
       card.addEventListener('click', function() {
         goTo(flatIdx);
         if (_mode === 'write') loadNodeIntoWS(flatIdx);
@@ -4033,29 +4048,41 @@ function loadNodeIntoWS(flatIdx) {
   _wsEditIdx = flatIdx;
   var n = entry.node;
 
-  // State badge
   var badge = document.getElementById('ws-state-badge');
   if (badge) { badge.textContent = 'Editing'; badge.classList.add('editing'); }
 
-  // Chapter label
   var lbl = document.getElementById('ws-chapter-label');
   if (lbl) lbl.textContent = 'Ch. ' + (entry.chapterIdx + 1) + ' \u2014 node ' + (entry.nodeIdx + 1);
 
-  // Type
   _wsType = n.type;
   document.querySelectorAll('.ws-type-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.type === _wsType); });
+  applyWsTypePreview(_wsType);
 
-  // Mood
   _wsMood = n.mood || 'none';
   document.querySelectorAll('#ws-mood-row .bmood-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.mood === _wsMood); });
 
-  // Text
   var ta = document.getElementById('ws-textarea');
   if (ta) { ta.value = n.text; ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, window.innerHeight * 0.3) + 'px'; }
 
-  // Commit button
   var btn = document.getElementById('ws-commit');
   if (btn) btn.textContent = 'Save \u2192';
+
+  // Restore image preview if node has one
+  if (n.image) {
+    _wsImageSrc = n.image;
+    var preview = document.getElementById('ws-img-preview');
+    var attached = document.getElementById('ws-img-attached');
+    var polaroidImg = document.getElementById('ws-polaroid-img');
+    var polaroid = document.getElementById('ws-polaroid');
+    var imgBtn = document.getElementById('ws-img-btn');
+    if (preview) preview.src = n.image;
+    if (attached) attached.style.display = 'flex';
+    if (polaroidImg) polaroidImg.src = n.image;
+    if (polaroid) { polaroid.style.display = ''; polaroid.classList.add('visible'); }
+    if (imgBtn) { imgBtn.style.borderColor = 'var(--sage)'; imgBtn.style.color = 'var(--sage)'; }
+  } else {
+    clearWsImage();
+  }
 
   updateWsCharCount();
 }
@@ -4078,24 +4105,29 @@ function commitWS() {
   var text = ta ? ta.value.trim() : '';
   if (!text) return;
 
+  // Capture image before anything clears it
+  var imgSrc = _wsImageSrc;
+  var editingIdx = _wsEditIdx;
+
   histSnapshot();
 
-  if (_wsEditIdx >= 0) {
-    // Edit existing
-    var entry = _allNodes[_wsEditIdx];
+  if (editingIdx >= 0) {
+    var entry = _allNodes[editingIdx];
     entry.node.text = text;
     entry.node.type = _wsType;
     entry.node.mood = _wsMood;
+    if (imgSrc) entry.node.image = imgSrc;
     buildFlatList();
     renderPage();
     renderSpineBar();
-    goTo(_wsEditIdx);
+    goTo(editingIdx);
     clearWS();
     showToast('Saved');
   } else {
-    // New node — append to active chapter
     var curCh = _allNodes[_cur] ? _allNodes[_cur].chapterIdx : CHAPTERS.length - 1;
-    CHAPTERS[curCh].nodes.push({ id: 'n'+Date.now(), type: _wsType, mood: _wsMood, text: text });
+    var newNode = { id: 'n'+Date.now(), type: _wsType, mood: _wsMood, text: text };
+    if (imgSrc) newNode.image = imgSrc;
+    CHAPTERS[curCh].nodes.push(newNode);
     buildFlatList();
     renderPage();
     renderSpineBar();
@@ -4112,7 +4144,7 @@ document.getElementById('ws-close')?.addEventListener('click', function() {
   document.body.classList.remove('writing-open');
 });
 document.getElementById('ws-clear')?.addEventListener('click', clearWS);
-document.getElementById('ws-commit')?.addEventListener('click', commitWS);
+document.getElementById('ws-commit')?.addEventListener('click', function() { commitWS(); });
 
 // Type buttons
 document.querySelectorAll('.ws-type-btn').forEach(function(btn) {
@@ -4260,39 +4292,14 @@ document.getElementById('ws-url-href')?.addEventListener('keydown', function(e) 
 });
 
 /* ── Patch commitWS to carry image — attach BEFORE render ── */
-var _origCommitWSImg = commitWS;
-commitWS = function() {
-  var imgSrc = _wsImageSrc; // capture before commitWS clears it
-  var editingIdx = _wsEditIdx; // capture before commitWS resets it
-  var wasNew = editingIdx < 0;
-
-  // Temporarily disable clearWsImage during commit so imgSrc survives
-  _origCommitWSImg();
-
-  // Now attach image to the node that was just created/edited
-  if (imgSrc) {
-    var targetIdx;
-    if (!wasNew) {
-      // editing: editingIdx is stable flat index
-      targetIdx = editingIdx;
-    } else {
-      // new node: it was appended to the active chapter — last in flat list
-      targetIdx = _allNodes.length - 1;
-    }
-    if (targetIdx >= 0 && _allNodes[targetIdx]) {
-      _allNodes[targetIdx].node.image = imgSrc;
-      renderPage(); // re-render to show the thumb
-    }
-  }
-};
-
-/* ── Patch renderNodeText to render inline links + polaroid ── */
+/* ── Patch renderNodeText: inline links + note-thumb ── */
 var _origRenderNodeText = renderNodeText;
 renderNodeText = function(n, sentenceEl) {
   _origRenderNodeText(n, sentenceEl);
-  // Replace [text](url) bracket-link syntax with actual <a> tags
+
+  // [text](url) → <a> tags
   sentenceEl.childNodes.forEach(function(child) {
-    if (child.nodeType !== 3) return; // only text nodes
+    if (child.nodeType !== 3) return;
     var text = child.textContent;
     if (!text.includes('](')) return;
     var frag = document.createDocumentFragment();
@@ -4310,24 +4317,7 @@ renderNodeText = function(n, sentenceEl) {
     if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
     if (last > 0) sentenceEl.replaceChild(frag, child);
   });
-  // Render inline thumb if node has image — verbatim reasonably node-with-image
-  if (n.image) {
-    var card = sentenceEl.closest('.node-card');
-    if (card && !card.querySelector('.note-thumb')) {
-      card.classList.add('node-with-image');
-      var thumb = document.createElement('div');
-      thumb.className = 'note-thumb';
-      var img = document.createElement('img');
-      img.src = n.image; img.alt = '';
-      thumb.appendChild(img);
-      // Wrap existing sentence content in note-thumb-text
-      var textWrap = document.createElement('div');
-      textWrap.className = 'note-thumb-text';
-      while (card.firstChild) textWrap.appendChild(card.firstChild);
-      card.appendChild(thumb);
-      card.appendChild(textWrap);
-    }
-  }
+  // Note: image thumb injection is handled in renderPage after card assembly
 };
 
 /* ── Patch clearWS to also clear image ── */
