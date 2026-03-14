@@ -2169,10 +2169,46 @@ body.step-mode .node-card.active { opacity: 1; }
 
 /* Node rendering: inline thumb left, text right — verbatim reasonably */
 .node-with-image { display: flex; align-items: flex-start; gap: 10px; }
-.note-thumb { flex-shrink: 0; width: 36px; height: 36px; border-radius: 3px; overflow: hidden; border: 1px solid var(--rule-2); opacity: 0.7; transition: opacity 0.2s; }
+.note-thumb {
+  flex-shrink: 0; width: 36px; height: 36px;
+  border-radius: 3px; overflow: visible;
+  border: 1px solid var(--rule-2); opacity: 0.7;
+  transition: opacity 0.2s;
+  position: relative;
+}
 .node-with-image:hover .note-thumb { opacity: 1; }
-.note-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.note-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 2px; }
 .note-thumb-text { flex: 1; min-width: 0; }
+
+/* Image ghost — larger preview on thumb hover */
+.note-thumb-ghost {
+  position: absolute;
+  top: 0; left: calc(100% + 10px);
+  z-index: 400;
+  width: 200px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-6px) scale(0.97);
+  transition: opacity 0.2s, transform 0.2s var(--ease-out);
+  transform-origin: left top;
+}
+.note-thumb:hover .note-thumb-ghost {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+.note-thumb-ghost-inner {
+  background: var(--paper);
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+  overflow: hidden;
+}
+.note-thumb-ghost-inner img {
+  width: 100%; height: auto;
+  display: block;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
 
 /* Inline hyperlinks in node text */
 .node-sentence a {
@@ -3941,6 +3977,16 @@ function renderPage() {
         var tImg = document.createElement('img');
         tImg.src = n.image; tImg.alt = '';
         thumb.appendChild(tImg);
+        // Ghost enlarged preview
+        var tGhost = document.createElement('div');
+        tGhost.className = 'note-thumb-ghost';
+        var tGhostInner = document.createElement('div');
+        tGhostInner.className = 'note-thumb-ghost-inner';
+        var tGhostImg = document.createElement('img');
+        tGhostImg.src = n.image; tGhostImg.alt = '';
+        tGhostInner.appendChild(tGhostImg);
+        tGhost.appendChild(tGhostInner);
+        thumb.appendChild(tGhost);
         var textWrap = document.createElement('div');
         textWrap.className = 'note-thumb-text';
         textWrap.appendChild(sentence);
