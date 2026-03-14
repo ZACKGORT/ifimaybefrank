@@ -118,6 +118,140 @@ body::after {
 ═══════════════════════════════════════════════ */
 .chapter-block {
   margin-bottom: 64px;
+  position: relative;
+}
+
+/* Chapter head hover zone */
+.chapter-head-wrap {
+  cursor: default;
+  position: relative;
+}
+.chapter-head-wrap:hover .chapter-title { color: var(--ink-2); }
+
+/* Chapter provenance ghost card */
+.chapter-provenance-ghost {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 380;
+  width: 300px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.18s, transform 0.18s var(--ease-out);
+}
+.chapter-head-wrap:hover .chapter-provenance-ghost,
+.chapter-provenance-ghost.pinned {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cpg-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-2);
+  border-top: 2px solid var(--red);
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+  padding: 12px 14px 14px;
+}
+
+.cpg-header {
+  font-family: var(--font-ui);
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cpg-timestamp {
+  font-family: var(--font-ui);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--ink-4);
+}
+
+.cpg-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cpg-key {
+  font-family: var(--font-ui);
+  font-size: 7px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  flex-shrink: 0;
+  min-width: 60px;
+}
+
+.cpg-val {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-2);
+  flex: 1;
+}
+
+/* Mood arc — swatches in sequence */
+.cpg-mood-arc {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.cpg-mood-swatch {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+}
+.cpg-mood-swatch:hover { transform: scale(1.4); }
+.cpg-mood-swatch[data-mood="none"] {
+  background: transparent;
+  border: 1px solid var(--rule-2);
+}
+
+/* Type breakdown bar */
+.cpg-type-bar {
+  display: flex;
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  gap: 1px;
+  margin-top: 2px;
+}
+.cpg-type-seg {
+  height: 100%;
+  border-radius: 1px;
+  transition: flex 0.3s;
+}
+.cpg-type-legend {
+  display: flex;
+  gap: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+.cpg-type-item {
+  font-family: var(--font-ui);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: var(--ink-4);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.cpg-type-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .chapter-label {
@@ -3589,6 +3723,162 @@ document.getElementById('hud-undo')?.addEventListener('click', histUndo);
 document.getElementById('hud-redo')?.addEventListener('click', histRedo);
 
 /* ═══════════════════════════════════════════════
+   CHAPTER PROVENANCE GHOST
+═══════════════════════════════════════════════ */
+var TYPE_COLORS = {
+  thesis:   '#8a7aac',
+  evidence: '#7ba8c4',
+  aside:    '#c4a07a',
+  question: '#c47a6a',
+  break:    '#9c8c7c'
+};
+var MOOD_COLORS_MAP = {
+  clear: '#7ba8c4', tense: '#c47a6a', tender: '#c4a07a',
+  wry: '#8aac7c', resolute: '#8a7aac', none: 'transparent'
+};
+
+function buildChapterGhost(ch, ci) {
+  var ghost = document.createElement('div');
+  ghost.className = 'chapter-provenance-ghost';
+
+  var card = document.createElement('div');
+  card.className = 'cpg-card';
+
+  // Header — chapter number + session timestamp
+  var header = document.createElement('div');
+  header.className = 'cpg-header';
+  var chLabel = document.createElement('span');
+  chLabel.textContent = 'Ch. ' + (ci + 1) + ' — provenance';
+  var ts = document.createElement('span');
+  ts.className = 'cpg-timestamp';
+  // Use creation time if stored, else session time
+  var created = ch._created || _sessionStart;
+  ts.textContent = formatTime(created);
+  header.appendChild(chLabel);
+  header.appendChild(ts);
+  card.appendChild(header);
+
+  // Node count + word count
+  var words = ch.nodes.reduce(function(acc, n) {
+    return acc + (n.text || '').split(/\s+/).filter(Boolean).length;
+  }, 0);
+
+  var countRow = document.createElement('div');
+  countRow.className = 'cpg-row';
+  countRow.innerHTML = '<span class="cpg-key">Nodes</span><span class="cpg-val">' + ch.nodes.length + ' nodes · ' + words + ' words</span>';
+  card.appendChild(countRow);
+
+  // Dominant mood
+  var moodTally = {};
+  ch.nodes.forEach(function(n) {
+    var m = n.mood || 'none';
+    moodTally[m] = (moodTally[m] || 0) + 1;
+  });
+  var dominantMood = Object.keys(moodTally).sort(function(a,b){ return moodTally[b]-moodTally[a]; })[0] || 'none';
+
+  var moodRow = document.createElement('div');
+  moodRow.className = 'cpg-row';
+  var moodKey = document.createElement('span');
+  moodKey.className = 'cpg-key';
+  moodKey.textContent = 'Mood';
+  var moodVal = document.createElement('span');
+  moodVal.className = 'cpg-val';
+  moodVal.textContent = dominantMood === 'none' ? 'unset' : dominantMood;
+  moodRow.appendChild(moodKey);
+  moodRow.appendChild(moodVal);
+  card.appendChild(moodRow);
+
+  // Mood arc — swatches in node order, skipping 'none'
+  var arcRow = document.createElement('div');
+  arcRow.className = 'cpg-row';
+  var arcKey = document.createElement('span');
+  arcKey.className = 'cpg-key';
+  arcKey.textContent = 'Arc';
+  var arc = document.createElement('div');
+  arc.className = 'cpg-mood-arc';
+  ch.nodes.forEach(function(n) {
+    var swatch = document.createElement('div');
+    swatch.className = 'cpg-mood-swatch';
+    swatch.dataset.mood = n.mood || 'none';
+    swatch.title = n.mood || 'none';
+    swatch.style.background = MOOD_COLORS_MAP[n.mood] || 'transparent';
+    if (!n.mood || n.mood === 'none') swatch.style.border = '1px solid var(--rule-2)';
+    arc.appendChild(swatch);
+  });
+  arcRow.appendChild(arcKey);
+  arcRow.appendChild(arc);
+  card.appendChild(arcRow);
+
+  // Type breakdown bar
+  var typeCounts = {};
+  ch.nodes.forEach(function(n) { typeCounts[n.type] = (typeCounts[n.type] || 0) + 1; });
+  var total = ch.nodes.length || 1;
+
+  var typeRow = document.createElement('div');
+  typeRow.className = 'cpg-row';
+  var typeKey = document.createElement('span');
+  typeKey.className = 'cpg-key';
+  typeKey.textContent = 'Types';
+  var typeWrap = document.createElement('div');
+  typeWrap.style.flex = '1';
+
+  var bar = document.createElement('div');
+  bar.className = 'cpg-type-bar';
+  Object.keys(typeCounts).forEach(function(type) {
+    var seg = document.createElement('div');
+    seg.className = 'cpg-type-seg';
+    seg.style.flex = typeCounts[type];
+    seg.style.background = TYPE_COLORS[type] || 'var(--rule-3)';
+    seg.title = type + ': ' + typeCounts[type];
+    bar.appendChild(seg);
+  });
+
+  var legend = document.createElement('div');
+  legend.className = 'cpg-type-legend';
+  Object.keys(typeCounts).forEach(function(type) {
+    var item = document.createElement('div');
+    item.className = 'cpg-type-item';
+    var dot = document.createElement('div');
+    dot.className = 'cpg-type-dot';
+    dot.style.background = TYPE_COLORS[type] || 'var(--rule-3)';
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(type + ' ' + typeCounts[type]));
+    legend.appendChild(item);
+  });
+
+  typeWrap.appendChild(bar);
+  typeWrap.appendChild(legend);
+  typeRow.appendChild(typeKey);
+  typeRow.appendChild(typeWrap);
+  card.appendChild(typeRow);
+
+  ghost.appendChild(card);
+  return ghost;
+}
+
+function formatTime(ms) {
+  if (!ms) return 'this session';
+  var d = new Date(ms);
+  var h = d.getHours(), m = d.getMinutes();
+  var ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12 || 12;
+  return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+}
+
+// Session start time — record on load
+var _sessionStart = Date.now();
+
+// Record creation time on new chapter
+var _origCommitChapterGhost = commitChapterGhost;
+commitChapterGhost = function() {
+  var prevLen = CHAPTERS.length;
+  _origCommitChapterGhost();
+  if (CHAPTERS.length > prevLen) {
+    CHAPTERS[CHAPTERS.length - 1]._created = Date.now();
+  }
+};
+
+/* ═══════════════════════════════════════════════
    RENDER PAGE
 ═══════════════════════════════════════════════ */
 function renderPage() {
@@ -3604,12 +3894,21 @@ function renderPage() {
     var label = document.createElement('div');
     label.className = 'chapter-label';
     label.textContent = 'Chapter ' + (ci + 1);
-    block.appendChild(label);
 
     var title = document.createElement('div');
     title.className = 'chapter-title';
     title.textContent = ch.title;
-    block.appendChild(title);
+
+    // Chapter head hover wrap — contains label, title, and ghost card
+    var headWrap = document.createElement('div');
+    headWrap.className = 'chapter-head-wrap';
+    headWrap.appendChild(label);
+    headWrap.appendChild(title);
+
+    // Build provenance ghost card
+    var ghost = buildChapterGhost(ch, ci);
+    headWrap.appendChild(ghost);
+    block.appendChild(headWrap);
 
     ch.nodes.forEach(function(n, ni) {
       var flatIdx = getFlatIdx(ci, ni);
