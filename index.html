@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>if i may be frank — zack.cx</title>
+<title>if i may be frank — zack.gort</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 body{background:#0a0a0a;overflow:hidden;font-family:'Courier New',monospace;cursor:none;user-select:none;-webkit-user-select:none;}
@@ -354,7 +354,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
     </div>
     <div class="div" style="margin-bottom:4px;"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">AMOUNT</span><span class="ctrl-vl" id="v-count">8000</span></div><input type="range" id="sl-count" min="500" max="8000" step="100" value="8000"></div>
-    <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">GRAVITY</span><span class="ctrl-vl" id="v-grav">4.2</span></div><input type="range" id="sl-grav" min="1" max="30" step="0.1" value="4.2"></div>
+    <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">GRAVITY</span><span class="ctrl-vl" id="v-grav">4.2</span></div><input type="range" id="sl-grav" min="1" max="11" step="0.1" value="4.2"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">SPREAD</span><span class="ctrl-vl" id="v-spread">1.25</span></div><input type="range" id="sl-spread" min="0.05" max="2.5" step="0.05" value="1.25"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">BOUNCE</span><span class="ctrl-vl" id="v-bounce">0.36</span></div><input type="range" id="sl-bounce" min="0" max="1.0" step="0.01" value="0.36"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">SIZE</span><span class="ctrl-vl" id="v-size">0.65</span></div><input type="range" id="sl-size" min="0.2" max="1.0" step="0.05" value="0.65"></div>
@@ -405,7 +405,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
       <div id="anote-text">In 2026, <em>design is no longer a discipline</em> — it is a conversation between intent and physics. The boundary between tool and creator has dissolved. Flows are <em>redirected, not engineered</em>. Constraints are placed, not drawn. The designer's gesture is now the angle of deflection. What falls is gravity. What <em>reaches its target</em> is intention.</div>
       <div id="anote-sig">— on the nature of directed systems</div>
       <div id="anote-links">
-        <a href="https://ifimaybefrank.com" target="_blank" rel="noopener">ifimaybefrank.com</a>
+        <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
       </div>
     </div>
   </div>
@@ -419,7 +419,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 
 <!-- MOBILE TOP BAR: Note only -->
 <div id="mobile-bar">
-  <button class="mb-btn" id="mb-note-btn">if i may be frank — zack.cx</button>
+  <button class="mb-btn" id="mb-note-btn">if i may be frank — zack.gort</button>
 </div>
 <div class="mb-panel" id="mb-note-panel">
   <div style="padding:16px 20px;">
@@ -445,7 +445,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   </div>
   <div class="mb-ctrl-row">
     <span class="mb-ctrl-lbl">Gravity</span>
-    <input class="mb-range" type="range" id="mb-sl-grav" min="1" max="30" step="0.1" value="3.3">
+    <input class="mb-range" type="range" id="mb-sl-grav" min="1" max="11" step="0.1" value="3.3">
     <span class="mb-ctrl-val" id="mb-v-grav">3.3</span>
   </div>
   <div class="mb-ctrl-row">
@@ -1059,6 +1059,19 @@ function getSpout(){const r=ctaBtn.getBoundingClientRect();return s2w(r.left+r.w
 const MP=8000,pp=new Float32Array(MP*3),pv=new Float32Array(MP*3),ps=new Float32Array(MP),pa=new Float32Array(MP),pl=new Float32Array(MP),pal=new Uint8Array(MP);
 const P={count:isMobile?8000:8000,gravity:isMobile?3.3:4.2,spread:isMobile?0.65:1.25,bounce:0.36,size:isMobile?0.65:0.65,rain:false};
 
+// Derive bounce from count+size: more particles & larger size → more bounce
+function derivedBounce(){
+  const cNorm=(P.count-500)/(8000-500);       // 0→1
+  const sNorm=(P.size-0.2)/(1.0-0.2);          // 0→1
+  const intensity=(cNorm+sNorm)*0.5;            // combined 0→1
+  return Math.round(Math.max(0.05,Math.min(1.0, 0.12+intensity*0.72))*100)/100;
+}
+function syncBounce(){
+  P.bounce=derivedBounce();
+  const sl=document.getElementById('sl-bounce'),vl=document.getElementById('v-bounce');
+  if(sl)sl.value=P.bounce; if(vl)vl.textContent=P.bounce.toFixed(2);
+}
+
 function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=9+Math.random()*5;pa[i]=Math.random()*pl[i];pal[i]=1;}
 for(let i=0;i<MP;i++)spawn(i);
 
@@ -1154,11 +1167,12 @@ window.addEventListener('wheel',e=>{
     document.getElementById('v-count').textContent=Math.round(P.count);
     document.getElementById('sl-size').value=P.size;
     document.getElementById('v-size').textContent=P.size.toFixed(2);
+    syncBounce();
   }
 },{passive:false});
 
 // ── PANEL SLIDERS ─────────────────────────────────────────────────────────────
-function bindSl(id,vid,key,fmt){const sl=document.getElementById(id),vl=document.getElementById(vid);sl.addEventListener('input',()=>{P[key]=parseFloat(sl.value);vl.textContent=fmt(P[key]);});}
+function bindSl(id,vid,key,fmt){const sl=document.getElementById(id),vl=document.getElementById(vid);sl.addEventListener('input',()=>{P[key]=parseFloat(sl.value);vl.textContent=fmt(P[key]);if(key==='count'||key==='size')syncBounce();});}
 bindSl('sl-count','v-count','count',v=>Math.round(v));
 bindSl('sl-grav','v-grav','gravity',v=>v.toFixed(1));
 bindSl('sl-spread','v-spread','spread',v=>v.toFixed(2));
