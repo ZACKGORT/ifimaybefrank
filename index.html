@@ -185,9 +185,21 @@ body.paper .div{background:rgba(0,0,0,0.06);}
 body.paper .tog{border-color:rgba(0,0,0,0.1);color:rgba(0,0,0,0.3);}
 body.paper .tog.on{color:rgba(0,0,0,0.75);border-color:rgba(0,0,0,0.35);}
 body.paper .chk-row .ctrl-nm{color:rgba(0,0,0,0.28);}
-body.paper .ins-btn{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);}
-body.paper .ins-btn:hover{background:rgba(0,0,0,0.07);}
-body.paper .ins-btn-lbl{color:rgba(0,0,0,0.3);}
+body.paper .ins-btn svg path,
+body.paper .ins-btn svg circle,
+body.paper .ins-btn svg ellipse,
+body.paper .ins-btn svg line {
+  stroke: rgba(0,0,0,0.55) !important;
+}
+body.paper .ins-btn svg path[stroke*="0.2"],
+body.paper .ins-btn svg path[stroke*="0.18"],
+body.paper .ins-btn svg line,
+body.paper .ins-btn svg ellipse {
+  stroke: rgba(0,0,0,0.2) !important;
+}
+body.paper .ins-btn svg [fill*="0.04"] {
+  fill: rgba(0,0,0,0.04) !important;
+}
 body.paper .ins-clear{border-color:rgba(200,40,40,0.15);color:rgba(180,40,40,0.38);}
 body.paper .ins-clear:hover{border-color:rgba(200,40,40,0.4);color:rgba(180,40,40,0.7);}
 body.paper .tbar-bg{background:rgba(0,0,0,0.07);}
@@ -2142,13 +2154,13 @@ buildInit = function(){
 };
 
 // Intercept addShape
-window._addShapeOrig = addShape;
-function addShape(t){
-  window._addShapeOrig(t);
+const _addShapeOrig = addShape;
+addShape = function(t){
+  _addShapeOrig(t);
   if(isPaper) _applyShapeMat(shapes[shapes.length-1], true);
-}
-// Re-bind insert buttons to use the new addShape
-document.querySelectorAll('.ins-btn').forEach(b=>b.addEventListener('click',()=>addShape(b.dataset.shape)));
+};
+// (Removed the duplicate event listener re-bind to prevent it from firing twice)
+
 
 // Text color variable
 let _paperTextColor = 'rgba(255,255,248,';
