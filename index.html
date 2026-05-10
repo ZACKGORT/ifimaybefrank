@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>if i may be frank — zack.cx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 body{background:#0a0a0a;overflow:hidden;font-family:'Courier New',monospace;cursor:none;user-select:none;-webkit-user-select:none;}
@@ -554,7 +557,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
       <div id="anote-text">In 2026, <em>design is no longer a discipline</em> — it is a conversation between intent and physics. The boundary between tool and creator has dissolved. Flows are <em>redirected, not engineered</em>. Constraints are placed, not drawn. The designer's gesture is now the angle of deflection. What falls is gravity. What <em>reaches its target</em> is intention.</div>
       <div id="anote-sig">— on the nature of directed systems</div>
       <div id="anote-links">
-        <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
+        <a href="https://ifimaybefrank.com" target="_blank" rel="noopener">ifimaybefrank.com</a>
       </div>
     </div>
   </div>
@@ -891,18 +894,18 @@ let lvlTextAlpha=0,lvlTextAlphaTgt=0;
 let FONT_SIZE=24;
 // Two typographic roles: HEADLINE (first line of block) + BODY (remaining lines)
 const TYPO = {
-  headline: { weight: '300', family: '"Courier New",monospace', op: 0.55 },
-  body:      { weight: '300', family: '"Courier New",monospace', op: 0.48 },
+  headline: { weight: '400', family: '"Instrument Serif",Georgia,serif', op: 0.60 },
+  body:      { weight: '400', family: '"Instrument Serif",Georgia,serif', op: 0.50 },
 };
 function getFontMetrics(){
-  // Courier New is monospaced: charW = 0.600 * size exactly
+  // Instrument Serif is proportional — avg charW ≈ 0.52 * size
   const sz = Math.max(10, FONT_SIZE);
   TYPO.headline.size = sz;
-  TYPO.headline.charW = sz * 0.600;
-  TYPO.headline.lineH = sz * 1.72;
+  TYPO.headline.charW = sz * 0.52;
+  TYPO.headline.lineH = sz * 1.65;
   TYPO.body.size = sz;
-  TYPO.body.charW = sz * 0.600;
-  TYPO.body.lineH = sz * 1.72;
+  TYPO.body.charW = sz * 0.52;
+  TYPO.body.lineH = sz * 1.65;
   return { CHAR_W: TYPO.body.charW, LINE_H: TYPO.body.lineH };
 }
 // Column: left-biased, narrow — keeps text away from right panel chrome
