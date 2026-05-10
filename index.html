@@ -332,6 +332,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     transition:all 0.15s;
   }
   .mb-ctrl-btn:active{background:rgba(255,255,255,0.08);color:#fff;}
+  .mb-lvl-sel-btn.active{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.35);color:rgba(255,255,255,0.9);}
   .mb-ctrl-val{
     font-family:'Courier New',monospace;font-size:9px;
     color:rgba(255,255,255,0.35);min-width:28px;text-align:center;
@@ -629,8 +630,11 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="mb-ctrl-btn" id="mb-font-up">+</button>
   </div>
   <div class="mb-ctrl-row">
-    <span class="mb-ctrl-lbl">Next Level</span>
-    <button class="mb-ctrl-btn" id="mb-next-btn">→</button>
+    <span class="mb-ctrl-lbl">Level</span>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="0" id="mb-lvl-1">1</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="1" id="mb-lvl-2">2</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
   </div>
 </div>
 
@@ -698,8 +702,8 @@ const LEVEL_TITLES = [
     "Precision is not a style. It is the only load-bearing decision you actually make.",
   ],
   [
-    "One target. One distortion. The field is no longer neutral.",
-    "A black hole doesn't destroy the flow. It just has a very strong opinion about where it goes.",
+    "Chaos is the default. Craft is the decision to move through it anyway.",
+    "Intent curation isn't control — it's knowing which forces to work with and which to navigate around.",
   ],
 ];
 
@@ -734,14 +738,14 @@ const SHAPE_COPY = {
     "The pyramid is the shape of a deadline. Nothing escapes the point.",
   ],
   blackhole: [
-    "The singularity pulls all strings. You dictate the center.",
-    "A black hole doesn't negotiate. It consumes.",
-    "Gravity is the ultimate design constraint."
+    "The singularity is fixed in its nature — but not its position. Work with it.",
+    "Some forces don't move far. The craft is knowing how to orbit them.",
+    "A black hole doesn't negotiate. But its range is finite. That's the opening."
   ],
   neutronstar: [
-    "Smaller, denser, luminous. The neutron star violently redirects.",
-    "High density means high consequence. Watch the jets.",
-    "Intense gravity combined with a hard surface creates absolute chaos."
+    "Smaller than a black hole. No less decisive. Placement is everything.",
+    "The neutron star can go anywhere. That's the gift — and the responsibility.",
+    "High density means high consequence. You chose where to put it. Own that."
   ]
 };
 
@@ -915,7 +919,7 @@ function getFontMetrics(){
 }
 // Column: left-biased, narrow — keeps text away from right panel chrome
 const PAD_X = 54;
-const COL_W_FRAC = 0.52; // max 52% of viewport width
+const COL_W_FRAC = 0.34; // max 34% of viewport width — keeps text left, clear of scene
 
 function buildTextChars(lvlN){
   _textTitleIdx = 0;
@@ -1002,7 +1006,7 @@ const LEVELS=[
   {targets:[{x:5.5,r:2.8}]},
   {targets:[{x:-5.0,r:2.5},{x:6.0,r:2.5}]},
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
-  {targets:[{x:5.5,r:2.8}],blackHole:true}
+  {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2}
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
@@ -1149,6 +1153,27 @@ class Attractor {
     if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
     if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
 
+    // Black hole: enforce limited drag radius from spawn origin
+    if (this.type === 'blackhole' && this._constrainRadius != null) {
+      const cdx = this.pos.x - this._originX;
+      const cdy = this.pos.y - this._originY;
+      const cdist = Math.sqrt(cdx*cdx + cdy*cdy);
+      if (cdist > this._constrainRadius) {
+        const ratio = this._constrainRadius / cdist;
+        this.pos.x = this._originX + cdx * ratio;
+        this.pos.y = this._originY + cdy * ratio;
+        this.vel.x *= 0.2; this.vel.y *= 0.2;
+        // Also pull rest back toward origin so spring doesn't fight constraint
+        const rdx = this.rest.x - this._originX;
+        const rdy = this.rest.y - this._originY;
+        const rdist = Math.sqrt(rdx*rdx + rdy*rdy);
+        if (rdist > this._constrainRadius) {
+          this.rest.x = this._originX + rdx/rdist * this._constrainRadius;
+          this.rest.y = this._originY + rdy/rdist * this._constrainRadius;
+        }
+      }
+    }
+
     this.mesh.position.set(this.pos.x, this.pos.y, 0);
     this.mesh.updateMatrixWorld(true);
   }
@@ -1264,17 +1289,40 @@ function initLevel(n){
   if(dBH) dBH.style.display = isLvl4 ? 'flex' : 'none';
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
   if(dNS) dNS.style.display = isLvl4 ? 'flex' : 'none';
+  // Hide regular shape buttons on level 4
+  ['cube','sphere','pyramid'].forEach(type=>{
+    const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
+    if(btn) btn.style.display = isLvl4 ? 'none' : '';
+  });
 
   const mBH = document.getElementById('mb-add-blackhole');
   if(mBH) mBH.style.display = isLvl4 ? 'flex' : 'none';
   const mNS = document.getElementById('mb-add-neutronstar');
   if(mNS) mNS.style.display = isLvl4 ? 'flex' : 'none';
+  const mbCube = document.getElementById('mb-add-cube');
+  if(mbCube) mbCube.style.display = isLvl4 ? 'none' : 'flex';
+  const mbSphere = document.getElementById('mb-add-sphere');
+  if(mbSphere) mbSphere.style.display = isLvl4 ? 'none' : 'flex';
+  const mbPyramid = document.getElementById('mb-add-pyramid');
+  if(mbPyramid) mbPyramid.style.display = isLvl4 ? 'none' : 'flex';
 
   destroyAttractors();
   if (LEVELS[n].blackHole) {
     const rx = (Math.random() - 0.5) * 8;
     const ry = 1.5 + Math.random() * 4;
-    attractors.push(new Attractor('blackhole', new THREE.Vector3(rx, ry, 0)));
+    const bh = new Attractor('blackhole', new THREE.Vector3(rx, ry, 0));
+    // Black hole has limited motion — constrain to ±3 units from spawn position
+    bh._constrainRadius = 3.0;
+    bh._originX = rx;
+    bh._originY = ry;
+    attractors.push(bh);
+  }
+  const nsCount = LEVELS[n].neutronStars || 0;
+  for (let i = 0; i < nsCount; i++) {
+    // Neutron stars placed randomly — freely positionable
+    const rx = (Math.random() - 0.5) * 14;
+    const ry = (Math.random() - 0.5) * 10 + 1.5;
+    attractors.push(new Attractor('neutronstar', new THREE.Vector3(rx, ry, 0)));
   }
   updateLevelNav();
 }
@@ -1451,17 +1499,23 @@ let shapes=[];
 
 function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
-  // Shuffle a copy of TYPES so each slot gets a distinct shape type
-  const typePool=[...TYPES].sort(()=>Math.random()-0.5);
-  SLOTS.forEach((slot,i)=>{
-    const type=typePool[i];
-    const orients=SDEFS[type].orients;
-    // Pick a random orient index; for the top slot bias toward deflecting presets
-    const oi=Math.floor(Math.random()*orients.length);
-    const rot=orients[oi].clone();
-    const sc=randSc(type);
-    shapes.push(new Shape(type,slot.pos,rot,sc));
+  // Level 4: no regular shapes — only attractors (neutron stars + black hole)
+  const isLvl4 = lvl === 3;
+  ['cube','sphere','pyramid'].forEach(type=>{
+    const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
+    if(btn) btn.parentElement && (btn.style.display = isLvl4 ? 'none' : '');
   });
+  if (!isLvl4) {
+    const typePool=[...TYPES].sort(()=>Math.random()-0.5);
+    SLOTS.forEach((slot,i)=>{
+      const type=typePool[i];
+      const orients=SDEFS[type].orients;
+      const oi=Math.floor(Math.random()*orients.length);
+      const rot=orients[oi].clone();
+      const sc=randSc(type);
+      shapes.push(new Shape(type,slot.pos,rot,sc));
+    });
+  }
   updateCnt();
 }
 function addShape(t){shapes.push(new Shape(t,new THREE.Vector3((Math.random()-0.5)*4,0,0),null,randSc(t)));updateCnt();}
@@ -1918,11 +1972,20 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   const mbFontVal=document.getElementById('mb-font-val');
   if(mbFontVal)mbFontVal.textContent=FONT_SIZE;
 
-  // Next level
-  const mbNextBtn=document.getElementById('mb-next-btn');
-  if(mbNextBtn)mbNextBtn.addEventListener('click',()=>{
-    if(lvl<LEVELS.length-1){lvl++;initLevel(lvl);tCounts=[];for(let i=0;i<MP;i++)spawn(i);buildInit();}
+  // Mobile level select buttons
+  function updateMbLvlBtns() {
+    document.querySelectorAll('.mb-lvl-sel-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.lvl) === lvl);
+    });
+  }
+  document.querySelectorAll('.mb-lvl-sel-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const n = parseInt(btn.dataset.lvl);
+      initLevel(n); tCounts=[]; for(let i=0;i<MP;i++)spawn(i); buildInit();
+      updateMbLvlBtns();
+    });
   });
+  updateMbLvlBtns();
 
   // Touch for shapes/attractors: tap to cycle, drag to move, two-finger pinch to scale
   let tShape=null,tOff=new THREE.Vector3(),tPrevWP=null,tMoved=false,tTime=0;
@@ -2198,7 +2261,7 @@ const LVL_DESCS=[
   'One target. Precision required.',
   'Two targets. One tilt decides.',
   'Three targets. Navigate all.',
-  'One target. One singularity.',
+  'Chaos + two anchors. Navigate with intent.',
 ];
 const _lvlDone=[false,false,false,false];
 
@@ -2211,6 +2274,10 @@ function updateLevelNav(){
     const n=parseInt(btn.dataset.lvl);
     btn.classList.toggle('active',n===lvl);
     btn.classList.toggle('done',!!_lvlDone[n]);
+  });
+  // Sync mobile level buttons
+  document.querySelectorAll('.mb-lvl-sel-btn').forEach(btn=>{
+    btn.classList.toggle('active',parseInt(btn.dataset.lvl)===lvl);
   });
 }
 document.querySelectorAll('.lvl-nav-btn').forEach(btn=>{
