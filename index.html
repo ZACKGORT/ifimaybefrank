@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <meta property="og:title" content="if i may be frank">
-<meta property="og:description" content="Care in craft extends to every pixel. A particle simulation that makes the case — drag, deflect, direct. Precision isn't a style.">
+<meta property="og:description" content="a position on craft | zack g.">
 <meta property="og:url" content="https://ifimaybefrank.com">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="if i may be frank">
-<meta name="twitter:description" content="Care in craft extends to every pixel. A particle simulation that makes the case — drag, deflect, direct. Precision isn't a style.">
+<meta name="twitter:description" content="a position on craft">
 
 <title>if i may be frank — zack.cx</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -240,7 +240,7 @@ body.paper #anote-sig{color:rgba(0,0,0,0.22);}
 body.paper #anote-links a{color:rgba(0,0,0,0.3);}
 body.paper #anote-links a:hover{color:rgba(0,0,0,0.7);}
 body.paper #hint{color:rgba(0,0,0,0.12);}
-body.paper #zckgrt-logo span{color:rgba(0,0,0,0.1);}
+body.paper #zckgrt-logo span{color:rgba(0,0,0,0.85);}
 body.paper #cta-btn{background:#111;color:#f0ece4;box-shadow:0 2px 16px rgba(0,0,0,0.15);}
 body.paper #cta-btn.paused{background:#f0ece4;color:#111;border:1px solid rgba(0,0,0,0.15);}
 body.paper #screenshot-btn{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.4);}
@@ -254,7 +254,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 
 /* ── FRANK LOGO ── */
 #zckgrt-logo{
-  position:fixed;left:16px;top:16px;z-index:300;
+  position:fixed;left:54px;top:22px;z-index:300;
   pointer-events:none;
 }
 #zckgrt-logo span{
@@ -262,7 +262,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   font-weight:900;
   font-size:13px;
   letter-spacing:0.18em;
-  color:rgba(255,255,255,0.12);
+  color:rgba(255,255,255,1.0);
   text-transform:uppercase;
   display:inline-block;
   transition:color 0.3s;
@@ -807,7 +807,8 @@ function _buildFloatText(lines, immediate) {
       totalH += rows * role.lineH;
       if (li < lines.length - 1) totalH += role.lineH * 0.55;
     });
-    const PAD_TOP = Math.max(72, (H - totalH) * 0.42);
+    const LOGO_BOTTOM = 22 + 20 + 14; // logo top + approx height + gap = ~56px
+    const PAD_TOP = Math.max(LOGO_BOTTOM, (H - totalH) * 0.42);
     const allChars = [];
     let y = PAD_TOP;
     lines.forEach((line, li) => {
@@ -1498,26 +1499,26 @@ const SDEFS={
   cube:{baseR:1.55,springK:6.0,damping:8.0,color:0xffffff,rough:0.55,
     makeGeo:s=>new THREE.BoxGeometry(2.6*s,2.6*s,2.6*s),
     orients:[
-      // 0 — flat top (0°): maximum catch, symmetric split
+      // 0 — flat top: maximum catch surface, symmetric pour off both edges
       new THREE.Euler(0,0,0),
-      // 1 — ramp right 15° (π/12): gentle rightward bias
-      new THREE.Euler(0,0,-Math.PI/12),
-      // 2 — ramp left 15°: gentle leftward bias
-      new THREE.Euler(0,0,Math.PI/12),
-      // 3 — ramp right 30° (π/6): firm rightward deflection
-      new THREE.Euler(0,0,-_E),
-      // 4 — ramp left 30°: firm leftward deflection
-      new THREE.Euler(0,0,_E),
-      // 5 — ramp right 45° (π/4): steep redirect, edge becomes a catcher
+      // 1 — edge splitter: stood on one bottom edge (X 45°), incoming stream hits a ridge and splits
+      new THREE.Euler(_Q,0,0),
+      // 2 — corner point: balanced on one corner (X+Z 35°), sheds everything in three directions
+      new THREE.Euler(0.615,_Q,0.615),
+      // 3 — aggressive ramp right (Z 45°): steep redirect — most flow exits right, little catch
       new THREE.Euler(0,0,-_Q),
-      // 6 — ramp left 45°: steep redirect left
+      // 4 — aggressive ramp left
       new THREE.Euler(0,0,_Q),
-      // 7 — Y-45° + flat: face rotated 45° in XY plane, splits to left/right equally
-      new THREE.Euler(0,_Q,0),
-      // 8 — Y-45° + ramp right 30°: diagonal catch with rightward bias
-      new THREE.Euler(0,_Q,-_E),
-      // 9 — Y-45° + ramp left 30°: diagonal catch with leftward bias
-      new THREE.Euler(0,_Q,_E),
+      // 5 — wall: stood on end (X 90°), presents a vertical face — deflects sideways, minimal catch
+      new THREE.Euler(_H,0,0),
+      // 6 — diagonal wall right (Y 45° + X 90°): narrow edge-on deflector, splits diagonally
+      new THREE.Euler(_H,_Q,0),
+      // 7 — tumbled: X 30° + Z 20° — no face is level, randomised cascade off compound angles
+      new THREE.Euler(_E,0,Math.PI/9),
+      // 8 — shallow ramp right (Z 20°): gentle bias, large usable catch surface still intact
+      new THREE.Euler(0,0,-Math.PI/9),
+      // 9 — shallow ramp left
+      new THREE.Euler(0,0,Math.PI/9),
     ]},
   sphere:{baseR:1.4,springK:6.0,damping:7.0,color:0xdddddd,rough:0.15,
     makeGeo:s=>new THREE.SphereGeometry(1.4*s,32,20),
@@ -1690,7 +1691,7 @@ function resolveCollisions(){
   
   for(let a of attractors) {
     for(let sh of shapes) {
-      const basePull = a.type === 'neutronstar' ? 38.0 : 48.0;
+      const basePull = a.type === 'neutronstar' ? 38.0 : 55.0;
       const scale = Math.sqrt(a.pullStrength / basePull);
       const rScaled = a.radius * scale;
 
@@ -1875,10 +1876,10 @@ window.addEventListener('wheel',e=>{
   if(tAttractor){
     if(tAttractor.type === 'blackhole') {
       // Size increases slowly; gravity increases significantly
-      const rMin = tAttractor._bhRadiusMin || 0.5625;
-      const rMax = tAttractor._bhRadiusMax || 1.44375;
-      const pullMin = 28.0;  // floor — compact but already meaningful
-      const pullMax = 200.0;
+      const rMin = tAttractor._bhRadiusMin || 0.703125;
+      const rMax = tAttractor._bhRadiusMax || 0.721875;
+      const pullMin = 55.0;  // floor — compact but strong
+      const pullMax = 140.0;
 
       // Normalize current state 0→1 across the scroll range
       const t = (tAttractor.pullStrength - pullMin) / (pullMax - pullMin);
@@ -2196,12 +2197,12 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       } else if(tAttractor){
         if(tAttractor.type === 'blackhole') {
           const ratio = d / pinchDist0;
-          const pullMin = 28.0, pullMax = 200.0;
+          const pullMin = 55.0, pullMax = 140.0;
           const newPull = Math.max(pullMin, Math.min(pullMax, aPinchPull0 * ratio));
           tAttractor.pullStrength = newPull;
           const t = (newPull - pullMin) / (pullMax - pullMin);
-          const rMin = tAttractor._bhRadiusMin || 0.5625;
-          const rMax = tAttractor._bhRadiusMax || 1.44375;
+          const rMin = tAttractor._bhRadiusMin || 0.703125;
+          const rMax = tAttractor._bhRadiusMax || 0.721875;
           tAttractor.radius = rMin + Math.pow(t, 2.2) * (rMax - rMin);
           tAttractor.consumeRadius = tAttractor.radius * 0.53;
         } else {
