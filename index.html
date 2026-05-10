@@ -240,7 +240,7 @@ body.paper #anote-sig{color:rgba(0,0,0,0.22);}
 body.paper #anote-links a{color:rgba(0,0,0,0.3);}
 body.paper #anote-links a:hover{color:rgba(0,0,0,0.7);}
 body.paper #hint{color:rgba(0,0,0,0.12);}
-body.paper #zckgrt-logo span{color:rgba(0,0,0,0.85);}
+body.paper #zckgrt-logo span{color:rgba(0,0,0,0.1);}
 body.paper #cta-btn{background:#111;color:#f0ece4;box-shadow:0 2px 16px rgba(0,0,0,0.15);}
 body.paper #cta-btn.paused{background:#f0ece4;color:#111;border:1px solid rgba(0,0,0,0.15);}
 body.paper #screenshot-btn{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.4);}
@@ -254,7 +254,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 
 /* ── FRANK LOGO ── */
 #zckgrt-logo{
-  position:fixed;left:54px;top:22px;z-index:300;
+  position:fixed;left:16px;top:16px;z-index:300;
   pointer-events:none;
 }
 #zckgrt-logo span{
@@ -262,7 +262,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   font-weight:900;
   font-size:13px;
   letter-spacing:0.18em;
-  color:rgba(255,255,255,1.0);
+  color:rgba(255,255,255,0.12);
   text-transform:uppercase;
   display:inline-block;
   transition:color 0.3s;
@@ -533,6 +533,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="lvl-nav-btn" data-lvl="1">2</button>
     <button class="lvl-nav-btn" data-lvl="2">3</button>
     <button class="lvl-nav-btn" data-lvl="3">4</button>
+    <button class="lvl-nav-btn" data-lvl="4">5</button>
   </div>
   <div id="level-nav-desc">One target. Precision required.</div>
 </div>
@@ -635,6 +636,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="1" id="mb-lvl-2">2</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="4" id="mb-lvl-5">5</button>
   </div>
 </div>
 
@@ -700,6 +702,10 @@ const LEVEL_TITLES = [
   [
     "Zero friction. Maximum flexibility. One floor. Whatever shapes you can find.",
     "Precision is not a style. It is the only load-bearing decision you actually make.",
+  ],
+  [
+    "The exit is yours to place. Where things come out depends on where you put it.",
+    "A wormhole doesn't change what falls. It changes where falling leads.",
   ],
   [
     "In a world caught in the wash of greater forces — have your own gravity.",
@@ -1006,6 +1012,7 @@ const LEVELS=[
   {targets:[{x:5.5,r:2.8}]},
   {targets:[{x:-5.0,r:2.5},{x:6.0,r:2.5}]},
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
+  {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
   {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2}
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
@@ -1018,6 +1025,7 @@ const FILL_A=0.04,FLR=-9.0;
 
 // ── ATTRACTORS (Black Hole & Neutron Star) ────────────────────────────────────
 let attractors = [];
+const wormhole = { active: false, entranceX: 0, entranceR: 3.2, exitX: 0, exitY: 11, exitR: 2.4, phase: 0, dragging: false };
 const BH_SPRING_K = 5.0;
 const BH_DAMPING = 7.5;
 
@@ -1029,12 +1037,12 @@ class Attractor {
     this.vel = new THREE.Vector3();
     this.dragging = false;
     this._pulseT = 0;
-    this.pullStrength = type === 'neutronstar' ? 35.0 : 28.0;   // NS pulls hard — stream chases it
-    this.radius = type === 'neutronstar' ? 0.32 : 1.1;
-    this.consumeRadius = type === 'neutronstar' ? 0.04 : 0.58;  // NS: near-zero consume — particles follow, not disappear
-    this.influenceR = type === 'neutronstar' ? 5.0 : null;      // NS: wide field so stream reaches it from far
-    this._bhRadiusMin = type === 'blackhole' ? 0.75 : null;
-    this._bhRadiusMax = type === 'blackhole' ? 1.65 : null;
+    this.pullStrength = type === 'neutronstar' ? 35.0 : 28.0;
+    this.radius = type === 'neutronstar' ? 0.32 : 1.43;
+    this.consumeRadius = type === 'neutronstar' ? 0.04 : 0.75;
+    this.influenceR = type === 'neutronstar' ? 5.0 : null;
+    this._bhRadiusMin = type === 'blackhole' ? 0.97 : null;
+    this._bhRadiusMax = type === 'blackhole' ? 2.15 : null;
     this._bhPullBase  = type === 'blackhole' ? 28.0 : null;
     this._build();
   }
@@ -1104,128 +1112,126 @@ class Attractor {
   }
 
   _initAccretionDisc() {
-    const N = 320;
+    const N = 480;
     this._adN = N;
     this._adPos = new Float32Array(N * 3);
     this._adVel = new Float32Array(N * 3);
-    this._adLife = new Float32Array(N); // 0..1 normalized age
-
-    // Seed particles in a flat tilted disc around the BH
-    const discTilt = 0.22; // slight z-tilt for depth
+    this._adLife = new Float32Array(N);
+    this._adFlare = new Float32Array(N);
+    this._adBand = new Uint8Array(N);
     for (let i = 0; i < N; i++) {
+      this._adBand[i] = i < N * 0.6 ? 0 : 1;
       this._adSeed(i);
     }
-
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(this._adPos, 3));
-
-    // Color gradient: inner hot white-blue → outer dim violet
     const colors = new Float32Array(N * 3);
     for (let i = 0; i < N; i++) {
       const t = i / N;
-      colors[i*3]   = 0.55 + t * 0.25;  // R
-      colors[i*3+1] = 0.35 + t * 0.10;  // G
-      colors[i*3+2] = 1.0;               // B
+      colors[i*3] = 0.55 + t * 0.25; colors[i*3+1] = 0.35 + t * 0.10; colors[i*3+2] = 1.0;
     }
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
     this._adMat = new THREE.PointsMaterial({
-      size: 0.045,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.72,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      sizeAttenuation: true,
+      size: 0.055, vertexColors: true, transparent: true, opacity: 0.82,
+      depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true,
     });
     this._adPoints = new THREE.Points(geo, this._adMat);
     scene.add(this._adPoints);
+    this._adStreamHits = 0;
   }
 
   _adSeed(i) {
     const b = i * 3;
-    // Random orbit radius in [r*1.1 .. r*3.2], biased toward inner disc
-    const r = this.radius * (1.1 + Math.pow(Math.random(), 1.6) * 2.1);
+    const isInner = this._adBand ? this._adBand[i] === 0 : true;
+    const rMin = isInner ? this.radius * 1.1 : this.radius * 2.2;
+    const rMax = isInner ? this.radius * 2.2 : this.radius * 4.0;
+    const r = rMin + Math.pow(Math.random(), isInner ? 1.8 : 1.2) * (rMax - rMin);
     const angle = Math.random() * Math.PI * 2;
-    const discZ = (Math.random() - 0.5) * 0.08 * r; // thin disc thickness
-
+    const discZ = (Math.random() - 0.5) * (isInner ? 0.06 : 0.15) * r;
     this._adPos[b]   = this.pos.x + Math.cos(angle) * r;
-    this._adPos[b+1] = this.pos.y + Math.sin(angle) * r * 0.28; // elliptical — flattened in y for perspective
+    this._adPos[b+1] = this.pos.y + Math.sin(angle) * r * 0.28;
     this._adPos[b+2] = this.pos.z + discZ;
-
-    // Circular orbital velocity: v = sqrt(GM/r), scaled to game units
-    const vOrbit = Math.sqrt(this.pullStrength / r) * 0.85;
+    const vOrbit = Math.sqrt(this.pullStrength / r) * (isInner ? 0.88 : 0.75);
     this._adVel[b]   = -Math.sin(angle) * vOrbit;
     this._adVel[b+1] =  Math.cos(angle) * vOrbit * 0.28;
-    this._adVel[b+2] =  0;
-
-    this._adLife[i] = Math.random(); // stagger lifetimes
+    this._adVel[b+2] =  (Math.random() - 0.5) * 0.02;
+    this._adLife[i] = Math.random();
+    if (this._adFlare) this._adFlare[i] = 0;
   }
 
   _updateAccretionDisc(dt) {
     const geo = this._adPoints.geometry;
     const posAttr = geo.getAttribute('position');
     const colorAttr = geo.getAttribute('color');
-
+    this._adStreamHits = Math.max(0, (this._adStreamHits || 0) - dt * 3.5);
+    const globalFlare = Math.min(1, this._adStreamHits * 0.4);
     for (let i = 0; i < this._adN; i++) {
       const b = i * 3;
-      this._adLife[i] += dt * (0.04 + Math.random() * 0.02);
+      const isInner = this._adBand ? this._adBand[i] === 0 : true;
+      this._adLife[i] += dt * (isInner ? 0.025 : 0.018);
       if (this._adLife[i] > 1.0) { this._adSeed(i); this._adLife[i] = 0; continue; }
-
       const dx = this.pos.x - this._adPos[b];
-      const dy = (this.pos.y - this._adPos[b+1]) / 0.28; // unproject ellipse for physics
+      const dy = (this.pos.y - this._adPos[b+1]) / 0.28;
       const dz = this.pos.z - this._adPos[b+2];
       const dist = Math.sqrt(dx*dx + dy*dy*0.28*0.28 + dz*dz) + 0.001;
-
-      // Gravitational pull toward BH
       const f = this.pullStrength * 1.8 * dt / (dist * dist + 0.08);
       this._adVel[b]   += dx / dist * f;
       this._adVel[b+1] += (this.pos.y - this._adPos[b+1]) / dist * f;
       this._adVel[b+2] += dz / dist * f;
-
-      // Angular momentum preservation — tangential correction keeps them in orbit
-      const rx = this._adPos[b]   - this.pos.x;
+      const rx = this._adPos[b] - this.pos.x;
       const ry = (this._adPos[b+1] - this.pos.y) / 0.28;
       const rDist = Math.sqrt(rx*rx + ry*ry) + 0.001;
-      const vOrbit = Math.sqrt(this.pullStrength / rDist) * 0.85;
-      // Nudge tangential component toward ideal orbital speed
+      const vOrbit = Math.sqrt(this.pullStrength / rDist) * (isInner ? 0.88 : 0.75);
       const tx = -ry / rDist, ty = rx / rDist;
       const vTan = this._adVel[b] * tx + this._adVel[b+1] * ty * 0.28;
-      const dv = (vOrbit - vTan) * 0.12;
+      const dv = (vOrbit - vTan) * (isInner ? 0.14 : 0.09);
       this._adVel[b]   += tx * dv;
       this._adVel[b+1] += ty * 0.28 * dv;
-
-      // Speed cap to prevent runaway
       const spd = Math.sqrt(this._adVel[b]**2 + this._adVel[b+1]**2);
       if (spd > vOrbit * 2.2) { this._adVel[b] *= vOrbit * 2.2 / spd; this._adVel[b+1] *= vOrbit * 2.2 / spd; }
-
       this._adPos[b]   += this._adVel[b]   * dt;
       this._adPos[b+1] += this._adVel[b+1] * dt;
       this._adPos[b+2] += this._adVel[b+2] * dt;
-
-      // Respawn if consumed or strayed too far
       const rdx = this._adPos[b] - this.pos.x, rdy = this._adPos[b+1] - this.pos.y;
       const rdist = Math.sqrt(rdx*rdx + rdy*rdy);
-      if (rdist < this.radius * 0.9 || rdist > this.radius * 6.0) {
-        this._adSeed(i); this._adLife[i] = 0; continue;
-      }
-
-      // Color: inner = bright blue-white, outer = dim violet, fade at lifecycle ends
-      const normR = Math.min(1, (rdist - this.radius) / (this.radius * 2.5));
+      const maxR = isInner ? this.radius * 4.2 : this.radius * 7.0;
+      if (rdist < this.radius * 0.9 || rdist > maxR) { this._adSeed(i); this._adLife[i] = 0; continue; }
+      if (this._adFlare) this._adFlare[i] = Math.max(0, this._adFlare[i] - dt * 4.0);
+      const flare = (this._adFlare ? this._adFlare[i] : 0) + globalFlare * (isInner ? 0.9 : 0.5);
+      const normR = Math.min(1, (rdist - this.radius) / (this.radius * (isInner ? 1.2 : 3.0)));
       const lifeFade = Math.sin(this._adLife[i] * Math.PI);
-      const br = lifeFade * (1.0 - normR * 0.45);
-      colorAttr.array[b]   = (0.7 + normR * 0.2) * br;
-      colorAttr.array[b+1] = (0.4 - normR * 0.2) * br;
-      colorAttr.array[b+2] = br;
-
+      const br = lifeFade * (1.0 - normR * (isInner ? 0.35 : 0.6)) * (1.0 + flare * 1.8);
+      if (isInner) {
+        colorAttr.array[b]   = (0.65 + normR * 0.25 + flare * 0.4) * br;
+        colorAttr.array[b+1] = (0.5  - normR * 0.3  + flare * 0.2) * br;
+        colorAttr.array[b+2] = br;
+      } else {
+        colorAttr.array[b]   = (0.35 + normR * 0.15 + flare * 0.35) * br * 0.7;
+        colorAttr.array[b+1] = (0.15 + flare * 0.15) * br * 0.7;
+        colorAttr.array[b+2] = (0.85 - normR * 0.3) * br * 0.7;
+      }
       posAttr.array[b]   = this._adPos[b];
       posAttr.array[b+1] = this._adPos[b+1];
       posAttr.array[b+2] = this._adPos[b+2];
     }
-
     posAttr.needsUpdate = true;
     colorAttr.needsUpdate = true;
-    this._adPoints.position.set(0, 0, 0); // world-space, not relative to mesh
+    this._adPoints.position.set(0, 0, 0);
+  }
+
+  notifyStreamParticle(px, py, pz) {
+    if (!this._adFlare) return;
+    const discR = this.radius * 4.0;
+    const dx = px - this.pos.x, dy = py - this.pos.y;
+    const dist2d = Math.sqrt(dx*dx + dy*dy);
+    if (dist2d > discR || Math.abs(pz) > 0.8) return;
+    this._adStreamHits = Math.min(4, (this._adStreamHits || 0) + 0.18);
+    for (let i = 0; i < this._adN; i++) {
+      const b = i * 3;
+      const ddx = this._adPos[b] - px, ddy = this._adPos[b+1] - py;
+      const proximity = 1.0 - Math.min(1, Math.sqrt(ddx*ddx+ddy*ddy) / (this.radius * 1.5));
+      if (proximity > 0.2 && this._adFlare) this._adFlare[i] = Math.min(1.0, this._adFlare[i] + proximity * 0.65);
+    }
   }
 
   update(dt) {
@@ -1327,13 +1333,13 @@ function applyAttractorForces(i, b, dt) {
     if (dist < 0.001) continue;
 
     if (a.type === 'blackhole') {
-      // Pure radial inward pull. 1/(dist²+softening) — dominant close, falls off fast.
-      // Softening=0.25: strong grip at close range, ignorable at distance.
       const f = a.pullStrength * dt / (dist2 + 0.25);
       pv[b]   += dx / dist * f;
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
-      // Consume threshold
+      if (dist < a.radius * 5.0 && a.notifyStreamParticle) {
+        a.notifyStreamParticle(pp[b], pp[b+1], pp[b+2] || 0);
+      }
       if (dist < a.consumeRadius) { spawn(i); return true; }
 
     } else {
@@ -1403,10 +1409,12 @@ function drawBlackHoleOverlay() {
       });
     }
 
-    ovCtx.font = '8px Courier New';
-    ovCtx.fillStyle = bh.type === 'neutronstar' ? 'rgba(150,220,255,0.6)' : 'rgba(110,80,220,0.38)';
-    ovCtx.textAlign = 'center';
-    ovCtx.fillText(bh.type === 'neutronstar' ? 'NEUTRON STAR' : 'SINGULARITY', sx, sy + coreR + 14);
+    if (bh.type !== 'neutronstar') {
+      ovCtx.font = '8px Courier New';
+      ovCtx.fillStyle = 'rgba(110,80,220,0.38)';
+      ovCtx.textAlign = 'center';
+      ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
+    }
     ovCtx.restore();
   });
 }
@@ -1421,27 +1429,29 @@ function initLevel(n){
   buildHUD();
   buildTextChars(n);
   
-  const isLvl4 = n === 3;
+  const isLvl4 = n === 3; // wormhole level
+  const isLvl5 = n === 4; // black hole level
+  const isAttractorLevel = isLvl5; // only lvl5 hides shapes; lvl4 (wormhole) has shapes
+
   const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
-  if(dBH) dBH.style.display = isLvl4 ? 'flex' : 'none';
+  if(dBH) dBH.style.display = isLvl5 ? 'flex' : 'none';
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
-  if(dNS) dNS.style.display = isLvl4 ? 'flex' : 'none';
-  // Hide regular shape buttons on level 4
+  if(dNS) dNS.style.display = isLvl5 ? 'flex' : 'none';
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.style.display = isLvl4 ? 'none' : '';
+    if(btn) btn.style.display = isAttractorLevel ? 'none' : '';
   });
 
   const mBH = document.getElementById('mb-add-blackhole');
-  if(mBH) mBH.style.display = isLvl4 ? 'flex' : 'none';
+  if(mBH) mBH.style.display = isLvl5 ? 'flex' : 'none';
   const mNS = document.getElementById('mb-add-neutronstar');
-  if(mNS) mNS.style.display = isLvl4 ? 'flex' : 'none';
+  if(mNS) mNS.style.display = isLvl5 ? 'flex' : 'none';
   const mbCube = document.getElementById('mb-add-cube');
-  if(mbCube) mbCube.style.display = isLvl4 ? 'none' : 'flex';
+  if(mbCube) mbCube.style.display = isAttractorLevel ? 'none' : 'flex';
   const mbSphere = document.getElementById('mb-add-sphere');
-  if(mbSphere) mbSphere.style.display = isLvl4 ? 'none' : 'flex';
+  if(mbSphere) mbSphere.style.display = isAttractorLevel ? 'none' : 'flex';
   const mbPyramid = document.getElementById('mb-add-pyramid');
-  if(mbPyramid) mbPyramid.style.display = isLvl4 ? 'none' : 'flex';
+  if(mbPyramid) mbPyramid.style.display = isAttractorLevel ? 'none' : 'flex';
 
   destroyAttractors();
   if (LEVELS[n].blackHole) {
@@ -1454,18 +1464,38 @@ function initLevel(n){
     attractors.push(bh);
   }
 
-  // Level 4: set max amount, lowest gravity, lowest spread, max bounce
+  // Level 4: wormhole settings + spawn exit
   if (n === 3) {
-    P.count = 8000; P.gravity = 1; P.spread = 0.05; P.bounce = 1.0; P.size = 0.65;
+    P.count = 7000; P.gravity = 1.8; P.spread = 0.06; P.bounce = 0.75; P.size = 0.55;
+    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    setSl('sl-count', 7000); setVl('v-count', 7000);
+    setSl('sl-grav', 1.8); setVl('v-grav', '1.8');
+    setSl('sl-spread', 0.06); setVl('v-spread', '0.06');
+    setSl('sl-bounce', 0.75); setVl('v-bounce', '0.75');
+    wormhole.active = true;
+    wormhole.entranceX = LEVELS[n].wormholeX;
+    wormhole.entranceR = LEVELS[n].wormholeR;
+    wormhole.exitX = (Math.random() - 0.5) * 8;
+    wormhole.exitY = 11.5 + Math.random() * 1.5;
+    wormhole.exitR = LEVELS[n].wormholeR * 0.8;
+    wormhole.phase = 0;
+  } else {
+    wormhole.active = false;
+  }
+
+  // Level 5: black hole + neutron stars
+  if (n === 4) {
+    P.count = 8000; P.gravity = 0.5; P.spread = 0.03; P.bounce = 1.0; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     setSl('sl-count', 8000); setVl('v-count', 8000);
-    setSl('sl-grav', 1); setVl('v-grav', '1.0');
-    setSl('sl-spread', 0.05); setVl('v-spread', '0.05');
+    setSl('sl-grav', 0.5); setVl('v-grav', '0.5');
+    setSl('sl-spread', 0.03); setVl('v-spread', '0.03');
     setSl('sl-bounce', 1.0); setVl('v-bounce', '1.00');
     setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
-    setSl('mb-sl-grav', 1); setVl('mb-v-grav', '1.0');
-    setSl('mb-sl-spread', 0.05); setVl('mb-v-spread', '0.05');
+    setSl('mb-sl-grav', 0.5); setVl('mb-v-grav', '0.5');
+    setSl('mb-sl-spread', 0.03); setVl('mb-v-spread', '0.03');
   }
   updateLevelNav();
 }
@@ -1642,22 +1672,41 @@ let shapes=[];
 
 function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
-  // Level 4: no regular shapes — only attractors (neutron stars + black hole)
-  const isLvl4 = lvl === 3;
+  const isLvl4 = lvl === 3; // wormhole — has shapes
+  const isLvl5 = lvl === 4; // black hole — no shapes
+  const noShapes = isLvl5 || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.parentElement && (btn.style.display = isLvl4 ? 'none' : '');
+    if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
   });
-  if (!isLvl4) {
+  if (!noShapes) {
     const typePool=[...TYPES].sort(()=>Math.random()-0.5);
-    SLOTS.forEach((slot,i)=>{
-      const type=typePool[i];
-      const orients=SDEFS[type].orients;
-      const oi=Math.floor(Math.random()*orients.length);
-      const rot=orients[oi].clone();
-      const sc=randSc(type);
-      shapes.push(new Shape(type,slot.pos,rot,sc));
-    });
+    const isLvl4shapes = lvl === 3 && LEVELS[lvl].shapes;
+    if (isLvl4shapes) {
+      // Level 5: 4 shapes at deliberate positions to interact with wormhole stream
+      const lvl5Slots = [
+        new THREE.Vector3(-3.0, 3.0, 0),
+        new THREE.Vector3(1.0, 1.0, 0),
+        new THREE.Vector3(5.0, 4.5, 0),
+        new THREE.Vector3(2.5, -1.5, 0),
+      ];
+      const allTypes = ['cube','sphere','pyramid'];
+      lvl5Slots.forEach((pos, i) => {
+        const type = allTypes[i % allTypes.length];
+        const orients = SDEFS[type].orients;
+        const rot = orients[Math.floor(Math.random()*orients.length)].clone();
+        shapes.push(new Shape(type, pos, rot, randSc(type)));
+      });
+    } else {
+      SLOTS.forEach((slot,i)=>{
+        const type=typePool[i];
+        const orients=SDEFS[type].orients;
+        const oi=Math.floor(Math.random()*orients.length);
+        const rot=orients[oi].clone();
+        const sc=randSc(type);
+        shapes.push(new Shape(type,slot.pos,rot,sc));
+      });
+    }
   }
   updateCnt();
 }
@@ -1773,7 +1822,15 @@ let tAttractor=null,aDragOff=new THREE.Vector3();
 
 window.addEventListener('mousemove',e=>{
   mVX=e.clientX-mX;mVY=e.clientY-mY;mX=e.clientX;mY=e.clientY;
-  
+
+  // Wormhole exit drag — free movement anywhere in world space
+  if(wormhole.active && wormhole.dragging) {
+    const wp=s2w(e.clientX,e.clientY);
+    wormhole.exitX = wp.x;
+    wormhole.exitY = wp.y;
+    return;
+  }
+
   if(tAttractor){
     const wp=s2w(e.clientX,e.clientY);
     tAttractor.pos.x=wp.x-aDragOff.x;
@@ -1800,6 +1857,7 @@ window.addEventListener('mousemove',e=>{
   }
 });
 window.addEventListener('mouseup',e=>{
+  if(e.button===0&&wormhole.dragging){wormhole.dragging=false;return;}
   if(e.button===0&&tAttractor){
     tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
     tAttractor.dragging=false;
@@ -1810,6 +1868,15 @@ window.addEventListener('mouseup',e=>{
 
 renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
+
+  // Wormhole exit drag — hit test against screen-space circle
+  if(wormhole.active && wormhole._screenX != null) {
+    const dx=e.clientX-wormhole._screenX, dy=e.clientY-wormhole._screenY;
+    if(Math.sqrt(dx*dx+dy*dy) < (wormhole._screenR||40)) {
+      wormhole.dragging=true; return;
+    }
+  }
+
   ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
   
@@ -2406,9 +2473,10 @@ const LVL_DESCS=[
   'One target. Precision required.',
   'Two targets. One tilt decides.',
   'Three targets. Navigate all.',
-  'Chaos + two anchors. Navigate with intent.',
+  'Wormhole entrance fixed. You control the exit.',
+  'Singularity. Two anchors. Navigate the chaos.'
 ];
-const _lvlDone=[false,false,false,false];
+const _lvlDone=[false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
@@ -2455,6 +2523,53 @@ function drawOverlay(){
     if(met){ovCtx.save();ovCtx.translate(cx,cy);ovCtx.scale(1,ry/rx);const g=ovCtx.createRadialGradient(0,0,0,0,0,rx*0.84);g.addColorStop(0,rgba(col,0.1+Math.sin(t*3)*0.04));g.addColorStop(1,rgba(col,0));ovCtx.beginPath();ovCtx.arc(0,0,rx*0.84,0,Math.PI*2);ovCtx.fillStyle=g;ovCtx.fill();ovCtx.restore();}
     ovCtx.font='10px Courier New';ovCtx.textAlign='center';ovCtx.fillStyle=met?col:`rgba(${rgb(col)},${0.28+fill*0.4})`;ovCtx.shadowColor=col;ovCtx.shadowBlur=met?8:2;ovCtx.fillText(met?'✓ FILLED':`TARGET ${String.fromCharCode(65+tg.idx)}`,cx,cy+ry+15);ovCtx.shadowBlur=0;
   });
+
+  // ── Wormhole overlay ──
+  if(wormhole.active) {
+    wormhole.phase = (wormhole.phase || 0) + 0.016;
+    const tw = wormhole.phase;
+    function projW(v){const c=v.clone().project(camera);return{x:(c.x+1)/2*W,y:(-c.y+1)/2*H};}
+
+    // ENTRANCE — ground plane void
+    const eC = projW(new THREE.Vector3(wormhole.entranceX,FLR,0));
+    const eL = projW(new THREE.Vector3(wormhole.entranceX-wormhole.entranceR,FLR,0));
+    const eR2= projW(new THREE.Vector3(wormhole.entranceX+wormhole.entranceR,FLR,0));
+    const eF = projW(new THREE.Vector3(wormhole.entranceX,FLR,wormhole.entranceR*0.55));
+    const erx=(eR2.x-eL.x)/2, ery=Math.abs(eF.y-eC.y)*1.1;
+    const ecx=(eR2.x+eL.x)/2, ecy=eC.y;
+    ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx);
+    const voidG=ovCtx.createRadialGradient(0,0,0,0,0,erx);
+    voidG.addColorStop(0,'rgba(0,0,0,0.95)'); voidG.addColorStop(0.65,'rgba(0,15,25,0.75)'); voidG.addColorStop(1,'rgba(0,180,200,0)');
+    ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.fillStyle=voidG; ovCtx.fill(); ovCtx.restore();
+    ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx); ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.restore();
+    ovCtx.setLineDash([8,5]); ovCtx.lineDashOffset=-tw*22;
+    ovCtx.strokeStyle=`rgba(0,220,200,${0.55+Math.sin(tw*2.5)*0.18})`; ovCtx.lineWidth=2.0;
+    ovCtx.shadowColor='rgba(0,220,200,0.8)'; ovCtx.shadowBlur=10; ovCtx.stroke();
+    ovCtx.setLineDash([]); ovCtx.shadowBlur=0;
+    ovCtx.font='9px Courier New'; ovCtx.textAlign='center';
+    ovCtx.fillStyle='rgba(0,220,200,0.5)'; ovCtx.fillText('WORMHOLE ENTRANCE',ecx,ecy+ery+14);
+
+    // EXIT — ceiling portal, draggable
+    const xC = projW(new THREE.Vector3(wormhole.exitX,wormhole.exitY,0));
+    const xL = projW(new THREE.Vector3(wormhole.exitX-wormhole.exitR,wormhole.exitY,0));
+    const xR2= projW(new THREE.Vector3(wormhole.exitX+wormhole.exitR,wormhole.exitY,0));
+    const xF = projW(new THREE.Vector3(wormhole.exitX,wormhole.exitY,wormhole.exitR*0.55));
+    const xrx=(xR2.x-xL.x)/2, xry=Math.abs(xF.y-xC.y)*1.1+4;
+    const xcx=(xR2.x+xL.x)/2, xcy=xC.y;
+    wormhole._screenX=xcx; wormhole._screenY=xcy; wormhole._screenR=xrx+10;
+    ovCtx.save(); ovCtx.translate(xcx,xcy); ovCtx.scale(1,xry/xrx);
+    const exitG=ovCtx.createRadialGradient(0,0,0,0,0,xrx);
+    exitG.addColorStop(0,`rgba(180,100,255,${0.14+Math.sin(tw*3)*0.06})`); exitG.addColorStop(1,'rgba(100,50,200,0)');
+    ovCtx.beginPath(); ovCtx.arc(0,0,xrx,0,Math.PI*2); ovCtx.fillStyle=exitG; ovCtx.fill(); ovCtx.restore();
+    ovCtx.save(); ovCtx.translate(xcx,xcy); ovCtx.scale(1,xry/xrx); ovCtx.beginPath(); ovCtx.arc(0,0,xrx,0,Math.PI*2); ovCtx.restore();
+    ovCtx.setLineDash([6,4]); ovCtx.lineDashOffset=tw*18;
+    ovCtx.strokeStyle=`rgba(180,100,255,${0.62+Math.sin(tw*2.1)*0.18})`; ovCtx.lineWidth=1.8;
+    ovCtx.shadowColor='rgba(160,80,255,0.7)'; ovCtx.shadowBlur=12; ovCtx.stroke();
+    ovCtx.setLineDash([]); ovCtx.shadowBlur=0;
+    ovCtx.font='9px Courier New'; ovCtx.textAlign='center';
+    ovCtx.fillStyle=`rgba(180,100,255,${wormhole.dragging?0.9:0.55})`;
+    ovCtx.fillText(wormhole.dragging?'EXIT ✦':'EXIT (drag)', xcx, xcy-xry-6);
+  }
 }
 
 // ── TEXT CURSOR LAYER DRAW (cx.html port) ─────────────────────────────────────
@@ -2658,6 +2773,26 @@ function tick(){
       }
     }
     if(pp[b]<edgeL-1||pp[b]>edgeR+1)spawn(i);
+
+    // ── Wormhole entrance: teleport to exit, preserve velocity ──
+    if(wormhole.active && pp[b+1] < -8.5) {
+      const wdx = pp[b] - wormhole.entranceX, wdz = pp[b+2];
+      if(wdx*wdx + wdz*wdz < wormhole.entranceR * wormhole.entranceR * 0.85) {
+        // Mirror entry offset so relative position within entrance maps to exit
+        const entryFracX = wdx / wormhole.entranceR;
+        const entryFracZ = pp[b+2] / (wormhole.entranceR * 0.5);
+        pp[b]   = wormhole.exitX + entryFracX * wormhole.exitR * P.spread * 18;
+        pp[b+1] = wormhole.exitY;
+        pp[b+2] = entryFracZ * wormhole.exitR * P.spread * 12;
+        // Match incoming speed exactly — same density, same momentum, just redirected downward
+        const inSpd = Math.sqrt(pv[b]*pv[b] + pv[b+1]*pv[b+1] + pv[b+2]*pv[b+2]);
+        const exitSpd = Math.max(inSpd, 2.0);
+        pv[b]   = 0;
+        pv[b+1] = -exitSpd;
+        pv[b+2] = 0;
+        pal[i] = 1;
+      }
+    }
     pv[b]*=0.997;
   }
   for(let i=N;i<MP;i++){if(pal[i]){pal[i]=0;pp[i*3+1]=-9999;}}
