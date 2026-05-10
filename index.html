@@ -474,14 +474,14 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3L22 20H2L12 3Z" stroke="rgba(255,255,255,0.55)" stroke-width="1.1" fill="rgba(255,255,255,0.04)"/><path d="M12 3L2 20M12 3L22 20" stroke="rgba(255,255,255,0.18)" stroke-width="0.7"/></svg>
         <span class="ins-btn-lbl">Pyramid</span>
       </button>
-      <button class="ins-btn" data-shape="blackhole" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
+      <button class="ins-btn" data-shape="blackhole" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s; display:none;">
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
           <circle cx="12" cy="12" r="5" fill="rgba(0,0,0,0.8)" stroke="rgba(100,80,220,0.8)" stroke-width="1.5"/>
           <circle cx="12" cy="12" r="8" stroke="rgba(100,80,220,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
         </svg>
         <span class="ins-btn-lbl">Singularity</span>
       </button>
-      <button class="ins-btn" data-shape="neutronstar" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
+      <button class="ins-btn" data-shape="neutronstar" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s; display:none;">
          <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
            <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.9)" stroke="rgba(100,200,255,0.8)" stroke-width="1.5"/>
            <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(150,220,255,0.6)" stroke-width="1.5"/>
@@ -647,14 +647,14 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3L22 20H2L12 3Z" stroke="rgba(255,255,255,0.8)" stroke-width="1.1" fill="rgba(255,255,255,0.04)"/><path d="M12 3L2 20M12 3L22 20" stroke="rgba(255,255,255,0.22)" stroke-width="0.7"/></svg>
     Pyramid
   </button>
-  <button class="mb-shape-btn" id="mb-add-blackhole">
+  <button class="mb-shape-btn" id="mb-add-blackhole" style="display:none;">
     <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
        <circle cx="12" cy="12" r="5" fill="rgba(0,0,0,0.8)" stroke="rgba(100,80,220,0.8)" stroke-width="1.5"/>
        <circle cx="12" cy="12" r="8" stroke="rgba(100,80,220,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
     </svg>
     Singularity
   </button>
-  <button class="mb-shape-btn" id="mb-add-neutronstar">
+  <button class="mb-shape-btn" id="mb-add-neutronstar" style="display:none;">
     <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
        <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.9)" stroke="rgba(100,200,255,0.8)" stroke-width="1.5"/>
        <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(150,220,255,0.6)" stroke-width="1.5"/>
@@ -1098,17 +1098,6 @@ class Attractor {
         this.mesh.add(g);
         return g;
       });
-
-      // Energetic jets
-      this.torusMat = new THREE.MeshBasicMaterial({ color: 0xccffff, transparent: true, opacity: 0.6 });
-      this.torus = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, this.radius * 6, 16), this.torusMat);
-      this.torus.rotation.z = Math.PI / 4;
-      this.mesh.add(this.torus);
-
-      this.torus2Mat = new THREE.MeshBasicMaterial({ color: 0x44aaff, transparent: true, opacity: 0.4 });
-      this.torus2 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, this.radius * 8, 16), this.torus2Mat);
-      this.torus2.rotation.z = Math.PI / 4;
-      this.mesh.add(this.torus2);
     }
 
     this.mesh.position.copy(this.pos);
@@ -1128,8 +1117,6 @@ class Attractor {
       this.torusMat.opacity = 0.32 + pulse * 0.16;
       this.torus2Mat.opacity = 0.10 + pulse * 0.10;
     } else {
-      this.torus.rotation.x += dt * 4.0;
-      this.torus2.rotation.y += dt * 3.0;
       const pulse = 0.5 + Math.sin(this._pulseT * 8.0) * 0.5;
       this.glowMeshes[0].material.opacity = 0.2 + pulse * 0.15;
       this.glowMeshes[1].material.opacity = 0.1 + pulse * 0.08;
@@ -1272,6 +1259,17 @@ function initLevel(n){
   buildHUD();
   buildTextChars(n);
   
+  const isLvl4 = n === 3;
+  const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
+  if(dBH) dBH.style.display = isLvl4 ? 'flex' : 'none';
+  const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
+  if(dNS) dNS.style.display = isLvl4 ? 'flex' : 'none';
+
+  const mBH = document.getElementById('mb-add-blackhole');
+  if(mBH) mBH.style.display = isLvl4 ? 'flex' : 'none';
+  const mNS = document.getElementById('mb-add-neutronstar');
+  if(mNS) mNS.style.display = isLvl4 ? 'flex' : 'none';
+
   destroyAttractors();
   if (LEVELS[n].blackHole) {
     const rx = (Math.random() - 0.5) * 8;
@@ -2646,20 +2644,11 @@ function _applyShapeMat(sh, paper) {
   });
 }
 
-// Patch addShape to apply theme to new shapes
+// Intercept addShape to apply paper theme to new shapes
 const _origAddShape = addShape;
-// Override the build path — patch _build via shape material after construction
-const _origBuildInit = buildInit;
-buildInit = function(){
-  _origBuildInit();
-  if(isPaper) shapes.forEach(sh=>_applyShapeMat(sh,true));
-};
-
-// Intercept addShape
-window._addShapeOrig = addShape;
-function addShape(t){
-  window._addShapeOrig(t);
-  if(isPaper) _applyShapeMat(shapes[shapes.length-1], true);
+addShape = function(t){
+  _origAddShape(t);
+  if(isPaper && shapes.length > 0) _applyShapeMat(shapes[shapes.length-1], true);
 }
 
 // Text color variable
