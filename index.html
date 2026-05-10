@@ -499,11 +499,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">SIZE</span><span class="ctrl-vl" id="v-size">0.65</span></div><input type="range" id="sl-size" min="0.2" max="1.0" step="0.05" value="0.65"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">FONT SIZE</span><span class="ctrl-vl" id="v-font">24</span></div><input type="range" id="sl-font" min="8" max="48" step="1" value="24"></div>
     <div class="div"></div>
-    <div class="chk-row"><span class="ctrl-nm">RAIN</span><button class="tog" id="tog-rain">OFF</button></div>
-    <div class="div"></div>
     <div class="chk-row"><span class="ctrl-nm">TEXT</span><button class="tog on" id="tog-text">ON</button></div>
-    <div class="div"></div>
-    <div class="chk-row"><span class="ctrl-nm">RESET PARTICLES</span><button class="tog" id="tog-reset">GO</button></div>
     <div class="div"></div>
     <button class="ins-clear" id="btn-clear2" style="width:100%;background:transparent;border:1px solid rgba(255,60,60,0.15);color:rgba(255,80,80,0.38);font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.1em;padding:5px 4px;cursor:none;text-transform:uppercase;border-radius:3px;transition:all 0.15s;">CLEAR ALL</button>
   </div>
@@ -607,14 +603,6 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <span class="mb-ctrl-lbl">Size</span>
     <input class="mb-range" type="range" id="mb-sl-size" min="0.2" max="1.0" step="0.05" value="0.65">
     <span class="mb-ctrl-val" id="mb-v-size">0.65</span>
-  </div>
-  <div class="mb-ctrl-row">
-    <span class="mb-ctrl-lbl">Rain</span>
-    <button class="mb-tog-btn" id="mb-tog-rain">Off</button>
-  </div>
-  <div class="mb-ctrl-row">
-    <span class="mb-ctrl-lbl">Reset</span>
-    <button class="mb-ctrl-btn" id="mb-tog-reset">↺</button>
   </div>
 </div>
 
@@ -1311,18 +1299,24 @@ function initLevel(n){
     const rx = (Math.random() - 0.5) * 8;
     const ry = 1.5 + Math.random() * 4;
     const bh = new Attractor('blackhole', new THREE.Vector3(rx, ry, 0));
-    // Black hole has limited motion — constrain to ±3 units from spawn position
     bh._constrainRadius = 3.0;
     bh._originX = rx;
     bh._originY = ry;
     attractors.push(bh);
   }
-  const nsCount = LEVELS[n].neutronStars || 0;
-  for (let i = 0; i < nsCount; i++) {
-    // Neutron stars placed randomly — freely positionable
-    const rx = (Math.random() - 0.5) * 14;
-    const ry = (Math.random() - 0.5) * 10 + 1.5;
-    attractors.push(new Attractor('neutronstar', new THREE.Vector3(rx, ry, 0)));
+
+  // Level 4: set max amount, lowest gravity, lowest spread, max bounce
+  if (n === 3) {
+    P.count = 8000; P.gravity = 1; P.spread = 0.05; P.bounce = 1.0; P.size = 0.65;
+    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    setSl('sl-count', 8000); setVl('v-count', 8000);
+    setSl('sl-grav', 1); setVl('v-grav', '1.0');
+    setSl('sl-spread', 0.05); setVl('v-spread', '0.05');
+    setSl('sl-bounce', 1.0); setVl('v-bounce', '1.00');
+    setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
+    setSl('mb-sl-grav', 1); setVl('mb-v-grav', '1.0');
+    setSl('mb-sl-spread', 0.05); setVl('mb-v-spread', '0.05');
   }
   updateLevelNav();
 }
@@ -1956,14 +1950,6 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   mbBindSl('mb-sl-spread','mb-v-spread','spread',v=>v.toFixed(2));
   mbBindSl('mb-sl-size','mb-v-size','size',v=>v.toFixed(2));
 
-  // Rain toggle
-  let mbRain=false;
-  const mbRainBtn=document.getElementById('mb-tog-rain');
-  mbRainBtn.addEventListener('click',()=>{mbRain=!mbRain;P.rain=mbRain;mbRainBtn.textContent=mbRain?'On':'Off';mbRainBtn.classList.toggle('on',mbRain);});
-
-  // Reset
-  document.getElementById('mb-tog-reset').addEventListener('click',()=>{for(let i=0;i<MP;i++)spawn(i);});
-
   // Font size
   const mbFontDown=document.getElementById('mb-font-down');
   const mbFontUp=document.getElementById('mb-font-up');
@@ -2085,8 +2071,7 @@ ctaBtn.addEventListener('click',e=>{if(!dMoved)setPaused(!paused);e.stopPropagat
 document.getElementById('btn-pp').addEventListener('click',()=>setPaused(!paused));
 
 function makeTog(id,on,off){const b=document.getElementById(id);let s=false;b.addEventListener('click',()=>{s=!s;b.textContent=s?'ON':'OFF';b.classList.toggle('on',s);s?on():off();});}
-makeTog('tog-rain',()=>P.rain=true,()=>P.rain=false);
-document.getElementById('tog-reset').addEventListener('click',()=>{for(let i=0;i<MP;i++)spawn(i);});
+makeTog('tog-text',()=>{},()=>{});
 
 // ── DESKTOP TEXT TOGGLE FIX ───────────────────────────────────────────────────
 let textVisibleDesktop = true;
