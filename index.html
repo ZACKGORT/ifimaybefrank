@@ -1276,26 +1276,6 @@ class Attractor {
     if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
     if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
 
-    // Black hole: enforce limited drag radius from spawn origin
-    if (this.type === 'blackhole' && this._constrainRadius != null) {
-      const cdx = this.pos.x - this._originX;
-      const cdy = this.pos.y - this._originY;
-      const cdist = Math.sqrt(cdx*cdx + cdy*cdy);
-      if (cdist > this._constrainRadius) {
-        const ratio = this._constrainRadius / cdist;
-        this.pos.x = this._originX + cdx * ratio;
-        this.pos.y = this._originY + cdy * ratio;
-        this.vel.x *= 0.2; this.vel.y *= 0.2;
-        // Also pull rest back toward origin so spring doesn't fight constraint
-        const rdx = this.rest.x - this._originX;
-        const rdy = this.rest.y - this._originY;
-        const rdist = Math.sqrt(rdx*rdx + rdy*rdy);
-        if (rdist > this._constrainRadius) {
-          this.rest.x = this._originX + rdx/rdist * this._constrainRadius;
-          this.rest.y = this._originY + rdy/rdist * this._constrainRadius;
-        }
-      }
-    }
 
     this.mesh.position.set(this.pos.x, this.pos.y, 0);
     this.mesh.updateMatrixWorld(true);
