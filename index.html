@@ -3002,11 +3002,14 @@ function tick(){
         pp[b]   = wormhole.exitX + entryFracX * wormhole.exitR;
         pp[b+1] = wormhole.exitY;
         pp[b+2] = entryFracZ * wormhole.exitR * 0.5;
-        // Preserve incoming speed exactly — no boost, no damping
-        const inSpd = Math.sqrt(pv[b]*pv[b] + pv[b+1]*pv[b+1] + pv[b+2]*pv[b+2]);
-        pv[b]   = 0;
-        pv[b+1] = -inSpd;
-        pv[b+2] = 0;
+        // Exit at free-fall speed matching primary stream at this height
+        // v = sqrt(2 * g * drop) where drop = emitter height - exitY
+        const emitterY = emitterShape ? emitterShape.pos.y - (emitterShape._totalH||3.5)*0.5 : 10;
+        const drop = Math.max(0, emitterY - wormhole.exitY);
+        const exitSpd = Math.sqrt(2 * P.gravity * drop) + 0.5;
+        pv[b]   = (Math.random()-0.5)*P.spread*0.3;
+        pv[b+1] = -exitSpd;
+        pv[b+2] = (Math.random()-0.5)*P.spread*0.3;
         pal[i] = 1;
       }
     }
