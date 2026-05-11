@@ -1494,7 +1494,7 @@ function initLevel(n){
     wormhole.entranceX = LEVELS[n].wormholeX;
     wormhole.entranceR = LEVELS[n].wormholeR;
     wormhole.exitX = (Math.random() - 0.5) * 8;
-    wormhole.exitY = 11.5 + Math.random() * 1.5;
+    wormhole.exitY = 2.5 + Math.random() * 2.0;
     wormhole.exitR = LEVELS[n].wormholeR * 0.8;
     wormhole.phase = 0;
   } else {
@@ -2751,17 +2751,13 @@ function drawOverlay(){
     const tw = wormhole.phase;
     function projW(v){const c=v.clone().project(camera);return{x:(c.x+1)/2*W,y:(-c.y+1)/2*H};}
 
-    // ENTRANCE — ground plane ring with subtle glow fill (particles render over via layer order)
+    // ENTRANCE — dashed ring only, no fill (fill occludes incoming particles)
     const eC = projW(new THREE.Vector3(wormhole.entranceX,FLR,0));
     const eL = projW(new THREE.Vector3(wormhole.entranceX-wormhole.entranceR,FLR,0));
     const eR2= projW(new THREE.Vector3(wormhole.entranceX+wormhole.entranceR,FLR,0));
     const eF = projW(new THREE.Vector3(wormhole.entranceX,FLR,wormhole.entranceR*0.55));
     const erx=(eR2.x-eL.x)/2, ery=Math.abs(eF.y-eC.y)*1.1;
     const ecx=(eR2.x+eL.x)/2, ecy=eC.y;
-    ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx);
-    const entrG=ovCtx.createRadialGradient(0,0,0,0,0,erx);
-    entrG.addColorStop(0,`rgba(0,220,200,${0.12+Math.sin(tw*2.5)*0.05})`); entrG.addColorStop(1,'rgba(0,180,160,0)');
-    ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.fillStyle=entrG; ovCtx.fill(); ovCtx.restore();
     ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx); ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.restore();
     ovCtx.setLineDash([8,5]); ovCtx.lineDashOffset=-tw*22;
     ovCtx.strokeStyle=`rgba(0,220,200,${0.55+Math.sin(tw*2.5)*0.18})`; ovCtx.lineWidth=2.0;
@@ -2996,21 +2992,20 @@ function tick(){
     }
     if(pp[b]<edgeL-1||pp[b]>edgeR+1)spawn(i);
 
-    // ── Wormhole entrance: teleport to exit, preserve velocity ──
+    // ── Wormhole entrance: teleport to exit, unimpeded ──
     if(wormhole.active && pp[b+1] < -8.5) {
       const wdx = pp[b] - wormhole.entranceX, wdz = pp[b+2];
       if(wdx*wdx + wdz*wdz < wormhole.entranceR * wormhole.entranceR * 0.85) {
-        // Mirror entry offset so relative position within entrance maps to exit
+        // Preserve relative position within entrance, mapped 1:1 to exit
         const entryFracX = wdx / wormhole.entranceR;
         const entryFracZ = pp[b+2] / (wormhole.entranceR * 0.5);
-        pp[b]   = wormhole.exitX + entryFracX * wormhole.exitR * P.spread * 18;
+        pp[b]   = wormhole.exitX + entryFracX * wormhole.exitR;
         pp[b+1] = wormhole.exitY;
-        pp[b+2] = entryFracZ * wormhole.exitR * P.spread * 12;
-        // Match incoming speed exactly — same density, same momentum, just redirected downward
+        pp[b+2] = entryFracZ * wormhole.exitR * 0.5;
+        // Preserve incoming speed exactly — no boost, no damping
         const inSpd = Math.sqrt(pv[b]*pv[b] + pv[b+1]*pv[b+1] + pv[b+2]*pv[b+2]);
-        const exitSpd = Math.max(inSpd, 2.0);
         pv[b]   = 0;
-        pv[b+1] = -exitSpd;
+        pv[b+1] = -inSpd;
         pv[b+2] = 0;
         pal[i] = 1;
       }
