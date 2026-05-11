@@ -262,7 +262,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   font-weight:900;
   font-size:13px;
   letter-spacing:0.18em;
-  color:rgba(255,255,255,0.12);
+  color:rgba(255,255,255,1.0);
   text-transform:uppercase;
   display:inline-block;
   transition:color 0.3s;
@@ -458,7 +458,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 <div id="flash-delete"></div>
 <canvas id="text-canvas"></canvas>
 
-<div id="dispenser">
+<div id="dispenser" style="display:none;">
   <button id="cta-btn"><span id="btn-label">Flow On</span></button>
 </div>
 
@@ -752,11 +752,17 @@ const SHAPE_COPY = {
     "Have your own gravity. The stream will follow.",
     "In a field dominated by greater forces — shine with your own intensity. Things will orient toward you.",
     "Move it. Watch the stream chase. That's not metaphor."
+  ],
+  panelstack: [
+    "Wide open: maximum flow, zero opinion.",
+    "Narrowing. The stream starts to agree with itself.",
+    "A focused column. Intensity, not volume.",
+    "Apex down. Everything converges to a point.",
   ]
 };
 
 // Per-type rotation counters
-const _shapeCopyIdx = { cube: 0, sphere: 0, pyramid: 0, blackhole: 0, neutronstar: 0 };
+const _shapeCopyIdx = { cube: 0, sphere: 0, pyramid: 0, blackhole: 0, neutronstar: 0, panelstack: 0 };
 function nextShapeCopy(type) {
   const pool = SHAPE_COPY[type] || SHAPE_COPY.cube;
   const line = pool[_shapeCopyIdx[type] % pool.length];
@@ -1037,13 +1043,13 @@ class Attractor {
     this.vel = new THREE.Vector3();
     this.dragging = false;
     this._pulseT = 0;
-    this.pullStrength = type === 'neutronstar' ? 35.0 : 28.0;
-    this.radius = type === 'neutronstar' ? 0.32 : 1.43;
-    this.consumeRadius = type === 'neutronstar' ? 0.04 : 0.75;
-    this.influenceR = type === 'neutronstar' ? 5.0 : null;
-    this._bhRadiusMin = type === 'blackhole' ? 0.97 : null;
-    this._bhRadiusMax = type === 'blackhole' ? 2.15 : null;
-    this._bhPullBase  = type === 'blackhole' ? 28.0 : null;
+    this.pullStrength = type === 'neutronstar' ? 32.0 : 48.0;
+    this.radius = type === 'neutronstar' ? 0.20 : 1.001;
+    this.consumeRadius = type === 'neutronstar' ? 0.03 : 0.52;
+    this.influenceR = type === 'neutronstar' ? 5.5 : null;
+    this._bhRadiusMin = type === 'blackhole' ? 0.68 : null;
+    this._bhRadiusMax = type === 'blackhole' ? 1.505 : null;
+    this._bhPullBase  = type === 'blackhole' ? 48.0 : null;
     this._build();
   }
 
@@ -1082,20 +1088,20 @@ class Attractor {
       // Neutron Star
       const coreGeo = new THREE.SphereGeometry(this.radius, 48, 32);
       const coreMat = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff, emissive: 0x88ccff, emissiveIntensity: 2.0,
+        color: 0xffffff, emissive: 0x88ccff, emissiveIntensity: 0.9,
         roughness: 0.2, metalness: 0.8
       });
       this.core = new THREE.Mesh(coreGeo, coreMat);
       this.mesh.add(this.core);
 
       // Point Light
-      this.light = new THREE.PointLight(0x88ccff, 3.0, 20);
+      this.light = new THREE.PointLight(0x88ccff, 1.4, 12);
       this.mesh.add(this.light);
 
-      // Glow corona
+      // Glow corona — tight rings, subtle
       const glowLayers = [
-        { r: this.radius * 1.8, color: 0x88ccff, opacity: 0.3 },
-        { r: this.radius * 2.5, color: 0x4488ff, opacity: 0.15 },
+        { r: this.radius * 1.5, color: 0x88ccff, opacity: 0.18 },
+        { r: this.radius * 2.0, color: 0x4488ff, opacity: 0.08 },
       ];
       this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
         const g = new THREE.Mesh(
@@ -1245,12 +1251,12 @@ class Attractor {
       if (this._adPoints) this._updateAccretionDisc(dt);
     } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 8.0) * 0.5;
-      this.glowMeshes[0].material.opacity = 0.2 + pulse * 0.15;
-      this.glowMeshes[1].material.opacity = 0.1 + pulse * 0.08;
+      this.glowMeshes[0].material.opacity = 0.12 + pulse * 0.07;
+      this.glowMeshes[1].material.opacity = 0.05 + pulse * 0.04;
     }
 
     // Dynamic Scale Based on Pull Strength
-    const basePull = this.type === 'neutronstar' ? 38.0 : 28.0;
+    const basePull = this.type === 'neutronstar' ? 38.0 : 57.0;
     const scale = Math.sqrt(this.pullStrength / basePull);
     this.mesh.scale.set(scale, scale, scale);
 
@@ -1276,6 +1282,26 @@ class Attractor {
     if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
     if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
 
+    // Black hole: enforce limited drag radius from spawn origin
+    if (this.type === 'blackhole' && this._constrainRadius != null) {
+      const cdx = this.pos.x - this._originX;
+      const cdy = this.pos.y - this._originY;
+      const cdist = Math.sqrt(cdx*cdx + cdy*cdy);
+      if (cdist > this._constrainRadius) {
+        const ratio = this._constrainRadius / cdist;
+        this.pos.x = this._originX + cdx * ratio;
+        this.pos.y = this._originY + cdy * ratio;
+        this.vel.x *= 0.2; this.vel.y *= 0.2;
+        // Also pull rest back toward origin so spring doesn't fight constraint
+        const rdx = this.rest.x - this._originX;
+        const rdy = this.rest.y - this._originY;
+        const rdist = Math.sqrt(rdx*rdx + rdy*rdy);
+        if (rdist > this._constrainRadius) {
+          this.rest.x = this._originX + rdx/rdist * this._constrainRadius;
+          this.rest.y = this._originY + rdy/rdist * this._constrainRadius;
+        }
+      }
+    }
 
     this.mesh.position.set(this.pos.x, this.pos.y, 0);
     this.mesh.updateMatrixWorld(true);
@@ -1313,29 +1339,64 @@ function applyAttractorForces(i, b, dt) {
     if (dist < 0.001) continue;
 
     if (a.type === 'blackhole') {
-      const f = a.pullStrength * dt / (dist2 + 0.25);
+      // Inverse-square pull — strong enough to capture and hold orbital paths
+      const f = a.pullStrength * 2.8 * dt / (dist2 + 0.15);
       pv[b]   += dx / dist * f;
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
+
+      // Orbital circularization: bleed off radial velocity, preserve tangential
+      // This is what makes an accretion disc — particles settle into rings
+      if (dist < a.radius * 12.0) {
+        const rx = pp[b] - a.pos.x, ry = pp[b+1] - a.pos.y;
+        const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
+        // tangent unit vector (perpendicular to radial, in orbital direction)
+        const tx = -ry / r, ty = rx / r;
+        // current tangential speed
+        const vTan = pv[b] * tx + pv[b+1] * ty;
+        // target circular orbital speed at this radius
+        const vCirc = Math.sqrt(Math.max(0, a.pullStrength / r));
+        // nudge toward circular orbit — damp excess radial, boost tangential
+        const nudge = (vCirc - vTan) * 0.055;
+        pv[b]   += tx * nudge;
+        pv[b+1] += ty * nudge;
+        // flatten the disc: damp z strongly so the disc stays planar
+        pv[b+2] *= 0.88;
+      }
+
       if (dist < a.radius * 5.0 && a.notifyStreamParticle) {
         a.notifyStreamParticle(pp[b], pp[b+1], pp[b+2] || 0);
       }
       if (dist < a.consumeRadius) { spawn(i); return true; }
 
     } else {
-      // Neutron star — the lead. Particles chase it wherever it goes.
-      // Strong attraction, near-zero consume radius: the stream follows, clusters, trails.
-      // It competes with the BH for the stream's attention — proximity and movement win.
-      const influenceR = a.influenceR || 5.0;
+      // Neutron star — powerful magnetic collimator.
+      // Pulls particles toward it along radial axis, then damps their tangential
+      // drift so the stream stays tightly shaped rather than spraying outward.
+      const influenceR = a.influenceR || 7.0;
       if (dist > influenceR) continue;
 
-      // Strong radial pull — enough to visibly pull particles away from the BH's basin
-      const f = a.pullStrength * dt / (dist2 + 0.12);
+      // Strong radial attraction — enough to visibly bend and hold the stream
+      const f = a.pullStrength * 2.2 * dt / (dist2 + 0.08);
       pv[b]   += dx / dist * f;
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
-      // Tiny consume radius — particles swarm it, not disappear into it
+      // Magnetic collimation: damp tangential velocity strongly within close range
+      // This is what makes it feel like a magnet — stream snaps to it, holds shape
+      if (dist < influenceR * 0.65) {
+        const rx = pp[b] - a.pos.x, ry = pp[b+1] - a.pos.y;
+        const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
+        const tx = -ry / r, ty = rx / r;
+        const vTan = pv[b] * tx + pv[b+1] * ty;
+        // bleed off tangential component — particles follow radial axis, not orbit
+        const bleed = vTan * 0.18 * dt * 60;
+        pv[b]   -= tx * bleed;
+        pv[b+1] -= ty * bleed;
+        // also damp z drift — keeps stream in plane
+        pv[b+2] *= 0.82;
+      }
+
       if (dist < a.consumeRadius) { spawn(i); return true; }
     }
   }
@@ -1359,7 +1420,7 @@ function drawBlackHoleOverlay() {
     ovCtx.setLineDash([]);
 
     // Glow halos
-    const basePull = bh.type === 'neutronstar' ? 38.0 : 28.0;
+    const basePull = bh.type === 'neutronstar' ? 38.0 : 57.0;
     const scale = Math.sqrt(bh.pullStrength / basePull);
     const bhEdge = new THREE.Vector3(bh.pos.x + bh.radius * scale, bh.pos.y, 0).project(camera);
     const coreR = Math.abs((bhEdge.x + 1) / 2 * W - sx);
@@ -1464,18 +1525,18 @@ function initLevel(n){
     wormhole.active = false;
   }
 
-  // Level 5: black hole + neutron stars
+  // Level 5: black hole + neutron stars — zero gravity, pure orbital physics
   if (n === 4) {
-    P.count = 8000; P.gravity = 0.5; P.spread = 0.03; P.bounce = 1.0; P.size = 0.55;
+    P.count = 8000; P.gravity = 0; P.spread = 0.04; P.bounce = 1.0; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     setSl('sl-count', 8000); setVl('v-count', 8000);
-    setSl('sl-grav', 0.5); setVl('v-grav', '0.5');
-    setSl('sl-spread', 0.03); setVl('v-spread', '0.03');
+    setSl('sl-grav', 0); setVl('v-grav', '0.0');
+    setSl('sl-spread', 0.04); setVl('v-spread', '0.04');
     setSl('sl-bounce', 1.0); setVl('v-bounce', '1.00');
     setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
-    setSl('mb-sl-grav', 0.5); setVl('mb-v-grav', '0.5');
-    setSl('mb-sl-spread', 0.03); setVl('mb-v-spread', '0.03');
+    setSl('mb-sl-grav', 0); setVl('mb-v-grav', '0.0');
+    setSl('mb-sl-spread', 0.04); setVl('mb-v-spread', '0.04');
   }
   updateLevelNav();
 }
@@ -1564,6 +1625,11 @@ const SDEFS={
       // 9 — lean left 30° + Y-45°: edge-on ramp left
       new THREE.Euler(0,_Q,_E),
     ]},
+  panelstack:{baseR:0.85,springK:5.0,damping:9.0,color:0xffffff,rough:0.55,
+    // panels:14, panelH:0.18, gap:0.06, baseSize:3.0 — built procedurally in Shape._build
+    makeGeo:s=>new THREE.BoxGeometry(3.0*s,3.0*s*1.2,3.0*s), // bounding proxy for raycasting only
+    orients:[new THREE.Euler(0,0,0)], // emitter has one orientation: apex down
+  },
 };
 
 // ── SHAPE CLASS ───────────────────────────────────────────────────────────────
@@ -1578,6 +1644,36 @@ class Shape{
   }
   _build(){
     const d=this.def,s=this.sc;
+    if(this.type==='panelstack'){
+      // Procedural inverted pyramid panel stack — point down, wide top
+      // 4 thick panels, compact scale
+      this.mesh=new THREE.Group();
+      this.mesh.rotation.copy(this.cEul);
+      this.mesh.position.copy(this.pos);
+      const PANELS=4,PANEL_H=0.22*s,GAP=0.07*s,BASE_W=1.4*s;
+      const totalH=PANELS*(PANEL_H+GAP);
+      this._panelMorphVal=this._panelMorphVal||0;
+      this._panels=[];
+      for(let i=0;i<PANELS;i++){
+        // i=0 is TOP (widest), i=PANELS-1 is BOTTOM (apex, narrowest)
+        const t=i/(PANELS-1); // 0=top 1=bottom
+        const yOff=totalH/2 - i*(PANEL_H+GAP) - PANEL_H/2;
+        const sc=Math.max(0.01,1.0-this._panelMorphVal*(t));
+        const geo=new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc);
+        const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.55,metalness:0.02});
+        const mesh=new THREE.Mesh(geo,mat);
+        mesh.position.y=yOff;
+        const eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc),22);
+        mesh.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x888888,transparent:true,opacity:0.22})));
+        this.mesh.add(mesh);
+        this._panels.push({mesh,t,yOff,BASE_W,PANEL_H,s});
+      }
+      this._totalH=totalH;
+      this._panelTargetRots=new Array(PANELS).fill(0);
+      this._panelCurRots=new Array(PANELS).fill(0);
+      scene.add(this.mesh);
+      return;
+    }
     const mat=new THREE.MeshStandardMaterial({color:d.color,roughness:d.rough,metalness:0.02});
     const geo=d.makeGeo(s);
     this.mesh=new THREE.Mesh(geo,mat);
@@ -1587,13 +1683,86 @@ class Shape{
     scene.add(this.mesh);
   }
   resize(sc){
+    if(this.type==='panelstack'){
+      // panelstack: scroll while held = morph not scale
+      return;
+    }
     scene.remove(this.mesh);this.mesh.geometry.dispose();this.mesh.material.dispose();
     this.mesh.children.forEach(c=>{c.geometry&&c.geometry.dispose();c.material&&c.material.dispose();});
     this.sc=sc;this.radius=this.def.baseR*sc;this._build();
     this.mesh.rotation.copy(this.cEul);this.mesh.position.copy(this.pos);this.mesh.updateMatrixWorld(true);
   }
   cycle(){const p=this.def.orients;this.oi=(this.oi+1)%p.length;this.tEul=p[this.oi].clone();}
+  setMorph(m){
+    if(this.type!=='panelstack')return;
+    this._panelMorphVal=Math.max(0,Math.min(1,m));
+    if(!this._panels)return;
+    const mv=this._panelMorphVal;
+    const PANELS=this._panels.length;
+    if(!this._panelTargetRots)this._panelTargetRots=new Array(PANELS).fill(0);
+    this._panels.forEach(({mesh,t},i)=>{
+      // XZ scale only: top stays full, bottom collapses — no tilt ever
+      const sc=Math.max(0.01,1.0-mv*t);
+      mesh.scale.set(sc,1,sc);
+      // panels never rotate — zero out target rotation
+      this._panelTargetRots[i]=0;
+    });
+    // drive particles
+    P.spread=isMobile?(0.65-mv*0.62):(1.25-mv*1.22);
+    P.count=Math.round(isMobile?(8000-mv*4000):(8000-mv*5000));
+    P.gravity=isMobile?(3.3+mv*1.2):(4.2+mv*2.0);
+    syncBounce();
+  }
+  // Animated morph — sets a target and lets update() interpolate with a twist
+  animateMorph(target){
+    if(this.type!=='panelstack')return;
+    this._morphTarget=Math.max(0,Math.min(1,target));
+    if(this._morphTarget===undefined)this._morphTarget=target;
+    // inject a twist: full rotation over the transition
+    this._twistTarget=Math.PI*(target>0.5?1:-1);
+    this._twistCur=this.tEul.y||0;
+  }
   update(dt){
+    if(this.type==='panelstack'&&this._panels&&this._panelTargetRots){
+      if(!this._panelCurRots)this._panelCurRots=new Array(this._panels.length).fill(0);
+
+      // Animated morph interpolation
+      if(this._morphTarget!==undefined&&Math.abs(this._panelMorphVal-this._morphTarget)>0.001){
+        const MORPH_SPEED=4.5; // units/sec — full 0→1 in ~0.22s
+        const dir=this._morphTarget>this._panelMorphVal?1:-1;
+        const step=MORPH_SPEED*dt;
+        const newM=dir>0
+          ?Math.min(this._morphTarget,this._panelMorphVal+step)
+          :Math.max(this._morphTarget,this._panelMorphVal-step);
+        this.setMorph(newM);
+      } else if(this._morphTarget!==undefined){
+        this.setMorph(this._morphTarget);
+        this._morphTarget=undefined;
+        this._twistTarget=0; // unwind after arriving
+      }
+
+      // Twist animation — Y rotation springs in and back out
+      if(this._twistTarget!==undefined){
+        if(this._twistCur===undefined)this._twistCur=0;
+        this._twistCur+=(this._twistTarget-this._twistCur)*Math.min(1,dt*6.0);
+        // Once morphTarget resolved, unwind
+        if(this._morphTarget===undefined){
+          this._twistTarget=0;
+          this._twistCur+=(0-this._twistCur)*Math.min(1,dt*5.0);
+          if(Math.abs(this._twistCur)<0.005)this._twistCur=0;
+        }
+        this.tEul.y=this._twistCur;
+      }
+
+      this._panels.forEach(({mesh},i)=>{
+        const target=this._panelTargetRots[i]||0;
+        const lerpK=0.10-i*0.015;
+        this._panelCurRots[i]+=(target-this._panelCurRots[i])*Math.max(0.03,lerpK);
+        mesh.rotation.x=this._panelCurRots[i];
+      });
+    }
+    // panelstack never tilts — lock group rotation to identity
+    if(this.type==='panelstack'){this.tEul.set(0,0,0);this.cEul.set(0,0,0);}
     this.cEul.x+=(this.tEul.x-this.cEul.x)*0.12;
     this.cEul.y+=(this.tEul.y-this.cEul.y)*0.12;
     this.cEul.z+=(this.tEul.z-this.cEul.z)*0.12;
@@ -1626,9 +1795,20 @@ class Shape{
     if(this.type==='cube'){const h=1.3*s,qx=Math.abs(x)-h,qy=Math.abs(y)-h,qz=Math.abs(z)-h;return Math.sqrt(Math.max(qx,0)**2+Math.max(qy,0)**2+Math.max(qz,0)**2)+Math.min(Math.max(qx,qy,qz),0);}
     if(this.type==='sphere')return Math.sqrt(x*x+y*y+z*z)-this.radius;
     if(this.type==='pyramid'){const H=1.4*s,bR=1.5*s,sl=Math.sqrt(bR*bR+4*H*H),nx=2*H/sl,ny=bR/sl,r2=Math.abs(x)+Math.abs(z),dS=r2*nx+y*ny-H*ny,dCy=-(y+H),dCr=r2-bR,dC=dCr>0&&dCy>0?Math.sqrt(dCr*dCr+dCy*dCy):Math.max(dCr,dCy);if(dS<=0&&dC<=0)return Math.max(dS,dC);if(dS<=0)return dC;if(dC<=0)return dS;return Math.sqrt(dS*dS+dC*dC);}
+    if(this.type==='panelstack'){
+      // SDF: axis-aligned box bounding the full stack
+      const hw=0.7*s,hh=(this._totalH||1.4*s)*0.5;
+      const qx=Math.abs(x)-hw,qy=Math.abs(y)-hh,qz=Math.abs(z)-hw;
+      return Math.sqrt(Math.max(qx,0)**2+Math.max(qy,0)**2+Math.max(qz,0)**2)+Math.min(Math.max(qx,qy,qz),0);
+    }
     return Math.sqrt(x*x+y*y+z*z)-this.radius;
   }
   dispose(){
+    if(this.type==='panelstack'){
+      scene.remove(this.mesh);
+      this.mesh.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material)c.material.dispose();});
+      return;
+    }
     scene.remove(this.mesh);this.mesh.geometry.dispose();this.mesh.material.dispose();
     this.mesh.children.forEach(c=>{c.geometry&&c.geometry.dispose();c.material&&c.material.dispose();});
   }
@@ -1701,6 +1881,9 @@ function updateCnt(){const e=document.getElementById('shape-count');e.textConten
 function flashEl(id){const e=document.getElementById(id);e.classList.add('on');setTimeout(()=>e.classList.remove('on'),200);}
 buildInit();
 
+// ── PANEL STACK EMITTER — spawned after P & syncBounce are declared below ────
+let emitterShape=null;
+
 function resolveCollisions(){
   for(let a=0;a<shapes.length;a++)for(let b=a+1;b<shapes.length;b++){
     const sa=shapes[a],sb=shapes[b];
@@ -1753,7 +1936,15 @@ dispEl.addEventListener('pointerdown',e=>{lastInteractTime=Date.now();if(e.butto
 window.addEventListener('pointermove',()=>{lastInteractTime=Date.now();hasInteracted=true;});
 window.addEventListener('pointermove',e=>{if(!dDrag)return;const dx=e.clientX-(dX+dOX),dy=e.clientY-(dY+dOY);if(Math.abs(dx)>4||Math.abs(dy)>4)dMoved=true;dX=e.clientX-dOX;dY=e.clientY-dOY;const ns=dY<SNAPZONE;snapHint.classList.toggle('visible',ns);if(ns){dY=18;dX=Math.max(60,Math.min(W-60,dX));}posDsp(dX,dY);});
 window.addEventListener('pointerup',e=>{if(!dDrag)return;dDrag=false;snapHint.classList.remove('visible');if(dY<SNAPZONE){dY=18;}posDsp(Math.max(60,Math.min(W-60,dX)),dY);});
-function getSpout(){const r=ctaBtn.getBoundingClientRect();return s2w(r.left+r.width/2,r.bottom);}
+function getSpout(){
+  if(emitterShape&&emitterShape.mesh){
+    // bottom of stack = pos.y - half total height
+    const totalH=emitterShape._totalH||3.5;
+    const worldY=emitterShape.pos.y - totalH*0.5;
+    return {x:emitterShape.pos.x, y:worldY};
+  }
+  const r=ctaBtn.getBoundingClientRect();return s2w(r.left+r.width/2,r.bottom);
+}
 
 // ── PARTICLES ─────────────────────────────────────────────────────────────────
 const MP=8000,pp=new Float32Array(MP*3),pv=new Float32Array(MP*3),ps=new Float32Array(MP),pa=new Float32Array(MP),pl=new Float32Array(MP),pal=new Uint8Array(MP);
@@ -1773,6 +1964,16 @@ function syncBounce(){
 }
 
 function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=9+Math.random()*5;pa[i]=Math.random()*pl[i];pal[i]=1;}
+
+// ── PANEL STACK EMITTER — spawned here so P & syncBounce are in scope ─────────
+(function(){
+  const startY=isMobile?11:10;
+  emitterShape=new Shape('panelstack',new THREE.Vector3(0,startY,0),null,1.0);
+  emitterShape.rest.set(0,startY,0);
+  emitterShape._panelMorphVal=0;
+  emitterShape.setMorph(0);
+})();
+
 for(let i=0;i<MP;i++)spawn(i);
 
 const pGeo=new THREE.BufferGeometry();
@@ -1819,7 +2020,7 @@ window.addEventListener('mousemove',e=>{
   }
   
   if(dShape){
-    if(shiftDown){
+    if(shiftDown&&dShape!==emitterShape){
       const dx=e.clientX-rotPrevX,dy=e.clientY-rotPrevY;
       if(Math.abs(dx)>0.5||Math.abs(dy)>0.5)dMov=true;
       const ROT_SPEED=0.012;
@@ -1872,9 +2073,17 @@ renderer.domElement.addEventListener('mousedown',e=>{
     }
   }
   
-  const hits=ray.intersectObjects(shapes.map(s=>s.mesh),true);
+  const allMeshes=shapes.map(s=>s.mesh);
+  if(emitterShape)allMeshes.push(emitterShape.mesh);
+  const hits=ray.intersectObjects(allMeshes,true);
   if(hits.length){
-    const sh=shapes.find(s=>s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object));
+    const allShapes=[...shapes,...(emitterShape?[emitterShape]:[])];
+    const sh=allShapes.find(s=>{
+      if(s.type==='panelstack'){
+        return s.mesh===hits[0].object||s.mesh.getObjectById(hits[0].object.id)!==undefined;
+      }
+      return s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object);
+    });
     if(sh){dTime=Date.now();dMov=false;dShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(e.clientX,e.clientY);dOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);prevWP=wp.clone();rotPrevX=e.clientX;rotPrevY=e.clientY;
       showShapeText(sh.type);
     }
@@ -1904,7 +2113,15 @@ renderer.domElement.addEventListener('contextmenu',e=>{
 });
 window.addEventListener('mouseup',e=>{
   if(e.button===0&&dShape){
-    if(!dMov&&(Date.now()-dTime)<350)dShape.cycle();
+    if(!dMov&&(Date.now()-dTime)<350){
+      if(dShape.type==='panelstack'){
+        // quick tap = toggle between max spread (0) and fully wringed (1) with twist animation
+        const target=dShape._panelMorphVal<0.5?1:0;
+        dShape.animateMorph(target);
+      } else {
+        dShape.cycle();
+      }
+    }
     dShape.rest.set(dShape.pos.x,dShape.pos.y,0);
     dShape.dragging=false;dShape=null;prevWP=null;
     revertToTitle();
@@ -1917,13 +2134,16 @@ window.addEventListener('wheel',e=>{
 
   if(tAttractor){
     if(tAttractor.type === 'blackhole') {
-      const pullMin = 8.0, pullMax = 120.0;
+      const pullMin = 8.0, pullMax = 84.0;
       tAttractor.pullStrength = Math.max(pullMin, Math.min(pullMax, tAttractor.pullStrength + dir * 6.0));
     } else {
-      // NS scroll: influence radius — how far the stream is willing to follow
       const rMin = 2.0, rMax = 9.0;
       tAttractor.influenceR = Math.max(rMin, Math.min(rMax, (tAttractor.influenceR || 5.0) + dir * 0.5));
     }
+  } else if(dShape&&dShape===emitterShape){
+    // Hold + scroll: continuously wring/unwring — fine control over spread↔intensity
+    const nm=Math.max(0,Math.min(1,(emitterShape._panelMorphVal||0)+dir*0.06));
+    emitterShape.setMorph(nm);
   } else if(dShape){
     const SC_MIN=0.3,SC_MAX=3.5,SC_STEP=0.09;
     const ns=Math.max(SC_MIN,Math.min(SC_MAX,dShape.sc+dir*SC_STEP));
@@ -2185,7 +2405,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     mX=t.clientX;mY=t.clientY;bX=t.clientX;bY=t.clientY;
     
     if(e.touches.length===2){
-      if(tShape){ pinchDist0=getTouchDist(e);pinchSc0=tShape.sc;return; }
+      if(tShape){ pinchDist0=getTouchDist(e);pinchSc0=tShape===emitterShape?(tShape._panelMorphVal||0):tShape.sc;return; }
       if(tAttractor){ pinchDist0=getTouchDist(e);aPinchPull0=tAttractor.type==='neutronstar'?(tAttractor.influenceR||3.5)*10:tAttractor.pullStrength;return; }
     }
     
@@ -2204,9 +2424,15 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       }
     }
     
-    const hits=ray.intersectObjects(shapes.map(s=>s.mesh),true);
+    const tAllMeshes=shapes.map(s=>s.mesh);
+    if(emitterShape)tAllMeshes.push(emitterShape.mesh);
+    const hits=ray.intersectObjects(tAllMeshes,true);
     if(hits.length){
-      const sh=shapes.find(s=>s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object));
+      const tAllShapes=[...shapes,...(emitterShape?[emitterShape]:[])];
+      const sh=tAllShapes.find(s=>{
+        if(s.type==='panelstack')return s.mesh===hits[0].object||s.mesh.getObjectById(hits[0].object.id)!==undefined;
+        return s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object);
+      });
       if(sh){tShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(t.clientX,t.clientY);tOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);tPrevWP=wp.clone();tMoved=false;tTime=Date.now();
         showShapeText(sh.type);
       }
@@ -2219,7 +2445,13 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     
     if(e.touches.length===2&&pinchDist0>0){
       const d=getTouchDist(e);
-      if(tShape){
+      if(tShape&&tShape===emitterShape){
+        // pinch on emitter = morph
+        const ratio=d/pinchDist0;
+        const nm=Math.max(0,Math.min(1,pinchSc0*(2-ratio)));
+        tShape.setMorph(nm);
+        tMoved=true;
+      } else if(tShape){
         const ns=Math.max(0.3,Math.min(3.5,pinchSc0*(d/pinchDist0)));
         tShape.resize(ns);
         const wp=s2w(t.clientX,t.clientY);tShape.pos.set(wp.x-tOff.x,wp.y-tOff.y,0);tShape.mesh.position.copy(tShape.pos);tPrevWP=wp.clone();
@@ -2257,7 +2489,14 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       tAttractor=null;
       revertToTitle();
     } else if(tShape){
-      if(!tMoved&&(Date.now()-tTime)<350)tShape.cycle();
+      if(!tMoved&&(Date.now()-tTime)<350){
+        if(tShape.type==='panelstack'){
+          const target=tShape._panelMorphVal<0.5?1:0;
+          tShape.setMorph(target);
+        } else {
+          tShape.cycle();
+        }
+      }
       tShape.rest.set(tShape.pos.x,tShape.pos.y,0);
       tShape.dragging=false;tShape=null;tPrevWP=null;
       revertToTitle();
@@ -2643,6 +2882,7 @@ function tick(){
 
   resolveCollisions();
   shapes.forEach(s=>s.update(dt));
+  if(emitterShape)emitterShape.update(dt);
   attractors.forEach(a=>a.update(dt));
   pMat.uniforms.uSz.value=P.size;
   const N=Math.min(P.count,MP);
