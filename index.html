@@ -1503,21 +1503,25 @@ function initLevel(n){
 
   // Level 5: black hole + neutron stars — zero gravity, pure orbital physics
   if (n === 4) {
-    P.count = 8000; P.gravity = 0; P.spread = 0.04; P.bounce = 1.0; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    // morph=0 = panels all full-width = wide fan = max spread.
+    // Snap to morph=1 (collapsed) first, then animate back to 0 (open) —
+    // this gives a visible shapeshift transition on every level 5 load.
+    if (emitterShape) {
+      emitterShape.setMorph(1);            // snap to collapsed instantly
+      emitterShape._morphTarget = 0;       // animate to fully open
+      emitterShape._twistTarget = -Math.PI;// spin during transition
+      emitterShape._twistCur = 0;
+    }
+    P.count = 8000; P.gravity = 0; P.spread = 1.25; P.bounce = 1.0; P.size = 0.55;
     setSl('sl-count', 8000); setVl('v-count', 8000);
     setSl('sl-grav', 0); setVl('v-grav', '0.0');
-    setSl('sl-spread', 0.04); setVl('v-spread', '0.04');
+    setSl('sl-spread', 1.25); setVl('v-spread', '1.25');
     setSl('sl-bounce', 1.0); setVl('v-bounce', '1.00');
     setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
     setSl('mb-sl-grav', 0); setVl('mb-v-grav', '0.0');
-    setSl('mb-sl-spread', 0.04); setVl('mb-v-spread', '0.04');
-    // Auto-shapeshift emitter to full spread on level load
-    if (emitterShape) {
-      emitterShape.setMorph(0); // ensure starting from collapsed
-      setTimeout(() => { if (emitterShape) emitterShape.animateMorph(1); }, 120);
-    }
+    setSl('mb-sl-spread', 1.25); setVl('mb-v-spread', '1.25');
   }
   updateLevelNav();
 }
@@ -1688,11 +1692,13 @@ class Shape{
       // panels never rotate — zero out target rotation
       this._panelTargetRots[i]=0;
     });
-    // drive particles
-    P.spread=isMobile?(0.65-mv*0.62):(1.25-mv*1.22);
-    P.count=Math.round(isMobile?(8000-mv*4000):(8000-mv*5000));
-    P.gravity=isMobile?(3.3+mv*1.2):(4.2+mv*2.0);
-    syncBounce();
+    // drive particles — but not during level 5 (it owns P values independently)
+    if(lvl !== 4) {
+      P.spread=isMobile?(0.65-mv*0.62):(1.25-mv*1.22);
+      P.count=Math.round(isMobile?(8000-mv*4000):(8000-mv*5000));
+      P.gravity=isMobile?(3.3+mv*1.2):(4.2+mv*2.0);
+      syncBounce();
+    }
   }
   // Animated morph — sets a target and lets update() interpolate with a twist
   animateMorph(target){
@@ -2901,19 +2907,7 @@ function tick(){
     pa[i]+=dt;if(pa[i]>pl[i]){spawn(i);continue;}
     
     if(applyAttractorForces(i,b,dt)) continue;
-
-    // ── Level 5 ribbon wave: gentle sinusoidal lateral undulation ──
-    // Each particle carries a unique phase offset so they form flowing ribbons
-    // rather than synchronised sheets. Frequency is slow (0.9 rad/s) for a
-    // graceful drift; amplitude is tiny so the force is felt as a whisper,
-    // not a shove. The z-axis gets a complementary wave to add depth.
-    if (lvl === 4) {
-      const wT = pa[i] * 0.9 + i * 0.00038; // time + unique phase
-      const wAmp = 0.28; // lateral strength — increase for bigger waves
-      pv[b]   += Math.sin(wT) * wAmp * dt;
-      pv[b+2] += Math.cos(wT * 0.7 + 1.1) * wAmp * 0.55 * dt;
-    }
-
+    
     pv[b+1]-=P.gravity*dt;
     if(P.rain){pv[b]-=pp[b]*0.4*dt;pv[b+2]-=pp[b+2]*0.3*dt;}
 
