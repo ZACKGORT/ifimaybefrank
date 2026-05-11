@@ -1014,6 +1014,8 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
 const THRESH=0.65;
+const LEVEL_THRESH=[0.65,0.65,0.65,0.35,0.65]; // level 4 wormhole: lower bar
+function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:5.5,r:2.8}]},
   {targets:[{x:-5.0,r:2.5},{x:6.0,r:2.5}]},
@@ -1043,8 +1045,8 @@ class Attractor {
     this.vel = new THREE.Vector3();
     this.dragging = false;
     this._pulseT = 0;
-    this.pullStrength = type === 'neutronstar' ? 32.0 : 48.0;
-    this.radius = type === 'neutronstar' ? 0.20 : 1.001;
+    this.pullStrength = type === 'neutronstar' ? 32.0 : 76.2;
+    this.radius = type === 'neutronstar' ? 0.30 : 1.001;
     this.consumeRadius = type === 'neutronstar' ? 0.03 : 0.52;
     this.influenceR = type === 'neutronstar' ? 5.5 : null;
     this._bhRadiusMin = type === 'blackhole' ? 0.68 : null;
@@ -1282,26 +1284,7 @@ class Attractor {
     if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
     if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
 
-    // Black hole: enforce limited drag radius from spawn origin
-    if (this.type === 'blackhole' && this._constrainRadius != null) {
-      const cdx = this.pos.x - this._originX;
-      const cdy = this.pos.y - this._originY;
-      const cdist = Math.sqrt(cdx*cdx + cdy*cdy);
-      if (cdist > this._constrainRadius) {
-        const ratio = this._constrainRadius / cdist;
-        this.pos.x = this._originX + cdx * ratio;
-        this.pos.y = this._originY + cdy * ratio;
-        this.vel.x *= 0.2; this.vel.y *= 0.2;
-        // Also pull rest back toward origin so spring doesn't fight constraint
-        const rdx = this.rest.x - this._originX;
-        const rdy = this.rest.y - this._originY;
-        const rdist = Math.sqrt(rdx*rdx + rdy*rdy);
-        if (rdist > this._constrainRadius) {
-          this.rest.x = this._originX + rdx/rdist * this._constrainRadius;
-          this.rest.y = this._originY + rdy/rdist * this._constrainRadius;
-        }
-      }
-    }
+
 
     this.mesh.position.set(this.pos.x, this.pos.y, 0);
     this.mesh.updateMatrixWorld(true);
@@ -1370,30 +1353,23 @@ function applyAttractorForces(i, b, dt) {
       if (dist < a.consumeRadius) { spawn(i); return true; }
 
     } else {
-      // Neutron star — powerful magnetic collimator.
-      // Pulls particles toward it along radial axis, then damps their tangential
-      // drift so the stream stays tightly shaped rather than spraying outward.
-      const influenceR = a.influenceR || 7.0;
+      // Neutron star — magnetic collimator, bends and holds the stream.
+      const influenceR = a.influenceR || 5.5;
       if (dist > influenceR) continue;
 
-      // Strong radial attraction — enough to visibly bend and hold the stream
       const f = a.pullStrength * 2.2 * dt / (dist2 + 0.08);
       pv[b]   += dx / dist * f;
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
-      // Magnetic collimation: damp tangential velocity strongly within close range
-      // This is what makes it feel like a magnet — stream snaps to it, holds shape
       if (dist < influenceR * 0.65) {
         const rx = pp[b] - a.pos.x, ry = pp[b+1] - a.pos.y;
         const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
         const tx = -ry / r, ty = rx / r;
         const vTan = pv[b] * tx + pv[b+1] * ty;
-        // bleed off tangential component — particles follow radial axis, not orbit
         const bleed = vTan * 0.18 * dt * 60;
         pv[b]   -= tx * bleed;
         pv[b+1] -= ty * bleed;
-        // also damp z drift — keeps stream in plane
         pv[b+2] *= 0.82;
       }
 
@@ -2061,16 +2037,27 @@ renderer.domElement.addEventListener('mousedown',e=>{
   ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
   
+  // Screen-space hit test for attractors — 28px min touch target (desktop), larger for NS
+  const MIN_CLICK_R = 14;
+  let hitAttractor = null, hitDist = Infinity;
   for(let a of attractors) {
-    if(ray.intersectObject(a.core, false).length) {
-      tAttractor = a;
-      a.dragging = true;
-      a.vel.set(0,0,0);
-      const wp = s2w(e.clientX, e.clientY);
-      aDragOff.set(wp.x - a.pos.x, wp.y - a.pos.y, 0);
-      showShapeText(a.type);
-      return;
-    }
+    const sc2d = a.pos.clone().project(camera);
+    const sx = (sc2d.x + 1) / 2 * W, sy = (-sc2d.y + 1) / 2 * H;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    const screenDist = Math.sqrt(dx*dx + dy*dy);
+    const edge = new THREE.Vector3(a.pos.x + a.radius, a.pos.y, a.pos.z).project(camera);
+    const visualR = Math.abs((edge.x + 1) / 2 * W - sx);
+    const clickR = Math.max(MIN_CLICK_R, visualR);
+    if(screenDist < clickR && screenDist < hitDist) { hitDist = screenDist; hitAttractor = a; }
+  }
+  if(hitAttractor) {
+    tAttractor = hitAttractor;
+    hitAttractor.dragging = true;
+    hitAttractor.vel.set(0,0,0);
+    const wp = s2w(e.clientX, e.clientY);
+    aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
+    showShapeText(hitAttractor.type);
+    return;
   }
   
   const allMeshes=shapes.map(s=>s.mesh);
@@ -2134,11 +2121,11 @@ window.addEventListener('wheel',e=>{
 
   if(tAttractor){
     if(tAttractor.type === 'blackhole') {
-      const pullMin = 8.0, pullMax = 84.0;
+      const pullMin = 8.0, pullMax = 126.0;
       tAttractor.pullStrength = Math.max(pullMin, Math.min(pullMax, tAttractor.pullStrength + dir * 6.0));
     } else {
       const rMin = 2.0, rMax = 9.0;
-      tAttractor.influenceR = Math.max(rMin, Math.min(rMax, (tAttractor.influenceR || 5.0) + dir * 0.5));
+      tAttractor.influenceR = Math.max(rMin, Math.min(rMax, (tAttractor.influenceR || 5.5) + dir * 0.5));
     }
   } else if(dShape&&dShape===emitterShape){
     // Hold + scroll: continuously wring/unwring — fine control over spread↔intensity
@@ -2412,16 +2399,31 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     ndc.set((t.clientX/W)*2-1,-(t.clientY/H)*2+1);
     ray.setFromCamera(ndc,camera);
     
+    // Screen-space hit test for attractors — standardized 44px minimum touch target
+    const MIN_TOUCH_R = 44;
+    let hitAttractor = null, hitAttractorDist = Infinity;
     for(let a of attractors) {
-      if(ray.intersectObject(a.core, false).length) {
-        tAttractor = a;
-        a.dragging = true;
-        a.vel.set(0,0,0);
-        const wp = s2w(t.clientX, t.clientY);
-        aDragOff.set(wp.x - a.pos.x, wp.y - a.pos.y, 0);
-        showShapeText(a.type);
-        return;
+      const sc2d = a.pos.clone().project(camera);
+      const sx = (sc2d.x + 1) / 2 * W, sy = (-sc2d.y + 1) / 2 * H;
+      const dx = t.clientX - sx, dy = t.clientY - sy;
+      const screenDist = Math.sqrt(dx*dx + dy*dy);
+      // visual radius in pixels: project edge point
+      const edge = new THREE.Vector3(a.pos.x + a.radius, a.pos.y, a.pos.z).project(camera);
+      const visualR = Math.abs((edge.x + 1) / 2 * W - sx);
+      const touchR = Math.max(MIN_TOUCH_R, visualR);
+      if(screenDist < touchR && screenDist < hitAttractorDist) {
+        hitAttractorDist = screenDist;
+        hitAttractor = a;
       }
+    }
+    if(hitAttractor) {
+      tAttractor = hitAttractor;
+      hitAttractor.dragging = true;
+      hitAttractor.vel.set(0,0,0);
+      const wp = s2w(t.clientX, t.clientY);
+      aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
+      showShapeText(hitAttractor.type);
+      return;
     }
     
     const tAllMeshes=shapes.map(s=>s.mesh);
@@ -2458,7 +2460,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
         tMoved=true;
       } else if(tAttractor){
         if(tAttractor.type === 'blackhole') {
-          tAttractor.pullStrength = Math.max(8.0, Math.min(120.0, aPinchPull0*(d/pinchDist0)));
+          tAttractor.pullStrength = Math.max(8.0, Math.min(126.0, aPinchPull0*(d/pinchDist0)));
         } else {
           const rMin = 1.2, rMax = 8.0;
           tAttractor.influenceR = Math.max(rMin, Math.min(rMax, (aPinchPull0/10)*(d/pinchDist0)));
@@ -2649,7 +2651,7 @@ function countTgts(){
   const N=Math.min(P.count,MP),raw=tgts.map(()=>0);let tot=0,inTarget=0;
   for(let i=0;i<N;i++){if(!pal[i])continue;const b=i*3;if(pp[b+1]>-7.5)continue;tot++;let hit=false;for(let t=0;t<tgts.length;t++){const tg=tgts[t],dx=pp[b]-tg.x,dz=pp[b+2];if(dx*dx+dz*dz<tg.r*tg.r){raw[t]++;hit=true;}}if(hit)inTarget++;}
   if(tCounts.length!==tgts.length)tCounts=tgts.map(()=>0);
-  for(let t=0;t<tgts.length;t++){tCounts[t]+=(raw[t]-tCounts[t])*FILL_A;const sh=tot>0?tCounts[t]/tot:0;tgts[t].fill=Math.min(sh/(1/Math.max(tgts.length,1))*0.7,1);tgts[t].met=tgts[t].fill>=THRESH;}
+  for(let t=0;t<tgts.length;t++){tCounts[t]+=(raw[t]-tCounts[t])*FILL_A;const sh=tot>0?tCounts[t]/tot:0;tgts[t].fill=Math.min(sh/(1/Math.max(tgts.length,1))*0.7,1);tgts[t].met=tgts[t].fill>=lvlThresh();}
   // Spillage: particles on floor outside any target
   const rawSpill=tot>0?Math.max(0,tot-inTarget):0;
   spillCount+=(rawSpill-spillCount)*FILL_A;
@@ -2678,8 +2680,8 @@ function checkDone(){
 document.getElementById('screenshot-btn').addEventListener('click',()=>{
   renderer.clear();
   renderer.render(scene,camera);
-  renderer.render(orthoScene,orthoCam);
   renderer.render(particleScene,camera);
+  renderer.render(orthoScene,orthoCam);
   const a=document.createElement('a');
   a.href=renderer.domElement.toDataURL('image/png');
   a.download='particle-flow-lvl'+(lvl+1)+'.png';
@@ -2749,7 +2751,7 @@ function drawOverlay(){
     const tw = wormhole.phase;
     function projW(v){const c=v.clone().project(camera);return{x:(c.x+1)/2*W,y:(-c.y+1)/2*H};}
 
-    // ENTRANCE — ground plane void
+    // ENTRANCE — ground plane ring with subtle glow fill (particles render over via layer order)
     const eC = projW(new THREE.Vector3(wormhole.entranceX,FLR,0));
     const eL = projW(new THREE.Vector3(wormhole.entranceX-wormhole.entranceR,FLR,0));
     const eR2= projW(new THREE.Vector3(wormhole.entranceX+wormhole.entranceR,FLR,0));
@@ -2757,9 +2759,9 @@ function drawOverlay(){
     const erx=(eR2.x-eL.x)/2, ery=Math.abs(eF.y-eC.y)*1.1;
     const ecx=(eR2.x+eL.x)/2, ecy=eC.y;
     ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx);
-    const voidG=ovCtx.createRadialGradient(0,0,0,0,0,erx);
-    voidG.addColorStop(0,'rgba(0,0,0,0.95)'); voidG.addColorStop(0.65,'rgba(0,15,25,0.75)'); voidG.addColorStop(1,'rgba(0,180,200,0)');
-    ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.fillStyle=voidG; ovCtx.fill(); ovCtx.restore();
+    const entrG=ovCtx.createRadialGradient(0,0,0,0,0,erx);
+    entrG.addColorStop(0,`rgba(0,220,200,${0.12+Math.sin(tw*2.5)*0.05})`); entrG.addColorStop(1,'rgba(0,180,160,0)');
+    ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.fillStyle=entrG; ovCtx.fill(); ovCtx.restore();
     ovCtx.save(); ovCtx.translate(ecx,ecy); ovCtx.scale(1,ery/erx); ovCtx.beginPath(); ovCtx.arc(0,0,erx,0,Math.PI*2); ovCtx.restore();
     ovCtx.setLineDash([8,5]); ovCtx.lineDashOffset=-tw*22;
     ovCtx.strokeStyle=`rgba(0,220,200,${0.55+Math.sin(tw*2.5)*0.18})`; ovCtx.lineWidth=2.0;
@@ -2875,8 +2877,8 @@ function tick(){
     ovTex.needsUpdate = true;
     renderer.clear();
     renderer.render(scene,camera);
-    renderer.render(orthoScene,orthoCam);
     renderer.render(particleScene,camera);
+    renderer.render(orthoScene,orthoCam);
     return;
   }
 
@@ -3026,8 +3028,8 @@ function tick(){
 
   renderer.clear();
   renderer.render(scene,camera);
-  renderer.render(orthoScene,orthoCam);
   renderer.render(particleScene,camera);
+  renderer.render(orthoScene,orthoCam);
 }
 
 tick();
