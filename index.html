@@ -1513,6 +1513,11 @@ function initLevel(n){
     setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
     setSl('mb-sl-grav', 0); setVl('mb-v-grav', '0.0');
     setSl('mb-sl-spread', 0.04); setVl('mb-v-spread', '0.04');
+    // Auto-shapeshift emitter to full spread on level load
+    if (emitterShape) {
+      emitterShape.setMorph(0); // ensure starting from collapsed
+      setTimeout(() => { if (emitterShape) emitterShape.animateMorph(1); }, 120);
+    }
   }
   updateLevelNav();
 }
@@ -2896,7 +2901,19 @@ function tick(){
     pa[i]+=dt;if(pa[i]>pl[i]){spawn(i);continue;}
     
     if(applyAttractorForces(i,b,dt)) continue;
-    
+
+    // ── Level 5 ribbon wave: gentle sinusoidal lateral undulation ──
+    // Each particle carries a unique phase offset so they form flowing ribbons
+    // rather than synchronised sheets. Frequency is slow (0.9 rad/s) for a
+    // graceful drift; amplitude is tiny so the force is felt as a whisper,
+    // not a shove. The z-axis gets a complementary wave to add depth.
+    if (lvl === 4) {
+      const wT = pa[i] * 0.9 + i * 0.00038; // time + unique phase
+      const wAmp = 0.28; // lateral strength — increase for bigger waves
+      pv[b]   += Math.sin(wT) * wAmp * dt;
+      pv[b+2] += Math.cos(wT * 0.7 + 1.1) * wAmp * 0.55 * dt;
+    }
+
     pv[b+1]-=P.gravity*dt;
     if(P.rain){pv[b]-=pp[b]*0.4*dt;pv[b+2]-=pp[b+2]*0.3*dt;}
 
