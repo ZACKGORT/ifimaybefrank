@@ -502,6 +502,15 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
          </svg>
          <span class="ins-btn-lbl">Neutron Star</span>
       </button>
+      <button class="ins-btn" id="btn-add-portal" style="flex:1 1 100%;display:none;flex-direction:column;align-items:center;gap:4px;background:rgba(0,180,255,0.06);border:1px solid rgba(0,200,255,0.18);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <ellipse cx="6" cy="12" rx="2.5" ry="6" stroke="rgba(0,200,255,0.75)" stroke-width="1.3" stroke-dasharray="3 2"/>
+          <ellipse cx="18" cy="12" rx="2.5" ry="6" stroke="rgba(0,200,255,0.75)" stroke-width="1.3" stroke-dasharray="3 2"/>
+          <line x1="8.5" y1="12" x2="15.5" y2="12" stroke="rgba(0,200,255,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
+          <text x="12" y="23" text-anchor="middle" font-size="4" fill="rgba(0,200,255,0.5)" font-family="monospace">A ↔ B</text>
+        </svg>
+        <span class="ins-btn-lbl" style="color:rgba(0,200,255,0.65);">Portal Pair</span>
+      </button>
     </div>
     <div class="div" style="margin-bottom:4px;"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">AMOUNT</span><span class="ctrl-vl" id="v-count">8000</span></div><input type="range" id="sl-count" min="500" max="8000" step="100" value="8000"></div>
@@ -534,6 +543,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="lvl-nav-btn" data-lvl="2">3</button>
     <button class="lvl-nav-btn" data-lvl="3">4</button>
     <button class="lvl-nav-btn" data-lvl="4">5</button>
+    <button class="lvl-nav-btn" data-lvl="5">6</button>
   </div>
   <div id="level-nav-desc">One target. Precision required.</div>
 </div>
@@ -563,11 +573,12 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   </div>
   <div class="widget-body" id="anote-body-wrap">
     <div id="anote-body">
-      <div id="anote-eye">On Design Today</div>
-      <div id="anote-text">In 2026, <em>design is no longer a discipline</em> — it is a conversation between intent and physics. The boundary between tool and creator has dissolved. Flows are <em>redirected, not engineered</em>. Constraints are placed, not drawn. The designer's gesture is now the angle of deflection. What falls is gravity. What <em>reaches its target</em> is intention.</div>
-      <div id="anote-sig">— on the nature of directed systems</div>
+      <div id="anote-eye">On Directed Systems</div>
+      <div id="anote-text">In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What reaches its target <em>is intention made physical</em>.</div>
+      <div id="anote-sig">— on the nature of frankly and agency</div>
       <div id="anote-links">
-        <a href="https://ifimaybefrank.com" target="_blank" rel="noopener">ifimaybefrank.com</a>
+        <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
+        <a href="https://wolfie.love" target="_blank" rel="noopener">wolfie.love</a>
       </div>
     </div>
   </div>
@@ -575,19 +586,20 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 
 
 <div id="zckgrt-logo">
-  <span id="zl-z">F</span><span id="zl-c">R</span><span id="zl-k">A</span><span id="zl-g">N</span><span id="zl-r">K</span><span id="zl-t">L</span><span id="zl-y">Y</span>
+  <span id="zl-z">F</span><span id="zl-c">R</span><span id="zl-k">A</span><span id="zl-g">N</span><span id="zl-k2">K</span><span id="zl-g2">L</span><span id="zl-g3">Y</span>
 </div>
 
 <div id="mobile-bar">
   <button class="mb-btn" id="mb-note-btn">Frankly</button>
 </div>
 <div class="mb-panel" id="mb-note-panel">
-  <div style="padding:16px 20px;">
-    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Design Today</div>
-    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">In 2026, <span style="color:rgba(255,255,255,0.55);">design is no longer a discipline</span> — it is a conversation between intent and physics. The boundary between tool and creator has dissolved. Flows are <span style="color:rgba(255,255,255,0.55);">redirected, not engineered</span>. Constraints are placed, not drawn. The designer's gesture is now the angle of deflection. What falls is gravity. What <span style="color:rgba(255,255,255,0.55);">reaches its target</span> is intention.</div>
-    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on the nature of directed systems</div>
+    <div style="padding:16px 20px;">
+    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Directed Systems</div>
+    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">In 2026, <span style="color:rgba(255,255,255,0.55);">the material is still gravity</span> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <span style="color:rgba(255,255,255,0.55);">the angle of the thing that catches</span>. What falls is given. What <span style="color:rgba(255,255,255,0.55);">reaches its target</span> is intention made physical.</div>
+    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on the nature of frankly and agency</div>
     <div id="mb-anote-links">
-      <a href="https://ifimaybefrank.com" target="_blank" rel="noopener">ifimaybefrank.com</a>
+      <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
+      <a href="https://wolfie.love" target="_blank" rel="noopener">wolfie.love</a>
     </div>
   </div>
 </div>
@@ -637,6 +649,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="4" id="mb-lvl-5">5</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="5" id="mb-lvl-6">6</button>
   </div>
 </div>
 
@@ -689,27 +702,41 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 'use strict';
 
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
+// On level completion: one statement replaces the floating title
+const LEVEL_COMPLETE = [
+  "the fall found its place.",
+  "the surface did its work.",
+  "patience is its own kind of precision.",
+  "two answers. both correct.",
+  "you understood the gravity of it.",
+  "the material became something. so did you.",
+];
+
 // At rest: one title statement per level
 const LEVEL_TITLES = [
   [
-    "The user arrives with intent, not a request.",
-    "Place the surface. Let gravity close the gap.",
+    "everything starts as raw material.",
+    "before the argument, before the form — there is only the thing falling. watch where it goes.",
   ],
   [
-    "Two needs. One floor. The tilt is the only decision.",
-    "The designer who says 'they'll figure it out' has never watched them not.",
+    "a surface changes everything.",
+    "the same material. a different angle. notice what the redirection reveals.",
   ],
   [
-    "Zero friction. Maximum flexibility. One floor. Whatever shapes you can find.",
-    "Precision is not a style. It is the only load-bearing decision you actually make.",
+    "some things require weight before they move.",
+    "you cannot rush overflow. it arrives when it arrives. the ledge is not an obstacle.",
   ],
   [
-    "The exit is yours to place. Where things come out depends on where you put it.",
-    "A wormhole doesn't change what falls. It changes where falling leads.",
+    "two directions. one origin.",
+    "the split is not a failure of focus. it is the first honest map of what you actually contain.",
   ],
   [
-    "In a world caught in the wash of greater forces — have your own gravity.",
-    "Shine with your own intensity. The stream will find you.",
+    "everything orbits something.",
+    "the question is not what you've built. it is what you've become the center of.",
+  ],
+  [
+    "the old rules don't apply here.",
+    "gravity has left its post. something else is in charge now — and it's moving.",
   ],
 ];
 
@@ -785,6 +812,7 @@ function showLevelTitle(lvlN, immediate) {
 }
 
 function showShapeText(type) {
+  if(lvlDone) return; // don't override completion statement
   _textMode = 'shape';
   _buildFloatText(nextShapeCopy(type), false);
 }
@@ -1017,11 +1045,12 @@ const THRESH=0.65;
 const LEVEL_THRESH=[0.65,0.65,0.65,0.35,0.65]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
-  {targets:[{x:5.5,r:2.8}]},
+  {targets:[{x:0,r:2.8}]},
   {targets:[{x:-5.0,r:2.5},{x:6.0,r:2.5}]},
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
-  {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2}
+  {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2},
+  {targets:[],bouncingBlackHole:true},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
@@ -1034,6 +1063,66 @@ const FILL_A=0.04,FLR=-9.0;
 // ── ATTRACTORS (Black Hole & Neutron Star) ────────────────────────────────────
 let attractors = [];
 const wormhole = { active: false, entranceX: 0, entranceR: 3.2, exitX: 0, exitY: 11, exitR: 2.4, phase: 0, dragging: false };
+// Level 6 free-placement portal pairs for the black hole
+// Each pair: { a: {x,y}, b: {x,y}, r: half-size, cooldown, phase, color, dragging: null|'a'|'b', _screenA, _screenB }
+const portalPairs = [];
+const PORTAL_PAIR_COLORS = [
+  '0,200,255',    // cyan
+  '180,80,255',   // violet
+  '80,255,160',   // mint
+  '255,160,40',   // amber
+  '255,60,120',   // rose
+];
+let _portalPhase = 0; // global phase for animation
+// Legacy compat shim — keeps BH wormhole teleport referencing portalPairs
+const bhWormholes = { get active(){ return portalPairs.length > 0; } };
+
+function addPortalPair() {
+  const col = PORTAL_PAIR_COLORS[portalPairs.length % PORTAL_PAIR_COLORS.length];
+  // Default: place A left-centre, B right-centre, offset vertically
+  const ex = s2w(W, H/2);
+  const spread = Math.abs(ex.x) * 0.55;
+  portalPairs.push({
+    a: { x: -spread + (Math.random()-0.5)*2, y: (Math.random()-0.5)*4 },
+    b: { x:  spread + (Math.random()-0.5)*2, y: (Math.random()-0.5)*4 },
+    r: 1.8,
+    cooldown: 0,
+    phase: Math.random() * Math.PI * 2,
+    color: col,
+    dragging: null,
+    // screen-space cached positions for hit-testing (set during draw)
+    _sAx: 0, _sAy: 0, _sAr: 0,
+    _sBx: 0, _sBy: 0, _sBr: 0,
+  });
+}
+
+function removePortalPairAt(screenX, screenY) {
+  for (let i = portalPairs.length - 1; i >= 0; i--) {
+    const p = portalPairs[i];
+    const dA = Math.sqrt((screenX-p._sAx)**2 + (screenY-p._sAy)**2);
+    const dB = Math.sqrt((screenX-p._sBx)**2 + (screenY-p._sBy)**2);
+    if (dA < p._sAr + 14 || dB < p._sBr + 14) {
+      portalPairs.splice(i, 1);
+      flashEl('flash-delete');
+      return true;
+    }
+  }
+  return false;
+}
+
+function hitTestPortal(screenX, screenY) {
+  // Returns {pair, which:'a'|'b'} or null
+  for (let i = portalPairs.length - 1; i >= 0; i--) {
+    const p = portalPairs[i];
+    const dA = Math.sqrt((screenX-p._sAx)**2 + (screenY-p._sAy)**2);
+    const dB = Math.sqrt((screenX-p._sBx)**2 + (screenY-p._sBy)**2);
+    if (dA < Math.max(p._sAr, 22)) return { pair: p, which: 'a' };
+    if (dB < Math.max(p._sBr, 22)) return { pair: p, which: 'b' };
+  }
+  return null;
+}
+
+let _draggingPortal = null; // { pair, which:'a'|'b', offX, offY }
 const BH_SPRING_K = 5.0;
 const BH_DAMPING = 7.5;
 
@@ -1045,13 +1134,15 @@ class Attractor {
     this.vel = new THREE.Vector3();
     this.dragging = false;
     this._pulseT = 0;
-    this.pullStrength = type === 'neutronstar' ? 32.0 : 76.2;
-    this.radius = type === 'neutronstar' ? 0.30 : 1.001;
-    this.consumeRadius = type === 'neutronstar' ? 0.03 : 0.52;
-    this.influenceR = type === 'neutronstar' ? 5.5 : null;
+    this.pullStrength = type === 'neutronstar' ? 28.0 : 76.2;
+    this.radius = type === 'neutronstar' ? 0.28 : 1.001;
+    this.consumeRadius = type === 'neutronstar' ? 0.05 : 0.52;
+    this.influenceR = type === 'neutronstar' ? 4.0 : null; // NS has smaller area influence than BH
     this._bhRadiusMin = type === 'blackhole' ? 0.68 : null;
     this._bhRadiusMax = type === 'blackhole' ? 1.505 : null;
     this._bhPullBase  = type === 'blackhole' ? 48.0 : null;
+    // Neutron stars bounce freely like the BH on level 6
+    this._bouncingNS = (type === 'neutronstar');
     this._build();
   }
 
@@ -1244,6 +1335,8 @@ class Attractor {
 
   update(dt) {
     this._pulseT += dt;
+    // Tick portal cooldowns
+    for (const pp of portalPairs) { if (pp.cooldown > 0) pp.cooldown -= dt; }
 
     if (this.type === 'blackhole') {
       const pulse = 0.5 + Math.sin(this._pulseT * 2.2) * 0.5;
@@ -1263,26 +1356,146 @@ class Attractor {
     this.mesh.scale.set(scale, scale, scale);
 
     if (!this.dragging) {
-      const xe = this.pos.x - this.rest.x, ye = this.pos.y - this.rest.y;
-      const dist = Math.sqrt(xe * xe + ye * ye);
-      const magFactor = dist > 0.001 ? (1.0 + 0.8 / (dist + 0.3)) : 1.0;
-      this.vel.x -= xe * BH_SPRING_K * magFactor * dt;
-      this.vel.y -= ye * BH_SPRING_K * magFactor * dt;
-      this.vel.x -= this.vel.x * BH_DAMPING * dt;
-      this.vel.y -= this.vel.y * BH_DAMPING * dt;
-      if (dist < 0.008 && Math.sqrt(this.vel.x ** 2 + this.vel.y ** 2) < 0.015) {
-        this.pos.x = this.rest.x; this.pos.y = this.rest.y; this.vel.set(0, 0, 0);
+      if (this._bouncingBH) {
+        // ── Rubber-ball bouncing black hole physics ──────────────────────────
+        const BH_GRAV = 0.55; // near-zero — floats in perpetual motion
+        this.vel.y -= BH_GRAV * dt;
+        this.pos.x += this.vel.x * dt;
+        this.pos.y += this.vel.y * dt;
+
+        const basePullBH = 57.0;
+        const scaleBH = Math.sqrt(this.pullStrength / basePullBH);
+        const rEff = this.radius * scaleBH * 1.2;
+
+        const RESTITUTION = 0.78;
+        const FRICTION = 0.985;
+
+        // Use actual viewport edges in world space for horizontal bounds
+        const edgeLW = s2w(0, H / 2).x;
+        const edgeRW = s2w(W, H / 2).x;
+        const BY_FLOOR = -7.5, BY_CEIL = 12;
+
+        // ── BH Wormhole teleportation — checked BEFORE wall bounce ───────────────
+        let teleported = false;
+        for (const pp of portalPairs) {
+          if (pp.cooldown > 0) continue;
+          const r = pp.r;
+
+          // Distance from BH to portal A and B
+          const dxA = this.pos.x - pp.a.x, dyA = this.pos.y - pp.a.y;
+          const dxB = this.pos.x - pp.b.x, dyB = this.pos.y - pp.b.y;
+          const distA = Math.sqrt(dxA*dxA + dyA*dyA);
+          const distB = Math.sqrt(dxB*dxB + dyB*dyB);
+
+          if (distA < r * 1.1 && !teleported) {
+            // Enter A → exit B
+            this.pos.x = pp.b.x; this.pos.y = pp.b.y;
+            // Preserve speed, flip direction to exit away from B
+            const spd2 = Math.sqrt(this.vel.x**2 + this.vel.y**2);
+            const ex = dxA / (distA || 1), ey = dyA / (distA || 1);
+            this.vel.x = ex * spd2 * 0.92; this.vel.y = ey * spd2 * 0.92;
+            pp.cooldown = 0.8; teleported = true; break;
+          }
+          if (distB < r * 1.1 && !teleported) {
+            // Enter B → exit A
+            this.pos.x = pp.a.x; this.pos.y = pp.a.y;
+            const spd2 = Math.sqrt(this.vel.x**2 + this.vel.y**2);
+            const ex = dxB / (distB || 1), ey = dyB / (distB || 1);
+            this.vel.x = ex * spd2 * 0.92; this.vel.y = ey * spd2 * 0.92;
+            pp.cooldown = 0.8; teleported = true; break;
+          }
+        }
+
+        // Wall bounces — only apply horizontal bounce if no wormhole teleport
+        if (this.pos.y - rEff < BY_FLOOR) {
+          this.pos.y = BY_FLOOR + rEff;
+          if (this.vel.y < 0) { this.vel.y = -this.vel.y * RESTITUTION; this.vel.x *= FRICTION; }
+        }
+        if (this.pos.y + rEff > BY_CEIL) {
+          this.pos.y = BY_CEIL - rEff;
+          if (this.vel.y > 0) this.vel.y = -this.vel.y * RESTITUTION;
+        }
+        if (!teleported) {
+          if (this.pos.x + rEff > edgeRW) {
+            this.pos.x = edgeRW - rEff;
+            if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION;
+          }
+          if (this.pos.x - rEff < edgeLW) {
+            this.pos.x = edgeLW + rEff;
+            if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION;
+          }
+        }
+
+        const spd = Math.sqrt(this.vel.x**2 + this.vel.y**2);
+        const MAX_SPD = 22;
+        if (spd > MAX_SPD) { this.vel.x *= MAX_SPD / spd; this.vel.y *= MAX_SPD / spd; }
+
+      } else if (this._bouncingNS) {
+        // ── Neutron star: same bounce as BH, near-zero gravity — floats in perpetual motion
+        const NS_GRAV = 0.18; // almost nothing — stays in motion
+        this.vel.y -= NS_GRAV * dt;
+        this.pos.x += this.vel.x * dt;
+        this.pos.y += this.vel.y * dt;
+
+        const basePullNS = 57.0;
+        const scaleNS = Math.sqrt(this.pullStrength / basePullNS);
+        const rEffNS = this.radius * scaleNS * 1.2;
+
+        const RESTITUTION = 0.78; // same as BH
+        const FRICTION = 0.985;   // same as BH
+
+        const edgeLW2 = s2w(0, H / 2).x;
+        const edgeRW2 = s2w(W, H / 2).x;
+        const BY_FLOOR = -7.5, BY_CEIL = 12;
+
+        if (this.pos.y - rEffNS < BY_FLOOR) {
+          this.pos.y = BY_FLOOR + rEffNS;
+          if (this.vel.y < 0) { this.vel.y = -this.vel.y * RESTITUTION; this.vel.x *= FRICTION; }
+        }
+        if (this.pos.y + rEffNS > BY_CEIL) {
+          this.pos.y = BY_CEIL - rEffNS;
+          if (this.vel.y > 0) this.vel.y = -this.vel.y * RESTITUTION;
+        }
+        if (this.pos.x + rEffNS > edgeRW2) {
+          this.pos.x = edgeRW2 - rEffNS;
+          if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION;
+        }
+        if (this.pos.x - rEffNS < edgeLW2) {
+          this.pos.x = edgeLW2 + rEffNS;
+          if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION;
+        }
+
+        const nsSpd = Math.sqrt(this.vel.x**2 + this.vel.y**2);
+        const NS_MAX_SPD = 22;
+        if (nsSpd > NS_MAX_SPD) { this.vel.x *= NS_MAX_SPD / nsSpd; this.vel.y *= NS_MAX_SPD / nsSpd; }
+        // Minimum drift — NS never truly stops
+        if (nsSpd < 0.8 && !this.dragging) {
+          const ang = Math.random() * Math.PI * 2;
+          this.vel.x += Math.cos(ang) * 0.6; this.vel.y += Math.sin(ang) * 0.6;
+        }
+
       } else {
-        this.pos.x += this.vel.x * dt * 60; this.pos.y += this.vel.y * dt * 60;
+        const xe = this.pos.x - this.rest.x, ye = this.pos.y - this.rest.y;
+        const dist = Math.sqrt(xe * xe + ye * ye);
+        const magFactor = dist > 0.001 ? (1.0 + 0.8 / (dist + 0.3)) : 1.0;
+        this.vel.x -= xe * BH_SPRING_K * magFactor * dt;
+        this.vel.y -= ye * BH_SPRING_K * magFactor * dt;
+        this.vel.x -= this.vel.x * BH_DAMPING * dt;
+        this.vel.y -= this.vel.y * BH_DAMPING * dt;
+        if (dist < 0.008 && Math.sqrt(this.vel.x ** 2 + this.vel.y ** 2) < 0.015) {
+          this.pos.x = this.rest.x; this.pos.y = this.rest.y; this.vel.set(0, 0, 0);
+        } else {
+          this.pos.x += this.vel.x * dt * 60; this.pos.y += this.vel.y * dt * 60;
+        }
+
+        const rScaled2 = this.radius * scale;
+        const BX = 13, BBY = -8.5 + rScaled2, BTY = 14;
+        if (this.pos.x > BX) { this.pos.x = BX; this.vel.x *= -0.4; }
+        if (this.pos.x < -BX) { this.pos.x = -BX; this.vel.x *= -0.4; }
+        if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
+        if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
       }
     }
-
-    const rScaled = this.radius * scale;
-    const BX = 13, BBY = -8.5 + rScaled, BTY = 14;
-    if (this.pos.x > BX) { this.pos.x = BX; this.vel.x *= -0.4; }
-    if (this.pos.x < -BX) { this.pos.x = -BX; this.vel.x *= -0.4; }
-    if (this.pos.y < BBY) { this.pos.y = BBY; this.vel.y *= -0.35; }
-    if (this.pos.y > BTY) { this.pos.y = BTY; this.vel.y *= -0.3; }
 
 
 
@@ -1353,16 +1566,21 @@ function applyAttractorForces(i, b, dt) {
       if (dist < a.consumeRadius) { spawn(i); return true; }
 
     } else {
-      // Neutron star — magnetic collimator, bends and holds the stream.
-      const influenceR = a.influenceR || 5.5;
+      // Neutron star — smaller area of influence than black hole,
+      // but very strong pull at close proximity (inverse-square intensifies sharply)
+      const influenceR = a.influenceR || 4.0; // smaller area influence than BH
       if (dist > influenceR) continue;
 
-      const f = a.pullStrength * 2.2 * dt / (dist2 + 0.08);
+      // Strong close-range pull: force scales up sharply at short distances
+      // At close range (dist < 1.5) this becomes very strong; falls off quickly with distance
+      const proximityBoost = dist < 1.5 ? (1.5 / (dist + 0.12)) * 2.8 : 1.0;
+      const nsParticleMult = 1.8 * proximityBoost;
+      const f = a.pullStrength * nsParticleMult * dt / (dist2 + 0.05);
       pv[b]   += dx / dist * f;
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
-      if (dist < influenceR * 0.65) {
+      if (dist < influenceR * 0.55) {
         const rx = pp[b] - a.pos.x, ry = pp[b+1] - a.pos.y;
         const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
         const tx = -ry / r, ty = rx / r;
@@ -1381,17 +1599,66 @@ function applyAttractorForces(i, b, dt) {
 
 function drawBlackHoleOverlay() {
   const t = Date.now() * 0.001;
+
+  // ── BH shadow casting onto shapes ───────────────────────────────────────────
+  // For each black hole, project a soft shadow ellipse onto each shape below it
+  attractors.forEach(bh => {
+    if (bh.type !== 'blackhole') return;
+    const bhC = bh.pos.clone().project(camera);
+    const bhSX = (bhC.x + 1) / 2 * W, bhSY = (-bhC.y + 1) / 2 * H;
+    const basePullBH = 57.0;
+    const scaleBH = Math.sqrt(bh.pullStrength / basePullBH);
+    const bhEdge = new THREE.Vector3(bh.pos.x + bh.radius * scaleBH, bh.pos.y, 0).project(camera);
+    const bhCoreR = Math.abs((bhEdge.x + 1) / 2 * W - bhSX);
+
+    // Shadow over each shape — proximity-weighted dark blob
+    shapes.forEach(sh => {
+      const shC = sh.pos.clone().project(camera);
+      const shSX = (shC.x + 1) / 2 * W, shSY = (-shC.y + 1) / 2 * H;
+      const shEdge = new THREE.Vector3(sh.pos.x + sh.radius, sh.pos.y, 0).project(camera);
+      const shR = Math.abs((shEdge.x + 1) / 2 * W - shSX) * 1.6;
+
+      // World-space distance BH → shape
+      const wdx = bh.pos.x - sh.pos.x, wdy = bh.pos.y - sh.pos.y;
+      const wdist = Math.sqrt(wdx*wdx + wdy*wdy);
+      const shadowStrength = Math.max(0, 1.0 - wdist / 14.0); // falls off over 14 world units
+      if (shadowStrength < 0.02) return;
+
+      // Shadow offset: BH casts shadow on far side of shape from emitter (top)
+      // Direction: from BH toward shape, continued past shape
+      const sOff = wdist > 0.1 ? { x: (sh.pos.x - bh.pos.x) / wdist, y: (sh.pos.y - bh.pos.y) / wdist } : { x: 0, y: -1 };
+      const shadowOffsetPx = shR * 0.4;
+
+      const shadowX = shSX + sOff.x * shadowOffsetPx * 0.5;
+      const shadowY = shSY + sOff.y * shadowOffsetPx * 0.5;
+      const shadowR = shR * (1.2 + shadowStrength * 0.6);
+      const alpha = shadowStrength * 0.72;
+
+      ovCtx.save();
+      const sg = ovCtx.createRadialGradient(shadowX, shadowY, 0, shadowX, shadowY, shadowR);
+      sg.addColorStop(0, `rgba(0,0,0,${alpha})`);
+      sg.addColorStop(0.55, `rgba(0,0,0,${alpha * 0.45})`);
+      sg.addColorStop(1, 'rgba(0,0,0,0)');
+      ovCtx.beginPath(); ovCtx.arc(shadowX, shadowY, shadowR, 0, Math.PI * 2);
+      ovCtx.fillStyle = sg; ovCtx.fill();
+      ovCtx.restore();
+    });
+  });
+
   attractors.forEach(bh => {
     const c = bh.pos.clone().project(camera);
     const sx = (c.x + 1) / 2 * W, sy = (-c.y + 1) / 2 * H;
-    const pullRadiusWorld = Math.sqrt(bh.pullStrength / 0.5); // Where F ~= 0.5
+    // Smaller dotted rings — use actual influenceR for NS, tighter formula for BH
+    const pullRadiusWorld = bh.type === 'neutronstar'
+      ? (bh.influenceR || 4.0)   // NS: show actual area of influence
+      : Math.sqrt(bh.pullStrength / 3.5); // BH: significantly smaller ring
     const edge = new THREE.Vector3(bh.pos.x + pullRadiusWorld, bh.pos.y, 0).project(camera);
     const pullR = Math.abs((edge.x + 1) / 2 * W - sx);
 
     ovCtx.save();
-    ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 8;
+    ovCtx.setLineDash([2, 5]); ovCtx.lineDashOffset = -t * 8;
     ovCtx.beginPath(); ovCtx.arc(sx, sy, pullR, 0, Math.PI * 2);
-    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.25)' : 'rgba(80,50,200,0.15)';
+    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.30)' : 'rgba(80,50,200,0.22)';
     ovCtx.lineWidth = 1; ovCtx.stroke();
     ovCtx.setLineDash([]);
 
@@ -1448,27 +1715,33 @@ function initLevel(n){
   
   const isLvl4 = n === 3; // wormhole level
   const isLvl5 = n === 4; // black hole level
+  const isLvl6 = n === 5; // bouncing black hole sandbox
   const isAttractorLevel = isLvl5; // only lvl5 hides shapes; lvl4 (wormhole) has shapes
 
   const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
-  if(dBH) dBH.style.display = isLvl5 ? 'flex' : 'none';
+  if(dBH) dBH.style.display = (isLvl5 && !isLvl6) ? 'flex' : 'none';
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
-  if(dNS) dNS.style.display = isLvl5 ? 'flex' : 'none';
+  if(dNS) dNS.style.display = (isLvl5 || isLvl6) ? 'flex' : 'none';
+  const dPortal = document.getElementById('btn-add-portal');
+  if(dPortal) dPortal.style.display = isLvl6 ? 'flex' : 'none';
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.style.display = isAttractorLevel ? 'none' : '';
+    if(btn) btn.style.display = (isAttractorLevel || isLvl6) ? 'none' : '';
   });
 
+  // Clear portals when leaving/entering level 6
+  portalPairs.length = 0;
+
   const mBH = document.getElementById('mb-add-blackhole');
-  if(mBH) mBH.style.display = isLvl5 ? 'flex' : 'none';
+  if(mBH) mBH.style.display = (isLvl5 && !isLvl6) ? 'flex' : 'none';
   const mNS = document.getElementById('mb-add-neutronstar');
-  if(mNS) mNS.style.display = isLvl5 ? 'flex' : 'none';
+  if(mNS) mNS.style.display = (isLvl5 || isLvl6) ? 'flex' : 'none';
   const mbCube = document.getElementById('mb-add-cube');
-  if(mbCube) mbCube.style.display = isAttractorLevel ? 'none' : 'flex';
+  if(mbCube) mbCube.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
   const mbSphere = document.getElementById('mb-add-sphere');
-  if(mbSphere) mbSphere.style.display = isAttractorLevel ? 'none' : 'flex';
+  if(mbSphere) mbSphere.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
   const mbPyramid = document.getElementById('mb-add-pyramid');
-  if(mbPyramid) mbPyramid.style.display = isAttractorLevel ? 'none' : 'flex';
+  if(mbPyramid) mbPyramid.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
 
   destroyAttractors();
   if (LEVELS[n].blackHole) {
@@ -1503,18 +1776,69 @@ function initLevel(n){
 
   // Level 5: black hole + neutron stars — zero gravity, pure orbital physics
   if (n === 4) {
-    P.count = 8000; P.gravity = 0; P.spread = 0.04; P.bounce = 1.0; P.size = 0.55;
-    // spread=0.04 matches morph=1 (pyramid) — shapeshift the emitter to match
-    if (emitterShape) emitterShape.animateMorph(1);
+    P.count = 8000; P.gravity = 1.2; P.spread = 1.8; P.bounce = 0.85; P.size = 0.75;
+    if (emitterShape) emitterShape.animateMorph(0);
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     setSl('sl-count', 8000); setVl('v-count', 8000);
-    setSl('sl-grav', 0); setVl('v-grav', '0.0');
-    setSl('sl-spread', 0.04); setVl('v-spread', '0.04');
-    setSl('sl-bounce', 1.0); setVl('v-bounce', '1.00');
+    setSl('sl-grav', 1.2); setVl('v-grav', '1.2');
+    setSl('sl-spread', 1.8); setVl('v-spread', '1.80');
+    setSl('sl-bounce', 0.85); setVl('v-bounce', '0.85');
+    setSl('sl-size', 0.75); setVl('v-size', '0.75');
     setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
-    setSl('mb-sl-grav', 0); setVl('mb-v-grav', '0.0');
-    setSl('mb-sl-spread', 0.04); setVl('mb-v-spread', '0.04');
+    setSl('mb-sl-grav', 1.2); setVl('mb-v-grav', '1.2');
+    setSl('mb-sl-spread', 1.8); setVl('mb-v-spread', '1.80');
+    // Liquid shader with self-luminance — bright blue-white core for level 5
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*26.0);float halo=exp(-d*7.0)*(1.0-exp(-d*3.0))*1.3;float bloom=smoothstep(0.5,0.0,d)*0.65;float brightness=core*2.0+halo+bloom;float a=brightness*(1.0-vF*0.52);gl_FragColor=vec4(min(1.0,0.82+core*0.18),min(1.0,0.93+core*0.07),1.0,a*0.94);}`;
+    pMat.needsUpdate = true;
+  }
+  // Level 6: bouncing black hole — rubber-ball BH, neutron stars as gravitational toys
+  // + viewport-side wormholes (vertical portals) that teleport the black hole
+  if (n === 5) {
+    P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82; P.size = 0.70;
+    if (emitterShape) emitterShape.animateMorph(0);
+    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    setSl('sl-count', 8000); setVl('v-count', 8000);
+    setSl('sl-grav', 0.6); setVl('v-grav', '0.6');
+    setSl('sl-spread', 1.4); setVl('v-spread', '1.40');
+    setSl('sl-bounce', 0.82); setVl('v-bounce', '0.82');
+    setSl('sl-size', 0.70); setVl('v-size', '0.70');
+
+    // ── Portal pairs are added manually via "Portal Pair" button — none spawned by default
+
+    // Spawn bouncing black hole with gentle floating kick (low gravity = stays in motion)
+    const bx = (Math.random() - 0.5) * 6;
+    const by = 0.5 + Math.random() * 2.0;
+    const bounceBH = new Attractor('blackhole', new THREE.Vector3(bx, by, 0));
+    bounceBH._bouncingBH = true;
+    bounceBH.pullStrength = 88.0;
+    const bhAng = Math.random() * Math.PI * 2;
+    bounceBH.vel.x = Math.cos(bhAng) * (5 + Math.random() * 4);
+    bounceBH.vel.y = Math.sin(bhAng) * (4 + Math.random() * 3);
+    attractors.push(bounceBH);
+
+    // Spawn 2 neutron stars with floating kicks — same bounce as BH, near-zero gravity
+    if (LEVELS[n].neutronStars) {
+      for (let nsi = 0; nsi < LEVELS[n].neutronStars; nsi++) {
+        const nx = (Math.random() - 0.5) * 10;
+        const ny = (Math.random() - 0.5) * 6;
+        const ns = new Attractor('neutronstar', new THREE.Vector3(nx, ny, 0));
+        // _bouncingNS already set true in constructor
+        const nsAng = Math.random() * Math.PI * 2;
+        ns.vel.x = Math.cos(nsAng) * (3 + Math.random() * 4);
+        ns.vel.y = Math.sin(nsAng) * (2 + Math.random() * 3);
+        attractors.push(ns);
+      }
+    }
+
+    // Default shader — keep dry-salt for this level
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.needsUpdate = true;
+  } else if (n === 4) {
+    // Restore default dry-salt luminance shader for levels 1–4
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.needsUpdate = true;
   }
   updateLevelNav();
 }
@@ -1812,7 +2136,8 @@ function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
   const isLvl4 = lvl === 3; // wormhole — has shapes
   const isLvl5 = lvl === 4; // black hole — no shapes
-  const noShapes = isLvl5 || (isLvl4 && !LEVELS[lvl].shapes);
+  const isLvl6 = lvl === 5; // bouncing BH sandbox — no shapes
+  const noShapes = isLvl5 || isLvl6 || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
@@ -1898,11 +2223,14 @@ document.querySelectorAll('.ins-btn').forEach(b=>b.addEventListener('click',()=>
   const t = b.dataset.shape;
   if(t === 'blackhole' || t === 'neutronstar') {
     attractors.push(new Attractor(t, new THREE.Vector3((Math.random()-0.5)*4,0,0)));
-  } else {
+  } else if(t) {
     addShape(t);
   }
 }));
-document.getElementById('btn-clear2').addEventListener('click',clearShapes);
+// Portal pair button
+const _portalBtn = document.getElementById('btn-add-portal');
+if(_portalBtn) _portalBtn.addEventListener('click', () => { if(lvl===5) addPortalPair(); });
+document.getElementById('btn-clear2').addEventListener('click', () => { clearShapes(); portalPairs.length = 0; });
 
 // ── DISPENSER ─────────────────────────────────────────────────────────────────
 const dispEl=document.getElementById('dispenser'),ctaBtn=document.getElementById('cta-btn'),snapHint=document.getElementById('snap-hint');
@@ -1961,7 +2289,18 @@ pGeo.boundingSphere=new THREE.Sphere(new THREE.Vector3(0,0,0),200);
 const pMat=new THREE.ShaderMaterial({
   uniforms:{uSz:{value:1.0}},
   vertexShader:`attribute float size;varying float vF;uniform float uSz;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);float d=-mv.z;gl_PointSize=size*uSz*(260.0/d);gl_Position=projectionMatrix*mv;vF=clamp(d*0.025,0.0,1.0);}`,
-  fragmentShader:`varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float c=exp(-d*10.0);float s=smoothstep(0.5,0.0,d)*0.5;float a=(c+s)*(1.0-vF*0.75);gl_FragColor=vec4(1.0,0.99,0.97,a*0.82);}`,
+  fragmentShader:`varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;
+    // Hard core — incandescent white centre
+    float core=exp(-d*28.0);
+    // Mid halo — warm glow ring
+    float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;
+    // Outer bloom — wide soft radiance
+    float bloom=smoothstep(0.5,0.0,d)*0.6;
+    float brightness=core*1.8+halo+bloom;
+    float a=brightness*(1.0-vF*0.72);
+    // Colour: white-hot core → warm cream edge
+    float warmth=1.0-d*0.9;
+    gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`,
   transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
 });
 particleScene.add(new THREE.Points(pGeo,pMat));
@@ -1979,8 +2318,48 @@ window.addEventListener('keyup',e=>{if(e.key==='Shift'){shiftDown=false;if(dShap
 
 let tAttractor=null,aDragOff=new THREE.Vector3();
 
+// ── Throw velocity tracking for bouncing BH ───────────────────────────────────
+// Ring buffer of recent world-space attractor positions while dragging
+const _throwBuf = [];
+const _THROW_BUF_LEN = 6; // sample last 6 frames (~100ms)
+function _recordThrowPos(a) {
+  if (!a || !a._bouncingBH) return;
+  _throwBuf.push({ x: a.pos.x, y: a.pos.y, t: performance.now() });
+  if (_throwBuf.length > _THROW_BUF_LEN) _throwBuf.shift();
+}
+function _applyThrow(a) {
+  if (!a || !a._bouncingBH || _throwBuf.length < 2) return;
+  // Weighted average of recent deltas — more weight to the most recent
+  let vx = 0, vy = 0, totalW = 0;
+  for (let i = 1; i < _throwBuf.length; i++) {
+    const dt = (_throwBuf[i].t - _throwBuf[i-1].t) / 1000;
+    if (dt < 0.001) continue;
+    const w = i; // linear recency weight
+    vx += ((_throwBuf[i].x - _throwBuf[i-1].x) / dt) * w;
+    vy += ((_throwBuf[i].y - _throwBuf[i-1].y) / dt) * w;
+    totalW += w;
+  }
+  if (totalW > 0) {
+    const THROW_SCALE = 0.72; // tune feel: 1.0 = physically exact, >1 = exaggerated
+    const MAX_THROW = 28;
+    vx = Math.max(-MAX_THROW, Math.min(MAX_THROW, (vx / totalW) * THROW_SCALE));
+    vy = Math.max(-MAX_THROW, Math.min(MAX_THROW, (vy / totalW) * THROW_SCALE));
+    a.vel.x = vx;
+    a.vel.y = vy;
+  }
+  _throwBuf.length = 0;
+}
+
 window.addEventListener('mousemove',e=>{
   mVX=e.clientX-mX;mVY=e.clientY-mY;mX=e.clientX;mY=e.clientY;
+
+  // Portal drag
+  if(_draggingPortal) {
+    const wp = s2w(e.clientX, e.clientY);
+    _draggingPortal.pair[_draggingPortal.which].x = wp.x;
+    _draggingPortal.pair[_draggingPortal.which].y = wp.y;
+    return;
+  }
 
   // Wormhole exit drag — free movement anywhere in world space
   if(wormhole.active && wormhole.dragging) {
@@ -1994,6 +2373,7 @@ window.addEventListener('mousemove',e=>{
     const wp=s2w(e.clientX,e.clientY);
     tAttractor.pos.x=wp.x-aDragOff.x;
     tAttractor.pos.y=wp.y-aDragOff.y;
+    _recordThrowPos(tAttractor);
     return;
   }
   
@@ -2016,9 +2396,19 @@ window.addEventListener('mousemove',e=>{
   }
 });
 window.addEventListener('mouseup',e=>{
+  if(e.button===0&&_draggingPortal){
+    _draggingPortal.pair.dragging = null;
+    _draggingPortal = null;
+    return;
+  }
   if(e.button===0&&wormhole.dragging){wormhole.dragging=false;return;}
   if(e.button===0&&tAttractor){
-    tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
+    if(tAttractor._bouncingBH) {
+      _applyThrow(tAttractor);
+      // Don't reset rest for bouncing BH — it has no spring tether
+    } else {
+      tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
+    }
     tAttractor.dragging=false;
     tAttractor=null;
     return;
@@ -2027,6 +2417,16 @@ window.addEventListener('mouseup',e=>{
 
 renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
+
+  // Portal pair drag hit-test (Level 6)
+  if(lvl === 5 && portalPairs.length > 0) {
+    const hit = hitTestPortal(e.clientX, e.clientY);
+    if(hit) {
+      _draggingPortal = { pair: hit.pair, which: hit.which };
+      hit.pair.dragging = hit.which;
+      return;
+    }
+  }
 
   // Wormhole exit drag — hit test against screen-space circle
   if(wormhole.active && wormhole._screenX != null) {
@@ -2056,6 +2456,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
     tAttractor = hitAttractor;
     hitAttractor.dragging = true;
     hitAttractor.vel.set(0,0,0);
+    _throwBuf.length = 0; // fresh buffer for this drag
     const wp = s2w(e.clientX, e.clientY);
     aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
     showShapeText(hitAttractor.type);
@@ -2082,6 +2483,9 @@ renderer.domElement.addEventListener('contextmenu',e=>{
   e.preventDefault();
   ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
+
+  // Portal pair right-click removal (Level 6)
+  if(lvl === 5 && removePortalPairAt(e.clientX, e.clientY)) return;
   
   for(let i=0; i<attractors.length; i++){
     const a = attractors[i];
@@ -2424,6 +2828,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       tAttractor = hitAttractor;
       hitAttractor.dragging = true;
       hitAttractor.vel.set(0,0,0);
+      _throwBuf.length = 0; // fresh buffer for this drag
       const wp = s2w(t.clientX, t.clientY);
       aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
       showShapeText(hitAttractor.type);
@@ -2479,6 +2884,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
        const wp=s2w(t.clientX,t.clientY);
        tAttractor.pos.x=wp.x-aDragOff.x;
        tAttractor.pos.y=wp.y-aDragOff.y;
+       _recordThrowPos(tAttractor);
     } else if(tShape){
       const wp=s2w(t.clientX,t.clientY);
       if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05)tMoved=true;}
@@ -2490,7 +2896,12 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   renderer.domElement.addEventListener('touchend',e=>{
     e.preventDefault();
     if(tAttractor){
-      tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
+      if(tAttractor._bouncingBH) {
+        _applyThrow(tAttractor);
+        // No rest reset — bouncing BH is free-flying
+      } else {
+        tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
+      }
       tAttractor.dragging=false;
       tAttractor=null;
       revertToTitle();
@@ -2675,6 +3086,10 @@ function checkDone(){
     lvlDone=true;flashEl('flash-complete');
     _lvlDone[lvl]=true;
     if(typeof updateLevelNav==='function')updateLevelNav();
+    // Show completion statement in floating text
+    const completionLine = LEVEL_COMPLETE[Math.min(lvl, LEVEL_COMPLETE.length - 1)];
+    _buildFloatText([completionLine], false);
+    _textMode = 'idle'; // lock it — don't let shape grabs override until next level
     setTimeout(()=>{
       if(lvl<LEVELS.length-1)document.getElementById('next-btn').classList.add('visible');
     },600);
@@ -2696,13 +3111,14 @@ document.getElementById('next-btn').addEventListener('click',()=>{if(lvl<LEVELS.
 
 // ── LEVEL NAVIGATOR ───────────────────────────────────────────────────────────
 const LVL_DESCS=[
-  'One target. Precision required.',
-  'Two targets. One tilt decides.',
-  'Three targets. Navigate all.',
-  'Wormhole entrance fixed. You control the exit.',
-  'Singularity. Two anchors. Navigate the chaos.'
+  'raw material. unimpeded fall.',
+  'first surface. redirection begins.',
+  'accumulation. wait for the spill.',
+  'the split. two paths, one source.',
+  'gravity. everything orbits something.',
+  'gravity unbound. nothing stays still.',
 ];
-const _lvlDone=[false,false,false,false,false];
+const _lvlDone=[false,false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
@@ -2791,6 +3207,265 @@ function drawOverlay(){
     ovCtx.font='9px Courier New'; ovCtx.textAlign='center';
     ovCtx.fillStyle=`rgba(180,100,255,${wormhole.dragging?0.9:0.55})`;
     ovCtx.fillText(wormhole.dragging?'EXIT ✦':'EXIT (drag)', xcx, xcy-xry-6);
+  }
+
+  // ── Free-placement portal pairs (Level 6) — perspective 3D portals ──────────
+  if (portalPairs.length > 0) {
+    _portalPhase += 0.018;
+    const tw = _portalPhase;
+
+    function projP(v){const c=v.clone().project(camera);return{x:(c.x+1)/2*W,y:(-c.y+1)/2*H};}
+
+    // Find bouncing BH for ingestion animation
+    const bouncingBH = attractors.find(a => a._bouncingBH);
+
+    portalPairs.forEach((pp, pi) => {
+      const col = pp.color;
+      // Parse color components for use in rgba
+      const [cr,cg,cb] = col.split(',').map(Number);
+
+      // Initialize per-portal animation state
+      if (!pp._partA) {
+        pp._partA = Array.from({length:18}, (_,i) => ({
+          t: Math.random(), angle: (i/18)*Math.PI*2, speed: 0.3+Math.random()*0.4, r: 0.4+Math.random()*0.5
+        }));
+        pp._partB = Array.from({length:18}, (_,i) => ({
+          t: Math.random(), angle: (i/18)*Math.PI*2, speed: 0.3+Math.random()*0.4, r: 0.4+Math.random()*0.5
+        }));
+        pp._ingestT = -1;    // -1 = idle, 0..1 = ingesting into A or B
+        pp._ingestSide = null; // 'a' or 'b'
+        pp._emergeT = -1;
+        pp._emergeSide = null;
+      }
+
+      // Advance particle stream phase
+      pp._partA.forEach(p => { p.t = (p.t + pp.cooldown > 0 ? 0.008 : 0.018) % 1; });
+      pp._partB.forEach(p => { p.t = (p.t + pp.cooldown > 0 ? 0.008 : 0.018) % 1; });
+
+      // Detect BH proximity to trigger ingestion animation
+      if (bouncingBH && pp._ingestT < 0 && pp._emergeT < 0 && pp.cooldown <= 0) {
+        const dA = Math.hypot(bouncingBH.pos.x - pp.a.x, bouncingBH.pos.y - pp.a.y);
+        const dB = Math.hypot(bouncingBH.pos.x - pp.b.x, bouncingBH.pos.y - pp.b.y);
+        if (dA < pp.r * 1.5) { pp._ingestT = 0; pp._ingestSide = 'a'; pp._emergeSide = 'b'; }
+        else if (dB < pp.r * 1.5) { pp._ingestT = 0; pp._ingestSide = 'b'; pp._emergeSide = 'a'; }
+      }
+      if (pp._ingestT >= 0) {
+        pp._ingestT = Math.min(1, pp._ingestT + 0.04);
+        if (pp._ingestT >= 1 && pp._emergeT < 0) { pp._emergeT = 0; }
+      }
+      if (pp._emergeT >= 0) {
+        pp._emergeT = Math.min(1, pp._emergeT + 0.035);
+        if (pp._emergeT >= 1) { pp._ingestT = -1; pp._emergeT = -1; pp._ingestSide = null; }
+      }
+
+      // ── Draw one perspective portal disc ──────────────────────────────────
+      function drawPerspectivePortal(worldX, worldY, label, screenCache, parts, side) {
+        const ctr = projP(new THREE.Vector3(worldX, worldY, 0));
+        const edgePt = projP(new THREE.Vector3(worldX + pp.r, worldY, 0));
+        const sr = Math.max(28, Math.abs(edgePt.x - ctr.x));
+        const cx = ctr.x, cy = ctr.y;
+        screenCache.x = cx; screenCache.y = cy; screenCache.r = sr;
+
+        // Perspective tilt: portal is a vertical ring in 3D — project as tall ellipse
+        const ry = sr * 1.55; // tall (vertical portal face)
+        const rx = sr * 0.38; // narrow (foreshortened depth)
+
+        // Is BH being ingested/emerged through this portal?
+        const isIngesting = pp._ingestSide === side && pp._ingestT >= 0;
+        const isEmerging  = pp._emergeSide === side && pp._emergeT >= 0;
+        const animT = isIngesting ? pp._ingestT : (isEmerging ? pp._emergeT : 0);
+        const excited = (isIngesting || isEmerging) ? animT : 0;
+
+        // ── Tunnel depth rings (perspective illusion) ─────────────────────────
+        const tunnelDepth = 5;
+        for (let d = tunnelDepth; d >= 1; d--) {
+          const dFrac = d / tunnelDepth;
+          const trx = rx * (1 - dFrac * 0.82);
+          const try2 = ry * (1 - dFrac * 0.78);
+          const alpha = (1 - dFrac) * (0.18 + excited * 0.25);
+          if (alpha < 0.01) continue;
+          ovCtx.save();
+          ovCtx.translate(cx, cy);
+          ovCtx.scale(trx / try2, 1);
+          ovCtx.beginPath(); ovCtx.ellipse(0, 0, try2, try2, 0, 0, Math.PI*2);
+          ovCtx.restore();
+          ovCtx.strokeStyle = `rgba(${col},${alpha})`;
+          ovCtx.lineWidth = 0.8;
+          // draw via save/scale/restore then stroke
+          ovCtx.save();
+          ovCtx.translate(cx, cy);
+          ovCtx.scale(trx / try2, 1);
+          ovCtx.beginPath(); ovCtx.ellipse(0, 0, try2, try2, 0, 0, Math.PI*2);
+          ovCtx.restore();
+          ovCtx.stroke();
+        }
+
+        // ── Singularity point at tunnel center ───────────────────────────────
+        const singPulse = 0.5 + Math.sin(tw * 4 + pi) * 0.5;
+        const singR = 3.5 + singPulse * 2.0 + excited * 6;
+        const singGrd = ovCtx.createRadialGradient(cx, cy, 0, cx, cy, singR * 2.5);
+        singGrd.addColorStop(0, `rgba(255,255,255,${0.85 + excited * 0.15})`);
+        singGrd.addColorStop(0.3, `rgba(${col},${0.6 + excited * 0.3})`);
+        singGrd.addColorStop(1, `rgba(${col},0)`);
+        ovCtx.beginPath(); ovCtx.arc(cx, cy, singR * 2.5, 0, Math.PI*2);
+        ovCtx.fillStyle = singGrd; ovCtx.fill();
+        // hard bright dot
+        ovCtx.beginPath(); ovCtx.arc(cx, cy, singR * 0.55, 0, Math.PI*2);
+        ovCtx.fillStyle = `rgba(255,255,255,${0.9 + excited * 0.1})`;
+        ovCtx.fill();
+
+        // ── BH ingestion animation ───────────────────────────────────────────
+        if (isIngesting && pp._ingestT >= 0) {
+          const t = pp._ingestT;
+          // BH shrinks and spirals into singularity
+          const bhScale = 1.0 - t * t;
+          const spiralR = sr * (1 - t) * 0.7;
+          const spiralAng = t * Math.PI * 4;
+          const bhX = cx + Math.cos(spiralAng) * spiralR * (rx/ry);
+          const bhY = cy + Math.sin(spiralAng) * spiralR;
+          const bhDrawR = Math.max(2, (bhScale * sr * 0.45));
+          // BH glow
+          const bhGrd = ovCtx.createRadialGradient(bhX, bhY, 0, bhX, bhY, bhDrawR * 2.2);
+          bhGrd.addColorStop(0, `rgba(80,40,200,${0.8 * bhScale})`);
+          bhGrd.addColorStop(0.5, `rgba(40,20,120,${0.4 * bhScale})`);
+          bhGrd.addColorStop(1, `rgba(0,0,0,0)`);
+          ovCtx.beginPath(); ovCtx.arc(bhX, bhY, bhDrawR * 2.2, 0, Math.PI*2);
+          ovCtx.fillStyle = bhGrd; ovCtx.fill();
+          // BH core
+          ovCtx.beginPath(); ovCtx.arc(bhX, bhY, bhDrawR, 0, Math.PI*2);
+          ovCtx.fillStyle = `rgba(0,0,0,${0.9 * bhScale + 0.1})`;
+          ovCtx.fill();
+          // Accretion disc streaks
+          for (let s = 0; s < 6; s++) {
+            const sa = s * Math.PI/3 + tw * 3;
+            const sx1 = bhX + Math.cos(sa) * bhDrawR * 1.3;
+            const sy1 = bhY + Math.sin(sa) * bhDrawR * 0.38;
+            const sx2 = bhX + Math.cos(sa) * bhDrawR * 2.4;
+            const sy2 = bhY + Math.sin(sa) * bhDrawR * 0.72;
+            ovCtx.beginPath(); ovCtx.moveTo(sx1, sy1); ovCtx.lineTo(sx2, sy2);
+            ovCtx.strokeStyle = `rgba(${100+s*20},${50+s*10},255,${0.35 * bhScale})`;
+            ovCtx.lineWidth = 1; ovCtx.stroke();
+          }
+        }
+
+        // ── BH emergence animation ───────────────────────────────────────────
+        if (isEmerging && pp._emergeT >= 0) {
+          const t = pp._emergeT;
+          // BH grows from singularity and expands outward
+          const bhScale = t * t;
+          const spiralR = sr * t * 0.6;
+          const spiralAng = (1-t) * Math.PI * 3.5;
+          const bhX = cx + Math.cos(spiralAng) * spiralR * (rx/ry);
+          const bhY = cy + Math.sin(spiralAng) * spiralR;
+          const bhDrawR = Math.max(2, bhScale * sr * 0.5);
+          // Emergence flash
+          if (t < 0.25) {
+            const flashR = sr * (1 - t * 3) * 0.9;
+            const flashGrd = ovCtx.createRadialGradient(cx, cy, 0, cx, cy, flashR);
+            flashGrd.addColorStop(0, `rgba(255,255,255,${(0.25 - t) * 3.2})`);
+            flashGrd.addColorStop(1, `rgba(${col},0)`);
+            ovCtx.beginPath(); ovCtx.arc(cx, cy, flashR, 0, Math.PI*2);
+            ovCtx.fillStyle = flashGrd; ovCtx.fill();
+          }
+          // BH glow
+          const bhGrd = ovCtx.createRadialGradient(bhX, bhY, 0, bhX, bhY, bhDrawR * 2.5);
+          bhGrd.addColorStop(0, `rgba(80,40,200,${0.85 * bhScale})`);
+          bhGrd.addColorStop(0.5, `rgba(40,20,120,${0.4 * bhScale})`);
+          bhGrd.addColorStop(1, `rgba(0,0,0,0)`);
+          ovCtx.beginPath(); ovCtx.arc(bhX, bhY, bhDrawR * 2.5, 0, Math.PI*2);
+          ovCtx.fillStyle = bhGrd; ovCtx.fill();
+          ovCtx.beginPath(); ovCtx.arc(bhX, bhY, bhDrawR, 0, Math.PI*2);
+          ovCtx.fillStyle = `rgba(0,0,0,${0.9 * bhScale})`;
+          ovCtx.fill();
+        }
+
+        // ── Particle stream: dots spiraling into singularity ─────────────────
+        parts.forEach((p, i) => {
+          // Each particle spirals from portal edge inward as t progresses
+          const inwardT = (p.t + tw * p.speed * 0.4) % 1;
+          const particleR = (1 - inwardT * inwardT) * sr * 0.92; // quadratic inward
+          // In perspective: x compressed, y normal
+          const px2 = cx + Math.cos(p.angle + tw * p.speed * 0.8) * particleR * (rx / ry) * 0.9;
+          const py2 = cy + Math.sin(p.angle + tw * p.speed * 0.8) * particleR;
+          const alpha = (1 - inwardT) * (0.55 + excited * 0.3);
+          const sz = (1 - inwardT * 0.7) * (1.8 + Math.sin(tw * 3 + i) * 0.5);
+          ovCtx.beginPath(); ovCtx.arc(px2, py2, sz, 0, Math.PI*2);
+          ovCtx.fillStyle = `rgba(${col},${alpha})`;
+          ovCtx.fill();
+        });
+
+        // Also draw outward-streaming particles (emerging from other side feel)
+        parts.forEach((p, i) => {
+          const outwardT = ((p.t * 0.7 + tw * p.speed * 0.25 + 0.5) % 1);
+          const particleR2 = outwardT * outwardT * sr * 0.88;
+          const px3 = cx + Math.cos(p.angle - tw * p.speed * 0.6 + Math.PI) * particleR2 * (rx/ry) * 0.9;
+          const py3 = cy + Math.sin(p.angle - tw * p.speed * 0.6 + Math.PI) * particleR2;
+          const alpha2 = outwardT * (0.3 + excited * 0.2);
+          const sz2 = outwardT * 1.6 + 0.5;
+          ovCtx.beginPath(); ovCtx.arc(px3, py3, sz2, 0, Math.PI*2);
+          ovCtx.fillStyle = `rgba(${col},${alpha2})`;
+          ovCtx.fill();
+        });
+
+        // ── Outer ring — main perspective ellipse ────────────────────────────
+        ovCtx.save();
+        ovCtx.translate(cx, cy);
+        ovCtx.scale(rx / ry, 1);
+        ovCtx.beginPath(); ovCtx.ellipse(0, 0, ry, ry, 0, 0, Math.PI*2);
+        ovCtx.restore();
+        ovCtx.setLineDash([5, 3]);
+        ovCtx.lineDashOffset = (pi % 2 === 0 ? 1 : -1) * tw * 28;
+        ovCtx.strokeStyle = `rgba(${col},${0.72 + Math.sin(tw*2.2+pi)*0.18 + excited*0.2})`;
+        ovCtx.lineWidth = 2.0 + excited * 1.2;
+        ovCtx.shadowColor = `rgba(${col},${0.6 + excited*0.35})`;
+        ovCtx.shadowBlur = 14 + excited * 18;
+        // re-draw path after state changes
+        ovCtx.save();
+        ovCtx.translate(cx, cy);
+        ovCtx.scale(rx / ry, 1);
+        ovCtx.beginPath(); ovCtx.ellipse(0, 0, ry, ry, 0, 0, Math.PI*2);
+        ovCtx.restore();
+        ovCtx.stroke();
+        ovCtx.setLineDash([]); ovCtx.shadowBlur = 0;
+
+        // ── Inner rim highlight ───────────────────────────────────────────────
+        ovCtx.save();
+        ovCtx.translate(cx, cy);
+        ovCtx.scale(rx / ry * 0.72, 1);
+        ovCtx.beginPath(); ovCtx.ellipse(0, 0, ry * 0.72, ry * 0.72, 0, 0, Math.PI*2);
+        ovCtx.restore();
+        ovCtx.strokeStyle = `rgba(${col},${0.22 + excited * 0.18})`;
+        ovCtx.lineWidth = 0.8;
+        ovCtx.save();
+        ovCtx.translate(cx, cy);
+        ovCtx.scale(rx / ry * 0.72, 1);
+        ovCtx.beginPath(); ovCtx.ellipse(0, 0, ry * 0.72, ry * 0.72, 0, 0, Math.PI*2);
+        ovCtx.restore();
+        ovCtx.stroke();
+
+        // ── Label ─────────────────────────────────────────────────────────────
+        ovCtx.font = '8px Courier New';
+        ovCtx.textAlign = 'center';
+        ovCtx.fillStyle = `rgba(${col},0.48)`;
+        ovCtx.fillText(label, cx, cy - ry - 8);
+      }
+
+      // Tiny faint connector line between the two portals
+      const cA = projP(new THREE.Vector3(pp.a.x, pp.a.y, 0));
+      const cB = projP(new THREE.Vector3(pp.b.x, pp.b.y, 0));
+      ovCtx.setLineDash([2, 8]);
+      ovCtx.lineDashOffset = tw * 14;
+      ovCtx.beginPath(); ovCtx.moveTo(cA.x, cA.y); ovCtx.lineTo(cB.x, cB.y);
+      ovCtx.strokeStyle = `rgba(${col},0.10)`;
+      ovCtx.lineWidth = 1; ovCtx.stroke();
+      ovCtx.setLineDash([]);
+
+      const cacheA = {}, cacheB = {};
+      drawPerspectivePortal(pp.a.x, pp.a.y, `${String.fromCharCode(65+pi*2)} (drag)`, cacheA, pp._partA, 'a');
+      drawPerspectivePortal(pp.b.x, pp.b.y, `${String.fromCharCode(66+pi*2)} (drag)`, cacheB, pp._partB, 'b');
+      pp._sAx = cacheA.x; pp._sAy = cacheA.y; pp._sAr = cacheA.r;
+      pp._sBx = cacheB.x; pp._sBy = cacheB.y; pp._sBr = cacheB.r;
+    });
   }
 }
 
@@ -3073,8 +3748,8 @@ document.querySelectorAll('.widget').forEach(w => {
 // ── FRANK PHYSICS LOGO ───────────────────────────────────────────────────────
 (function(){
   if(window.innerWidth<=600)return;
-  const ids=['zl-z','zl-c','zl-k','zl-g','zl-r','zl-t','zl-y'];
-  const spans = ids.map(id=>document.getElementById(id));
+  const ids=['zl-z','zl-c','zl-k','zl-g','zl-k2','zl-g2','zl-g3'];
+  const spans = ids.map(id=>document.getElementById(id)).filter(Boolean);
   if(!spans[0])return;
 
   // Each letter has rest position + physics state
