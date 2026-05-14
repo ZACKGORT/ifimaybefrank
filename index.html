@@ -127,7 +127,40 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .widget-collapse:hover{color:rgba(255,255,255,0.5);}
 .widget-body{overflow:hidden;transition:max-height 0.25s ease,opacity 0.2s;}
 .widget-body.collapsed{max-height:0!important;opacity:0;}
+/* hide widget entirely — replaced by top-center toggle on desktop */
+#author-note{display:none!important;}
 @media (max-width:600px){#author-note{display:none!important;}}
+
+/* ── DESKTOP TOP-CENTER FLAVOR TOGGLE ── */
+#flavor-toggle{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  z-index:350;display:flex;align-items:center;gap:0;
+  pointer-events:auto;
+}
+#flavor-toggle button{
+  background:transparent;border:none;padding:0;
+  font-family:'Helvetica Neue',Arial,sans-serif;
+  font-weight:900;font-size:13px;letter-spacing:0.1em;
+  text-transform:none;cursor:none;
+  transition:color 0.2s, opacity 0.2s;
+  line-height:1;
+}
+#flavor-toggle .flv-sep{
+  font-family:'Helvetica Neue',Arial,sans-serif;
+  font-weight:900;font-size:13px;letter-spacing:0.1em;
+  color:rgba(255,255,255,0.15);
+  padding:0 6px;
+  user-select:none;
+}
+#flv-sugar{color:rgba(255,255,255,1.0);}
+#flv-salt{color:rgba(255,255,255,0.22);}
+#flavor-toggle button.flv-active{color:rgba(255,255,255,1.0);}
+#flavor-toggle button:not(.flv-active){color:rgba(255,255,255,0.22);}
+#flavor-toggle button:not(.flv-active):hover{color:rgba(255,255,255,0.5);}
+body.paper #flavor-toggle button.flv-active{color:rgba(0,0,0,0.85);}
+body.paper #flavor-toggle button:not(.flv-active){color:rgba(0,0,0,0.22);}
+body.paper #flavor-toggle .flv-sep{color:rgba(0,0,0,0.15);}
+@media(max-width:600px){#flavor-toggle{display:none!important;}}
 /* ── SPILL GRAPH WIDGET ── */
 #spill-graph-widget{left:16px;bottom:16px;top:auto;right:auto;width:200px!important;}
 #spill-graph-canvas{display:block;width:100%;height:64px;border-radius:3px;}
@@ -144,6 +177,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 #mb-anote-links{margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;}
 #mb-anote-links a{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;}
 #mb-anote-links a:hover{color:rgba(255,255,255,0.7);}
+
+/* ── MOBILE FLAVOR TABS ── */
+#mb-flavor-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);margin:-2px 0 12px;}
+.mb-flv-tab{flex:1;padding:10px 0 9px;background:transparent;border:none;
+  font-family:'Helvetica Neue',Arial,sans-serif;font-weight:900;font-size:11px;
+  letter-spacing:0.1em;text-transform:none;color:rgba(255,255,255,0.25);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color 0.15s;
+  border-bottom:2px solid transparent;margin-bottom:-1px;}
+.mb-flv-tab.active{color:rgba(255,255,255,0.88);border-bottom-color:rgba(255,255,255,0.45);}
+.mb-flv-panel{display:none;}
+.mb-flv-panel.active{display:block;}
 .widget:hover{
   background:rgba(22,20,18,0.94)!important;
   border-color:rgba(255,255,255,0.13)!important;
@@ -563,7 +607,14 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   </div>
 </div>
 
-<div class="widget" id="author-note">
+<div id="flavor-toggle">
+  <button id="flv-sugar" class="flv-active" aria-label="Sugar">sugar</button>
+  <span class="flv-sep">not</span>
+  <button id="flv-salt" aria-label="Salt">salt</button>
+</div>
+
+<!-- keep widget shell hidden, content driven by JS overlay -->
+<div class="widget" id="author-note" style="display:none!important;">
   <div class="widget-header" id="anote-header">
     <span class="widget-title">AUTHOR'S NOTE</span>
     <div style="display:flex;align-items:center;gap:8px">
@@ -593,13 +644,28 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   <button class="mb-btn" id="mb-note-btn">Frankly</button>
 </div>
 <div class="mb-panel" id="mb-note-panel">
-    <div style="padding:16px 20px;">
+  <div id="mb-flavor-tabs">
+    <button class="mb-flv-tab active" data-flavor="sugar">"sugar not salt"</button>
+    <button class="mb-flv-tab" data-flavor="salt">salt</button>
+  </div>
+  <!-- SUGAR panel -->
+  <div class="mb-flv-panel active" id="mb-panel-sugar" style="padding:0 20px 16px;">
     <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Directed Systems</div>
     <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">In 2026, <span style="color:rgba(255,255,255,0.55);">the material is still gravity</span> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <span style="color:rgba(255,255,255,0.55);">the angle of the thing that catches</span>. What falls is given. What <span style="color:rgba(255,255,255,0.55);">reaches its target</span> is intention made physical.</div>
     <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on the nature of frankly and agency</div>
     <div id="mb-anote-links">
       <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
       <a href="https://wolfie.love" target="_blank" rel="noopener">wolfie.love</a>
+    </div>
+  </div>
+  <!-- SALT panel -->
+  <div class="mb-flv-panel" id="mb-panel-salt" style="padding:0 20px 16px;">
+    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Influence</div>
+    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">Design is different now. It is seen as an <span style="color:rgba(255,255,255,0.55);">impedance</span>. Process theater costs unnecessarily — a single operator can achieve success. But I still think teamwork makes the dream work. Each discipline brings essential <span style="color:rgba(255,255,255,0.55);">nuance and care for craft</span>. Success today is measured not in how accurately you hit your target, but how consistently you <span style="color:rgba(255,255,255,0.55);">create wayward influence</span>. Be your own gravitational center.</div>
+    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on aim vs. influence</div>
+    <div style="margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;">
+      <a href="https://zackgort.com" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">zackgort.com</a>
+      <a href="https://wolfie.love" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">wolfie.love</a>
     </div>
   </div>
 </div>
@@ -701,6 +767,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 <script>
 'use strict';
 
+
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
 // On level completion: one statement replaces the floating title
 const LEVEL_COMPLETE = [
@@ -715,19 +782,19 @@ const LEVEL_COMPLETE = [
 // At rest: one title statement per level
 const LEVEL_TITLES = [
   [
-    "frankly, design is different now.",
-    "it is seen as an impedence.",
+    "design is different now.",
+    "design thinking is evolving.",
   ],
   [
-    "process theater costs unnecessarily — it seems.",
     "now, a single operator can achieve success.",
+    "a mere prompt with only casual intervention can find success.",
   ],
   [
-    "i still think teamwork makes the dream work.",
     "each discipline brings essential nuance & care for craft.",
+    "teamwork makes the dream work.",
   ],
   [
-    "are we seeing the collapse of creative collaboration?",
+    "user agency",
     "the split is not a failure of focus. it is the first honest map of what you actually contain.",
   ],
   [
@@ -1872,74 +1939,68 @@ function buildHUD(){
 }
 
 // ── SHAPE DEFS ────────────────────────────────────────────────────────────────
-// Orient philosophy:
-//   Cube   — flat faces are catchers; edge/corner orientations are splitters & ramps.
-//   Sphere — symmetric but tilts give visual intent cues; odd angles create surface spin.
-//   Pyramid— apex-up sheds everything; apex-down concentrates; side angles = directed ramps.
+// Orient philosophy: clockwise compass cycle — 8 stops at 45° increments.
+// Z-rotation drives flow direction; Y-rotation adds subtle depth without disrupting.
+// Flow always enters from top; each stop redirects it along the compass bearing.
 const _D=Math.PI,_H=Math.PI/2,_Q=Math.PI/4,_E=Math.PI/6,_T=Math.PI/3;
+const _CW = (deg) => -deg * Math.PI / 180; // clockwise = negative Z in Three.js
 const SDEFS={
   cube:{baseR:1.55,springK:6.0,damping:8.0,color:0xffffff,rough:0.55,
     makeGeo:s=>new THREE.BoxGeometry(2.6*s,2.6*s,2.6*s),
     orients:[
-      // 0 — flat top (0°): maximum catch, symmetric split
-      new THREE.Euler(0,0,0),
-      // 1 — ramp right 15° (π/12): gentle rightward bias
-      new THREE.Euler(0,0,-Math.PI/12),
-      // 2 — ramp left 15°: gentle leftward bias
-      new THREE.Euler(0,0,Math.PI/12),
-      // 3 — ramp right 30° (π/6): firm rightward deflection
-      new THREE.Euler(0,0,-_E),
-      // 4 — ramp left 30°: firm leftward deflection
-      new THREE.Euler(0,0,_E),
-      // 5 — ramp right 45° (π/4): steep redirect, edge becomes a catcher
-      new THREE.Euler(0,0,-_Q),
-      // 6 — ramp left 45°: steep redirect left
-      new THREE.Euler(0,0,_Q),
-      // 7 — Y-45° + flat: face rotated 45° in XY plane, splits to left/right equally
-      new THREE.Euler(0,_Q,0),
-      // 8 — Y-45° + ramp right 30°: diagonal catch with rightward bias
-      new THREE.Euler(0,_Q,-_E),
-      // 9 — Y-45° + ramp left 30°: diagonal catch with leftward bias
-      new THREE.Euler(0,_Q,_E),
+      // N  — flat top: even split, flow exits both sides equally
+      new THREE.Euler(0, 0, 0),
+      // NE — 45° ramp right: strong rightward redirect
+      new THREE.Euler(0, 0, _CW(45)),
+      // E  — 90° on edge: corner up, splits to steep diagonals
+      new THREE.Euler(0, 0, _CW(90)),
+      // SE — 135°: base faces upper-right, flow pours left off underside
+      new THREE.Euler(0, 0, _CW(135)),
+      // S  — upside-down flat: base up, flow cascades off either edge
+      new THREE.Euler(0, 0, _CW(180)),
+      // SW — 225° (= -135°): mirror of SE, flow pours right
+      new THREE.Euler(0, 0, _CW(225)),
+      // W  — 270°: corner up left side, splits to steep diagonals (mirror of E)
+      new THREE.Euler(0, 0, _CW(270)),
+      // NW — 315°: gentle ramp left, 45° mirror of NE
+      new THREE.Euler(0, 0, _CW(315)),
     ]},
   sphere:{baseR:1.4,springK:6.0,damping:7.0,color:0xdddddd,rough:0.15,
     makeGeo:s=>new THREE.SphereGeometry(1.4*s,32,20),
     orients:[
-      // Sphere is rotationally symmetric — presets serve as visual anchors & intent signals.
-      // 0 — neutral (smooth even scatter off crown)
-      new THREE.Euler(0,0,0),
-      // 1 — slight lean right: visual cue to push right; surface bias nudges particles right
-      new THREE.Euler(0,0,-0.22),
-      // 2 — slight lean left
-      new THREE.Euler(0,0,0.22),
-      // 3 — rolled toward camera: crown forward, more particles hit upper face and forward-scatter
-      new THREE.Euler(0.28,0,0),
-      // 4 — rolled away: crown back, forward edge becomes a ramp
-      new THREE.Euler(-0.28,0,0),
+      // Sphere reads through surface tilt — compass steps give clear visual intent.
+      // N  — crown neutral: even scatter
+      new THREE.Euler(0, 0, 0),
+      // NE — lean right 45°: surface bias pushes flow right
+      new THREE.Euler(0, 0, _CW(45)),
+      // E  — lean right 90°: equator up, flow sheds downward on both sides
+      new THREE.Euler(0, 0, _CW(90)),
+      // SE — lean right 135°: underside up, deflects upward-left
+      new THREE.Euler(0, 0, _CW(135)),
+      // W  — lean left 90°: mirror of E
+      new THREE.Euler(0, 0, _CW(270)),
+      // NW — lean left 45°: surface bias pushes flow left
+      new THREE.Euler(0, 0, _CW(315)),
     ]},
   pyramid:{baseR:1.45,springK:5.5,damping:8.0,color:0xffffff,rough:0.8,
     makeGeo:s=>new THREE.ConeGeometry(1.5*s,2.8*s,4),
     orients:[
-      // 0 — apex up, face forward: apex splits flow cleanly down both sides
-      new THREE.Euler(0,0,0),
-      // 1 — apex up, Y-45°: edge-on profile, splits to sharp diagonals
-      new THREE.Euler(0,_Q,0),
-      // 2 — lean right 30°: apex tilts right, base catches left — biased rightward pour
-      new THREE.Euler(0,0,-_E),
-      // 3 — lean left 30°: apex tilts left, biased leftward pour
-      new THREE.Euler(0,0,_E),
-      // 4 — lean right 52° (π/3): aggressive ramp, most flow exits right off base edge
-      new THREE.Euler(0,0,-_T),
-      // 5 — lean left 52°: aggressive ramp left
-      new THREE.Euler(0,0,_T),
-      // 6 — inverted apex-down: concentrator, draws flow to a point beneath
-      new THREE.Euler(_D,0,0),
-      // 7 — inverted + Y-45°: rotated concentrator, diagonal draw-in
-      new THREE.Euler(_D,_Q,0),
-      // 8 — lean right 30° + Y-45°: edge-on ramp right, narrow deflection surface
-      new THREE.Euler(0,_Q,-_E),
-      // 9 — lean left 30° + Y-45°: edge-on ramp left
-      new THREE.Euler(0,_Q,_E),
+      // N  — apex up, face forward: clean bilateral split
+      new THREE.Euler(0, 0, 0),
+      // NE — apex up, leaned right 45°: flow sheds strongly right
+      new THREE.Euler(0, 0, _CW(45)),
+      // E  — apex right, horizontal: flow splits above/below apex
+      new THREE.Euler(0, 0, _CW(90)),
+      // SE — leaned right 135°: base up-right, concentrated pour left
+      new THREE.Euler(0, 0, _CW(135)),
+      // S  — inverted apex-down: concentrator, draws flow to a point
+      new THREE.Euler(0, 0, _CW(180)),
+      // SW — inverted leaned left 135°: concentrated pour right
+      new THREE.Euler(0, 0, _CW(225)),
+      // W  — apex left: flow splits above/below (mirror of E)
+      new THREE.Euler(0, 0, _CW(270)),
+      // NW — apex up, leaned left 45°: flow sheds strongly left
+      new THREE.Euler(0, 0, _CW(315)),
     ]},
   panelstack:{baseR:0.85,springK:5.0,damping:9.0,color:0xffffff,rough:0.55,
     // panels:14, panelH:0.18, gap:0.06, baseSize:3.0 — built procedurally in Shape._build
@@ -4078,6 +4139,110 @@ drawTextLayer = function(){
 };
 
 document.getElementById('theme-toggle').addEventListener('click', ()=>applyTheme(!isPaper));
+
+// ── FLAVOR TOGGLE: SUGAR / SALT ───────────────────────────────────────────────
+
+const FLAVOR_TITLES = {
+  sugar: [
+    [
+      "a user arrives with intent, not a request.",
+      "in a perfect world, nothing gets in the way of that; or some things make a way for it.",
+    ],
+    [
+      "with only modest involvement, your reach extends further.",
+      "with nay more than a mere prompt, or few, a.i. enables, but requires human intervention.",
+    ],
+    [
+      "at least as of this week in writing this, solving for complexity still requires nuanced human manipulation.",
+      "form is function; function is form.",
+    ],
+    [
+      "to be multi-dimensional.",
+      "hoory! anyways....",
+    ],
+    [
+      "a consistent signal will eventually be noticed; consistent conveyance points to success",
+      "the question is not what you've built. it is what you've become the center of.",
+    ],
+    [
+      "be your own gravitational influence.",
+      "same world. same physics. same fundamentals. just complete agency.",
+    ],
+  ],
+  salt: [
+    [
+      "design is different now.",
+      "design thinking is defining something new.",
+    ],
+    [
+    "now, a single operator can achieve success.",
+    "prefer provable product iterations to process theatrics",
+
+    ],
+    [
+      "i still think teamwork makes the dream work.",
+      "each discipline brings essential nuance & care for craft.",
+    ],
+    [
+      "are we seeing the collapse of creative collaboration?",
+      "the split is not a failure of focus. it is the first honest map of what you actually contain.",
+    ],
+    [
+      "I think success in today's terms is measured not in how accurately you can hit your target, but how consistently you create wayward influence.",
+      "the question is not what you've built. it is what you've become the center of.",
+    ],
+    [
+      "no longer is the focus on aim — rather influence",
+      "Same world. Same physics. Same fundamentals. Just complete agency.",
+    ],
+  ],
+};
+
+let _currentFlavor = 'sugar';
+
+function setFlavor(flavor) {
+  _currentFlavor = flavor;
+  // Swap LEVEL_TITLES in place so all existing text machinery uses the new set
+  const titles = FLAVOR_TITLES[flavor];
+  for (let i = 0; i < LEVEL_TITLES.length; i++) {
+    LEVEL_TITLES[i] = titles[i] || LEVEL_TITLES[i];
+  }
+  // Refresh current level's text immediately
+  _textTitleIdx = 0;
+  showLevelTitle(lvl, false);
+
+  // Update desktop toggle button states
+  const sugarBtn = document.getElementById('flv-sugar');
+  const saltBtn  = document.getElementById('flv-salt');
+  if (sugarBtn && saltBtn) {
+    sugarBtn.classList.toggle('flv-active', flavor === 'sugar');
+    saltBtn.classList.toggle('flv-active', flavor === 'salt');
+  }
+}
+
+// Desktop toggle clicks
+const _flvSugar = document.getElementById('flv-sugar');
+const _flvSalt  = document.getElementById('flv-salt');
+if (_flvSugar) _flvSugar.addEventListener('click', () => setFlavor('sugar'));
+if (_flvSalt)  _flvSalt.addEventListener('click',  () => setFlavor('salt'));
+
+// Mobile tab clicks
+document.querySelectorAll('.mb-flv-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const flavor = tab.dataset.flavor;
+    // Update tab active states
+    document.querySelectorAll('.mb-flv-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.mb-flv-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const panel = document.getElementById('mb-panel-' + flavor);
+    if (panel) panel.classList.add('active');
+    // Also drive the text overlay
+    setFlavor(flavor);
+  });
+});
+
+// Init: prime FLAVOR_TITLES into LEVEL_TITLES on load (sugar = default = already set)
+setFlavor('sugar');
 
 </script>
 </body>
