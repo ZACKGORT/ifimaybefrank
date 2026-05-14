@@ -503,7 +503,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 <canvas id="text-canvas"></canvas>
 
 <div id="dispenser" style="display:none;">
-  <button id="cta-btn"><span id="btn-label">Flow On</span></button>
+  <button id="cta-btn"><span id="btn-label"></span></button>
 </div>
 
 
@@ -515,7 +515,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 <div class="widget" id="panel">
   <div id="panel-header">
     <div id="panel-title">FLOW</div>
-    <button id="btn-pp">❚❚ PAUSE FLOW</button>
+    <button id="btn-pp"></button>
   </div>
   <div id="panel-body">
     <div id="panel-shapes-row" style="display:flex;gap:5px;margin-bottom:2px;flex-wrap:wrap;">
@@ -570,7 +570,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   </div>
 </div>
 
-<div id="hint">DRAG SHAPES · SCROLL OVER ATTRACTOR TO CHANGE PULL · SCROLL OVER SHAPE TO SCALE · RIGHT-CLICK TO REMOVE</div>
+<div id="hint"></div>
 <div id="shape-count"></div>
 <button id="theme-toggle">PAPER</button>
 <button id="screenshot-btn" aria-label="Capture This Moment">
@@ -580,7 +580,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   </svg>
 </button>
 <div id="level-nav">
-  <div id="level-nav-title">LEVEL SELECT <span id="level-nav-sub">LVL 1</span></div>
+  <div id="level-nav-title"><span id="level-nav-label"></span> <span id="level-nav-sub"></span></div>
   <div id="level-nav-btns">
     <button class="lvl-nav-btn active" data-lvl="0">1</button>
     <button class="lvl-nav-btn" data-lvl="1">2</button>
@@ -589,7 +589,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="lvl-nav-btn" data-lvl="4">5</button>
     <button class="lvl-nav-btn" data-lvl="5">6</button>
   </div>
-  <div id="level-nav-desc">One target. Precision required.</div>
+  <div id="level-nav-desc"></div>
 </div>
 <button id="next-btn">NEXT LEVEL →</button>
 
@@ -613,67 +613,26 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   <button id="flv-salt" aria-label="Salt">salt</button>
 </div>
 
-<!-- keep widget shell hidden, content driven by JS overlay -->
-<div class="widget" id="author-note" style="display:none!important;">
-  <div class="widget-header" id="anote-header">
-    <span class="widget-title">AUTHOR'S NOTE</span>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span class="widget-sub">2026</span>
-      <button class="widget-collapse" data-target="anote-body-wrap" aria-label="Collapse">&#9660;</button>
-    </div>
-  </div>
-  <div class="widget-body" id="anote-body-wrap">
-    <div id="anote-body">
-      <div id="anote-eye">On Directed Systems</div>
-      <div id="anote-text">In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What reaches its target <em>is intention made physical</em>.</div>
-      <div id="anote-sig">— on the nature of frankly and agency</div>
-      <div id="anote-links">
-        <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
-        <a href="https://wolfie.love" target="_blank" rel="noopener">wolfie.love</a>
-      </div>
-    </div>
-  </div>
-</div>
 
-
-<div id="zckgrt-logo">
-  <span id="zl-z">F</span><span id="zl-c">R</span><span id="zl-k">A</span><span id="zl-g">N</span><span id="zl-k2">K</span><span id="zl-g2">L</span><span id="zl-g3">Y</span>
-</div>
+<div id="zckgrt-logo"></div>
 
 <div id="mobile-bar">
-  <button class="mb-btn" id="mb-note-btn">Frankly</button>
+  <button class="mb-btn" id="mb-note-btn"></button>
 </div>
 <div class="mb-panel" id="mb-note-panel">
   <div id="mb-flavor-tabs">
-    <button class="mb-flv-tab active" data-flavor="sugar">"sugar not salt"</button>
-    <button class="mb-flv-tab" data-flavor="salt">salt</button>
+    <button class="mb-flv-tab active" data-flavor="sugar"></button>
+    <button class="mb-flv-tab" data-flavor="salt"></button>
   </div>
-  <!-- SUGAR panel -->
-  <div class="mb-flv-panel active" id="mb-panel-sugar" style="padding:0 20px 16px;">
-    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Directed Systems</div>
-    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">In 2026, <span style="color:rgba(255,255,255,0.55);">the material is still gravity</span> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <span style="color:rgba(255,255,255,0.55);">the angle of the thing that catches</span>. What falls is given. What <span style="color:rgba(255,255,255,0.55);">reaches its target</span> is intention made physical.</div>
-    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on the nature of frankly and agency</div>
-    <div id="mb-anote-links">
-      <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
-      <a href="https://wolfie.love" target="_blank" rel="noopener">wolfie.love</a>
-    </div>
-  </div>
-  <!-- SALT panel -->
-  <div class="mb-flv-panel" id="mb-panel-salt" style="padding:0 20px 16px;">
-    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">On Influence</div>
-    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;">Design is different now. It is seen as an <span style="color:rgba(255,255,255,0.55);">impedance</span>. Process theater costs unnecessarily — a single operator can achieve success. But I still think teamwork makes the dream work. Each discipline brings essential <span style="color:rgba(255,255,255,0.55);">nuance and care for craft</span>. Success today is measured not in how accurately you hit your target, but how consistently you <span style="color:rgba(255,255,255,0.55);">create wayward influence</span>. Be your own gravitational center.</div>
-    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">— on aim vs. influence</div>
-    <div style="margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;">
-      <a href="https://zackgort.com" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">zackgort.com</a>
-      <a href="https://wolfie.love" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">wolfie.love</a>
-    </div>
-  </div>
+  <!-- panels populated by setFlavor() from FLAVOR_PROSE -->
+  <div class="mb-flv-panel active" id="mb-panel-sugar" style="padding:0 20px 16px;"></div>
+  <div class="mb-flv-panel" id="mb-panel-salt" style="padding:0 20px 16px;"></div>
 </div>
 
 <div class="mb-panel" id="mb-flow-panel">
   <div class="mb-ctrl-row">
     <span class="mb-ctrl-lbl">Pause</span>
-    <button class="mb-ctrl-btn" id="mb-btn-pp">❚❚ Pause</button>
+    <button class="mb-ctrl-btn" id="mb-btn-pp"></button>
   </div>
   <div class="mb-ctrl-row">
     <span class="mb-ctrl-lbl">Amount</span>
@@ -768,92 +727,206 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 'use strict';
 
 
+// ── CONTENT: single source of truth for all UI text ─────────────────────────
+const CONTENT = {
+  // Site identity
+  logo:           'FRANKLY',
+  mobileBarLabel: 'Frankly',
+
+  // Desktop hint bar (fades after 8s)
+  hint: 'DRAG SHAPES · SCROLL OVER ATTRACTOR TO CHANGE PULL · SCROLL OVER SHAPE TO SCALE · RIGHT-CLICK TO REMOVE',
+
+  // Flow toggle / pause button labels
+  flowOn:     'Flow On',
+  flowOff:    'Flow Off',
+  pauseFlow:   '❚❚ PAUSE FLOW',
+  resumeFlow:  '▶ RESUME FLOW',
+  mbPause:     '❚❚ Pause',
+  mbPlay:      '▶ Play',
+
+  // Level navigator widget
+  levelNavLabel: 'LEVEL SELECT',
+
+  // Mobile flavor tab labels
+  flavorTabs: {
+    sugar: '"sugar"',
+    salt:  'salt',
+  },
+
+  // Shape button labels (desktop + mobile)
+  shapes: {
+    cube:        'Cube',
+    sphere:      'Sphere',
+    pyramid:     'Pyramid',
+    blackhole:   'Singularity',
+    neutronstar: 'Neutron Star',
+    portal:      'Portal Pair',
+  },
+
+  // Mobile bottom rail labels
+  railFlow:     'Flow',
+  railControls: 'Controls',
+
+  // Mobile shape HUD clear button
+  clearAll: 'Clear',
+
+  // Desktop panel labels
+  panelTitle:   'FLOW',
+  hudTitle:     'TARGETS',
+  spillLabel:   'escaping',
+  textToggle:   'TEXT',
+  clearAllBtn:  'CLEAR ALL',
+  textOn:       'ON',
+  textOff:      'OFF',
+};
+
+// ── BOOT: populate HTML shells from CONTENT before any other JS runs ──────────
+(function initContent() {
+  // Logo — build spans dynamically so IDs match the physics IIFE below
+  const logoEl = document.getElementById('zckgrt-logo');
+  if (logoEl) {
+    const ids = ['zl-z','zl-c','zl-k','zl-g','zl-k2','zl-g2','zl-g3'];
+    logoEl.innerHTML = [...CONTENT.logo].map((ch, i) =>
+      `<span id="${ids[i]}">${ch}</span>`
+    ).join('');
+  }
+
+  // Hint bar
+  const hintEl = document.getElementById('hint');
+  if (hintEl) hintEl.textContent = CONTENT.hint;
+
+  // Flow button
+  const btnLbl = document.getElementById('btn-label');
+  if (btnLbl) btnLbl.textContent = CONTENT.flowOn;
+
+  // Pause/resume button
+  const ppBtn = document.getElementById('btn-pp');
+  if (ppBtn) ppBtn.textContent = CONTENT.pauseFlow;
+
+  // Level navigator label
+  const navLbl = document.getElementById('level-nav-label');
+  if (navLbl) navLbl.textContent = CONTENT.levelNavLabel;
+
+  // Level nav sub — updateLevelNav() will overwrite on initLevel()
+  const navSub = document.getElementById('level-nav-sub');
+  if (navSub) navSub.textContent = 'LVL 1';
+
+  // Mobile pause button
+  const mbPpBtn = document.getElementById('mb-btn-pp');
+  if (mbPpBtn) mbPpBtn.textContent = CONTENT.mbPause;
+
+  // Mobile note-bar button
+  const mbNote = document.getElementById('mb-note-btn');
+  if (mbNote) mbNote.textContent = CONTENT.mobileBarLabel;
+
+  // Mobile flavor tabs
+  document.querySelectorAll('.mb-flv-tab').forEach(tab => {
+    const f = tab.dataset.flavor;
+    if (f && CONTENT.flavorTabs[f]) tab.textContent = CONTENT.flavorTabs[f];
+  });
+})();
+
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
 // On level completion: one statement replaces the floating title
 const LEVEL_COMPLETE = [
-  "easy. nice.",
+  "design is deciding the direction of that intent.",
   "go ahead and right-click those unused shapes.",
   "craft still counts — in fact, I'd argue it's necessary.",
-  "if you moved the wormhole exit, shame on you for breaking my metaphor, but at the same time, it's a meta-commentary of how a.i. enables sidestepping of foundational elements — alas, I digress.",
-  "consistency creates an undeniable narrative.",
-  "point is, be your own gravitational influence.",
+  "it doesn't matter if you win by an inch or a mile — v.deisel",
+  "the target was never really the point.",
+  "make mass; have gravity; daringly disrupt.",
 ];
 
-// At rest: one title statement per level
+// At rest: one title statement per level (default; overwritten by setFlavor)
 const LEVEL_TITLES = [
-  [
-    "design is different now.",
-    "design thinking is evolving.",
-  ],
-  [
-    "now, a single operator can achieve success.",
-    "a mere prompt with only casual intervention can find success.",
-  ],
-  [
-    "each discipline brings essential nuance & care for craft.",
-    "teamwork makes the dream work.",
-  ],
-  [
-    "user agency",
-    "the split is not a failure of focus. it is the first honest map of what you actually contain.",
-  ],
-  [
-    "I think success in today's terms is measured not in how accurately you can hit your target, but how consistently you create wayward influence.",
-    "the question is not what you've built. it is what you've become the center of.",
-  ],
-  [
-    "no longer is the focus on aim — rather influence",
-    "Same world. Same physics. Same fundamentals. Just complete agency.",
-  ],
+  "'the best part is no part' — spaceX",
+  "time to 'think different' — a jobless steve jobs, probably",
+  "each discipline brings essential nuance & care for craft.",
+  "user agency",
+  "Eventually, you realize the target is not the point.",
+  "make mass; have gravity; daringly disrupt.",
 ];
 
-// On shape grab: rotating statements keyed by shape type
-// Each call rotates through the pool for that type
-const SHAPE_COPY = {
-  cube: [
-    "The cube is a flat promise. It catches everything — then everything depends on the angle.",
-    "Flat face up: maximum trust, zero guidance. The stream must decide for itself.",
-    "A ramp at 15°. Small honesty. Most flows need only a gentle suggestion.",
-    "At 45°, the cube stops catching and starts directing. Decisive.",
-    "Edge-forward: the cube becomes a splitter. Two answers from one question.",
-    "The cube has ten useful orientations. Most designers use one.",
-    "Flat is neutral. Tilt is opinion. The cube is excellent at having opinions.",
+// ── FLAVOR TITLES: SUGAR / SALT ───────────────────────────────────────────────
+// One statement per level per flavor. setFlavor() swaps these into LEVEL_TITLES.
+const FLAVOR_TITLES = {
+  sugar: [
+    "a user arrives with intent, not a request.",
+    "with only modest involvement, one's reach extends further.",
+    "workflows can be guided with light intervention.",
+    "if the system allows it, is it ethical?",
+    "more signal, more opportunity; touchpoints, not targets.",
+    "be your own gravitational influence.",
   ],
-  sphere: [
-    "The sphere deflects. It cannot hold anything — which is, sometimes, exactly right.",
-    "A sphere at rest is indifferent. Leaned slightly: it becomes a preference.",
-    "No corners. No commitments. The sphere redistributes responsibility beautifully.",
-    "The sphere's surface is one long, continuous suggestion.",
-    "Rolled toward you, the sphere sheds flow forward. Everything has a lean, even neutrality.",
-    "The sphere is the shape of a design that refuses to trap the user.",
-    "Symmetric, frictionless, and honest. The sphere is what good defaults feel like.",
+  salt: [
+    "'the best part is no part' — spaceX",
+    "'all for one; one for all!'",
+    "specialist, now niche; requisite now calls for multi-hyphenate.",
+    "each discipline brings essential nuance & care for craft.",
+    "at some point you realize that stationary target is now moot; rather, the focus becomes about gravity",
+    "make mass; have gravity; daringly disrupt.",
   ],
-  pyramid: [
-    "Apex up: the pyramid splits everything it touches. Precise, unambiguous, opinionated.",
-    "Inverted, the pyramid becomes a concentrator. It draws the stream to a single point.",
-    "Leaned at 52°, the pyramid is mostly ramp. Aggressive clarity.",
-    "The pyramid has no ambiguity. Every angle is a statement.",
-    "Edge-on, the pyramid is a blade. It does not distribute — it decides.",
-    "Apex-down: commitment. The pyramid says: here, and nowhere else.",
-    "The pyramid is the shape of a deadline. Nothing escapes the point.",
-  ],
-  blackhole: [
-    "The singularity is fixed in its nature — but not its position. Work with it.",
-    "Some forces don't move far. The craft is knowing how to orbit them.",
-    "A black hole doesn't negotiate. But its range is finite. That's the opening."
-  ],
-  neutronstar: [
-    "Have your own gravity. The stream will follow.",
-    "In a field dominated by greater forces — shine with your own intensity. Things will orient toward you.",
-    "Move it. Watch the stream chase. That's not metaphor."
-  ],
-  panelstack: [
-    "Wide open: maximum flow, zero opinion.",
-    "Narrowing. The stream starts to agree with itself.",
-    "A focused column. Intensity, not volume.",
-    "Apex down. Everything converges to a point.",
-  ]
 };
+
+// ── FLAVOR PROSE: mobile panel long-form copy (single source of truth) ─────────
+// Edit here; setFlavor() renders this into #mb-panel-sugar / #mb-panel-salt.
+const FLAVOR_PROSE = {
+  sugar: {
+    eyebrow: "On Directed Systems",
+    body: `In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What <em>reaches its target</em> is intention made physical.`,
+    sig: "— on the nature of frankly and agency",
+  },
+  salt: {
+    eyebrow: "On Influence",
+    body: `Design is different now. It is seen as an <em>impedance</em>. Process theater costs unnecessarily — a single operator can achieve success. teamwork makes the dream work. Each discipline brings essential <em>nuance and care for craft</em>. Success today is measured not in how accurately you hit your target, but how consistently you <em>create wayward influence</em>. Be your own gravitational center.`,
+    sig: "— on aim vs. influence",
+  },
+};
+
+const _PANEL_LINKS = `
+  <div style="margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;">
+    <a href="https://zackgort.com" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">zackgort.com</a>
+    <a href="https://wolfie.love" target="_blank" rel="noopener" style="font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;">wolfie.love</a>
+  </div>`;
+
+function _renderMobilePanel(flavor) {
+  const panel = document.getElementById('mb-panel-' + flavor);
+  if (!panel) return;
+  const p = FLAVOR_PROSE[flavor];
+  if (!p) return;
+  panel.innerHTML = `
+    <div style="font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin-bottom:8px;">${p.eyebrow}</div>
+    <div style="font-size:10px;line-height:1.75;color:rgba(255,255,255,0.32);letter-spacing:0.03em;font-style:normal;">${p.body.replace(/<em>/g,'<span style="color:rgba(255,255,255,0.55);font-style:normal;">').replace(/<\/em>/g,'</span>')}</div>
+    <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">${p.sig}</div>
+    ${_PANEL_LINKS}`;
+}
+
+let _currentFlavor = 'sugar';
+
+function setFlavor(flavor) {
+  _currentFlavor = flavor;
+  // Swap LEVEL_TITLES in place so all existing text machinery uses the new set
+  const titles = FLAVOR_TITLES[flavor];
+  for (let i = 0; i < LEVEL_TITLES.length; i++) {
+    LEVEL_TITLES[i] = titles[i] || LEVEL_TITLES[i];
+  }
+  // Refresh current level's text immediately
+  _textTitleIdx = 0;
+  showLevelTitle(lvl, false);
+
+  // Update desktop toggle button states
+  const sugarBtn = document.getElementById('flv-sugar');
+  const saltBtn  = document.getElementById('flv-salt');
+  if (sugarBtn && saltBtn) {
+    sugarBtn.classList.toggle('flv-active', flavor === 'sugar');
+    saltBtn.classList.toggle('flv-active', flavor === 'salt');
+  }
+
+  // Render mobile panel from single source of truth
+  _renderMobilePanel('sugar');
+  _renderMobilePanel('salt');
+}
+
 
 // Per-type rotation counters
 const _shapeCopyIdx = { cube: 0, sphere: 0, pyramid: 0, blackhole: 0, neutronstar: 0, panelstack: 0 };
@@ -872,16 +945,63 @@ let _titleFlipTimer = null;
 
 function showLevelTitle(lvlN, immediate) {
   _textMode = 'idle';
-  const lines = LEVEL_TITLES[Math.min(lvlN, LEVEL_TITLES.length - 1)];
-  const line = [lines[_textTitleIdx % lines.length]];
-  _textTitleIdx++;
-  _buildFloatText(line, immediate);
+  const line = LEVEL_TITLES[Math.min(lvlN, LEVEL_TITLES.length - 1)];
+  _textTitleIdx++; 
+  _buildFloatText([line], immediate);
 }
 
-function showShapeText(type) {
+function showShapeText(type, obj) {
   if(lvlDone) return; // don't override completion statement
   _textMode = 'shape';
-  _buildFloatText(nextShapeCopy(type), false);
+  // Display XYZ coordinates of the clicked object
+  let coordLine = '';
+  if (obj && obj.pos) {
+    const x = obj.pos.x.toFixed(2);
+    const y = obj.pos.y.toFixed(2);
+    const z = (obj.pos.z || 0).toFixed(2);
+    coordLine = `${type}  x: ${x}  y: ${y}  z: ${z}`;
+  } else if (obj && obj.x !== undefined) {
+    // wormhole or target object
+    const x = (obj.x || 0).toFixed(2);
+    const y = (obj.y || 0).toFixed(2);
+    const z = (obj.z || 0).toFixed(2);
+    coordLine = `${type}  x: ${x}  y: ${y}  z: ${z}`;
+  } else {
+    coordLine = `${type}  x: —  y: —  z: —`;
+  }
+  _buildFloatText([coordLine], false);
+}
+
+// Live-update coordinate display while dragging
+function updateShapeCoords(type, obj) {
+  if (_textMode !== 'shape' || lvlDone) return;
+  let coordLine = '';
+  if (obj && obj.pos) {
+    const x = obj.pos.x.toFixed(2);
+    const y = obj.pos.y.toFixed(2);
+    const z = (obj.pos.z || 0).toFixed(2);
+    coordLine = `${type}  x: ${x}  y: ${y}  z: ${z}`;
+  } else {
+    coordLine = `${type}  x: —  y: —  z: —`;
+  }
+  textChars = [];
+  getFontMetrics();
+  const role = TYPO.headline;
+  const { charW, lineH } = role;
+  const PAD_TOP = Math.max(72, (H - lineH) * 0.42);
+  const allChars = [];
+  for (let ci = 0; ci < coordLine.length; ci++) {
+    allChars.push({
+      ch: coordLine[ci],
+      restX: PAD_X + ci * charW, restY: PAD_TOP,
+      x: PAD_X + ci * charW, y: PAD_TOP,
+      vx: 0, vy: 0,
+      baseOp: role.op,
+      role: 'headline',
+    });
+  }
+  textChars = allChars;
+  lvlTextAlphaTgt = 1;
 }
 
 function revertToTitle() {
@@ -901,6 +1021,9 @@ function _buildFloatText(lines, immediate) {
     textChars = [];
     getFontMetrics();
     const maxW = Math.min(W * COL_W_FRAC, W - PAD_X - 220);
+    // Level 6 has no shapes panel obscuring the scene — allow wider text column
+    const effectiveMaxW = (lvl === 5) ? Math.min(W * 0.55, W - PAD_X - 180) : maxW;
+
     let totalH = 0;
     lines.forEach((line, li) => {
       const role = li === 0 ? TYPO.headline : TYPO.body;
@@ -908,7 +1031,7 @@ function _buildFloatText(lines, immediate) {
       let rowW = 0, rows = 1;
       words.forEach(w => {
         const sw = (w.length + 1) * role.charW;
-        if (rowW + sw > maxW && rowW > 0) { rows++; rowW = 0; }
+        if (rowW + sw > effectiveMaxW && rowW > 0) { rows++; rowW = 0; }
         rowW += sw;
       });
       totalH += rows * role.lineH;
@@ -924,7 +1047,7 @@ function _buildFloatText(lines, immediate) {
       let row = [], rowW = 0, rows = [];
       words.forEach(w => {
         const sw = (w.length + 1) * charW;
-        if (rowW + sw > maxW && row.length) { rows.push(row.join(' ')); row = []; rowW = 0; }
+        if (rowW + sw > effectiveMaxW && row.length) { rows.push(row.join(' ')); row = []; rowW = 0; }
         row.push(w); rowW += sw;
       });
       if (row.length) rows.push(row.join(' '));
@@ -1014,13 +1137,12 @@ const TYPO = {
   body:      { weight: '400', family: '"Instrument Serif",Georgia,serif', op: 0.50 },
 };
 function getFontMetrics(){
-  // Instrument Serif is proportional — avg charW ≈ 0.52 * size
   const sz = Math.max(10, FONT_SIZE);
   TYPO.headline.size = sz;
-  TYPO.headline.charW = sz * 0.52;
+  TYPO.headline.charW = sz * 0.62;
   TYPO.headline.lineH = sz * 1.65;
   TYPO.body.size = sz;
-  TYPO.body.charW = sz * 0.52;
+  TYPO.body.charW = sz * 0.62;
   TYPO.body.lineH = sz * 1.65;
   return { CHAR_W: TYPO.body.charW, LINE_H: TYPO.body.lineH };
 }
@@ -1042,7 +1164,7 @@ function s2w(sx,sy){
 }
 
 // ── DRAGGABLE WIDGETS ─────────────────────────────────────────────────────────
-const WIDGETS=['game-hud','panel','author-note','spill-graph-widget'];
+const WIDGETS=['game-hud','panel','spill-graph-widget'];
 const PAD=6;
 function getRect(id){const el=document.getElementById(id),r=el.getBoundingClientRect();return{id,el,x:r.left,y:r.top,w:r.width,h:r.height};}
 function rectsOverlap(a,b){return a.x<b.x+b.w+PAD&&a.x+a.w+PAD>b.x&&a.y<b.y+b.h+PAD&&a.y+a.h+PAD>b.y;}
@@ -1089,7 +1211,7 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 // Stack all widgets down the right rail on init
 (()=>{
   function stackRightRail(){
-    const ORDER=['panel','author-note','game-hud','spill-graph-widget'];
+    const ORDER=['panel','game-hud','spill-graph-widget'];
     const RAIL_RIGHT=16;
     let y=16;
     ORDER.forEach(id=>{
@@ -1108,8 +1230,8 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
-const THRESH=0.65;
-const LEVEL_THRESH=[0.65,0.65,0.65,0.35,0.65]; // level 4 wormhole: lower bar
+const THRESH=0.55;
+const LEVEL_THRESH=[0.55,0.55,0.55,0.30,0.55]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:0,r:2.8}]},
@@ -1117,7 +1239,7 @@ const LEVELS=[
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
   {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2},
-  {targets:[],bouncingBlackHole:true},
+  {targets:[],bouncingBlackHole:true,neutronStars:3},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
@@ -1642,13 +1764,10 @@ function applyAttractorForces(i, b, dt) {
       if (dist < a.consumeRadius) { spawn(i); return true; }
 
     } else {
-      // Neutron star — smaller area of influence than black hole,
-      // but very strong pull at close proximity (inverse-square intensifies sharply)
-      const influenceR = a.influenceR || 4.0; // smaller area influence than BH
+      // Neutron star particle interaction
+      const influenceR = a.influenceR || 4.0;
       if (dist > influenceR) continue;
 
-      // Strong close-range pull: force scales up sharply at short distances
-      // At close range (dist < 1.5) this becomes very strong; falls off quickly with distance
       const proximityBoost = dist < 1.5 ? (1.5 / (dist + 0.12)) * 2.8 : 1.0;
       const nsParticleMult = 1.8 * proximityBoost;
       const f = a.pullStrength * nsParticleMult * dt / (dist2 + 0.05);
@@ -1656,15 +1775,87 @@ function applyAttractorForces(i, b, dt) {
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
-      if (dist < influenceR * 0.55) {
-        const rx = pp[b] - a.pos.x, ry = pp[b+1] - a.pos.y;
-        const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
-        const tx = -ry / r, ty = rx / r;
-        const vTan = pv[b] * tx + pv[b+1] * ty;
-        const bleed = vTan * 0.18 * dt * 60;
-        pv[b]   -= tx * bleed;
-        pv[b+1] -= ty * bleed;
-        pv[b+2] *= 0.82;
+      // Orbital circularization for NS — level 4 only; level 5 is jet collimation
+      const orbitThresh = lvl === 4 ? influenceR * 0.85 : influenceR * 0.55;
+      if (dist < orbitThresh) {
+        if (lvl === 4) {
+          const rx2 = pp[b] - a.pos.x, ry2 = pp[b+1] - a.pos.y;
+          const r2 = Math.sqrt(rx2*rx2 + ry2*ry2) + 0.001;
+          const tx2 = -ry2 / r2, ty2 = rx2 / r2;
+          const vTan2 = pv[b] * tx2 + pv[b+1] * ty2;
+          const vCircNS = Math.sqrt(Math.max(0, a.pullStrength * 0.06 / r2));
+          const bleed = (vCircNS - vTan2) * 0.045;
+          pv[b]   += tx2 * bleed;
+          pv[b+1] += ty2 * bleed;
+          pv[b+2] *= 0.75;
+        } else {
+          // ── Quasar jet collimation ─────────────────────────────────────────
+          // Compute jet axis: vector between all NS on this level.
+          // With 2 NS the axis is the line between them; with 1 fall back to their
+          // velocity direction. Alignment between NS tightens the beam.
+          const nsAll = attractors.filter(x => x.type === 'neutronstar');
+          let jx = 0, jy = 1; // default jet axis: straight down
+          let alignment = 0;  // 0 = scattered, 1 = perfectly collinear
+
+          if (nsAll.length >= 2) {
+            // Find the NS pair with the greatest separation — that's the primary axis
+            let bestDist = 0, bx2 = 0, by2 = 1;
+            for (let pi = 0; pi < nsAll.length; pi++) {
+              for (let qi = pi + 1; qi < nsAll.length; qi++) {
+                const ddx = nsAll[qi].pos.x - nsAll[pi].pos.x;
+                const ddy = nsAll[qi].pos.y - nsAll[pi].pos.y;
+                const dd = Math.sqrt(ddx*ddx + ddy*ddy);
+                if (dd > bestDist) { bestDist = dd; bx2 = ddx/dd; by2 = ddy/dd; }
+              }
+            }
+            jx = bx2; jy = by2;
+            // Alignment score: how collinear are all the NS?
+            // Check how tightly packed they are perpendicular to the axis
+            let maxLateral = 0;
+            for (const ns2 of nsAll) {
+              const relx = ns2.pos.x - a.pos.x, rely = ns2.pos.y - a.pos.y;
+              const lat = Math.abs(relx * (-jy) + rely * jx); // perp component
+              if (lat > maxLateral) maxLateral = lat;
+            }
+            // Tight alignment = small lateral spread relative to length
+            alignment = Math.max(0, 1.0 - maxLateral / Math.max(bestDist, 0.1));
+          } else {
+            // Solo NS: jet axis follows its velocity direction
+            const spd = Math.sqrt(a.vel.x**2 + a.vel.y**2);
+            if (spd > 0.1) { jx = a.vel.x / spd; jy = a.vel.y / spd; }
+            alignment = 0.4; // solo always has moderate collimation
+          }
+
+          // Decompose particle velocity into jet-axis and lateral components
+          const rx2 = pp[b] - a.pos.x, ry2 = pp[b+1] - a.pos.y;
+          const r2 = Math.sqrt(rx2*rx2 + ry2*ry2) + 0.001;
+
+          // Jet component (along axis)
+          const vJet = pv[b] * jx + pv[b+1] * jy;
+          // Lateral component (perpendicular to axis, in XY)
+          const latX = pv[b] - vJet * jx;
+          const latY = pv[b+1] - vJet * jy;
+
+          // Collimation strength: stronger closer to NS, stronger with better alignment
+          const proximity = 1.0 - dist / orbitThresh;
+          const colStrength = proximity * proximity * (0.35 + alignment * 0.65);
+
+          // Squeeze lateral velocity toward zero (beam narrowing)
+          const LATERAL_DAMP = colStrength * 0.22;
+          pv[b]   -= latX * LATERAL_DAMP;
+          pv[b+1] -= latY * LATERAL_DAMP;
+
+          // Boost along jet axis — particles get accelerated into the beam
+          // Direction of boost: away from NS along jet (bipolar jets)
+          const jetDot = rx2 * jx + ry2 * jy; // which side of NS the particle is on
+          const jetDir = jetDot >= 0 ? 1 : -1;
+          const JET_BOOST = colStrength * 0.18 * a.pullStrength * dt;
+          pv[b]   += jx * jetDir * JET_BOOST;
+          pv[b+1] += jy * jetDir * JET_BOOST;
+
+          // Flatten Z — jet stays planar
+          pv[b+2] *= (1.0 - colStrength * 0.35);
+        }
       }
 
       if (dist < a.consumeRadius) { spawn(i); return true; }
@@ -1757,9 +1948,13 @@ function drawBlackHoleOverlay() {
         ovCtx.fillStyle = g; ovCtx.fill();
       });
     } else {
+      // NS hit by BH: shift glow to warm amber to indicate it's been caught
+      const captured = (lvl === 5 && bh._bhHitCount > 0);
+      const nsColA = captured ? '220,120,80' : '100,200,255';
+      const nsColB = captured ? '255,180,120' : '200,255,255';
       [
-        { r: coreR * 3.0, a: 0.15, col: '100,200,255' },
-        { r: coreR * 1.5, a: 0.3, col: '200,255,255' }
+        { r: coreR * 3.0, a: captured ? 0.28 : 0.15, col: nsColA },
+        { r: coreR * 1.5, a: captured ? 0.5 : 0.3, col: nsColB }
       ].forEach(({ r, a, col }) => {
         const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
         g.addColorStop(0, `rgba(${col},${a})`);
@@ -1847,7 +2042,7 @@ function initLevel(n){
     wormhole.active = true;
     wormhole.entranceX = LEVELS[n].wormholeX;
     wormhole.entranceR = LEVELS[n].wormholeR;
-    wormhole.exitX = (Math.random() - 0.5) * 8;
+    wormhole.exitX = -6.5 - Math.random() * 2.0;
     wormhole.exitY = 2.5 + Math.random() * 2.0;
     wormhole.exitR = LEVELS[n].wormholeR * 0.8;
     wormhole.phase = 0;
@@ -1872,6 +2067,7 @@ function initLevel(n){
     // Liquid shader with self-luminance — bright blue-white core for level 5
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*26.0);float halo=exp(-d*7.0)*(1.0-exp(-d*3.0))*1.3;float bloom=smoothstep(0.5,0.0,d)*0.65;float brightness=core*2.0+halo+bloom;float a=brightness*(1.0-vF*0.52);gl_FragColor=vec4(min(1.0,0.82+core*0.18),min(1.0,0.93+core*0.07),1.0,a*0.94);}`;
     pMat.needsUpdate = true;
+
   }
   // Level 6: bouncing black hole — rubber-ball BH, neutron stars as gravitational toys
   // + viewport-side wormholes (vertical portals) that teleport the black hole
@@ -1893,25 +2089,13 @@ function initLevel(n){
     const by = 0.5 + Math.random() * 2.0;
     const bounceBH = new Attractor('blackhole', new THREE.Vector3(bx, by, 0));
     bounceBH._bouncingBH = true;
-    bounceBH.pullStrength = 88.0;
+    bounceBH.radius *= 1.30;         // 30% larger — gargantuan
+    bounceBH.consumeRadius *= 1.30;
+    bounceBH.pullStrength = 112.0 * (1.30 * 1.30); // mass scales with radius²
     const bhAng = Math.random() * Math.PI * 2;
-    bounceBH.vel.x = Math.cos(bhAng) * (5 + Math.random() * 4);
-    bounceBH.vel.y = Math.sin(bhAng) * (4 + Math.random() * 3);
+    bounceBH.vel.x = Math.cos(bhAng) * (4 + Math.random() * 3);
+    bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
     attractors.push(bounceBH);
-
-    // Spawn 2 neutron stars with floating kicks — same bounce as BH, near-zero gravity
-    if (LEVELS[n].neutronStars) {
-      for (let nsi = 0; nsi < LEVELS[n].neutronStars; nsi++) {
-        const nx = (Math.random() - 0.5) * 10;
-        const ny = (Math.random() - 0.5) * 6;
-        const ns = new Attractor('neutronstar', new THREE.Vector3(nx, ny, 0));
-        // _bouncingNS already set true in constructor
-        const nsAng = Math.random() * Math.PI * 2;
-        ns.vel.x = Math.cos(nsAng) * (3 + Math.random() * 4);
-        ns.vel.y = Math.sin(nsAng) * (2 + Math.random() * 3);
-        attractors.push(ns);
-      }
-    }
 
     // Default shader — keep dry-salt for this level
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
@@ -1930,6 +2114,19 @@ function buildHUD(){
     row.innerHTML=`<div class="tdot" style="background:${t.col}"></div><div class="tbar-bg"><div class="tbar-fill" id="bar${i}" style="width:0%;background:${t.col}"></div></div><span class="tpct" id="pct${i}">0%</span><span class="tchk" id="chk${i}">✓</span>`;
     c.appendChild(row);
   });
+  // Level 6: capture counter rows (one per neutron star)
+  if (lvl === 5) {
+    for (let ni = 0; ni < 3; ni++) {
+      const row = document.createElement('div'); row.className='target-row';
+      row.innerHTML=`<div class="tdot" style="background:rgba(100,200,255,0.6)"></div><div class="tbar-bg"><div class="tbar-fill" id="ns-cap-bar${ni}" style="width:0%;background:rgba(100,200,255,0.55);"></div></div><span class="tpct" id="ns-cap-pct${ni}" style="color:rgba(100,200,255,0.4);">—</span><span class="tchk" id="ns-cap-chk${ni}">✓</span>`;
+      c.appendChild(row);
+    }
+    const labelRow = document.createElement('div');
+    labelRow.style.cssText='margin-top:4px;font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.1);text-transform:uppercase;';
+    labelRow.textContent='STARS CAPTURED';
+    c.appendChild(labelRow);
+    return; // skip spill row for level 6
+  }
   // Spillage row
   const sprow=document.createElement('div');
   sprow.className='target-row';sprow.id='spill-row';
@@ -2293,10 +2490,10 @@ function resolveCollisions(){
     }
   }
 
-  // ── NS-NS mutual gravity: soft wide pull, wanting to co-orbit (level 6 only) ─
+  // ── NS-NS mutual gravity: strong pull — neutron stars strongly attract each other ─
   if (lvl === 5) {
-  const NS_MUTUAL_G = 0.012;   // gentle — feels like a natural want, not a snap
-  const NS_MUTUAL_MAX_DIST = 22.0; // wide influence radius
+  const NS_MUTUAL_G = 0.065;   // strong — NS want to clump and orbit each other
+  const NS_MUTUAL_MAX_DIST = 30.0; // very wide — they feel each other from across the screen
   const nsArr = attractors.filter(a => a.type === 'neutronstar' && !a.dragging);
   for (let i = 0; i < nsArr.length; i++) {
     for (let j = i + 1; j < nsArr.length; j++) {
@@ -2372,17 +2569,17 @@ function resolveCollisions(){
             ns._bhCapture = bh;
             ns._bhCaptureTimer = 2.2 + Math.random() * 1.8; // hold 2–4 sec
             // Give NS a tangential nudge to kick off the orbit arc
-            const speed = Math.sqrt(ns.vel.x**2 + ns.vel.y**2);
             const targetOrbitSpd = Math.sqrt(bh.pullStrength * 0.12 / Math.max(dist, bhR * 1.5));
             ns.vel.x = -ny * targetOrbitSpd * (Math.random() < 0.5 ? 1 : -1);
             ns.vel.y =  nx * targetOrbitSpd * (Math.random() < 0.5 ? 1 : -1);
+            // Count as hit for win condition
+            ns._bhHitCount = (ns._bhHitCount || 0) + 1;
           }
         }
 
         // ── While captured: steer NS into orbit around BH ────────────────────
         if (ns._bhCapture === bh && !ns.dragging) {
           ns._bhCaptureTimer -= 1/60; // approx dt
-          const orbitDist = Math.max(dist, bhR * 1.8);
           const rx = ns.pos.x - bh.pos.x, ry = ns.pos.y - bh.pos.y;
           const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
           const txO = -ry / r, tyO = rx / r;
@@ -2466,7 +2663,7 @@ function syncBounce(){
   if(sl)sl.value=P.bounce; if(vl)vl.textContent=P.bounce.toFixed(2);
 }
 
-function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=9+Math.random()*5;pa[i]=Math.random()*pl[i];pal[i]=1;}
+function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=lvl===3?(22+Math.random()*10):(9+Math.random()*5);pa[i]=Math.random()*pl[i];pal[i]=1;}
 
 // ── PANEL STACK EMITTER — spawned here so P & syncBounce are in scope ─────────
 (function(){
@@ -2571,6 +2768,7 @@ window.addEventListener('mousemove',e=>{
     tAttractor.pos.x=wp.x-aDragOff.x;
     tAttractor.pos.y=wp.y-aDragOff.y;
     _recordThrowPos(tAttractor);
+    updateShapeCoords(tAttractor.type, tAttractor);
     return;
   }
   
@@ -2589,6 +2787,7 @@ window.addEventListener('mousemove',e=>{
       dShape.pos.set(wp.x-dOff.x,wp.y-dOff.y,0);
       if(prevWP)dShape.vel.set((wp.x-prevWP.x)*2.5,(wp.y-prevWP.y)*2.5,0);
       prevWP=wp.clone();
+      updateShapeCoords(dShape.type, dShape);
     }
   }
 });
@@ -2656,7 +2855,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
     _throwBuf.length = 0; // fresh buffer for this drag
     const wp = s2w(e.clientX, e.clientY);
     aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
-    showShapeText(hitAttractor.type);
+    showShapeText(hitAttractor.type, hitAttractor);
     return;
   }
   
@@ -2672,7 +2871,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
       return s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object);
     });
     if(sh){dTime=Date.now();dMov=false;dShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(e.clientX,e.clientY);dOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);prevWP=wp.clone();rotPrevX=e.clientX;rotPrevY=e.clientY;
-      showShapeText(sh.type);
+      showShapeText(sh.type, sh);
     }
   }
 });
@@ -2950,7 +3149,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   // Pause
   document.getElementById('mb-btn-pp').addEventListener('click',()=>{
     setPaused(!paused);
-    document.getElementById('mb-btn-pp').textContent=paused?'▶ Play':'❚❚ Pause';
+    document.getElementById('mb-btn-pp').textContent=paused?CONTENT.mbPlay:CONTENT.mbPause;
   });
 
   // Sliders
@@ -3028,7 +3227,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       _throwBuf.length = 0; // fresh buffer for this drag
       const wp = s2w(t.clientX, t.clientY);
       aDragOff.set(wp.x - hitAttractor.pos.x, wp.y - hitAttractor.pos.y, 0);
-      showShapeText(hitAttractor.type);
+      showShapeText(hitAttractor.type, hitAttractor);
       return;
     }
     
@@ -3042,7 +3241,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
         return s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object);
       });
       if(sh){tShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(t.clientX,t.clientY);tOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);tPrevWP=wp.clone();tMoved=false;tTime=Date.now();
-        showShapeText(sh.type);
+        showShapeText(sh.type, sh);
       }
     }
   },{passive:false});
@@ -3125,8 +3324,8 @@ const clk=new THREE.Clock();
 function setPaused(v){
   paused=v;
   const lbl=document.getElementById('btn-label'),pp2=document.getElementById('btn-pp');
-  if(paused){ctaBtn.classList.add('paused');lbl.textContent='Flow Paused';pp2.textContent='▶ RESUME FLOW';pp2.classList.add('paused');}
-  else{ctaBtn.classList.remove('paused');lbl.textContent='Flow On';pp2.textContent='❚❚ PAUSE FLOW';pp2.classList.remove('paused');clk.getDelta();}
+  if(paused){ctaBtn.classList.add('paused');lbl.textContent=CONTENT.flowOff;pp2.textContent=CONTENT.resumeFlow;pp2.classList.add('paused');}
+  else{ctaBtn.classList.remove('paused');lbl.textContent=CONTENT.flowOn;pp2.textContent=CONTENT.pauseFlow;pp2.classList.remove('paused');clk.getDelta();}
 }
 ctaBtn.addEventListener('click',e=>{if(!dMoved)setPaused(!paused);e.stopPropagation();});
 document.getElementById('btn-pp').addEventListener('click',()=>setPaused(!paused));
@@ -3273,12 +3472,52 @@ function countTgts(){
 }
 function updateHUD(){
   tgts.forEach((t,i)=>{const bar=document.getElementById('bar'+i),pct=document.getElementById('pct'+i),chk=document.getElementById('chk'+i);if(!bar)return;bar.style.width=(t.fill*100).toFixed(1)+'%';pct.textContent=Math.round(t.fill*100)+'%';chk.classList.toggle('done',t.met);});
+  // Level 6: update NS capture bars
+  if (lvl === 5) {
+    const nsAll = attractors.filter(a => a.type === 'neutronstar');
+    for (let ni = 0; ni < 3; ni++) {
+      const ns = nsAll[ni];
+      const bar = document.getElementById('ns-cap-bar'+ni);
+      const pct = document.getElementById('ns-cap-pct'+ni);
+      const chk = document.getElementById('ns-cap-chk'+ni);
+      if (!bar) continue;
+      if (!ns) { bar.style.width='0%'; if(pct) pct.textContent='—'; continue; }
+      const captured = ns._bhHitCount > 0;
+      // Smooth the bar fill toward 100 when captured, 0 when free
+      if (!ns._capFill) ns._capFill = 0;
+      ns._capFill += ((captured ? 1 : 0) - ns._capFill) * 0.06;
+      const fillPct = (ns._capFill * 100).toFixed(1);
+      bar.style.width = fillPct + '%';
+      bar.style.background = captured ? 'rgba(220,120,80,0.7)' : 'rgba(100,200,255,0.55)';
+      if (pct) { pct.textContent = captured ? '✓' : '—'; pct.style.color = captured ? 'rgba(220,160,80,0.8)' : 'rgba(100,200,255,0.4)'; }
+      if (chk) chk.classList.toggle('done', captured);
+    }
+    return;
+  }
   const sb=document.getElementById('bar-spill'),sp=document.getElementById('pct-spill');
   if(sb){sb.style.width=(spillSmooth*100).toFixed(1)+'%';}
   if(sp){sp.textContent=Math.round(spillSmooth*100)+'%';sp.style.color=spillSmooth>0.6?'rgba(255,80,60,0.75)':spillSmooth>0.35?'rgba(255,150,80,0.55)':'rgba(255,100,80,0.38)';}
 }
 function checkDone(){
   if(lvlDone)return;
+
+  // Level 6: win when all 3 NS have been caught in the BH's gravity well (hit by BH)
+  if (lvl === 5) {
+    const nsAll = attractors.filter(a => a.type === 'neutronstar');
+    if (nsAll.length >= 3 && nsAll.every(ns => ns._bhHitCount > 0)) {
+      lvlDone=true; flashEl('flash-complete');
+      _lvlDone[lvl]=true;
+      if(typeof updateLevelNav==='function')updateLevelNav();
+      const completionLine = LEVEL_COMPLETE[Math.min(lvl, LEVEL_COMPLETE.length - 1)];
+      _buildFloatText([completionLine], false);
+      _textMode = 'idle';
+      setTimeout(()=>{
+        document.getElementById('next-btn').classList.add('visible');
+      },600);
+    }
+    return;
+  }
+
   if(tgts.length>0&&tgts.every(t=>t.met)){
     lvlDone=true;flashEl('flash-complete');
     _lvlDone[lvl]=true;
@@ -3313,7 +3552,7 @@ const LVL_DESCS=[
   'accumulation. wait for the spill.',
   'the split. two paths, one source.',
   'gravity. everything orbits something.',
-  'gravity unbound. nothing stays still.',
+  'gravity unbound. lure all three stars in.',
 ];
 const _lvlDone=[false,false,false,false,false,false];
 
@@ -3921,8 +4160,6 @@ window.addEventListener('resize',()=>{
   buildTextChars(lvl);
 });
 
-// ── AUTHOR'S NOTE WIDGET ──────────────────────────────────────────────────────
-makeDraggable(document.getElementById('author-note'),document.getElementById('anote-header'));
 makeDraggable(document.getElementById('spill-graph-widget'),document.getElementById('spill-graph-header'));
 // collapse toggle
 document.querySelectorAll('.widget-collapse').forEach(btn=>{
@@ -4140,85 +4377,7 @@ drawTextLayer = function(){
 
 document.getElementById('theme-toggle').addEventListener('click', ()=>applyTheme(!isPaper));
 
-// ── FLAVOR TOGGLE: SUGAR / SALT ───────────────────────────────────────────────
-
-const FLAVOR_TITLES = {
-  sugar: [
-    [
-      "a user arrives with intent, not a request.",
-      "in a perfect world, nothing gets in the way of that; or some things make a way for it.",
-    ],
-    [
-      "with only modest involvement, your reach extends further.",
-      "with nay more than a mere prompt, or few, a.i. enables, but requires human intervention.",
-    ],
-    [
-      "at least as of this week in writing this, solving for complexity still requires nuanced human manipulation.",
-      "form is function; function is form.",
-    ],
-    [
-      "to be multi-dimensional.",
-      "hoory! anyways....",
-    ],
-    [
-      "a consistent signal will eventually be noticed; consistent conveyance points to success",
-      "the question is not what you've built. it is what you've become the center of.",
-    ],
-    [
-      "be your own gravitational influence.",
-      "same world. same physics. same fundamentals. just complete agency.",
-    ],
-  ],
-  salt: [
-    [
-      "design is different now.",
-      "design thinking is defining something new.",
-    ],
-    [
-    "now, a single operator can achieve success.",
-    "prefer provable product iterations to process theatrics",
-
-    ],
-    [
-      "i still think teamwork makes the dream work.",
-      "each discipline brings essential nuance & care for craft.",
-    ],
-    [
-      "are we seeing the collapse of creative collaboration?",
-      "the split is not a failure of focus. it is the first honest map of what you actually contain.",
-    ],
-    [
-      "I think success in today's terms is measured not in how accurately you can hit your target, but how consistently you create wayward influence.",
-      "the question is not what you've built. it is what you've become the center of.",
-    ],
-    [
-      "no longer is the focus on aim — rather influence",
-      "Same world. Same physics. Same fundamentals. Just complete agency.",
-    ],
-  ],
-};
-
-let _currentFlavor = 'sugar';
-
-function setFlavor(flavor) {
-  _currentFlavor = flavor;
-  // Swap LEVEL_TITLES in place so all existing text machinery uses the new set
-  const titles = FLAVOR_TITLES[flavor];
-  for (let i = 0; i < LEVEL_TITLES.length; i++) {
-    LEVEL_TITLES[i] = titles[i] || LEVEL_TITLES[i];
-  }
-  // Refresh current level's text immediately
-  _textTitleIdx = 0;
-  showLevelTitle(lvl, false);
-
-  // Update desktop toggle button states
-  const sugarBtn = document.getElementById('flv-sugar');
-  const saltBtn  = document.getElementById('flv-salt');
-  if (sugarBtn && saltBtn) {
-    sugarBtn.classList.toggle('flv-active', flavor === 'sugar');
-    saltBtn.classList.toggle('flv-active', flavor === 'salt');
-  }
-}
+// ── FLAVOR TOGGLE EVENT LISTENERS ────────────────────────────────────────────
 
 // Desktop toggle clicks
 const _flvSugar = document.getElementById('flv-sugar');
