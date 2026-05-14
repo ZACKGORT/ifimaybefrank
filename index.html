@@ -704,39 +704,39 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
 // On level completion: one statement replaces the floating title
 const LEVEL_COMPLETE = [
-  "the fall found its place.",
-  "the surface did its work.",
-  "patience is its own kind of precision.",
-  "two answers. both correct.",
-  "you understood the gravity of it.",
-  "the material became something. so did you.",
+  "easy. nice.",
+  "go ahead and right-click those unused shapes.",
+  "craft still counts — in fact, I'd argue it's necessary.",
+  "if you moved the wormhole exit, shame on you for breaking my metaphor, but at the same time, it's a meta-commentary of how a.i. enables sidestepping of foundational elements — alas, I digress.",
+  "consistency creates an undeniable narrative.",
+  "point is, be your own gravitational influence.",
 ];
 
 // At rest: one title statement per level
 const LEVEL_TITLES = [
   [
-    "everything starts as raw material.",
-    "before the argument, before the form — there is only the thing falling. watch where it goes.",
+    "frankly, design is different now.",
+    "it is seen as an impedence.",
   ],
   [
-    "a surface changes everything.",
-    "the same material. a different angle. notice what the redirection reveals.",
+    "process theater costs unnecessarily — it seems.",
+    "now, a single operator can achieve success.",
   ],
   [
-    "some things require weight before they move.",
-    "you cannot rush overflow. it arrives when it arrives. the ledge is not an obstacle.",
+    "i still think teamwork makes the dream work.",
+    "each discipline brings essential nuance & care for craft.",
   ],
   [
-    "two directions. one origin.",
+    "are we seeing the collapse of creative collaboration?",
     "the split is not a failure of focus. it is the first honest map of what you actually contain.",
   ],
   [
-    "everything orbits something.",
+    "I think success in today's terms is measured not in how accurately you can hit your target, but how consistently you create wayward influence.",
     "the question is not what you've built. it is what you've become the center of.",
   ],
   [
-    "the old rules don't apply here.",
-    "gravity has left its post. something else is in charge now — and it's moving.",
+    "no longer is the focus on aim — rather influence",
+    "Same world. Same physics. Same fundamentals. Just complete agency.",
   ],
 ];
 
@@ -1141,8 +1141,8 @@ class Attractor {
     this._bhRadiusMin = type === 'blackhole' ? 0.68 : null;
     this._bhRadiusMax = type === 'blackhole' ? 1.505 : null;
     this._bhPullBase  = type === 'blackhole' ? 48.0 : null;
-    // Neutron stars bounce freely like the BH on level 6
-    this._bouncingNS = (type === 'neutronstar');
+    // Neutron stars bounce freely only on level 6; on level 5 they spring-anchor like shapes
+    this._bouncingNS = (type === 'neutronstar') && (typeof lvl !== 'undefined' ? lvl === 5 : false);
     this._build();
   }
 
@@ -1432,7 +1432,15 @@ class Attractor {
 
       } else if (this._bouncingNS) {
         // ── Neutron star: same bounce as BH, near-zero gravity — floats in perpetual motion
-        const NS_GRAV = 0.18; // almost nothing — stays in motion
+        // Skip normal physics if currently captured by a BH (BH-NS orbit managed in resolveCollisions)
+        if (this._bhCapture && !this._bhCapture.dragging) {
+          // Minimal gravity only — orbit steering handled elsewhere
+          this.vel.y -= 0.05 * dt;
+          this.pos.x += this.vel.x * dt;
+          this.pos.y += this.vel.y * dt;
+        } else {
+          this._bhCapture = null; // ensure clean state if BH gone
+          const NS_GRAV = 0.18; // almost nothing — stays in motion
         this.vel.y -= NS_GRAV * dt;
         this.pos.x += this.vel.x * dt;
         this.pos.y += this.vel.y * dt;
@@ -1473,6 +1481,7 @@ class Attractor {
           const ang = Math.random() * Math.PI * 2;
           this.vel.x += Math.cos(ang) * 0.6; this.vel.y += Math.sin(ang) * 0.6;
         }
+        } // end else (not captured)
 
       } else {
         const xe = this.pos.x - this.rest.x, ye = this.pos.y - this.rest.y;
@@ -1723,7 +1732,7 @@ function initLevel(n){
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
   if(dNS) dNS.style.display = (isLvl5 || isLvl6) ? 'flex' : 'none';
   const dPortal = document.getElementById('btn-add-portal');
-  if(dPortal) dPortal.style.display = isLvl6 ? 'flex' : 'none';
+  if(dPortal) dPortal.style.display = 'none'; // portals disabled on lvl6
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.style.display = (isAttractorLevel || isLvl6) ? 'none' : '';
@@ -1751,6 +1760,11 @@ function initLevel(n){
     bh._constrainRadius = 3.0;
     bh._originX = rx;
     bh._originY = ry;
+    // Level-specific BH size: lvl5 +10%, lvl6 +30%
+    const bhSizeScale = isLvl6 ? 1.30 : (isLvl5 ? 1.10 : 1.0);
+    bh.radius *= bhSizeScale;
+    bh.pullStrength *= (bhSizeScale * bhSizeScale); // area scales with radius²
+    bh.consumeRadius *= bhSizeScale;
     attractors.push(bh);
   }
 
@@ -2214,6 +2228,128 @@ function resolveCollisions(){
         sh.pos.x+=nx*pen*wb;sh.pos.y+=ny*pen*wb;
         const dvx=sh.vel.x-a.vel.x,dvy=sh.vel.y-a.vel.y,dot=dvx*nx+dvy*ny;
         if(dot<0){const j=(1+0.5)*dot*0.5;if(!a.dragging){a.vel.x+=j*nx;a.vel.y+=j*ny;}if(!sh.dragging){sh.vel.x-=j*nx;sh.vel.y-=j*ny;}}
+      }
+    }
+  }
+
+  // ── NS-NS mutual gravity: soft wide pull, wanting to co-orbit (level 6 only) ─
+  if (lvl === 5) {
+  const NS_MUTUAL_G = 0.012;   // gentle — feels like a natural want, not a snap
+  const NS_MUTUAL_MAX_DIST = 22.0; // wide influence radius
+  const nsArr = attractors.filter(a => a.type === 'neutronstar' && !a.dragging);
+  for (let i = 0; i < nsArr.length; i++) {
+    for (let j = i + 1; j < nsArr.length; j++) {
+      const a = nsArr[i], b = nsArr[j];
+      const dx = b.pos.x - a.pos.x, dy = b.pos.y - a.pos.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 0.001 || dist > NS_MUTUAL_MAX_DIST) continue;
+      // Inverse-square but capped so they never slam into each other
+      const f = NS_MUTUAL_G / Math.max(dist * dist, 2.5);
+      const nx = dx / dist, ny = dy / dist;
+      // Add tangential component to encourage co-orbiting rather than straight-line collapse
+      const tx = -ny, ty = nx; // perpendicular
+      const tanBias = 0.45;
+      a.vel.x += (nx + tx * tanBias) * f;
+      a.vel.y += (ny + ty * tanBias) * f;
+      b.vel.x -= (nx - tx * tanBias) * f;
+      b.vel.y -= (ny - ty * tanBias) * f;
+    }
+  }
+  } // end lvl === 5 NS-NS gravity
+
+  // ── BH-NS collision: bounce + temporary capture + release ────────────────────
+  // Level 6 only — on level 5, NS are spring-anchored and BH doesn't affect their position
+  if (lvl === 5) {
+    const bhArr = attractors.filter(a => a.type === 'blackhole');
+    const nsArr2 = attractors.filter(a => a.type === 'neutronstar');
+    for (const bh of bhArr) {
+      const bhScale = Math.sqrt(bh.pullStrength / 57.0);
+      const bhR = bh.radius * bhScale * 1.4; // collision radius with some margin
+      for (const ns of nsArr2) {
+        if (ns.dragging || bh.dragging) continue;
+        const nsScale = Math.sqrt(ns.pullStrength / 38.0);
+        const nsR = ns.radius * nsScale;
+        const dx = ns.pos.x - bh.pos.x, dy = ns.pos.y - bh.pos.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const minDist = bhR + nsR;
+
+        // ── Approach zone: BH gravity snatches NS into orbit ─────────────────
+        const captureZone = bhR * 5.5;
+        if (!ns._bhCapture && dist < captureZone && dist > minDist) {
+          // Pull NS toward BH with circular-orbit tangential bias
+          const pullF = 0.18 / Math.max(dist * dist * 0.08, 0.5);
+          const nx = dx / dist, ny = dy / dist;
+          const tx = -ny, ty = nx; // tangent for orbit
+          ns.vel.x -= (nx * 0.7 - tx * 0.8) * pullF;
+          ns.vel.y -= (ny * 0.7 - ty * 0.8) * pullF;
+        }
+
+        // ── Hard collision: bounce + enter capture state ──────────────────────
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx / dist, ny = dy / dist;
+          // Separate
+          const pen = minDist - dist;
+          ns.pos.x += nx * pen * 0.8;
+          ns.pos.y += ny * pen * 0.8;
+          bh.pos.x -= nx * pen * 0.2;
+          bh.pos.y -= ny * pen * 0.2;
+
+          // Elastic-ish bounce
+          const relVx = ns.vel.x - bh.vel.x, relVy = ns.vel.y - bh.vel.y;
+          const dot = relVx * nx + relVy * ny;
+          const RESTITUTION = 0.62;
+          if (dot < 0) {
+            const j = -(1 + RESTITUTION) * dot * 0.5;
+            ns.vel.x += j * nx;
+            ns.vel.y += j * ny;
+            bh.vel.x -= j * nx * 0.15; // BH barely moves — it's massive
+            bh.vel.y -= j * ny * 0.15;
+          }
+
+          // Begin capture: BH grabs the NS into a temporary orbit
+          if (!ns._bhCapture) {
+            ns._bhCapture = bh;
+            ns._bhCaptureTimer = 2.2 + Math.random() * 1.8; // hold 2–4 sec
+            // Give NS a tangential nudge to kick off the orbit arc
+            const speed = Math.sqrt(ns.vel.x**2 + ns.vel.y**2);
+            const targetOrbitSpd = Math.sqrt(bh.pullStrength * 0.12 / Math.max(dist, bhR * 1.5));
+            ns.vel.x = -ny * targetOrbitSpd * (Math.random() < 0.5 ? 1 : -1);
+            ns.vel.y =  nx * targetOrbitSpd * (Math.random() < 0.5 ? 1 : -1);
+          }
+        }
+
+        // ── While captured: steer NS into orbit around BH ────────────────────
+        if (ns._bhCapture === bh && !ns.dragging) {
+          ns._bhCaptureTimer -= 1/60; // approx dt
+          const orbitDist = Math.max(dist, bhR * 1.8);
+          const rx = ns.pos.x - bh.pos.x, ry = ns.pos.y - bh.pos.y;
+          const r = Math.sqrt(rx*rx + ry*ry) + 0.001;
+          const txO = -ry / r, tyO = rx / r;
+          const vTan = ns.vel.x * txO + ns.vel.y * tyO;
+          const vCirc = Math.sqrt(bh.pullStrength * 0.12 / r);
+          const nudge = (vCirc - vTan) * 0.08;
+          ns.vel.x += txO * nudge;
+          ns.vel.y += tyO * nudge;
+          // Slight pull inward to maintain orbit altitude
+          const radialPull = 0.04;
+          ns.vel.x -= (rx / r) * radialPull;
+          ns.vel.y -= (ry / r) * radialPull;
+
+          // Release: timer expired or NS dragged away
+          if (ns._bhCaptureTimer <= 0) {
+            ns._bhCapture = null;
+            ns._bhCaptureTimer = 0;
+            // Fling tangentially on release — exits on a clean arc
+            const exitSpd = Math.sqrt(ns.vel.x**2 + ns.vel.y**2) * 1.3;
+            ns.vel.x = txO * exitSpd;
+            ns.vel.y = tyO * exitSpd;
+          }
+        }
+        // Clear capture if NS was dragged
+        if (ns._bhCapture === bh && ns.dragging) {
+          ns._bhCapture = null;
+          ns._bhCaptureTimer = 0;
+        }
       }
     }
   }
