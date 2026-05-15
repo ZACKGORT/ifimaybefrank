@@ -801,6 +801,7 @@ function showThankYouToast() {
     _tOX = e.clientX - r.left;
     _tOY = e.clientY - r.top;
     t.style.left = r.left + 'px'; t.style.top = r.top + 'px';
+    t.style.bottom = 'auto';
     t.style.transform = 'none';
     e.preventDefault();
   }
@@ -1074,7 +1075,7 @@ function showShapeText(type, obj) {
   } else {
     coordLine = `${type}  x: —  y: —  z: —`;
   }
-  _buildFloatText([coordLine], false);
+  _buildFloatText([coordLine], true);
 }
 
 // Live-update coordinate display while dragging
@@ -2906,6 +2907,27 @@ window.addEventListener('mouseup',e=>{
   }
 });
 
+// ── SUPERNOVA IMPULSE ─────────────────────────────────────────────────────────
+const SUPERNOVA_R = 7.0;
+const SUPERNOVA_F = 18.0;
+const SUPERNOVA_LIFT = 4.0;
+function supernovaImpulse(wx, wy) {
+  const N = Math.min(P.count, MP);
+  for (let i = 0; i < N; i++) {
+    if (!pal[i]) continue;
+    const b = i * 3;
+    const dx = pp[b] - wx, dy = pp[b+1] - wy, dz = pp[b+2];
+    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.001;
+    if (dist > SUPERNOVA_R) continue;
+    const t = 1 - dist / SUPERNOVA_R;
+    const f = SUPERNOVA_F * t * t;
+    pv[b]   += (dx / dist) * f;
+    pv[b+1] += (dy / dist) * f + SUPERNOVA_LIFT * t;
+    pv[b+2] += (dz / dist) * f;
+  }
+  flashEl('flash-complete');
+}
+
 renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
 
@@ -2969,6 +2991,8 @@ renderer.domElement.addEventListener('mousedown',e=>{
       showShapeText(sh.type, sh);
     }
   }
+  // Empty-space click — supernova blast
+  else { const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
 });
 renderer.domElement.addEventListener('contextmenu',e=>{
   e.preventDefault();
@@ -3424,6 +3448,10 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       tShape.rest.set(tShape.pos.x,tShape.pos.y,0);
       tShape.dragging=false;tShape=null;tPrevWP=null;
       revertToTitle();
+    } else if(!tAttractor && !tShape) {
+      // Quick tap on empty space — supernova
+      const te = e.changedTouches[0];
+      if (te) { const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
     }
   },{passive:false});
 })();
