@@ -498,9 +498,9 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 /* ── THANK YOU TOAST ── */
 #thank-you-toast{
   position:fixed;
-  /* Desktop: centered */
-  top:50%;left:50%;right:auto;bottom:auto;
-  transform:translate(-50%,-50%) scale(0.88);
+  /* Desktop: bottom center */
+  bottom:24px;left:50%;right:auto;top:auto;
+  transform:translateX(-50%) scale(0.88);
   background:rgba(10,10,10,0.94);border:1px solid rgba(255,255,255,0.14);
   backdrop-filter:blur(20px);border-radius:8px;padding:20px 26px 18px;
   text-align:center;z-index:2000;pointer-events:none;
@@ -509,7 +509,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   cursor:grab;min-width:220px;
   user-select:none;-webkit-user-select:none;
 }
-#thank-you-toast.visible{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto;}
+#thank-you-toast.visible{opacity:1;transform:translateX(-50%) scale(1);pointer-events:auto;}
 #thank-you-toast.dragging{cursor:grabbing;transition:none;}
 #thank-you-toast .tyt-title{font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:rgba(255,255,248,0.92);margin-bottom:6px;letter-spacing:0.02em;}
 #thank-you-toast .tyt-body{font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;color:rgba(255,255,255,0.35);text-transform:uppercase;}
@@ -788,10 +788,10 @@ function showThankYouToast() {
 
   // ── Desktop: draggable ────────────────────────────────────────────────────
   let _tDrag = false, _tOX = 0, _tOY = 0;
-  // Reset to CSS default centered position
-  t.style.left = '50%'; t.style.top = '50%';
-  t.style.right = 'auto'; t.style.bottom = 'auto';
-  t.style.transform = 'translate(-50%,-50%) scale(1)';
+  // Reset to CSS default bottom-center position
+  t.style.left = '50%'; t.style.bottom = '24px';
+  t.style.right = 'auto'; t.style.top = 'auto';
+  t.style.transform = 'translateX(-50%) scale(1)';
 
   function _tDown(e) {
     if (e.button !== 0) return;
@@ -924,11 +924,11 @@ const CONTENT = {
 // Per-flavor win statements (5 levels after removing old level 5)
 const LEVEL_COMPLETE_FLAVOR = {
   sugar: [
-    "design is a position; best served with discretion.",
+    "design is a position; <br>best served with discretion.",
     "ahh, that's better.",
-    "craft still counts — in fact, I'd argue it's necessary.",
-    "very nice, well done.",
-    "mass makes gravity. gravity is influence. ",
+    "craft still counts — arguably, necessary.",
+    "very nice, well done. clever, indeed.",
+    "mass makes gravity. <br>gravity is influence. ",
   ],
   salt: [
     "reduction is a form of precision.",
@@ -962,14 +962,14 @@ const FLAVOR_TITLES = {
     "more often, design is simply balance.",
     "design for intent is rarely a singular path.",
     "design requirements are now inter-dimensional.",
-    "the paradigm we knew has changed. We exist in a dynamic world with no clear targets. what matters today is having a signal; meaningful mass begets opportunity towards success. best to see what sticks.",
+    "what matters today is having a signal; meaningful mass begets gravity. gravity beckons influence.",
   ],
   salt: [
     "the best part is no part — spaceX",
     "all for one; one for all!",
     "honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint; which I suppose is testament to my point that craft remains a viable catalyst for success.",
     "if the system allows it, is it ethical? where do you draw the line?",
-    "less posture; more position — fafo, but with ferocious focus and intent.",    
+    "less posture; more position <br>— fafo, but with ferocious focus and intent.",
   ],
 };
 
@@ -1129,9 +1129,24 @@ function _buildFloatText(lines, immediate) {
     // Level 5 has no shapes panel obscuring the scene — allow wider text column
     const effectiveMaxW = (lvl === 4) ? Math.min(W * 0.55, W - PAD_X - 180) : maxW;
 
+    // Expand any <br> tags into actual separate lines, preserving parent role
+    const expandedLines = [];
+    const expandedRoles = []; // 'headline' | 'body' for each expanded line
+    const expandedIsBr  = []; // true if this line is a <br> continuation (no extra gap before next)
+    lines.forEach((line, li) => {
+      const parentRole = li === 0 ? 'headline' : 'body';
+      const parts = line.split(/<br\s*\/?>/i);
+      parts.forEach((p, pi) => {
+        expandedLines.push(p);
+        expandedRoles.push(parentRole);
+        expandedIsBr.push(pi < parts.length - 1); // true for all but the last segment of a split
+      });
+    });
+    lines = expandedLines;
+
     let totalH = 0;
     lines.forEach((line, li) => {
-      const role = li === 0 ? TYPO.headline : TYPO.body;
+      const role = TYPO[expandedRoles[li]];
       const words = line.split(' ');
       let rowW = 0, rows = 1;
       words.forEach(w => {
@@ -1140,13 +1155,13 @@ function _buildFloatText(lines, immediate) {
         rowW += sw;
       });
       totalH += rows * role.lineH;
-      if (li < lines.length - 1) totalH += role.lineH * 0.55;
+      if (li < lines.length - 1) totalH += expandedIsBr[li] ? 0 : role.lineH * 0.55;
     });
     const PAD_TOP = Math.max(72, (H - totalH) * 0.42);
     const allChars = [];
     let y = PAD_TOP;
     lines.forEach((line, li) => {
-      const role = li === 0 ? TYPO.headline : TYPO.body;
+      const role = TYPO[expandedRoles[li]];
       const { charW, lineH } = role;
       const words = line.split(' ');
       let row = [], rowW = 0, rows = [];
@@ -1166,12 +1181,12 @@ function _buildFloatText(lines, immediate) {
             y: y + (Math.random() - 0.5) * 35,
             vx: (Math.random() - 0.5) * 1.8, vy: (Math.random() - 0.5) * 1.8,
             baseOp: role.op,
-            role: li === 0 ? 'headline' : 'body',
+            role: expandedRoles[li],
           });
         }
         y += lineH;
       });
-      if (li < lines.length - 1) y += role.lineH * 0.55;
+      if (li < lines.length - 1) y += expandedIsBr[li] ? 0 : role.lineH * 0.55;
     });
     textChars = allChars;
     lvlTextAlphaTgt = 1;
