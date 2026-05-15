@@ -603,6 +603,7 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">FONT SIZE</span><span class="ctrl-vl" id="v-font">24</span></div><input type="range" id="sl-font" min="8" max="48" step="1" value="24"></div>
     <div class="div"></div>
     <div class="chk-row"><span class="ctrl-nm">TEXT</span><button class="tog on" id="tog-text">ON</button></div>
+    <div class="chk-row" style="margin-top:5px;"><span class="ctrl-nm">WATERFALL</span><button class="tog" id="tog-waterfall">OFF</button></div>
     <div class="div"></div>
     <button class="ins-clear" id="btn-clear2" style="width:100%;background:transparent;border:1px solid rgba(255,60,60,0.15);color:rgba(255,80,80,0.38);font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.1em;padding:5px 4px;cursor:none;text-transform:uppercase;border-radius:3px;transition:all 0.15s;">CLEAR ALL</button>
   </div>
@@ -2096,6 +2097,24 @@ function drawBlackHoleOverlay() {
       ovCtx.textAlign = 'center';
       ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
     }
+
+    // Nova shockwave flare — expanding ring when hit by a supernova click
+    if (bh._novaHitT && bh._novaHitT > 0) {
+      const ft = bh._novaHitT;
+      const flareR = coreR * (1.8 + (1 - ft) * 6.0);
+      const flareCol = bh.type === 'blackhole' ? '255,160,60' : '180,240,255';
+      ovCtx.beginPath();
+      ovCtx.arc(sx, sy, flareR, 0, Math.PI * 2);
+      ovCtx.strokeStyle = `rgba(${flareCol},${ft * 0.8})`;
+      ovCtx.lineWidth = 2.5 * ft;
+      ovCtx.stroke();
+      const fg = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, flareR * 0.8);
+      fg.addColorStop(0, `rgba(${flareCol},${ft * 0.25})`);
+      fg.addColorStop(1, `rgba(${flareCol},0)`);
+      ovCtx.beginPath(); ovCtx.arc(sx, sy, flareR * 0.8, 0, Math.PI * 2);
+      ovCtx.fillStyle = fg; ovCtx.fill();
+    }
+
     ovCtx.restore();
   });
 }
@@ -2750,7 +2769,7 @@ function getSpout(){
 
 // ── PARTICLES ─────────────────────────────────────────────────────────────────
 const MP=8000,pp=new Float32Array(MP*3),pv=new Float32Array(MP*3),ps=new Float32Array(MP),pa=new Float32Array(MP),pl=new Float32Array(MP),pal=new Uint8Array(MP);
-const P={count:isMobile?8000:8000,gravity:isMobile?3.3:4.2,spread:isMobile?0.65:1.25,bounce:0.36,size:isMobile?0.65:0.65,rain:false};
+const P={count:isMobile?8000:8000,gravity:isMobile?3.3:4.2,spread:isMobile?0.65:1.25,bounce:0.36,size:isMobile?0.65:0.65,rain:false,waterfall:false};
 
 // Derive bounce from count+size: more particles & larger size → more bounce
 function derivedBounce(){
@@ -2765,7 +2784,39 @@ function syncBounce(){
   if(sl)sl.value=P.bounce; if(vl)vl.textContent=P.bounce.toFixed(2);
 }
 
-function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=lvl===3?(22+Math.random()*10):(9+Math.random()*5);pa[i]=Math.random()*pl[i];pal[i]=1;}
+// Waterfall wave clock — drives the heavy→thin→heavy cycle
+let _wfPhase = 0; // advances in tick(), 0–2π per wave cycle
+let _wfSavedP = null; // saved P settings to restore on toggle off
+
+// Per-particle gravity tier — assigned at spawn, used in tick
+const pGravTier = new Float32Array(MP); // 0=slow 1=mid 2=fast
+
+function spawn(i){
+  const b=i*3,sw=getSpout();
+  if(P.waterfall){
+    // Max spread — full emitter width
+    pp[b]  = sw.x + (Math.random()-0.5)*P.spread;
+    pp[b+1]= sw.y + Math.random()*0.3;
+    // Deep z layering: spread particles across several z planes for volumetric curtain
+    pp[b+2]= (Math.random()-0.5)*2.8;
+    // Tiny lateral drift
+    pv[b]  = (Math.random()-0.5)*0.03;
+    pv[b+2]= (Math.random()-0.5)*0.02;
+    // Three gravity tiers — fast core, mid spray, slow mist
+    const tier = Math.floor(Math.random()*3); // 0=mist 1=mid 2=heavy
+    pGravTier[i] = tier;
+    const speeds = [0.25, 0.45, 0.75];
+    const jitter  = [0.08, 0.18, 0.30];
+    pv[b+1]= -(speeds[tier] + Math.random()*jitter[tier]);
+    // Tiny particles — small size, long life so the scene stays dense
+    ps[i]  = 0.15 + Math.random()*0.22;
+    pl[i]  = 20 + Math.random()*10;
+    pa[i]  = Math.random()*pl[i];
+    pal[i] = 1;
+  } else {
+    pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=lvl===3?(22+Math.random()*10):(9+Math.random()*5);pa[i]=Math.random()*pl[i];pal[i]=1;
+  }
+}
 
 // ── PANEL STACK EMITTER — spawned here so P & syncBounce are in scope ─────────
 (function(){
@@ -2931,6 +2982,38 @@ function supernovaImpulse(wx, wy) {
     pv[b+1] += (dy / dist) * f + SUPERNOVA_LIFT * t;
     pv[b+2] += (dz / dist) * f;
   }
+
+  // ── Level 5: supernova shockwave blasts attractors (BH + NS) ──────────────
+  if (lvl === 4) {
+    const NOVA_ATTRACTOR_R = 14.0;  // shockwave reach in world units
+    const NOVA_BH_F        = 10.0;  // kick on black hole (massive — resists but recoils)
+    const NOVA_NS_F        = 24.0;  // kick on neutron star (lighter — flung hard)
+    for (const a of attractors) {
+      if (a.dragging) continue;
+      const adx = a.pos.x - wx, ady = a.pos.y - wy;
+      const adist = Math.sqrt(adx*adx + ady*ady) || 0.001;
+      if (adist > NOVA_ATTRACTOR_R) continue;
+      const tA = 1 - adist / NOVA_ATTRACTOR_R;
+      const isBH = a.type === 'blackhole';
+      const force = (isBH ? NOVA_BH_F : NOVA_NS_F) * tA * tA;
+      // Radial blast away from epicentre
+      a.vel.x += (adx / adist) * force;
+      a.vel.y += (ady / adist) * force + (isBH ? 1.5 : 4.0) * tA;
+      // NS: add a random tangential spin kick for extra chaos
+      if (!isBH) {
+        const tx = -ady / adist, ty = adx / adist;
+        const spinDir = Math.random() < 0.5 ? 1 : -1;
+        a.vel.x += tx * force * 0.35 * spinDir;
+        a.vel.y += ty * force * 0.35 * spinDir;
+        // Break active BH capture so it flies free
+        a._bhCapture = null;
+        a._bhCaptureTimer = 0;
+      }
+      // Mark for glow flare (drawn in overlay, decayed each frame)
+      a._novaHitT = 0.6;
+    }
+  }
+
   flashEl('flash-complete');
 }
 
@@ -3492,6 +3575,19 @@ if(togTextBtn) {
       mbTextTog.textContent = textVisibleDesktop ? 'Aa On' : 'Aa Off';
       mbTextTog.classList.toggle('on', textVisibleDesktop);
     }
+  });
+}
+
+// ── WATERFALL TOGGLE ─────────────────────────────────────────────────────────
+const togWaterfall = document.getElementById('tog-waterfall');
+if(togWaterfall) {
+  togWaterfall.addEventListener('click', () => {
+    P.waterfall = !P.waterfall;
+    togWaterfall.textContent = P.waterfall ? 'ON' : 'OFF';
+    togWaterfall.classList.toggle('on', P.waterfall);
+    _wfPhase = 0; // restart wave from peak
+    // Respawn all so lifetimes update immediately
+    for(let i=0;i<MP;i++) spawn(i);
   });
 }
 
@@ -4141,6 +4237,12 @@ function tick(){
   shapes.forEach(s=>s.update(dt));
   if(emitterShape)emitterShape.update(dt);
   attractors.forEach(a=>a.update(dt));
+  // Decay supernova hit flare
+  if (lvl === 4) attractors.forEach(a=>{ if(a._novaHitT>0) a._novaHitT=Math.max(0,a._novaHitT-dt*1.8); });
+
+  // Advance waterfall wave phase — one full cycle every ~3.5s
+  if(P.waterfall) _wfPhase += dt * (Math.PI * 2 / 3.5);
+
   pMat.uniforms.uSz.value=P.size;
   const N=Math.min(P.count,MP);
 
@@ -4152,18 +4254,35 @@ function tick(){
   for(let i=0;i<N;i++){
     const b=i*3;
     if(!pal[i]){spawn(i);continue;}
-    pa[i]+=dt;if(pa[i]>pl[i]){spawn(i);continue;}
+    pa[i]+=dt;if(pa[i]>pl[i]){
+      if(P.waterfall){
+        // Asymmetric wave: fast attack to max, long slow decay to near-zero, repeat
+        // t = 0→1 over one cycle
+        const pOffset = (i / N) * 0.18; // small phase spread for texture
+        const t = ((_wfPhase + pOffset) % (Math.PI * 2)) / (Math.PI * 2); // 0→1
+        // Shape: pow curve gives slow decay; the (1-t)^3 drops steeply near end
+        // then wraps instantly back to 1 — fast attack, long tail
+        const wave = Math.pow(1 - t, 2.2);
+        const spawnThreshold = 0.04 + wave * 0.96;
+        if(Math.random() < spawnThreshold){ spawn(i); } else { pa[i]=0; }
+        continue;
+      }
+      spawn(i);continue;
+    }
     
     if(applyAttractorForces(i,b,dt)) continue;
     
-    pv[b+1]-=P.gravity*dt;
+    // Waterfall: each tier has its own gravity multiplier so layers fall at different speeds
+    const gravMult = P.waterfall ? (0.45 + pGravTier[i] * 0.55) : 1.0;
+    pv[b+1]-=P.gravity*gravMult*dt;
     if(P.rain){pv[b]-=pp[b]*0.4*dt;pv[b+2]-=pp[b+2]*0.3*dt;}
 
     // ── Freefall XY bias: damp z toward 0 while particle is airborne ──
+    // In waterfall mode suppress z damping so the depth layers stay spread
     const airborne=pp[b+1]>-8.0;
-    if(airborne){
-      pp[b+2]*=0.88;   // bleed z position back toward centre plane
-      pv[b+2]*=0.80;   // damp z velocity strongly while falling
+    if(airborne && !P.waterfall){
+      pp[b+2]*=0.88;
+      pv[b+2]*=0.80;
     }
 
     pp[b]+=pv[b]*dt;pp[b+1]+=pv[b+1]*dt;pp[b+2]+=pv[b+2]*dt;
