@@ -83,8 +83,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .chk-row{display:flex;align-items:center;justify-content:space-between;}
 
 #flash-complete,#flash-delete{position:fixed;inset:0;pointer-events:none;z-index:600;transition:background 0.1s;background:transparent;}
-#flash-complete.on{background:rgba(255,255,255,0.01);}
-#flash-delete.on{background:rgba(255,40,40,0.07);}
+#flash-complete.on{background:transparent;}
+#flash-delete.on{background:transparent;}
 
 #screenshot-btn {
   position: fixed;
@@ -603,7 +603,7 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">FONT SIZE</span><span class="ctrl-vl" id="v-font">24</span></div><input type="range" id="sl-font" min="8" max="48" step="1" value="24"></div>
     <div class="div"></div>
     <div class="chk-row"><span class="ctrl-nm">TEXT</span><button class="tog on" id="tog-text">ON</button></div>
-    <div class="chk-row" style="margin-top:5px;"><span class="ctrl-nm">WATERFALL</span><button class="tog" id="tog-waterfall">OFF</button></div>
+    <div class="chk-row" id="waterfall-row" style="margin-top:5px;display:none;"><span class="ctrl-nm">WATERFALL</span><button class="tog" id="tog-waterfall">OFF</button></div>
     <div class="div"></div>
     <button class="ins-clear" id="btn-clear2" style="width:100%;background:transparent;border:1px solid rgba(255,60,60,0.15);color:rgba(255,80,80,0.38);font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.1em;padding:5px 4px;cursor:none;text-transform:uppercase;border-radius:3px;transition:all 0.15s;">CLEAR ALL</button>
   </div>
@@ -926,18 +926,18 @@ const CONTENT = {
 // Per-flavor win statements (5 levels after removing old level 5)
 const LEVEL_COMPLETE_FLAVOR = {
   sugar: [
-    "design is a position; <br>best served with discretion.",
-    "ahh, that's better.",
-    "that's craft.",
-    "very nice, well done.",
-    "mass makes gravity. <br>gravity is influence. ",
+    `design is a position; <br>best served with discretion.`,
+    `ahh, that's better.`,
+    `that's craft.`,
+    `very nice, well done.`,
+    `mass makes gravity. <br>gravity is influence. `,
   ],
   salt: [
-    "reduction is a form of precision.",
-    "go ahead and right-click those unused shapes.",
-    "that wasn't so bad.",
-    "if you moved the wormhole, that's like moving the goal posts, but a win is a win, I suppose.",
-    "make mass; have gravity; daringly disrupt.",
+    `reduction is a form of precision.`,
+    `go ahead and right-click those unused shapes.`,
+    `that wasn't so bad.`,
+    `if you moved the wormhole, that's like moving the goal posts, but a win is a win, I suppose.`,
+    `make mass; have gravity; daringly disrupt.`,
   ],
 };
 function getLevelComplete(lvlN) {
@@ -949,44 +949,45 @@ const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
 
 // At rest: one title statement per level (default; overwritten by setFlavor)
 const LEVEL_TITLES = [
-  "the best part is no part <br>— space.X",
-  "think different — steve.jobs",
-  "the more u practice, the luckier i get.<br>— gary.player",
-  "I like my sugar with coffee and cream - beastie.boys",
-  "make mass. have gravity. daringly disrupt.",
+  `"the best part is no part"<br>— space.X`,
+  `think different — steve.jobs`,
+  `the more u practice, the luckier i get.<br>— gary.player`,
+  `I like my sugar with coffee and cream - beastie.boys`,
+  `make mass. have gravity. daringly disrupt.`,
 ];
 
 // ── FLAVOR TITLES: SUGAR / SALT ───────────────────────────────────────────────
 // One statement per level per flavor. setFlavor() swaps these into LEVEL_TITLES.
 const FLAVOR_TITLES = {
   sugar: [
-    "sometimes, <br>design isn't design.",
-    "more often, <br>design is simply balance.",
-    "design for intent <br>is rarely a singular path.",
-    "intergalactic planetary, planetary intergalactic<br>",
-    "make mass. have gravity. <br>consistency in conviction is key.",
+    `sometimes, <br>design isn't design.`,
+    `more often, <br>design is simply balance.`,
+    `design may offer <br>pathways for intent.`,
+    `design can be defined as "anything not created by nature"`,
+    `frankly,<br><br>design is still very much 'about' pixel-perfection, but the role of a designer is in optimizing for real-world physics. <br><br>perhaps craft matters most now?`,
   ],
   salt: [
-    "the best part is no part <br>— spaceX",
-    "a single operator can control multiple streams.",
-    "honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.",
-    "if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?",
-    "anyways— <br>less posture; more position. <br>#fafo, but intentfully.",
+  `"the best part is no part"<br>— space.X`,
+    `a single operator can control multiple streams.`,
+    `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
+    `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
+    `frankly,<br><br>less posture; more position. <br>the more meaningful one's mass;<br>the greater one's gravity.`,
   ],
 };
 
 // ── FLAVOR PROSE: mobile panel long-form copy (single source of truth) ─────────
 // Edit here; setFlavor() renders this into #mb-panel-sugar / #mb-panel-salt.
+// All strings use backticks — you can freely use " marks anywhere in your content.
 const FLAVOR_PROSE = {
   sugar: {
-    eyebrow: "On Directed Systems",
+    eyebrow: `On Directed Systems`,
     body: `In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What <em>reaches its target</em> is intention made physical.`,
-    sig: "— on the nature of frankly and agency",
+    sig: `— on the nature of frankly and agency`,
   },
   salt: {
-    eyebrow: "On Influence",
+    eyebrow: `On Influence`,
     body: `Design is different now. It is seen as an <em>impedance</em>. Process theater costs unnecessarily — a single operator can achieve success. teamwork makes the dream work. Each discipline brings essential <em>nuance and care for craft</em>. Success today is measured not in how accurately you hit your target, but how consistently you <em>create wayward influence</em>. Be your own gravitational center.`,
-    sig: "— on aim vs. influence",
+    sig: `— on aim vs. influence`,
   },
 };
 
@@ -2207,11 +2208,9 @@ function initLevel(n){
     bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
     attractors.push(bounceBH);
 
-    // Spawn 3 neutron stars at staggered positions on load
+    // Spawn 1 neutron star on load
     const nsSpawnPositions = [
-      new THREE.Vector3(-5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
-      new THREE.Vector3( 0.0 + (Math.random()-0.5)*1.5, 2.5 + Math.random()*1.5, 0),
-      new THREE.Vector3( 5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
+      new THREE.Vector3((Math.random()-0.5)*3, 1.5 + Math.random()*2.0, 0),
     ];
     nsSpawnPositions.forEach(pos => {
       const ns = new Attractor('neutronstar', pos);
@@ -2221,10 +2220,25 @@ function initLevel(n){
     // Default shader — keep dry-salt for this level
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
+
+    // Level 5: waterfall ON by default
+    P.waterfall = true;
+    _wfPhase = 0;
+    const wfRow = document.getElementById('waterfall-row');
+    if (wfRow) wfRow.style.display = 'flex';
+    const wfTog = document.getElementById('tog-waterfall');
+    if (wfTog) { wfTog.textContent = 'ON'; wfTog.classList.add('on'); }
   } else {
     // Restore default dry-salt luminance shader for levels 1–4
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
+
+    // Levels 1–4: waterfall OFF, hide the row
+    P.waterfall = false;
+    const wfRow = document.getElementById('waterfall-row');
+    if (wfRow) wfRow.style.display = 'none';
+    const wfTog = document.getElementById('tog-waterfall');
+    if (wfTog) { wfTog.textContent = 'OFF'; wfTog.classList.remove('on'); }
   }
   updateLevelNav();
 }
@@ -2237,7 +2251,7 @@ function buildHUD(){
   });
   // Level 5: capture counter rows (one per neutron star)
   if (lvl === 4) {
-    for (let ni = 0; ni < 3; ni++) {
+    for (let ni = 0; ni < 1; ni++) {
       const row = document.createElement('div'); row.className='target-row';
       row.innerHTML=`<div class="tdot" style="background:rgba(100,200,255,0.6)"></div><div class="tbar-bg"><div class="tbar-fill" id="ns-cap-bar${ni}" style="width:0%;background:rgba(100,200,255,0.55);"></div></div><span class="tpct" id="ns-cap-pct${ni}" style="color:rgba(100,200,255,0.4);">—</span><span class="tchk" id="ns-cap-chk${ni}">✓</span>`;
       c.appendChild(row);
@@ -3397,6 +3411,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   // Touch for shapes/attractors: tap to cycle, drag to move, two-finger pinch to scale
   let tShape=null,tOff=new THREE.Vector3(),tPrevWP=null,tMoved=false,tTime=0;
   let pinchDist0=0,pinchSc0=1,aPinchPull0=0;
+  let _lpTimer=null; // longpress timer for emitter waterfall toggle
   function getTouchDist(e){if(e.touches.length<2)return 0;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
   renderer.domElement.addEventListener('touchstart',e=>{
     e.preventDefault();
@@ -3458,6 +3473,19 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       });
       if(sh){tShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(t.clientX,t.clientY);tOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);tPrevWP=wp.clone();tMoved=false;tTime=Date.now();
         showShapeText(sh.type, sh);
+        // Longpress on emitter (panelstack) triggers waterfall toggle — level 5 only
+        if(sh.type==='panelstack' && lvl===4) {
+          _lpTimer = setTimeout(() => {
+            if(!tMoved) {
+              P.waterfall = !P.waterfall;
+              _wfPhase = 0;
+              for(let _i=0;_i<MP;_i++) spawn(_i);
+              // Sync desktop toggle
+              const wfTog = document.getElementById('tog-waterfall');
+              if(wfTog) { wfTog.textContent = P.waterfall?'ON':'OFF'; wfTog.classList.toggle('on', P.waterfall); }
+            }
+          }, 500);
+        }
       }
     }
   },{passive:false});
@@ -3503,7 +3531,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
        _recordThrowPos(tAttractor);
     } else if(tShape){
       const wp=s2w(t.clientX,t.clientY);
-      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05)tMoved=true;}
+      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}}}
       tShape.pos.set(wp.x-tOff.x,wp.y-tOff.y,0);
       if(tPrevWP)tShape.vel.set((wp.x-tPrevWP.x)*2.5,(wp.y-tPrevWP.y)*2.5,0);
       tPrevWP=wp.clone();
@@ -3525,6 +3553,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       tAttractor=null;
       revertToTitle();
     } else if(tShape){
+      if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
       if(!tMoved&&(Date.now()-tTime)<350){
         if(tShape.type==='panelstack'){
           const target=tShape._panelMorphVal<0.5?1:0;
