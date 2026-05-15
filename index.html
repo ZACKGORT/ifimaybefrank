@@ -2136,12 +2136,11 @@ function initLevel(n){
 
   // Level 4 (index 3): wormhole settings + spawn exit
   if (n === 3) {
-    P.count = 7000; P.gravity = 1.8; P.spread = 0.06; P.bounce = 0.75; P.size = 0.55;
+    P.count = 7000; P.gravity = 1.8; P.bounce = 0.75; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     setSl('sl-count', 7000); setVl('v-count', 7000);
     setSl('sl-grav', 1.8); setVl('v-grav', '1.8');
-    setSl('sl-spread', 0.06); setVl('v-spread', '0.06');
     setSl('sl-bounce', 0.75); setVl('v-bounce', '0.75');
     wormhole.active = true;
     wormhole.entranceX = LEVELS[n].wormholeX;
