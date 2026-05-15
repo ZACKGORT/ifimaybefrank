@@ -13,6 +13,7 @@
 <meta name="twitter:description" content="a position on craft">
 
 <title>if i may be frank — zack.cx</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='13' height='13' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3Ccircle cx='24' cy='8' r='6.5' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3Cpolygon points='16,32 32,32 24,18' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
@@ -493,6 +494,46 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 
 }
 @media (min-width:601px){#mobile-bar,.mb-panel,#mobile-bottom-rail,#mb-shape-hud{display:none!important;}}
+
+/* ── THANK YOU TOAST ── */
+#thank-you-toast{
+  position:fixed;
+  /* Desktop: bottom-right corner, above theme toggle */
+  right:16px;bottom:72px;left:auto;top:auto;
+  transform:scale(0.88);
+  background:rgba(10,10,10,0.94);border:1px solid rgba(255,255,255,0.14);
+  backdrop-filter:blur(20px);border-radius:8px;padding:20px 26px 18px;
+  text-align:left;z-index:2000;pointer-events:none;
+  opacity:0;transition:opacity 0.4s,transform 0.4s;
+  box-shadow:0 8px 48px rgba(0,0,0,0.7);
+  cursor:grab;min-width:220px;
+  user-select:none;-webkit-user-select:none;
+}
+#thank-you-toast.visible{opacity:1;transform:scale(1);pointer-events:auto;}
+#thank-you-toast.dragging{cursor:grabbing;transition:none;}
+#thank-you-toast .tyt-title{font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:rgba(255,255,248,0.92);margin-bottom:6px;letter-spacing:0.02em;}
+#thank-you-toast .tyt-body{font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+#thank-you-toast .tyt-email{font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.6);margin-top:5px;display:block;}
+/* Mobile: bottom-clamped, full-width-ish, tap to dismiss */
+@media(max-width:600px){
+  #thank-you-toast{
+    right:auto;bottom:0;left:0;width:100%;border-radius:12px 12px 0 0;
+    padding:18px 24px 28px;text-align:center;cursor:pointer;
+    transform:translateY(8px) scale(0.98);
+    border-bottom:none;
+  }
+  #thank-you-toast.visible{transform:translateY(0) scale(1);}
+  #thank-you-toast::after{
+    content:'tap to dismiss';display:block;margin-top:12px;
+    font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.22em;
+    color:rgba(255,255,255,0.18);text-transform:uppercase;
+  }
+}
+body.paper #thank-you-toast{background:rgba(255,252,246,0.95);border-color:rgba(0,0,0,0.1);}
+body.paper #thank-you-toast .tyt-title{color:rgba(10,8,6,0.88);}
+body.paper #thank-you-toast .tyt-body{color:rgba(0,0,0,0.35);}
+body.paper #thank-you-toast .tyt-email{color:rgba(0,0,0,0.6);}
+body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
 </style>
 </head>
 <body>
@@ -546,15 +587,7 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
          </svg>
          <span class="ins-btn-lbl">Neutron Star</span>
       </button>
-      <button class="ins-btn" id="btn-add-portal" style="flex:1 1 100%;display:none;flex-direction:column;align-items:center;gap:4px;background:rgba(0,180,255,0.06);border:1px solid rgba(0,200,255,0.18);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
-        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-          <ellipse cx="6" cy="12" rx="2.5" ry="6" stroke="rgba(0,200,255,0.75)" stroke-width="1.3" stroke-dasharray="3 2"/>
-          <ellipse cx="18" cy="12" rx="2.5" ry="6" stroke="rgba(0,200,255,0.75)" stroke-width="1.3" stroke-dasharray="3 2"/>
-          <line x1="8.5" y1="12" x2="15.5" y2="12" stroke="rgba(0,200,255,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
-          <text x="12" y="23" text-anchor="middle" font-size="4" fill="rgba(0,200,255,0.5)" font-family="monospace">A ↔ B</text>
-        </svg>
-        <span class="ins-btn-lbl" style="color:rgba(0,200,255,0.65);">Portal Pair</span>
-      </button>
+
     </div>
     <div class="div" style="margin-bottom:4px;"></div>
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">AMOUNT</span><span class="ctrl-vl" id="v-count">8000</span></div><input type="range" id="sl-count" min="500" max="8000" step="100" value="8000"></div>
@@ -587,7 +620,6 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="lvl-nav-btn" data-lvl="2">3</button>
     <button class="lvl-nav-btn" data-lvl="3">4</button>
     <button class="lvl-nav-btn" data-lvl="4">5</button>
-    <button class="lvl-nav-btn" data-lvl="5">6</button>
   </div>
   <div id="level-nav-desc"></div>
 </div>
@@ -608,9 +640,9 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 </div>
 
 <div id="flavor-toggle">
-  <button id="flv-sugar" class="flv-active" aria-label="Sugar">sugar</button>
-  <span class="flv-sep">not</span>
-  <button id="flv-salt" aria-label="Salt">salt</button>
+  <button id="flv-sugar" class="flv-active" aria-label="Sugar"><strong>sugar</strong></button>
+  <span class="flv-sep">,</span>
+  <button id="flv-salt" aria-label="Salt"><em>not</em> <strong>salt</strong></button>
 </div>
 
 
@@ -674,7 +706,6 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="4" id="mb-lvl-5">5</button>
-    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="5" id="mb-lvl-6">6</button>
   </div>
 </div>
 
@@ -722,10 +753,62 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
     Controls
   </button>
 </div>
+<div id="thank-you-toast">
+  <div class="tyt-title">thank you</div>
+  <div class="tyt-body">say hi</div>
+  <div class="tyt-email">zack@reasonably.cc</div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 'use strict';
 
+
+
+function showThankYouToast() {
+  const t = document.getElementById('thank-you-toast');
+  if (!t) return;
+  t.classList.add('visible');
+
+  // ── Mobile: tap anywhere on toast to dismiss ──────────────────────────────
+  if (window.innerWidth <= 600) {
+    t.addEventListener('click', () => {
+      t.classList.remove('visible');
+    }, { once: true });
+    return;
+  }
+
+  // ── Desktop: draggable ────────────────────────────────────────────────────
+  let _tDrag = false, _tOX = 0, _tOY = 0;
+  // Reset to CSS default position first
+  t.style.right = '16px'; t.style.bottom = '72px';
+  t.style.left = 'auto'; t.style.top = 'auto';
+
+  function _tDown(e) {
+    if (e.button !== 0) return;
+    _tDrag = true;
+    t.classList.add('dragging');
+    const r = t.getBoundingClientRect();
+    _tOX = e.clientX - r.left;
+    _tOY = e.clientY - r.top;
+    t.style.right = 'auto'; t.style.bottom = 'auto';
+    t.style.left = r.left + 'px'; t.style.top = r.top + 'px';
+    e.preventDefault();
+  }
+  function _tMove(e) {
+    if (!_tDrag) return;
+    const nx = Math.max(0, Math.min(window.innerWidth - t.offsetWidth, e.clientX - _tOX));
+    const ny = Math.max(0, Math.min(window.innerHeight - t.offsetHeight, e.clientY - _tOY));
+    t.style.left = nx + 'px'; t.style.top = ny + 'px';
+  }
+  function _tUp() {
+    if (!_tDrag) return;
+    _tDrag = false;
+    t.classList.remove('dragging');
+  }
+  t.addEventListener('mousedown', _tDown);
+  window.addEventListener('mousemove', _tMove);
+  window.addEventListener('mouseup', _tUp);
+}
 
 // ── CONTENT: single source of truth for all UI text ─────────────────────────
 const CONTENT = {
@@ -828,22 +911,36 @@ const CONTENT = {
 
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
 // On level completion: one statement replaces the floating title
-const LEVEL_COMPLETE = [
-  "design is deciding the direction of that intent.",
-  "go ahead and right-click those unused shapes.",
-  "craft still counts — in fact, I'd argue it's necessary.",
-  "it doesn't matter if you win by an inch or a mile — v.deisel",
-  "the target was never really the point.",
-  "make mass; have gravity; daringly disrupt.",
-];
+// Per-flavor win statements (5 levels after removing old level 5)
+const LEVEL_COMPLETE_FLAVOR = {
+  sugar: [
+    "sometimes, design isn't design.",
+    "design is almost always building for balance.",
+    "craft still counts — in fact, I'd argue it's necessary.",
+    "the wormhole was a shortcut. the target was the point.",
+    "make mass; have gravity; daringly disrupt.",
+  ],
+  salt: [
+    "reduction is a form of precision.",
+    "go ahead and right-click those unused shapes.",
+    "each discipline brings its own gravity.",
+    "when a bug becomes a feature. — v.deisel",
+    "make mass; have gravity; daringly disrupt.",
+  ],
+};
+function getLevelComplete(lvlN) {
+  const set = LEVEL_COMPLETE_FLAVOR[_currentFlavor] || LEVEL_COMPLETE_FLAVOR.sugar;
+  return set[Math.min(lvlN, set.length - 1)];
+}
+// Legacy alias
+const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
 
 // At rest: one title statement per level (default; overwritten by setFlavor)
 const LEVEL_TITLES = [
-  "'the best part is no part' — spaceX",
-  "time to 'think different' — a jobless steve jobs, probably",
+  "the best part is no part — spaceX",
+  "time to 'think different — a jobless steve jobs, probably",
   "each discipline brings essential nuance & care for craft.",
-  "user agency",
-  "Eventually, you realize the target is not the point.",
+  "it doesn't matter if you win by an inch or a mile — v.deisel",
   "make mass; have gravity; daringly disrupt.",
 ];
 
@@ -852,19 +949,17 @@ const LEVEL_TITLES = [
 const FLAVOR_TITLES = {
   sugar: [
     "a user arrives with intent, not a request.",
-    "with only modest involvement, one's reach extends further.",
-    "workflows can be guided with light intervention.",
+    "more often, design is setting things up.",
+    "~design thinking~ allows for solutioning [sic] around intent.",
     "each discipline brings essential nuance & care for craft.",
 
-    "more signal, more opportunity; touchpoints, not targets.",
     "be your own gravitational influence.",
   ],
   salt: [
-    "'the best part is no part' — spaceX",
-    "'all for one; one for all!'",
+    "the best part is no part — spaceX",
+    "all for one; one for all!",
     "calling specialist multi-hyphenates!",
     "if the system allows it, is it ethical?",
-    "at some point you realize that stationary target is now moot; rather, the focus becomes about gravity",
     "make mass; have gravity; daringly disrupt.",
   ],
 };
@@ -1022,8 +1117,8 @@ function _buildFloatText(lines, immediate) {
     textChars = [];
     getFontMetrics();
     const maxW = Math.min(W * COL_W_FRAC, W - PAD_X - 220);
-    // Level 6 has no shapes panel obscuring the scene — allow wider text column
-    const effectiveMaxW = (lvl === 5) ? Math.min(W * 0.55, W - PAD_X - 180) : maxW;
+    // Level 5 has no shapes panel obscuring the scene — allow wider text column
+    const effectiveMaxW = (lvl === 4) ? Math.min(W * 0.55, W - PAD_X - 180) : maxW;
 
     let totalH = 0;
     lines.forEach((line, li) => {
@@ -1232,14 +1327,13 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
 const THRESH=0.55;
-const LEVEL_THRESH=[0.55,0.55,0.55,0.30,0.55]; // level 4 wormhole: lower bar
+const LEVEL_THRESH=[0.55,0.55,0.55,0.30]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:0,r:2.8}]},
   {targets:[{x:-5.0,r:2.5},{x:6.0,r:2.5}]},
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
-  {targets:[{x:5.5,r:2.8}],blackHole:true,neutronStars:2},
   {targets:[],bouncingBlackHole:true,neutronStars:3},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
@@ -1331,8 +1425,8 @@ class Attractor {
     this._bhRadiusMin = type === 'blackhole' ? 0.68 : null;
     this._bhRadiusMax = type === 'blackhole' ? 1.505 : null;
     this._bhPullBase  = type === 'blackhole' ? 48.0 : null;
-    // Neutron stars bounce freely only on level 6; on level 5 they spring-anchor like shapes
-    this._bouncingNS = (type === 'neutronstar') && (typeof lvl !== 'undefined' ? lvl === 5 : false);
+    // Neutron stars bounce freely on level 5 (former level 6)
+    this._bouncingNS = (type === 'neutronstar') && (typeof lvl !== 'undefined' ? lvl === 4 : false);
     this._build();
   }
 
@@ -1950,7 +2044,7 @@ function drawBlackHoleOverlay() {
       });
     } else {
       // NS hit by BH: shift glow to warm amber to indicate it's been caught
-      const captured = (lvl === 5 && bh._bhHitCount > 0);
+      const captured = (lvl === 4 && bh._bhHitCount > 0);
       const nsColA = captured ? '220,120,80' : '100,200,255';
       const nsColB = captured ? '255,180,120' : '200,255,255';
       [
@@ -1986,52 +2080,37 @@ function initLevel(n){
   buildTextChars(n);
   
   const isLvl4 = n === 3; // wormhole level
-  const isLvl5 = n === 4; // black hole level
-  const isLvl6 = n === 5; // bouncing black hole sandbox
-  const isAttractorLevel = isLvl5; // only lvl5 hides shapes; lvl4 (wormhole) has shapes
+  const isLvl5 = n === 4; // bouncing black hole sandbox (was level 6)
+  const isAttractorLevel = false; // no level fully hides shapes in panel
 
   const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
-  if(dBH) dBH.style.display = (isLvl5 && !isLvl6) ? 'flex' : 'none';
+  if(dBH) dBH.style.display = 'none'; // BH not user-addable in any level
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
-  if(dNS) dNS.style.display = (isLvl5 || isLvl6) ? 'flex' : 'none';
+  if(dNS) dNS.style.display = isLvl5 ? 'flex' : 'none';
   const dPortal = document.getElementById('btn-add-portal');
-  if(dPortal) dPortal.style.display = 'none'; // portals disabled on lvl6
+  if(dPortal) dPortal.style.display = isLvl5 ? 'flex' : 'none';
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.style.display = (isAttractorLevel || isLvl6) ? 'none' : '';
+    if(btn) btn.style.display = isLvl5 ? 'none' : '';
   });
 
-  // Clear portals when leaving/entering level 6
+  // Clear portals when leaving/entering level 5
   portalPairs.length = 0;
 
   const mBH = document.getElementById('mb-add-blackhole');
-  if(mBH) mBH.style.display = (isLvl5 && !isLvl6) ? 'flex' : 'none';
+  if(mBH) mBH.style.display = 'none';
   const mNS = document.getElementById('mb-add-neutronstar');
-  if(mNS) mNS.style.display = (isLvl5 || isLvl6) ? 'flex' : 'none';
+  if(mNS) mNS.style.display = isLvl5 ? 'flex' : 'none';
   const mbCube = document.getElementById('mb-add-cube');
-  if(mbCube) mbCube.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
+  if(mbCube) mbCube.style.display = isLvl5 ? 'none' : 'flex';
   const mbSphere = document.getElementById('mb-add-sphere');
-  if(mbSphere) mbSphere.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
+  if(mbSphere) mbSphere.style.display = isLvl5 ? 'none' : 'flex';
   const mbPyramid = document.getElementById('mb-add-pyramid');
-  if(mbPyramid) mbPyramid.style.display = (isAttractorLevel || isLvl6) ? 'none' : 'flex';
+  if(mbPyramid) mbPyramid.style.display = isLvl5 ? 'none' : 'flex';
 
   destroyAttractors();
-  if (LEVELS[n].blackHole) {
-    const rx = (Math.random() - 0.5) * 8;
-    const ry = 1.5 + Math.random() * 4;
-    const bh = new Attractor('blackhole', new THREE.Vector3(rx, ry, 0));
-    bh._constrainRadius = 3.0;
-    bh._originX = rx;
-    bh._originY = ry;
-    // Level-specific BH size: lvl5 +10%, lvl6 +30%
-    const bhSizeScale = isLvl6 ? 1.30 : (isLvl5 ? 1.10 : 1.0);
-    bh.radius *= bhSizeScale;
-    bh.pullStrength *= (bhSizeScale * bhSizeScale); // area scales with radius²
-    bh.consumeRadius *= bhSizeScale;
-    attractors.push(bh);
-  }
 
-  // Level 4: wormhole settings + spawn exit
+  // Level 4 (index 3): wormhole settings + spawn exit
   if (n === 3) {
     P.count = 7000; P.gravity = 1.8; P.spread = 0.06; P.bounce = 0.75; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
@@ -2051,28 +2130,9 @@ function initLevel(n){
     wormhole.active = false;
   }
 
-  // Level 5: black hole + neutron stars — zero gravity, pure orbital physics
-  if (n === 4) {
-    P.count = 8000; P.gravity = 1.2; P.spread = 1.8; P.bounce = 0.85; P.size = 0.75;
-    if (emitterShape) emitterShape.animateMorph(0);
-    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
-    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-    setSl('sl-count', 8000); setVl('v-count', 8000);
-    setSl('sl-grav', 1.2); setVl('v-grav', '1.2');
-    setSl('sl-spread', 1.8); setVl('v-spread', '1.80');
-    setSl('sl-bounce', 0.85); setVl('v-bounce', '0.85');
-    setSl('sl-size', 0.75); setVl('v-size', '0.75');
-    setSl('mb-sl-count', 8000); setVl('mb-v-count', 8000);
-    setSl('mb-sl-grav', 1.2); setVl('mb-v-grav', '1.2');
-    setSl('mb-sl-spread', 1.8); setVl('mb-v-spread', '1.80');
-    // Liquid shader with self-luminance — bright blue-white core for level 5
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*26.0);float halo=exp(-d*7.0)*(1.0-exp(-d*3.0))*1.3;float bloom=smoothstep(0.5,0.0,d)*0.65;float brightness=core*2.0+halo+bloom;float a=brightness*(1.0-vF*0.52);gl_FragColor=vec4(min(1.0,0.82+core*0.18),min(1.0,0.93+core*0.07),1.0,a*0.94);}`;
-    pMat.needsUpdate = true;
-
-  }
-  // Level 6: bouncing black hole — rubber-ball BH, neutron stars as gravitational toys
+  // Level 5 (index 4): bouncing black hole — rubber-ball BH, neutron stars as gravitational toys
   // + viewport-side wormholes (vertical portals) that teleport the black hole
-  if (n === 5) {
+  if (n === 4) {
     P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82; P.size = 0.70;
     if (emitterShape) emitterShape.animateMorph(0);
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
@@ -2098,10 +2158,11 @@ function initLevel(n){
     bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
     attractors.push(bounceBH);
 
+    // Neutron stars: user adds manually via the NS button in the panel
     // Default shader — keep dry-salt for this level
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
-  } else if (n === 4) {
+  } else {
     // Restore default dry-salt luminance shader for levels 1–4
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
@@ -2115,8 +2176,8 @@ function buildHUD(){
     row.innerHTML=`<div class="tdot" style="background:${t.col}"></div><div class="tbar-bg"><div class="tbar-fill" id="bar${i}" style="width:0%;background:${t.col}"></div></div><span class="tpct" id="pct${i}">0%</span><span class="tchk" id="chk${i}">✓</span>`;
     c.appendChild(row);
   });
-  // Level 6: capture counter rows (one per neutron star)
-  if (lvl === 5) {
+  // Level 5: capture counter rows (one per neutron star)
+  if (lvl === 4) {
     for (let ni = 0; ni < 3; ni++) {
       const row = document.createElement('div'); row.className='target-row';
       row.innerHTML=`<div class="tdot" style="background:rgba(100,200,255,0.6)"></div><div class="tbar-bg"><div class="tbar-fill" id="ns-cap-bar${ni}" style="width:0%;background:rgba(100,200,255,0.55);"></div></div><span class="tpct" id="ns-cap-pct${ni}" style="color:rgba(100,200,255,0.4);">—</span><span class="tchk" id="ns-cap-chk${ni}">✓</span>`;
@@ -2409,8 +2470,8 @@ function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
   const isLvl4 = lvl === 3; // wormhole — has shapes
   const isLvl5 = lvl === 4; // black hole — no shapes
-  const isLvl6 = lvl === 5; // bouncing BH sandbox — no shapes
-  const noShapes = isLvl5 || isLvl6 || (isLvl4 && !LEVELS[lvl].shapes);
+  const isLvl5new = lvl === 4; // bouncing BH sandbox — no shapes
+  const noShapes = isLvl5new || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
@@ -2492,7 +2553,7 @@ function resolveCollisions(){
   }
 
   // ── NS-NS mutual gravity: strong pull — neutron stars strongly attract each other ─
-  if (lvl === 5) {
+  if (lvl === 4) {
   const NS_MUTUAL_G = 0.065;   // strong — NS want to clump and orbit each other
   const NS_MUTUAL_MAX_DIST = 30.0; // very wide — they feel each other from across the screen
   const nsArr = attractors.filter(a => a.type === 'neutronstar' && !a.dragging);
@@ -2514,11 +2575,11 @@ function resolveCollisions(){
       b.vel.y -= (ny - ty * tanBias) * f;
     }
   }
-  } // end lvl === 5 NS-NS gravity
+  } // end lvl === 4 NS-NS gravity
 
   // ── BH-NS collision: bounce + temporary capture + release ────────────────────
   // Level 6 only — on level 5, NS are spring-anchored and BH doesn't affect their position
-  if (lvl === 5) {
+  if (lvl === 4) {
     const bhArr = attractors.filter(a => a.type === 'blackhole');
     const nsArr2 = attractors.filter(a => a.type === 'neutronstar');
     for (const bh of bhArr) {
@@ -2624,7 +2685,7 @@ document.querySelectorAll('.ins-btn').forEach(b=>b.addEventListener('click',()=>
 }));
 // Portal pair button
 const _portalBtn = document.getElementById('btn-add-portal');
-if(_portalBtn) _portalBtn.addEventListener('click', () => { if(lvl===5) addPortalPair(); });
+if(_portalBtn) _portalBtn.addEventListener('click', () => { if(lvl===4) addPortalPair(); });
 document.getElementById('btn-clear2').addEventListener('click', () => { clearShapes(); portalPairs.length = 0; });
 
 // ── DISPENSER ─────────────────────────────────────────────────────────────────
@@ -2816,7 +2877,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
 
   // Portal pair drag hit-test (Level 6)
-  if(lvl === 5 && portalPairs.length > 0) {
+  if(lvl === 4 && portalPairs.length > 0) {
     const hit = hitTestPortal(e.clientX, e.clientY);
     if(hit) {
       _draggingPortal = { pair: hit.pair, which: hit.which };
@@ -2882,7 +2943,7 @@ renderer.domElement.addEventListener('contextmenu',e=>{
   ray.setFromCamera(ndc,camera);
 
   // Portal pair right-click removal (Level 6)
-  if(lvl === 5 && removePortalPairAt(e.clientX, e.clientY)) return;
+  if(lvl === 4 && removePortalPairAt(e.clientX, e.clientY)) return;
   
   for(let i=0; i<attractors.length; i++){
     const a = attractors[i];
@@ -3201,6 +3262,14 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       if(tAttractor){ pinchDist0=getTouchDist(e);aPinchPull0=tAttractor.type==='neutronstar'?(tAttractor.influenceR||3.5)*10:tAttractor.pullStrength;return; }
     }
     
+    // Wormhole exit drag — hit test before attractor/shape checks
+    if(wormhole.active && wormhole._screenX != null) {
+      const wdx=t.clientX-wormhole._screenX, wdy=t.clientY-wormhole._screenY;
+      if(Math.sqrt(wdx*wdx+wdy*wdy) < (wormhole._screenR||44)) {
+        wormhole.dragging=true; return;
+      }
+    }
+
     ndc.set((t.clientX/W)*2-1,-(t.clientY/H)*2+1);
     ray.setFromCamera(ndc,camera);
     
@@ -3277,7 +3346,11 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       return;
     }
     
-    if(tAttractor){
+    if(wormhole.active && wormhole.dragging) {
+      const wp=s2w(t.clientX,t.clientY);
+      wormhole.exitX = wp.x;
+      wormhole.exitY = wp.y;
+    } else if(tAttractor){
        const wp=s2w(t.clientX,t.clientY);
        tAttractor.pos.x=wp.x-aDragOff.x;
        tAttractor.pos.y=wp.y-aDragOff.y;
@@ -3292,6 +3365,9 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   },{passive:false});
   renderer.domElement.addEventListener('touchend',e=>{
     e.preventDefault();
+    if(wormhole.active && wormhole.dragging) {
+      wormhole.dragging=false; return;
+    }
     if(tAttractor){
       if(tAttractor._bouncingBH) {
         _applyThrow(tAttractor);
@@ -3473,8 +3549,8 @@ function countTgts(){
 }
 function updateHUD(){
   tgts.forEach((t,i)=>{const bar=document.getElementById('bar'+i),pct=document.getElementById('pct'+i),chk=document.getElementById('chk'+i);if(!bar)return;bar.style.width=(t.fill*100).toFixed(1)+'%';pct.textContent=Math.round(t.fill*100)+'%';chk.classList.toggle('done',t.met);});
-  // Level 6: update NS capture bars
-  if (lvl === 5) {
+  // Level 5: update NS capture bars
+  if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
     for (let ni = 0; ni < 3; ni++) {
       const ns = nsAll[ni];
@@ -3502,18 +3578,18 @@ function updateHUD(){
 function checkDone(){
   if(lvlDone)return;
 
-  // Level 6: win when all 3 NS have been caught in the BH's gravity well (hit by BH)
-  if (lvl === 5) {
+  // Level 5: win when all 3 NS have been caught in the BH's gravity well (hit by BH)
+  if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
     if (nsAll.length >= 3 && nsAll.every(ns => ns._bhHitCount > 0)) {
       lvlDone=true; flashEl('flash-complete');
       _lvlDone[lvl]=true;
       if(typeof updateLevelNav==='function')updateLevelNav();
-      const completionLine = LEVEL_COMPLETE[Math.min(lvl, LEVEL_COMPLETE.length - 1)];
+      const completionLine = getLevelComplete(lvl);
       _buildFloatText([completionLine], false);
       _textMode = 'idle';
       setTimeout(()=>{
-        document.getElementById('next-btn').classList.add('visible');
+        showThankYouToast();
       },600);
     }
     return;
@@ -3524,7 +3600,7 @@ function checkDone(){
     _lvlDone[lvl]=true;
     if(typeof updateLevelNav==='function')updateLevelNav();
     // Show completion statement in floating text
-    const completionLine = LEVEL_COMPLETE[Math.min(lvl, LEVEL_COMPLETE.length - 1)];
+    const completionLine = getLevelComplete(lvl);
     _buildFloatText([completionLine], false);
     _textMode = 'idle'; // lock it — don't let shape grabs override until next level
     setTimeout(()=>{
@@ -3552,10 +3628,9 @@ const LVL_DESCS=[
   'first surface. redirection begins.',
   'accumulation. wait for the spill.',
   'the split. two paths, one source.',
-  'gravity. everything orbits something.',
   'gravity unbound. lure all three stars in.',
 ];
-const _lvlDone=[false,false,false,false,false,false];
+const _lvlDone=[false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
