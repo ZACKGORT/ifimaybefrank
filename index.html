@@ -83,7 +83,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .chk-row{display:flex;align-items:center;justify-content:space-between;}
 
 #flash-complete,#flash-delete{position:fixed;inset:0;pointer-events:none;z-index:600;transition:background 0.1s;background:transparent;}
-#flash-complete.on{background:rgba(255,255,255,0.1);}
+#flash-complete.on{background:rgba(255,255,255,0.01);}
 #flash-delete.on{background:rgba(255,40,40,0.07);}
 
 #screenshot-btn {
@@ -948,10 +948,10 @@ const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
 
 // At rest: one title statement per level (default; overwritten by setFlavor)
 const LEVEL_TITLES = [
-  "the best part is no part — spaceX",
-  "time to 'think different — a jobless steve jobs, probably",
-  "each discipline brings essential nuance & care for craft.",
-  "it doesn't matter if you win by an inch or a mile — v.deisel",
+  "the best part is no part — space.X",
+  "time to 'think different — a jobless steve.jobs, probably",
+  "honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint; which I suppose is testament to my point that craft remains a viable catalyst for success.",
+  "I like my sugar with coffee and cream - beasie.boys",
   "make mass. have gravity. daringly disrupt.",
 ];
 
@@ -959,16 +959,17 @@ const LEVEL_TITLES = [
 // One statement per level per flavor. setFlavor() swaps these into LEVEL_TITLES.
 const FLAVOR_TITLES = {
   sugar: [
-    "sometimes, design isn't design.",
-    "more often, design is simply balance.",
-    "design for intent is rarely a singular path.",
-    "design requirements are now inter-dimensional.",
-    "what matters today is having a signal; meaningful mass begets gravity. gravity beckons influence.",
+    "sometimes, <br>design isn't design.",
+    "more often, <br>design is simply balance.",
+    "design for intent <br>is rarely a singular path.",
+    "intergalactic planetary, planetary intergalactic<br>",
+    "make mass. have gravity. <br>consistency in conviction is key.",
   ],
   salt: [
     "the best part is no part — spaceX",
     "all for one; one for all!",
-    "honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint; which I suppose is testament to my point that craft remains a viable catalyst for success.",
+
+    "'me-work makes the we-work' — ex.we-mmate ",
     "if the system allows it, is it ethical? where do you draw the line?",
     "less posture; more position <br>— fafo, but with ferocious focus and intent.",
   ],
@@ -1716,9 +1717,15 @@ class Attractor {
         }
 
         // Wall bounces — only apply horizontal bounce if no wormhole teleport
+        // Soft energy boost on collision: gentle persistent kick so BH never fully loses momentum
+        const BH_WALL_BOOST = 0.18; // lateral nudge on side hits
+        const BH_FLOOR_BOOST = 0.22; // vertical nudge on floor hit
         if (this.pos.y - rEff < BY_FLOOR) {
           this.pos.y = BY_FLOOR + rEff;
-          if (this.vel.y < 0) { this.vel.y = -this.vel.y * RESTITUTION; this.vel.x *= FRICTION; }
+          if (this.vel.y < 0) {
+            this.vel.y = -this.vel.y * RESTITUTION + BH_FLOOR_BOOST;
+            this.vel.x *= FRICTION;
+          }
         }
         if (this.pos.y + rEff > BY_CEIL) {
           this.pos.y = BY_CEIL - rEff;
@@ -1727,11 +1734,11 @@ class Attractor {
         if (!teleported) {
           if (this.pos.x + rEff > edgeRW) {
             this.pos.x = edgeRW - rEff;
-            if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION;
+            if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION - BH_WALL_BOOST;
           }
           if (this.pos.x - rEff < edgeLW) {
             this.pos.x = edgeLW + rEff;
-            if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION;
+            if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION + BH_WALL_BOOST;
           }
         }
 
