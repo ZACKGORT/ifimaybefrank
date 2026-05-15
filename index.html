@@ -83,8 +83,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .chk-row{display:flex;align-items:center;justify-content:space-between;}
 
 #flash-complete,#flash-delete{position:fixed;inset:0;pointer-events:none;z-index:600;transition:background 0.1s;background:transparent;}
-#flash-complete.on{background:transparent;}
-#flash-delete.on{background:transparent;}
+#flash-complete.on{background:rgba(255,255,255,0.01);}
+#flash-delete.on{background:rgba(255,40,40,0.07);}
 
 #screenshot-btn {
   position: fixed;
@@ -646,9 +646,9 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
 </div>
 
 <div id="flavor-toggle">
-  <button id="flv-sugar" class="flv-active" aria-label="Sugar"><strong>sugar</strong></button>
+  <button id="flv-sugar" class="flv-active" aria-label="Sugar">sugar</button>
   <span class="flv-sep">,</span>
-  <button id="flv-salt" aria-label="Salt"><em>not</em> <strong>salt</strong></button>
+  <button id="flv-salt" aria-label="Salt">not salt</button>
 </div>
 
 
@@ -1044,6 +1044,7 @@ function nextShapeCopy(type) {
   _shapeCopyIdx[type]++;
   return [line];
 }
+
 
 // ── TEXT STATE MACHINE ────────────────────────────────────────────────────────
 // 'idle' | 'shape'
@@ -2208,9 +2209,11 @@ function initLevel(n){
     bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
     attractors.push(bounceBH);
 
-    // Spawn 1 neutron star on load
+    // Spawn 3 neutron stars at staggered positions on load
     const nsSpawnPositions = [
-      new THREE.Vector3((Math.random()-0.5)*3, 1.5 + Math.random()*2.0, 0),
+      new THREE.Vector3(-5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
+      new THREE.Vector3( 0.0 + (Math.random()-0.5)*1.5, 2.5 + Math.random()*1.5, 0),
+      new THREE.Vector3( 5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
     ];
     nsSpawnPositions.forEach(pos => {
       const ns = new Attractor('neutronstar', pos);
@@ -2251,7 +2254,7 @@ function buildHUD(){
   });
   // Level 5: capture counter rows (one per neutron star)
   if (lvl === 4) {
-    for (let ni = 0; ni < 1; ni++) {
+    for (let ni = 0; ni < 3; ni++) {
       const row = document.createElement('div'); row.className='target-row';
       row.innerHTML=`<div class="tdot" style="background:rgba(100,200,255,0.6)"></div><div class="tbar-bg"><div class="tbar-fill" id="ns-cap-bar${ni}" style="width:0%;background:rgba(100,200,255,0.55);"></div></div><span class="tpct" id="ns-cap-pct${ni}" style="color:rgba(100,200,255,0.4);">—</span><span class="tchk" id="ns-cap-chk${ni}">✓</span>`;
       c.appendChild(row);
