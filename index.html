@@ -626,6 +626,7 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
     <button class="lvl-nav-btn" data-lvl="2">3</button>
     <button class="lvl-nav-btn" data-lvl="3">4</button>
     <button class="lvl-nav-btn" data-lvl="4">5</button>
+    <button class="lvl-nav-btn" data-lvl="5">✦</button>
   </div>
   <div id="level-nav-desc"></div>
 </div>
@@ -712,6 +713,7 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="4" id="mb-lvl-5">5</button>
+    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="5" id="mb-lvl-6">✦</button>
   </div>
 </div>
 
@@ -931,6 +933,7 @@ const LEVEL_COMPLETE_FLAVOR = {
     `that's craft.`,
     `very nice, well done.`,
     `mass makes gravity. <br>gravity is influence. `,
+    `some systems don't need a goal.`,
   ],
   salt: [
     `reduction is a form of precision.`,
@@ -938,6 +941,7 @@ const LEVEL_COMPLETE_FLAVOR = {
     `that wasn't so bad.`,
     `if you moved the wormhole, that's like moving the goal posts, but a win is a win, I suppose.`,
     `make mass; have gravity; daringly disrupt.`,
+    `this was always the point.`,
   ],
 };
 function getLevelComplete(lvlN) {
@@ -964,14 +968,16 @@ const FLAVOR_TITLES = {
     `more often, <br>design is simply balance.`,
     `design may offer <br>pathways for intent.`,
     `design can be defined as "anything not created by nature"`,
-    `franklh, <br>make mass. <br>have gravity.`,
+    `frankly,<br><br>design is still very much 'about' pixel-perfection, but the role of a designer is in optimizing for real-world physics. <br><br>perhaps craft matters most now?`,
+    `gravity without a target<br>is still gravity.`,
   ],
   salt: [
   `"the best part is no part"<br>— space.X`,
     `a single operator can control multiple streams.`,
     `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
     `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-    `frankly,<br><br>less posture; more position.`,
+    `frankly,<br><br>less posture; more position. <br>the more meaningful one's mass;<br>the greater one's gravity.`,
+    `influence doesn't wait<br>to be aimed.`,
   ],
 };
 
@@ -1355,7 +1361,7 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
 const THRESH=0.55;
-const LEVEL_THRESH=[0.55,0.55,0.55,0.30]; // level 4 wormhole: lower bar
+const LEVEL_THRESH=[0.55,0.55,0.55,0.30,0.55,0.55]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:0,r:2.8}]},
@@ -1363,6 +1369,7 @@ const LEVELS=[
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
   {targets:[],bouncingBlackHole:true,neutronStars:3},
+  {targets:[],zenOrb:true},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
@@ -1439,8 +1446,9 @@ const BH_SPRING_K = 5.0;
 const BH_DAMPING = 7.5;
 
 class Attractor {
-  constructor(type, pos) {
+  constructor(type, pos, zenOrb) {
     this.type = type;
+    this._zenOrb = zenOrb || false;
     this.pos = pos.clone();
     this.rest = pos.clone();
     this.vel = new THREE.Vector3();
@@ -1462,20 +1470,79 @@ class Attractor {
     this.mesh = new THREE.Group();
 
     if (this.type === 'blackhole') {
-      // Core — obsidian black sphere
-      const coreGeo = new THREE.SphereGeometry(this.radius, 48, 32);
+      // Check if this is a zen orb variant
+      if (this._zenOrb) {
+        // Glowing glass orb — bright, luminous star-like sphere
+        const coreGeo = new THREE.SphereGeometry(this.radius, 64, 40);
+        const coreMat = new THREE.MeshPhysicalMaterial({
+          color: 0xffffff,
+          emissive: 0xffffff,
+          emissiveIntensity: 3.5,
+          roughness: 0.0,
+          metalness: 1.0,
+          reflectivity: 1.0,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.0,
+          transparent: true,
+          opacity: 0.97,
+        });
+        this.core = new THREE.Mesh(coreGeo, coreMat);
+        this.mesh.add(this.core);
+
+        // Point light — warm golden glow emanating from orb
+        this._zenLight = new THREE.PointLight(0xfff8e8, 6.0, 30);
+        this.mesh.add(this._zenLight);
+
+        // Glow corona layers — barely visible, just a breath of light
+        const glowLayers = [
+          { r: this.radius * 1.18, color: 0xffffff, opacity: 0.06 },
+          { r: this.radius * 1.55, color: 0xfff0d0, opacity: 0.03 },
+          { r: this.radius * 2.20, color: 0xffe090, opacity: 0.015 },
+          { r: this.radius * 3.60, color: 0xffcc60, opacity: 0.006 },
+        ];
+        this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
+          const g = new THREE.Mesh(
+            new THREE.SphereGeometry(r, 32, 20),
+            new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.BackSide, depthWrite: false })
+          );
+          this.mesh.add(g);
+          return g;
+        });
+
+        // No accretion disc for zen orb
+        this._adPoints = null;
+        this.mesh.position.copy(this.pos);
+        scene.add(this.mesh);
+        return;
+      }
+
+      // Core — luminous star/sun sphere (same look as zen orb)
+      const coreGeo = new THREE.SphereGeometry(this.radius, 64, 40);
       const coreMat = new THREE.MeshPhysicalMaterial({
-        color: 0x000000, roughness: 0.0, metalness: 1.0,
-        reflectivity: 1.0, clearcoat: 1.0, clearcoatRoughness: 0.0,
+        color: 0xffffff,
+        emissive: 0xffffff,
+        emissiveIntensity: 3.5,
+        roughness: 0.0,
+        metalness: 1.0,
+        reflectivity: 1.0,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.0,
+        transparent: true,
+        opacity: 0.97,
       });
       this.core = new THREE.Mesh(coreGeo, coreMat);
       this.mesh.add(this.core);
 
-      // Glow corona
+      // Point light — warm golden glow
+      this._zenLight = new THREE.PointLight(0xfff8e8, 6.0, 30);
+      this.mesh.add(this._zenLight);
+
+      // Glow corona layers — warm sun halos
       const glowLayers = [
-        { r: this.radius * 1.35, color: 0x5533ff, opacity: 0.18 },
-        { r: this.radius * 1.65, color: 0x3311cc, opacity: 0.10 },
-        { r: this.radius * 2.10, color: 0x220088, opacity: 0.05 },
+        { r: this.radius * 1.18, color: 0xffffff, opacity: 0.06 },
+        { r: this.radius * 1.55, color: 0xfff0d0, opacity: 0.03 },
+        { r: this.radius * 2.20, color: 0xffe090, opacity: 0.015 },
+        { r: this.radius * 3.60, color: 0xffcc60, opacity: 0.006 },
       ];
       this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
         const g = new THREE.Mesh(
@@ -1486,8 +1553,8 @@ class Attractor {
         return g;
       });
 
-      // Accretion disc — particle system orbiting the BH
-      this._initAccretionDisc();
+      // No accretion disc for sun-style BH
+      this._adPoints = null;
 
     } else {
       // Neutron Star
@@ -1652,11 +1719,27 @@ class Attractor {
     for (const pp of portalPairs) { if (pp.cooldown > 0) pp.cooldown -= dt; }
 
     if (this.type === 'blackhole') {
+      if (this._zenOrb) {
+        // Gentle breathing pulse for zen orb
+        const pulse = 0.5 + Math.sin(this._pulseT * 0.9) * 0.5;
+        const pulse2 = 0.5 + Math.sin(this._pulseT * 1.4 + 1.2) * 0.5;
+        this.glowMeshes[0].material.opacity = 0.04 + pulse * 0.025;
+        this.glowMeshes[1].material.opacity = 0.02 + pulse2 * 0.012;
+        this.glowMeshes[2].material.opacity = 0.008 + pulse * 0.007;
+        this.glowMeshes[3].material.opacity = 0.003 + pulse2 * 0.003;
+        if (this._zenLight) {
+          this._zenLight.intensity = 4.5 + pulse * 2.0;
+        }
+        if (this.core && this.core.material) {
+          this.core.material.emissiveIntensity = 3.0 + pulse * 1.0;
+        }
+      } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 2.2) * 0.5;
       this.glowMeshes[0].material.opacity = 0.14 + pulse * 0.08;
       this.glowMeshes[1].material.opacity = 0.07 + pulse * 0.04;
       this.glowMeshes[2].material.opacity = 0.03 + pulse * 0.025;
       if (this._adPoints) this._updateAccretionDisc(dt);
+      }
     } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 8.0) * 0.5;
       this.glowMeshes[0].material.opacity = 0.28 + pulse * 0.14;
@@ -2073,7 +2156,7 @@ function drawBlackHoleOverlay() {
     ovCtx.save();
     ovCtx.setLineDash([2, 5]); ovCtx.lineDashOffset = -t * 8;
     ovCtx.beginPath(); ovCtx.arc(sx, sy, pullR, 0, Math.PI * 2);
-    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.30)' : 'rgba(80,50,200,0.22)';
+    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.30)' : 'rgba(255,220,100,0.18)';
     ovCtx.lineWidth = 1; ovCtx.stroke();
     ovCtx.setLineDash([]);
 
@@ -2084,17 +2167,53 @@ function drawBlackHoleOverlay() {
     const coreR = Math.abs((bhEdge.x + 1) / 2 * W - sx);
 
     if (bh.type === 'blackhole') {
-      [
-        { r: coreR * 2.8, a: 0.10, col: '80,50,220' },
-        { r: coreR * 1.8, a: 0.18, col: '60,30,180' },
-        { r: coreR * 1.2, a: 0.28, col: '30,10,100' }
-      ].forEach(({ r, a, col }) => {
-        const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
-        g.addColorStop(0, `rgba(${col},${a})`);
-        g.addColorStop(1, `rgba(${col},0)`);
-        ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
-        ovCtx.fillStyle = g; ovCtx.fill();
-      });
+      if (bh._zenOrb) {
+        // Warm luminous glow halos — golden star
+        [
+          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
+          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
+          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
+        ].forEach(({ r, a, col }) => {
+          const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
+          g.addColorStop(0, `rgba(${col},${a})`);
+          g.addColorStop(1, `rgba(${col},0)`);
+          ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
+          ovCtx.fillStyle = g; ovCtx.fill();
+        });
+        // Animated shimmer ring
+        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
+        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
+        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
+        ovCtx.lineWidth = 1; ovCtx.stroke();
+        ovCtx.setLineDash([]);
+        ovCtx.font = '8px Courier New';
+        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
+        ovCtx.textAlign = 'center';
+        ovCtx.fillText('ZEN ORB', sx, sy + coreR + 14);
+      } else {
+        // Sun-style warm golden halos (same as zen orb)
+        [
+          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
+          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
+          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
+        ].forEach(({ r, a, col }) => {
+          const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
+          g.addColorStop(0, `rgba(${col},${a})`);
+          g.addColorStop(1, `rgba(${col},0)`);
+          ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
+          ovCtx.fillStyle = g; ovCtx.fill();
+        });
+        // Animated shimmer ring
+        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
+        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
+        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
+        ovCtx.lineWidth = 1; ovCtx.stroke();
+        ovCtx.setLineDash([]);
+        ovCtx.font = '8px Courier New';
+        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
+        ovCtx.textAlign = 'center';
+        ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
+      }
     } else {
       // NS: cosmic blue glow, no amber shift
       [
@@ -2107,13 +2226,6 @@ function drawBlackHoleOverlay() {
         ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
         ovCtx.fillStyle = g; ovCtx.fill();
       });
-    }
-
-    if (bh.type !== 'neutronstar') {
-      ovCtx.font = '8px Courier New';
-      ovCtx.fillStyle = 'rgba(110,80,220,0.38)';
-      ovCtx.textAlign = 'center';
-      ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
     }
 
     // Nova shockwave flare — expanding ring when hit by a supernova click
@@ -2147,19 +2259,28 @@ function initLevel(n){
   buildHUD();
   buildTextChars(n);
   
+  // Restore emitter visibility (level 6 hides it)
+  if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = (n !== 5);
+
   const isLvl4 = n === 3; // wormhole level
   const isLvl5 = n === 4; // bouncing black hole sandbox (was level 6)
-  const isAttractorLevel = false; // no level fully hides shapes in panel
+  const isLvl6 = n === 5; // zen mode
+
+  // Level 5 + 6: hide the insert panel entirely
+  const insPanel = document.getElementById('insert-panel');
+  if (insPanel) insPanel.style.display = (isLvl5 || isLvl6) ? 'none' : '';
+  const mbInsert = document.getElementById('mb-insert-row');
+  if (mbInsert) mbInsert.style.display = (isLvl5 || isLvl6) ? 'none' : '';
 
   const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
   if(dBH) dBH.style.display = 'none'; // BH not user-addable in any level
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
-  if(dNS) dNS.style.display = isLvl5 ? 'flex' : 'none';
+  if(dNS) dNS.style.display = 'none';
   const dPortal = document.getElementById('btn-add-portal');
-  if(dPortal) dPortal.style.display = isLvl5 ? 'flex' : 'none';
+  if(dPortal) dPortal.style.display = 'none';
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.style.display = isLvl5 ? 'none' : '';
+    if(btn) btn.style.display = (isLvl5 || isLvl6) ? 'none' : '';
   });
 
   // Clear portals when leaving/entering level 5
@@ -2168,13 +2289,13 @@ function initLevel(n){
   const mBH = document.getElementById('mb-add-blackhole');
   if(mBH) mBH.style.display = 'none';
   const mNS = document.getElementById('mb-add-neutronstar');
-  if(mNS) mNS.style.display = isLvl5 ? 'flex' : 'none';
+  if(mNS) mNS.style.display = 'none';
   const mbCube = document.getElementById('mb-add-cube');
-  if(mbCube) mbCube.style.display = isLvl5 ? 'none' : 'flex';
+  if(mbCube) mbCube.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
   const mbSphere = document.getElementById('mb-add-sphere');
-  if(mbSphere) mbSphere.style.display = isLvl5 ? 'none' : 'flex';
+  if(mbSphere) mbSphere.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
   const mbPyramid = document.getElementById('mb-add-pyramid');
-  if(mbPyramid) mbPyramid.style.display = isLvl5 ? 'none' : 'flex';
+  if(mbPyramid) mbPyramid.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
 
   destroyAttractors();
 
@@ -2258,6 +2379,48 @@ function initLevel(n){
     if (wfRow) wfRow.style.display = 'none';
     const wfTog = document.getElementById('tog-waterfall');
     if (wfTog) { wfTog.textContent = 'OFF'; wfTog.classList.remove('on'); }
+  }
+  // Level 6 (index 5): clone of level 5 — bouncing BH, no NS, full-viewport rain from top
+  if (n === 5) {
+    P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82; P.size = 0.70;
+    if (emitterShape) emitterShape.animateMorph(0);
+    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+    setSl('sl-count', 8000); setVl('v-count', 8000);
+    setSl('sl-grav', 0.6); setVl('v-grav', '0.6');
+    setSl('sl-spread', 1.4); setVl('v-spread', '1.40');
+    setSl('sl-bounce', 0.82); setVl('v-bounce', '0.82');
+    setSl('sl-size', 0.70); setVl('v-size', '0.70');
+
+    // Hide panelstack emitter — level 6 uses a full-viewport top emitter instead
+    if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = false;
+
+    // Spawn bouncing black hole — same as level 5
+    const bx = (Math.random() - 0.5) * 6;
+    const by = 0.5 + Math.random() * 2.0;
+    const bounceBH = new Attractor('blackhole', new THREE.Vector3(bx, by, 0));
+    bounceBH._bouncingBH = true;
+    bounceBH.radius *= 1.30;
+    bounceBH.consumeRadius *= 1.30;
+    bounceBH.pullStrength = 112.0 * (1.30 * 1.30);
+    const bhAng = Math.random() * Math.PI * 2;
+    bounceBH.vel.x = Math.cos(bhAng) * (4 + Math.random() * 3);
+    bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
+    attractors.push(bounceBH);
+
+    // No neutron stars on level 6
+
+    // Same particle shader as level 5
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.needsUpdate = true;
+
+    // Waterfall ON
+    P.waterfall = true;
+    _wfPhase = 0;
+    const wfRow = document.getElementById('waterfall-row');
+    if (wfRow) wfRow.style.display = 'flex';
+    const wfTog = document.getElementById('tog-waterfall');
+    if (wfTog) { wfTog.textContent = 'ON'; wfTog.classList.add('on'); }
   }
   updateLevelNav();
 }
@@ -2388,7 +2551,7 @@ class Shape{
         const yOff=totalH/2 - i*(PANEL_H+GAP) - PANEL_H/2;
         const sc=Math.max(0.01,1.0-this._panelMorphVal*(t));
         const geo=new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc);
-        const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.55,metalness:0.02});
+        const mat=new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:0.55,metalness:0.02,emissive:new THREE.Color(0xffffff),emissiveIntensity:0.55,clearcoat:0.4,clearcoatRoughness:0.2});
         const mesh=new THREE.Mesh(geo,mat);
         mesh.position.y=yOff;
         const eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc),22);
@@ -2402,12 +2565,34 @@ class Shape{
       scene.add(this.mesh);
       return;
     }
-    const mat=new THREE.MeshStandardMaterial({color:d.color,roughness:d.rough,metalness:0.02});
+    const mat=new THREE.MeshPhysicalMaterial({
+      color:d.color, roughness:0.0, metalness:1.0,
+      emissive:new THREE.Color(d.color), emissiveIntensity:3.5,
+      reflectivity:1.0, clearcoat:1.0, clearcoatRoughness:0.0,
+      transparent:true, opacity:0.97,
+    });
     const geo=d.makeGeo(s);
     this.mesh=new THREE.Mesh(geo,mat);
     this.mesh.rotation.copy(this.cEul);this.mesh.position.copy(this.pos);
     const eg=new THREE.EdgesGeometry(d.makeGeo(s),22);
-    this.mesh.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x888888,transparent:true,opacity:0.22})));
+    this.mesh.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.18})));
+    // ── Sun-style PointLight + glow corona ──
+    const shapeLight = new THREE.PointLight(0xfff8e8, 4.0, 20);
+    this.mesh.add(shapeLight);
+    const baseR = this.def.baseR * s;
+    const glowDefs = [
+      { r: baseR * 1.3,  color: 0xffffff,  opacity: 0.06 },
+      { r: baseR * 1.8,  color: 0xfff0d0,  opacity: 0.03 },
+      { r: baseR * 2.6,  color: 0xffe090,  opacity: 0.012 },
+      { r: baseR * 4.0,  color: 0xffcc60,  opacity: 0.005 },
+    ];
+    glowDefs.forEach(({ r, color, opacity }) => {
+      const g = new THREE.Mesh(
+        new THREE.SphereGeometry(r, 16, 10),
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.BackSide, depthWrite: false })
+      );
+      this.mesh.add(g);
+    });
     scene.add(this.mesh);
   }
   resize(sc){
@@ -2563,7 +2748,7 @@ function buildInit(){
   const isLvl4 = lvl === 3; // wormhole — has shapes
   const isLvl5 = lvl === 4; // black hole — no shapes
   const isLvl5new = lvl === 4; // bouncing BH sandbox — no shapes
-  const noShapes = isLvl5new || (isLvl4 && !LEVELS[lvl].shapes);
+  const noShapes = isLvl5new || lvl === 5 || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
@@ -2810,6 +2995,13 @@ window.addEventListener('pointermove',()=>{lastInteractTime=Date.now();hasIntera
 window.addEventListener('pointermove',e=>{if(!dDrag)return;const dx=e.clientX-(dX+dOX),dy=e.clientY-(dY+dOY);if(Math.abs(dx)>4||Math.abs(dy)>4)dMoved=true;dX=e.clientX-dOX;dY=e.clientY-dOY;const ns=dY<SNAPZONE;snapHint.classList.toggle('visible',ns);if(ns){dY=18;dX=Math.max(60,Math.min(W-60,dX));}posDsp(dX,dY);});
 window.addEventListener('pointerup',e=>{if(!dDrag)return;dDrag=false;snapHint.classList.remove('visible');if(dY<SNAPZONE){dY=18;}posDsp(Math.max(60,Math.min(W-60,dX)),dY);});
 function getSpout(){
+  // Level 6: full-viewport-width emitter from the very top of screen
+  if (lvl === 5) {
+    const topWorld = s2w(0, 0); // top-left world coord
+    const rightWorld = s2w(W, 0); // top-right world coord
+    const rx = topWorld.x + Math.random() * (rightWorld.x - topWorld.x);
+    return { x: rx, y: topWorld.y };
+  }
   if(emitterShape&&emitterShape.mesh){
     // bottom of stack = pos.y - half total height
     const totalH=emitterShape._totalH||3.5;
@@ -3813,6 +4005,9 @@ function updateHUD(){
 function checkDone(){
   if(lvlDone)return;
 
+  // Level 6: zen mode — no win condition
+  if (lvl === 5) return;
+
   // Level 5: win when all 3 NS have been caught in the BH's gravity well (hit by BH)
   if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
@@ -3864,8 +4059,9 @@ const LVL_DESCS=[
   'accumulation. wait for the spill.',
   'the split. two paths, one source.',
   'gravity unbound. lure all three stars in.',
+  'open field. the sun moves itself.',
 ];
-const _lvlDone=[false,false,false,false,false];
+const _lvlDone=[false,false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
@@ -4639,24 +4835,35 @@ function applyTheme(paper) {
 
 function _applyShapeMat(sh, paper) {
   const def = sh.def;
-  let p;
+  const m = sh.mesh.material;
+  if (!m) return;
   if (paper) {
-    p = sh.type==='sphere' ? PAPER_SHAPE_SPHERE : sh.type==='pyramid' ? PAPER_SHAPE_PYRAMID : PAPER_SHAPE;
+    const p = sh.type==='sphere' ? PAPER_SHAPE_SPHERE : sh.type==='pyramid' ? PAPER_SHAPE_PYRAMID : PAPER_SHAPE;
+    m.color.setHex(p.color);
+    m.roughness = p.roughness;
+    m.metalness = p.metalness;
+    if (m.emissive) { m.emissive.setHex(0x000000); m.emissiveIntensity = 0; }
+    sh.mesh.children.forEach(c => {
+      if (c.isPointLight) c.intensity = 0;
+      if (c.isMesh && c.material && c.material.side === THREE.BackSide) c.visible = false;
+      if (c.material && c.material.isLineBasicMaterial) {
+        c.material.color.setHex(0x444444); c.material.opacity = 0.35; c.material.needsUpdate = true;
+      }
+    });
   } else {
-    p = { color: def.color, roughness: def.rough, metalness: 0.02 };
+    m.color.setHex(def.color);
+    m.roughness = 0.0;
+    m.metalness = 1.0;
+    if (m.emissive) { m.emissive.setHex(def.color); m.emissiveIntensity = 3.5; }
+    sh.mesh.children.forEach(c => {
+      if (c.isPointLight) c.intensity = 4.0;
+      if (c.isMesh && c.material && c.material.side === THREE.BackSide) c.visible = true;
+      if (c.material && c.material.isLineBasicMaterial) {
+        c.material.color.setHex(0xffffff); c.material.opacity = 0.18; c.material.needsUpdate = true;
+      }
+    });
   }
-  sh.mesh.material.color.setHex(p.color);
-  sh.mesh.material.roughness = p.roughness;
-  sh.mesh.material.metalness = p.metalness;
-  sh.mesh.material.needsUpdate = true;
-  // Edge color
-  sh.mesh.children.forEach(c => {
-    if (c.material && c.material.isLineBasicMaterial) {
-      c.material.color.setHex(paper ? 0x444444 : 0x888888);
-      c.material.opacity = paper ? 0.35 : 0.22;
-      c.material.needsUpdate = true;
-    }
-  });
+  m.needsUpdate = true;
 }
 
 // Intercept addShape to apply paper theme to new shapes
