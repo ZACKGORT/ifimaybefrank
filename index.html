@@ -322,6 +322,29 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   #cursor{display:none!important;}
   body{cursor:auto;}
 
+  /* ── MOBILE LEVEL NAV (always-visible prev/next in top bar) ── */
+  #mb-lvl-nav{
+    display:flex;align-items:center;gap:0;
+    border-left:1px solid rgba(255,255,255,0.06);
+    flex-shrink:0;
+  }
+  #mb-lvl-prev,#mb-lvl-next{
+    width:38px;height:48px;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:none;
+    font-family:'Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:300;
+    color:rgba(255,255,255,0.35);
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+    transition:color 0.12s,background 0.12s;
+  }
+  #mb-lvl-prev:active,#mb-lvl-next:active{color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.06);}
+  #mb-lvl-label{
+    font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;
+    text-transform:uppercase;color:rgba(255,255,255,0.42);
+    min-width:38px;text-align:center;pointer-events:none;
+    white-space:nowrap;
+  }
+
   /* ── TOP BAR: Flow + Controls only ── */
   #mobile-bar{
     position:fixed;top:0;left:0;right:0;height:48px;
@@ -495,7 +518,17 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 }
 @media (min-width:601px){#mobile-bar,.mb-panel,#mobile-bottom-rail,#mb-shape-hud{display:none!important;}}
 
-/* ── THANK YOU TOAST ── */
+/* ── SINGULARITY COLLAPSE INDICATOR ── */
+#collapse-ring{
+  position:fixed;pointer-events:none;z-index:9998;
+  width:0;height:0;border-radius:50%;
+  border:2px solid rgba(255,80,80,0.0);
+  transform:translate(-50%,-50%);
+  transition:border-color 0.1s;
+  display:none;
+}
+#collapse-ring.active{display:block;border-color:rgba(255,80,80,0.6);}
+
 #thank-you-toast{
   position:fixed;
   /* Desktop: bottom center */
@@ -517,13 +550,13 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
 #thank-you-toast .tyt-links{display:flex;gap:14px;justify-content:center;margin-top:10px;}
 #thank-you-toast .tyt-links a{font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:rgba(255,255,255,0.3);text-decoration:none;text-transform:uppercase;transition:color 0.15s;}
 #thank-you-toast .tyt-links a:hover{color:rgba(255,255,255,0.75);}
-/* Mobile: bottom-clamped, full-width-ish, tap to dismiss */
+/* Mobile: bottom-clamped, NOT full-width, tap to dismiss */
 @media(max-width:600px){
   #thank-you-toast{
-    right:auto;bottom:0;left:0;width:100%;border-radius:12px 12px 0 0;
-    padding:18px 24px 28px;text-align:center;cursor:pointer;
-    transform:translateY(8px) scale(0.98);
-    border-bottom:none;
+    right:16px;bottom:60px;left:16px;width:auto;border-radius:12px;
+    padding:18px 24px 22px;text-align:center;cursor:pointer;
+    transform:translateY(12px) scale(0.96);
+    border-bottom:1px solid rgba(255,255,255,0.14);
   }
   #thank-you-toast.visible{transform:translateY(0) scale(1);}
   #thank-you-toast::after{
@@ -546,6 +579,7 @@ body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
 <div id="snap-hint"></div>
 <div id="flash-complete"></div>
 <div id="flash-delete"></div>
+<div id="collapse-ring"></div>
 <canvas id="text-canvas"></canvas>
 
 <div id="dispenser" style="display:none;">
@@ -719,6 +753,11 @@ body.paper #project-card-close { color: rgba(0,0,0,0.25); }
 
 <div id="mobile-bar">
   <button class="mb-btn" id="mb-note-btn"></button>
+  <div id="mb-lvl-nav">
+    <button id="mb-lvl-prev">‹</button>
+    <span id="mb-lvl-label">LVL 1</span>
+    <button id="mb-lvl-next">›</button>
+  </div>
 </div>
 <div class="mb-panel" id="mb-note-panel">
   <div id="mb-flavor-tabs">
@@ -825,7 +864,7 @@ body.paper #project-card-close { color: rgba(0,0,0,0.25); }
 </div>
 <div id="thank-you-toast">
   <div class="tyt-title">thank you</div>
-  <div class="tyt-body">say hi</div>
+  <div class="tyt-body">thank you for your clicks, much appreciated</div>
   <div class="tyt-email">zack@reasonably.cc</div>
   <div class="tyt-links">
     <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
@@ -841,6 +880,14 @@ body.paper #project-card-close { color: rgba(0,0,0,0.25); }
 function showThankYouToast() {
   const t = document.getElementById('thank-you-toast');
   if (!t) return;
+
+  // Update body text with click count
+  const bodyEl = t.querySelector('.tyt-body');
+  if (bodyEl) {
+    const n = _totalClickCount;
+    bodyEl.textContent = `thank you for your ${n} of clicks, much appreciated`;
+  }
+
   t.classList.add('visible');
 
   // ── Mobile: tap anywhere on toast to dismiss ──────────────────────────────
@@ -1030,14 +1077,16 @@ const FLAVOR_TITLES = {
     `more often, <br>design is simply balance.`,
     `design may offer <br>pathways for intent.`,
     `design can be defined as "anything not created by nature"`,
-    `meaningful mass<br>creates its own gravity.`,
+    `design is intake.`,
+    `make mass; have gravity.`,
   ],
   salt: [
   `"the best part is no part"<br>— space.X`,
     `a single operator can control multiple streams.`,
     `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
     `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-    `mass is the only influence<br>that doesn't need permission.`,
+    `concept. conviction. craft.`,
+    `i think.`,
   ],
 };
 
@@ -1440,6 +1489,7 @@ let spillCount=0,spillSmooth=0;
 let lastSpillMsg=-1;
 let lastInteractTime=0;
 let hasInteracted=false;
+let _totalClickCount=0; // cumulative click counter for thank-you message
 const SPILL_IDLE_MS=4000;
 const FILL_A=0.04,FLR=-9.0;
 
@@ -2331,7 +2381,8 @@ function initLevel(n){
   const isLvl6 = n === 5; // zen mode
 
   // Level 6: hide flow panel, targets (game-hud), and spill widget; restore otherwise
-  const _lvl6Widgets = ['panel','game-hud','spill-graph-widget','mobile-bar','mobile-bottom-rail','mb-shape-hud'];
+  // Keep mobile-bar and mobile-bottom-rail visible so logo + level select remain accessible
+  const _lvl6Widgets = ['panel','game-hud','spill-graph-widget','mb-shape-hud'];
   _lvl6Widgets.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = isLvl6 ? 'none' : '';
@@ -2459,7 +2510,9 @@ function initLevel(n){
   }
   // Level 6 (index 5): clone of level 5 — bouncing BH, no NS, full-viewport rain from top
   if (n === 5) {
-    P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82; P.size = 0.70;
+    P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82;
+    // Mobile: smaller particles = denser visual appearance
+    P.size = isMobile ? 0.42 : 0.70;
     if (emitterShape) emitterShape.animateMorph(0);
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
@@ -3645,38 +3698,159 @@ renderer.domElement.addEventListener('mousedown',e=>{
     }
   }
   // Empty-space click — supernova blast
-  else { const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
+  else { _totalClickCount++; const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
 });
-renderer.domElement.addEventListener('contextmenu',e=>{
-  e.preventDefault();
-  ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
-  ray.setFromCamera(ndc,camera);
+// ── SINGULARITY COLLAPSE (right-click hold / long-static-press) ───────────────
+// Threshold in ms before delete fires. Release early cancels.
+const COLLAPSE_THRESHOLD = 600;
+const collapseRing = document.getElementById('collapse-ring');
+let _collapseTimer = null;
+let _collapseTarget = null; // { type: 'shape'|'attractor'|'portal', ref }
+let _collapseStartSx = 0, _collapseStartSy = 0;
+let _collapseStartT = 0;
+let _collapseRAF = null;
 
-  // Portal pair right-click removal (Level 6)
-  if(lvl === 4 && removePortalPairAt(e.clientX, e.clientY)) return;
-  
-  for(let i=0; i<attractors.length; i++){
-    const a = attractors[i];
-    if(ray.intersectObject(a.core, false).length) {
-      if(a.type === 'blackhole') {
-        // Wiggle the black hole — can't delete it
-        _wiggleAttractor(a);
-        return;
+function _collapseHitTest(cx, cy) {
+  // Portal pair removal (Level 4)
+  if (lvl === 4 && portalPairs.length > 0) {
+    // Check via removePortalPairAt — we need the hit without removing
+    // We'll store portal as special type and call removePortalPairAt on commit
+    const hitPortal = (() => {
+      for (const pp of portalPairs) {
+        if (pp._sAx !== undefined) {
+          const dA = Math.hypot(cx - pp._sAx, cy - pp._sAy);
+          if (dA < Math.max(28, pp._sAr || 28)) return { type: 'portal', ref: pp, side: 'a' };
+          const dB = Math.hypot(cx - pp._sBx, cy - pp._sBy);
+          if (dB < Math.max(28, pp._sBr || 28)) return { type: 'portal', ref: pp, side: 'b' };
+        }
       }
-      if(tAttractor === a) tAttractor = null;
-      a.dispose();
-      attractors.splice(i, 1);
-      flashEl('flash-delete');
-      return;
+      return null;
+    })();
+    if (hitPortal) return hitPortal;
+  }
+  // Attractor hit-test
+  ndc.set((cx/W)*2-1,-(cy/H)*2+1);
+  ray.setFromCamera(ndc,camera);
+  for (let i = 0; i < attractors.length; i++) {
+    const a = attractors[i];
+    if (ray.intersectObject(a.core, false).length) {
+      return { type: 'attractor', ref: a };
     }
   }
-  
-  const hits=ray.intersectObjects(shapes.map(s=>s.mesh),true);
-  if(hits.length){
-    const sh=shapes.find(s=>s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object));
-    if(sh){if(dShape===sh){dShape=null;prevWP=null;}delShape(sh);}
+  // Shape hit-test
+  const hits = ray.intersectObjects(shapes.map(s=>s.mesh), true);
+  if (hits.length) {
+    const sh = shapes.find(s => s.mesh === hits[0].object || s.mesh.children.includes(hits[0].object));
+    if (sh) return { type: 'shape', ref: sh };
   }
+  return null;
+}
+
+function _collapseDrawRing(sx, sy, progress) {
+  // progress 0→1; ring shrinks inward (singularity collapse)
+  if (!collapseRing) return;
+  const maxR = 36;
+  const r = maxR * (1 - progress * 0.65); // shrinks but stays visible
+  collapseRing.style.left = sx + 'px';
+  collapseRing.style.top  = sy + 'px';
+  collapseRing.style.width  = (r * 2) + 'px';
+  collapseRing.style.height = (r * 2) + 'px';
+  collapseRing.style.borderColor = `rgba(255,${Math.round(80 - progress*60)},${Math.round(60 - progress*60)},${0.4 + progress * 0.5})`;
+  collapseRing.style.boxShadow = `0 0 ${4 + progress*14}px rgba(255,40,40,${progress*0.5})`;
+}
+
+function _collapseStart(cx, cy) {
+  const hit = _collapseHitTest(cx, cy);
+  if (!hit) return false;
+  // Can't delete a black hole
+  if (hit.type === 'attractor' && hit.ref.type === 'blackhole') {
+    _wiggleAttractor(hit.ref);
+    return true; // consumed event
+  }
+  _collapseTarget = hit;
+  _collapseStartSx = cx;
+  _collapseStartSy = cy;
+  _collapseStartT = performance.now();
+  if (collapseRing) collapseRing.classList.add('active');
+  _collapseAnimFrame();
+  return true;
+}
+
+function _collapseAnimFrame() {
+  if (!_collapseTarget) return;
+  const elapsed = performance.now() - _collapseStartT;
+  const progress = Math.min(1, elapsed / COLLAPSE_THRESHOLD);
+
+  // Project current position for the ring
+  let sx = _collapseStartSx, sy = _collapseStartSy;
+  if (_collapseTarget.type === 'attractor') {
+    const sc = _collapseTarget.ref.pos.clone().project(camera);
+    sx = (sc.x + 1) / 2 * W;
+    sy = (-sc.y + 1) / 2 * H;
+  } else if (_collapseTarget.type === 'shape') {
+    const sc = _collapseTarget.ref.pos.clone().project(camera);
+    sx = (sc.x + 1) / 2 * W;
+    sy = (-sc.y + 1) / 2 * H;
+  }
+  _collapseDrawRing(sx, sy, progress);
+
+  if (progress < 1) {
+    _collapseRAF = requestAnimationFrame(_collapseAnimFrame);
+  } else {
+    _collapseCommit();
+  }
+}
+
+function _collapseCommit() {
+  if (!_collapseTarget) return;
+  const hit = _collapseTarget;
+  _collapseCancel(false); // clean up ring without nulling target yet
+  if (hit.type === 'portal') {
+    removePortalPairAt(_collapseStartSx, _collapseStartSy);
+  } else if (hit.type === 'attractor') {
+    const a = hit.ref;
+    if (tAttractor === a) tAttractor = null;
+    a.dispose();
+    const idx = attractors.indexOf(a);
+    if (idx >= 0) attractors.splice(idx, 1);
+    flashEl('flash-delete');
+  } else if (hit.type === 'shape') {
+    const sh = hit.ref;
+    if (dShape === sh) { dShape = null; prevWP = null; }
+    delShape(sh);
+  }
+  _collapseTarget = null;
+}
+
+function _collapseCancel(clearTarget = true) {
+  if (_collapseRAF) { cancelAnimationFrame(_collapseRAF); _collapseRAF = null; }
+  if (collapseRing) {
+    collapseRing.classList.remove('active');
+    collapseRing.style.boxShadow = '';
+  }
+  if (clearTarget) _collapseTarget = null;
+}
+
+// ── Right-click: start collapse on mousedown, prevent contextmenu ─────────────
+renderer.domElement.addEventListener('contextmenu', e => { e.preventDefault(); });
+
+renderer.domElement.addEventListener('mousedown', e => {
+  if (e.button !== 2) return; // right button only
+  e.preventDefault();
+  _collapseStart(e.clientX, e.clientY);
+}, true);
+
+window.addEventListener('mouseup', e => {
+  if (e.button === 2 && _collapseTarget) {
+    _collapseCancel();
+  }
+}, true);
+
+// Also cancel if right mouse leaves window
+window.addEventListener('mouseleave', () => {
+  if (_collapseTarget) _collapseCancel();
 });
+
 window.addEventListener('mouseup',e=>{
   if(e.button===0&&dShape){
     if(!dMov&&(Date.now()-dTime)<350){
@@ -3963,6 +4137,33 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   });
   updateMbLvlBtns();
 
+  // ── Always-visible level prev/next in top bar ──────────────────────────────
+  const mbLvlPrev = document.getElementById('mb-lvl-prev');
+  const mbLvlNext = document.getElementById('mb-lvl-next');
+  const mbLvlLabel = document.getElementById('mb-lvl-label');
+  const LVL_LABELS = ['LVL 1','LVL 2','LVL 3','LVL 4','LVL 5','✦'];
+  function syncMbLvlLabel() {
+    if (mbLvlLabel) mbLvlLabel.textContent = LVL_LABELS[lvl] || ('LVL '+(lvl+1));
+    if (mbLvlPrev) mbLvlPrev.style.opacity = lvl === 0 ? '0.18' : '1';
+    if (mbLvlNext) mbLvlNext.style.opacity = lvl === LEVELS.length-1 ? '0.18' : '1';
+  }
+  if (mbLvlPrev) mbLvlPrev.addEventListener('click', () => {
+    if (lvl === 0) return;
+    const n = lvl - 1;
+    initLevel(n); tCounts=[]; for(let i=0;i<MP;i++) spawn(i); buildInit();
+    updateMbLvlBtns(); syncMbLvlLabel();
+  });
+  if (mbLvlNext) mbLvlNext.addEventListener('click', () => {
+    if (lvl === LEVELS.length-1) return;
+    const n = lvl + 1;
+    initLevel(n); tCounts=[]; for(let i=0;i<MP;i++) spawn(i); buildInit();
+    updateMbLvlBtns(); syncMbLvlLabel();
+  });
+  syncMbLvlLabel();
+  // Keep label in sync — updateLevelNav is called by every initLevel path
+  const _origUpdateLevelNav = updateLevelNav;
+  updateLevelNav = function() { _origUpdateLevelNav(); syncMbLvlLabel(); };
+
   // Touch for shapes/attractors: tap to cycle, drag to move, two-finger pinch to scale
   let tShape=null,tOff=new THREE.Vector3(),tPrevWP=null,tMoved=false,tTime=0;
   let pinchDist0=0,pinchSc0=1,aPinchPull0=0;
@@ -4041,6 +4242,26 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
             }
           }, 500);
         }
+        // Long-static-press to delete (non-emitter shapes) — starts collapse ring
+        if (sh.type !== 'panelstack') {
+          _lpTimer = setTimeout(() => {
+            if (!tMoved) {
+              // Commit collapse-delete
+              tShape = null; sh.dragging = false; tPrevWP = null;
+              if (dShape === sh) { dShape = null; prevWP = null; }
+              delShape(sh);
+              _collapseCancel(true);
+            }
+          }, COLLAPSE_THRESHOLD);
+          // Start visual ring immediately
+          const shSc = sh.pos.clone().project(camera);
+          const shSx = (shSc.x+1)/2*W, shSy = (-shSc.y+1)/2*H;
+          _collapseStartSx = shSx; _collapseStartSy = shSy;
+          _collapseStartT = performance.now();
+          _collapseTarget = { type: 'shape', ref: sh };
+          if (collapseRing) collapseRing.classList.add('active');
+          _collapseAnimFrame();
+        }
       }
     }
   },{passive:false});
@@ -4086,7 +4307,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
        _recordThrowPos(tAttractor);
     } else if(tShape){
       const wp=s2w(t.clientX,t.clientY);
-      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}}}
+      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}_collapseCancel();}}
       tShape.pos.set(wp.x-tOff.x,wp.y-tOff.y,0);
       if(tPrevWP)tShape.vel.set((wp.x-tPrevWP.x)*2.5,(wp.y-tPrevWP.y)*2.5,0);
       tPrevWP=wp.clone();
@@ -4116,6 +4337,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       revertToTitle();
     } else if(tShape){
       if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
+      _collapseCancel(); // cancel any pending collapse if released early
       if(!tMoved&&(Date.now()-tTime)<350){
         if(tShape.type==='panelstack'){
           const target=tShape._panelMorphVal<0.5?1:0;
@@ -4142,7 +4364,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
         if(orbHit) return;
         _hideProjectCard();
       }
-      if (te) { const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
+      if (te) { _totalClickCount++; const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
     }
   },{passive:false});
 })();
