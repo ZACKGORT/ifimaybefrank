@@ -2982,7 +2982,7 @@ function _createOrbWidget(orb) {
     border-left:2px solid ${c}bb;
     border-radius:6px;backdrop-filter:blur(12px);
     padding:10px 13px 11px;cursor:grab;
-    pointer-events:auto;user-select:none;
+    pointer-events:auto;user-select:none;touch-action:none;
     box-shadow:0 0 18px ${c}18, 0 2px 12px rgba(0,0,0,0.5);
     transition:box-shadow 0.2s,border-color 0.2s;
   `;
@@ -4199,6 +4199,9 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   let _lpTimer=null; // longpress timer for emitter waterfall toggle
   function getTouchDist(e){if(e.touches.length<2)return 0;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
   renderer.domElement.addEventListener('touchstart',e=>{
+    // Let orb-widget touches through — don't steal them
+    const t0=e.touches[0];
+    if(t0 && document.elementFromPoint(t0.clientX,t0.clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     const t=e.touches[0];
     mX=t.clientX;mY=t.clientY;bX=t.clientX;bY=t.clientY;
@@ -4295,6 +4298,8 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     }
   },{passive:false});
   renderer.domElement.addEventListener('touchmove',e=>{
+    const t0=e.touches[0];
+    if(t0 && document.elementFromPoint(t0.clientX,t0.clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     const t=e.touches[0];
     mX=t.clientX;mY=t.clientY;
@@ -4343,6 +4348,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     }
   },{passive:false});
   renderer.domElement.addEventListener('touchend',e=>{
+    if(e.changedTouches[0] && document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     if(wormhole.active && wormhole.dragging) {
       wormhole.dragging=false; return;
