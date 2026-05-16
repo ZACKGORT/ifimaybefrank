@@ -1904,6 +1904,23 @@ function applyAttractorForces(i, b, dt) {
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
+      // ── Gentle consumption: NS quietly absorbs nearby particles ─────────────
+      // Inner core: high absorption probability. Mid zone: sparse. Outer: just drag.
+      const innerR = influenceR * 0.35;
+      const midR   = influenceR * 0.65;
+      if (dist < innerR) {
+        if (Math.random() < 0.18) { spawn(i); return true; }
+      } else if (dist < midR) {
+        const t2 = 1.0 - (dist - innerR) / (midR - innerR);
+        if (Math.random() < 0.03 * t2 * t2) { spawn(i); return true; }
+      }
+      // Gentle drag — slows particles so they linger and eventually get consumed
+      const dragFade = Math.max(0, 1.0 - dist / influenceR);
+      const DRAG = dragFade * dragFade * dt * 4.5;
+      pv[b]   *= Math.max(0, 1.0 - DRAG);
+      pv[b+1] *= Math.max(0, 1.0 - DRAG);
+      pv[b+2] *= Math.max(0, 1.0 - DRAG * 0.5);
+
       // Orbital circularization for NS — level 4 only; level 5 is jet collimation
       const orbitThresh = lvl === 4 ? influenceR * 0.85 : influenceR * 0.55;
       if (dist < orbitThresh) {
@@ -2586,12 +2603,31 @@ function buildInit(){
 function addShape(t){shapes.push(new Shape(t,new THREE.Vector3((Math.random()-0.5)*4,0,0),null,randSc(t)));updateCnt();}
 function clearShapes(){
   shapes.forEach(s=>s.dispose());shapes=[];
-  attractors.forEach(a=>a.dispose());attractors=[];
+  // Preserve black holes — only remove non-blackhole attractors
+  const toRemove = attractors.filter(a => a.type !== 'blackhole');
+  toRemove.forEach(a => a.dispose());
+  attractors = attractors.filter(a => a.type === 'blackhole');
   updateCnt();
 }
 function delShape(sh){const i=shapes.indexOf(sh);if(i<0)return;sh.dispose();shapes.splice(i,1);updateCnt();flashEl('flash-delete');}
 function updateCnt(){const e=document.getElementById('shape-count');e.textContent=shapes.length?shapes.length+' shapes':'';}
 function flashEl(id){const e=document.getElementById(id);e.classList.add('on');setTimeout(()=>e.classList.remove('on'),200);}
+function _wiggleAttractor(a){
+  // Quick physical wiggle: inject a small random velocity burst that the spring will damp
+  if(a.dragging)return;
+  const dirs=[[-1,0],[1,0],[0,-1],[0,1]];
+  const STEPS=4,STEP_T=55,AMP=1.8;
+  let step=0;
+  function doWiggle(){
+    if(step>=STEPS*2)return;
+    const d=dirs[step%dirs.length];
+    a.vel.x=d[0]*AMP*(step%2===0?1:-1);
+    a.vel.y=d[1]*AMP*(step%2===0?1:-1)*0.5;
+    step++;
+    setTimeout(doWiggle,STEP_T);
+  }
+  doWiggle();
+}
 buildInit();
 
 // ── PANEL STACK EMITTER — spawned after P & syncBounce are declared below ────
@@ -3111,6 +3147,11 @@ renderer.domElement.addEventListener('contextmenu',e=>{
   for(let i=0; i<attractors.length; i++){
     const a = attractors[i];
     if(ray.intersectObject(a.core, false).length) {
+      if(a.type === 'blackhole') {
+        // Wiggle the black hole — can't delete it
+        _wiggleAttractor(a);
+        return;
+      }
       if(tAttractor === a) tAttractor = null;
       a.dispose();
       attractors.splice(i, 1);
