@@ -1207,7 +1207,7 @@ function _buildFloatText(lines, immediate) {
 let W=window.innerWidth,H=window.innerHeight;
 const isMobile=window.innerWidth<=600;
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?2.0:1.5));renderer.setClearColor(0x0a0a0a);
+renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));renderer.setClearColor(0x0a0a0a);
 renderer.autoClear = false;
 document.body.appendChild(renderer.domElement);
 
@@ -1228,8 +1228,10 @@ const floorM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStand
 floorM.rotation.x=-Math.PI/2;floorM.position.y=-9;scene.add(floorM);
 
 // overlay canvas for targets (rendered in multi-pass WebGL)
+const _dpr = Math.min(devicePixelRatio, isMobile ? 3.0 : 2.0);
 const ov=document.createElement('canvas');
-ov.width=W;ov.height=H;const ovCtx=ov.getContext('2d');
+ov.width=W*_dpr;ov.height=H*_dpr;const ovCtx=ov.getContext('2d');
+ovCtx.scale(_dpr,_dpr);
 const ovTex = new THREE.CanvasTexture(ov);
 ovTex.minFilter = THREE.LinearFilter;
 const orthoScene = new THREE.Scene();
@@ -1246,8 +1248,10 @@ particleScene.fog = scene.fog;
 
 // ── TEXT CURSOR LAYER (ported from cx.html) ───────────────────────────────────
 const tc=document.getElementById('text-canvas');
-tc.width=W;tc.height=H;
+tc.width=W*_dpr;tc.height=H*_dpr;
+tc.style.width=W+'px';tc.style.height=H+'px';
 const tctx=tc.getContext('2d');
+tctx.scale(_dpr,_dpr);
 
 // cx.html cursor blob state
 let mX=W/2,mY=H/2,bX=W/2,bY=H/2,eX=W/2,eY=H/2,eVX=0,eVY=0;
@@ -3227,8 +3231,8 @@ function supernovaImpulse(wx, wy) {
     pv[b+2] += (dz / dist) * f;
   }
 
-  // ── Level 5: supernova shockwave blasts attractors (BH + NS) ──────────────
-  if (lvl === 4) {
+  // ── Level 5 & 6: supernova shockwave blasts attractors ──────────────
+  if (lvl === 4 || lvl === 5) {
     const NOVA_ATTRACTOR_R = 14.0;  // shockwave reach in world units
     const NOVA_BH_F        = 10.0;  // kick on black hole (massive — resists but recoils)
     const NOVA_NS_F        = 24.0;  // kick on neutron star (lighter — flung hard)
@@ -4506,7 +4510,7 @@ function tick(){
   if(emitterShape)emitterShape.update(dt);
   attractors.forEach(a=>a.update(dt));
   // Decay supernova hit flare
-  if (lvl === 4) attractors.forEach(a=>{ if(a._novaHitT>0) a._novaHitT=Math.max(0,a._novaHitT-dt*1.8); });
+  if (lvl === 4 || lvl === 5) attractors.forEach(a=>{ if(a._novaHitT>0) a._novaHitT=Math.max(0,a._novaHitT-dt*1.8); });
 
   // Advance waterfall wave phase — one full cycle every ~3.5s
   if(P.waterfall) _wfPhase += dt * (Math.PI * 2 / 3.5);
@@ -4681,9 +4685,12 @@ tick();
 window.addEventListener('resize',()=>{
   W=window.innerWidth;H=window.innerHeight;
   camera.aspect=W/H;camera.updateProjectionMatrix();
-  renderer.setSize(W,H);
-  ov.width=W;ov.height=H;
-  tc.width=W;tc.height=H;
+  renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));
+  ov.width=W*_dpr;ov.height=H*_dpr;
+  ovCtx.setTransform(_dpr,0,0,_dpr,0,0);
+  tc.width=W*_dpr;tc.height=H*_dpr;
+  tc.style.width=W+'px';tc.style.height=H+'px';
+  tctx.setTransform(_dpr,0,0,_dpr,0,0);
   // apply mobile zoom
   camera.position.z=isMobile?44:28;
   // rebuild text positions for new dimensions
