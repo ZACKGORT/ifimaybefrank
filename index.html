@@ -2004,8 +2004,7 @@ function destroyAttractors() {
 }
 
 function applyAttractorForces(i, b, dt) {
-  const allAttractors = lvl === 5 ? [...attractors, ..._projectOrbs] : attractors;
-  for (let a of allAttractors) {
+  for (let a of attractors) {
     const dx = a.pos.x - pp[b], dy = a.pos.y - pp[b+1], dz = (a.pos.z || 0) - (pp[b+2] || 0);
     const dist2 = dx*dx + dy*dy + dz*dz;
     const dist = Math.sqrt(dist2);
@@ -2826,67 +2825,56 @@ let shapes=[];
 
 // ── PROJECT ORBS (Level 6) ────────────────────────────────────────────────────
 const PROJECT_DATA = [
-  { name: 'wolfie.love',      url: 'https://www.wolfie.love'    },
-  { name: 'zackgort.com',     url: 'https://www.zackgort.com'   },
-  { name: 'neverever.land',   url: 'https://www.neverever.land' },
-  { name: 'reasonably.cc',    url: 'https://www.reasonably.cc'  },
+  { name: 'wolfie.love',    url: 'https://www.wolfie.love',    desc: 'a love letter in motion',    color: '#ff7eb3', colorHex: 0xff7eb3 },
+  { name: 'zackgort.com',   url: 'https://www.zackgort.com',   desc: 'portfolio & work',            color: '#7eb3ff', colorHex: 0x7eb3ff },
+  { name: 'neverever.land', url: 'https://www.neverever.land', desc: 'a place for lost things',    color: '#b3ff7e', colorHex: 0xb3ff7e },
+  { name: 'reasonably.cc',  url: 'https://www.reasonably.cc',  desc: 'calm tools for clear minds', color: '#ffb37e', colorHex: 0xffb37e },
 ];
 
 let _projectOrbs = [];
 
 class ProjectOrb {
-  constructor(data, pos) {
+  // Wraps a real neutron-star Attractor — gets all NS physics, drag & BH collision for free.
+  constructor(data, pos, index) {
     this.data = data;
-    this.pos  = pos.clone();
-    this.vel  = new THREE.Vector3((Math.random()-0.5)*1.2,(Math.random()-0.5)*0.8,0);
-    this.radius = 0.55;
-    this._t = Math.random() * Math.PI * 2;
-    // Neutron-star physics — particles feel and get absorbed by project orbs
-    this.type = 'neutronstar';
-    this.pullStrength = 28.0;
-    this.influenceR = 4.0;
-    this.consumeRadius = 0.05;
-    this._build();
-  }
-  _build() {
-    this.mesh = new THREE.Group();
-    const core = new THREE.Mesh(
-      new THREE.SphereGeometry(this.radius, 32, 20),
-      new THREE.MeshPhysicalMaterial({
-        color:0xffffff,emissive:0xffffff,emissiveIntensity:4.0,
-        roughness:0.0,metalness:1.0,reflectivity:1.0,
-        clearcoat:1.0,clearcoatRoughness:0.0,transparent:true,opacity:0.97,
-      })
-    );
-    this.mesh.add(core);
-    this._light = new THREE.PointLight(0xfff8e8, 2.5, 10);
-    this.mesh.add(this._light);
-    [{r:this.radius*1.5,color:0xffffff,opacity:0.07},{r:this.radius*2.2,color:0xfff0d0,opacity:0.035},{r:this.radius*3.8,color:0xffcc60,opacity:0.012}].forEach(({r,color,opacity})=>{
-      this.mesh.add(new THREE.Mesh(new THREE.SphereGeometry(r,16,10),new THREE.MeshBasicMaterial({color,transparent:true,opacity,side:THREE.BackSide,depthWrite:false})));
-    });
-    // Label canvas sprite
-    const lc=document.createElement('canvas');lc.width=256;lc.height=48;
-    const lctx=lc.getContext('2d');lctx.font='13px Courier New';lctx.fillStyle='rgba(255,230,160,0.85)';lctx.textAlign='center';lctx.fillText(this.data.name,128,30);
-    const lt=new THREE.CanvasTexture(lc);
-    const lm=new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.42),new THREE.MeshBasicMaterial({map:lt,transparent:true,depthWrite:false}));
-    lm.position.y=-this.radius-0.55;
-    this.mesh.add(lm);this._labelMesh=lm;
-    this.mesh.position.copy(this.pos);
-    scene.add(this.mesh);
+    this.index = index;
+    this._attractor = new Attractor('neutronstar', pos.clone());
+    this._attractor._isProjectOrb = true;
+    this._attractor._orbData = data;
+    this._attractor._orbIndex = index;
+    this._attractor._bouncingNS = true;
+    const ang = Math.random() * Math.PI * 2;
+    this._attractor.vel.x = Math.cos(ang) * (1.5 + Math.random() * 1.5);
+    this._attractor.vel.y = Math.sin(ang) * (1.0 + Math.random() * 1.0);
+    // Apply unique color to NS core, light, and glow layers
+    const col = data.colorHex || 0xffffff;
+    if (this._attractor.core && this._attractor.core.material) {
+      this._attractor.core.material.color.setHex(col);
+      this._attractor.core.material.emissive.setHex(col);
+    }
+    if (this._attractor.light) this._attractor.light.color.setHex(col);
+    if (this._attractor.glowMeshes) this._attractor.glowMeshes.forEach(g => g.material.color.setHex(col));
+    // Proxy references so existing _projectOrbs code still works
+    this.pos    = this._attractor.pos;
+    this.vel    = this._attractor.vel;
+    this.radius = this._attractor.radius;
+    // Floating label sprite (no longer attached to mesh — widget replaces it)
+    // Keep a minimal billboard for orientation cue
+    const lc = document.createElement('canvas'); lc.width=256; lc.height=48;
+    const lctx = lc.getContext('2d');
+    lctx.font = 'bold 11px Courier New'; lctx.fillStyle = data.color || '#ffffff'; lctx.textAlign = 'center';
+    lctx.globalAlpha = 0.7;
+    lctx.fillText(data.name, 128, 30);
+    const lt = new THREE.CanvasTexture(lc);
+    const lm = new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.42), new THREE.MeshBasicMaterial({map:lt,transparent:true,depthWrite:false}));
+    lm.position.y = -this._attractor.radius * 1.8 - 0.45;
+    this._attractor.mesh.add(lm); this._labelMesh = lm;
   }
   update(dt) {
-    this._t+=dt;
-    this.vel.x+=Math.sin(this._t*0.4+this.pos.y)*0.015;
-    this.vel.y+=Math.cos(this._t*0.3+this.pos.x)*0.010;
-    this.vel.x*=0.98;this.vel.y*=0.98;
-    this.pos.x+=this.vel.x*dt;this.pos.y+=this.vel.y*dt;
-    const eL=s2w(0,H/2).x+1.5,eR=s2w(W,H/2).x-1.5,eT=s2w(W/2,0).y-1.5,eB=s2w(W/2,H).y+1.5;
-    if(this.pos.x<eL)this.vel.x+=0.4;if(this.pos.x>eR)this.vel.x-=0.4;
-    if(this.pos.y>eT)this.vel.y-=0.4;if(this.pos.y<eB)this.vel.y+=0.4;
-    const pulse=(Math.sin(this._t*1.8)+1)*0.5;
-    this._light.intensity=2.0+pulse*1.0;
-    this.mesh.position.copy(this.pos);
+    // Physics handled by Attractor.update(); just billboard label
     this._labelMesh.quaternion.copy(camera.quaternion);
+    // Sync floating widget position to orb screen coords
+    _syncOrbWidget(this);
   }
   hitTest(clientX,clientY) {
     const ndc2=new THREE.Vector2((clientX/W)*2-1,-(clientY/H)*2+1);
@@ -2894,8 +2882,10 @@ class ProjectOrb {
     return ray2.ray.intersectsSphere(new THREE.Sphere(this.pos,this.radius*3.5));
   }
   dispose() {
-    scene.remove(this.mesh);
-    this.mesh.traverse(c=>{if(c.material)c.material.dispose();if(c.geometry)c.geometry.dispose();});
+    const idx = attractors.indexOf(this._attractor);
+    if (idx !== -1) attractors.splice(idx, 1);
+    this._attractor.dispose();
+    _removeOrbWidget(this.index);
   }
 }
 
@@ -2907,24 +2897,109 @@ function _spawnProjectOrbs() {
     const col=i%2,row=Math.floor(i/2);
     const x=eL+sX*(0.25+col*0.5)+(Math.random()-0.5)*sX*0.12;
     const y=eB+sY*(0.65+row*-0.3)+(Math.random()-0.5)*sY*0.08;
-    _projectOrbs.push(new ProjectOrb(data,new THREE.Vector3(x,y,0)));
+    const orb = new ProjectOrb(data,new THREE.Vector3(x,y,0),i);
+    _projectOrbs.push(orb);
+    attractors.push(orb._attractor);
+    _createOrbWidget(orb);
   });
 }
 
 function _destroyProjectOrbs() {
-  _projectOrbs.forEach(o=>o.dispose());_projectOrbs=[];_hideProjectCard();
+  _projectOrbs.forEach(o=>o.dispose()); _projectOrbs=[];
+  // Remove all orb widgets
+  document.querySelectorAll('.orb-widget').forEach(el=>el.remove());
 }
 
-function _showProjectCard(orb,clientX,clientY) {
-  const card=document.getElementById('project-card');if(!card)return;
-  document.getElementById('project-card-name').textContent=orb.data.name;
-  const link=document.getElementById('project-card-link');
-  link.textContent=orb.data.url;link.href=orb.data.url;
-  card.style.left=Math.min(clientX+12,W-240)+'px';card.style.top=Math.min(clientY-20,H-120)+'px';card.style.display='flex';
+// ── ORB FLOATING WIDGETS ──────────────────────────────────────────────────────
+// Each orb gets a persistent movable widget. It tracks the orb in screen space
+// until the user drags it, then it stays put (user-anchored).
+
+function _createOrbWidget(orb) {
+  const d = orb.data, idx = orb.index;
+  const c = d.color || '#ffffff';
+  const cAlpha = c + '28'; // very transparent bg tint
+
+  const el = document.createElement('div');
+  el.id = `orb-widget-${idx}`;
+  el.className = 'orb-widget';
+  el.style.cssText = `
+    position:fixed;z-index:500;min-width:160px;max-width:190px;
+    background:rgba(6,4,2,0.88);
+    border:1px solid ${c}44;
+    border-left:2px solid ${c}bb;
+    border-radius:6px;backdrop-filter:blur(12px);
+    padding:10px 13px 11px;cursor:grab;
+    pointer-events:auto;user-select:none;
+    box-shadow:0 0 18px ${c}18, 0 2px 12px rgba(0,0,0,0.5);
+    transition:box-shadow 0.2s,border-color 0.2s;
+  `;
+
+  el.innerHTML = `
+    <div style="font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:${c}99;margin-bottom:5px;font-family:'Courier New',monospace;">${d.name}</div>
+    <div style="font-size:9px;line-height:1.6;color:rgba(255,255,255,0.38);font-family:'Courier New',monospace;letter-spacing:0.04em;margin-bottom:8px;">${d.desc || ''}</div>
+    <a href="${d.url}" target="_blank" rel="noopener"
+       style="display:block;font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.08em;
+              color:${c}cc;border:1px solid ${c}44;border-radius:3px;padding:5px 9px;
+              text-decoration:none;text-align:center;transition:background 0.12s,border-color 0.12s;"
+       onmouseover="this.style.background='${cAlpha}';this.style.borderColor='${c}99';"
+       onmouseout="this.style.background='transparent';this.style.borderColor='${c}44';">
+      ↗ visit
+    </a>
+  `;
+
+  // Place initially off-screen; will be positioned on first _syncOrbWidget call
+  el.style.left = '-9999px'; el.style.top = '-9999px';
+  document.body.appendChild(el);
+
+  // Dragging — once user moves it, stop auto-tracking the orb
+  let wDrag=false, wOX=0, wOY=0;
+  el._userAnchored = false;
+  el.addEventListener('pointerdown', e=>{
+    if(e.button!==0)return;
+    if(e.target.tagName==='A'||e.target.closest('a'))return;
+    wDrag=true; el.setPointerCapture(e.pointerId);
+    const r=el.getBoundingClientRect(); wOX=e.clientX-r.left; wOY=e.clientY-r.top;
+    el.style.transition='none'; el.style.cursor='grabbing';
+    e.stopPropagation();
+  });
+  window.addEventListener('pointermove', e=>{
+    if(!wDrag)return;
+    el._userAnchored=true;
+    let nx=Math.max(0,Math.min(W-el.offsetWidth,e.clientX-wOX));
+    let ny=Math.max(0,Math.min(H-el.offsetHeight,e.clientY-wOY));
+    el.style.left=nx+'px'; el.style.top=ny+'px';
+    el.style.right='auto'; el.style.bottom='auto';
+  });
+  window.addEventListener('pointerup', ()=>{ if(wDrag){wDrag=false;el.style.cursor='grab';} });
 }
 
-function _hideProjectCard(){const card=document.getElementById('project-card');if(card)card.style.display='none';}
-window.addEventListener('DOMContentLoaded',()=>{const btn=document.getElementById('project-card-close');if(btn)btn.addEventListener('click',_hideProjectCard);});
+function _syncOrbWidget(orb) {
+  const el = document.getElementById(`orb-widget-${orb.index}`);
+  if(!el || el._userAnchored) return;
+  // Project orb world pos to screen
+  const sc = orb.pos.clone().project(camera);
+  const sx = (sc.x+1)/2*W;
+  const sy = (-sc.y+1)/2*H;
+  // Offset widget to not overlap the orb — place it to the right and slightly up
+  const ww = el.offsetWidth || 170;
+  const wh = el.offsetHeight || 90;
+  let wx = sx + 28;
+  let wy = sy - wh/2;
+  // Clamp to viewport
+  wx = Math.max(4, Math.min(W-ww-4, wx));
+  wy = Math.max(4, Math.min(H-wh-4, wy));
+  el.style.left = wx+'px'; el.style.top = wy+'px';
+  el.style.right='auto'; el.style.bottom='auto';
+}
+
+function _removeOrbWidget(index) {
+  const el = document.getElementById(`orb-widget-${index}`);
+  if(el) el.remove();
+}
+
+// Keep old card API stubs so nothing breaks if called
+function _showProjectCard() {}
+function _hideProjectCard() {}
 
 function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
@@ -3017,6 +3092,38 @@ function resolveCollisions(){
       sa.pos.x-=nx*pen*wa;sa.pos.y-=ny*pen*wa;sb.pos.x+=nx*pen*wb;sb.pos.y+=ny*pen*wb;
       const dvx=sb.vel.x-sa.vel.x,dvy=sb.vel.y-sa.vel.y,dot=dvx*nx+dvy*ny;
       if(dot<0){const j=(1+0.5)*dot*0.5;if(!sa.dragging){sa.vel.x+=j*nx;sa.vel.y+=j*ny;}if(!sb.dragging){sb.vel.x-=j*nx;sb.vel.y-=j*ny;}}
+    }
+  }
+
+  // ── Zen orb ↔ Project orb bumper collisions ───────────────────────────────
+  if(lvl===5&&_projectOrbs.length){
+    const zenArr=attractors.filter(a=>a._bouncingBH);
+    const orbAtts=attractors.filter(a=>a._isProjectOrb);
+    for(const zen of zenArr){
+      const zenScale=Math.sqrt(zen.pullStrength/57.0);
+      const zenR=zen.radius*zenScale*1.1;
+      for(const orb of orbAtts){
+        if(orb.dragging)continue;
+        const dx=orb.pos.x-zen.pos.x,dy=orb.pos.y-zen.pos.y;
+        const dist=Math.sqrt(dx*dx+dy*dy)||0.001;
+        const minD=zenR+orb.radius;
+        if(dist<minD){
+          const nx=dx/dist,ny=dy/dist;
+          const pen=minD-dist;
+          zen.pos.x-=nx*pen*0.5;zen.pos.y-=ny*pen*0.5;
+          orb.pos.x+=nx*pen*0.5;orb.pos.y+=ny*pen*0.5;
+          const RESTITUTION=0.75;
+          const relDot=zen.vel.x*(-nx)+zen.vel.y*(-ny);
+          if(relDot>0){
+            zen.vel.x+=nx*relDot*(1+RESTITUTION);
+            zen.vel.y+=ny*relDot*(1+RESTITUTION);
+          }
+          // Kick the orb — it's a free NS so it bounces naturally
+          const kickStr=2.2+Math.sqrt(zen.vel.x**2+zen.vel.y**2)*0.18;
+          orb.vel.x+=nx*kickStr;orb.vel.y+=ny*kickStr;
+          _zenGravSpike=Math.max(_zenGravSpike,14.0);
+        }
+      }
     }
   }
   
@@ -3299,6 +3406,8 @@ window.addEventListener('keydown',e=>{if(e.key==='Shift'){shiftDown=true;rotPrev
 window.addEventListener('keyup',e=>{if(e.key==='Shift'){shiftDown=false;if(dShape&&prevWP){/* resume normal drag from current pos */const wp=s2w(mX,mY);dOff.set(wp.x-dShape.pos.x,wp.y-dShape.pos.y,0);prevWP=wp.clone();}}});
 
 let tAttractor=null,aDragOff=new THREE.Vector3();
+// Zen-orb particle gravity spike: spikes when BH touches a project orb, decays back
+let _zenGravSpike=0;
 
 // ── Throw velocity tracking for bouncing BH ───────────────────────────────────
 // Ring buffer of recent world-space attractor positions while dragging
@@ -3391,6 +3500,15 @@ window.addEventListener('mouseup',e=>{
       _applyThrow(tAttractor);
       // Don't reset rest for bouncing BH — it has no spring tether
     } else {
+      // Short tap on a project orb → show card instead of anchoring
+      if(tAttractor._isProjectOrb) {
+        const moved=Math.sqrt((tAttractor.pos.x-tAttractor.rest.x)**2+(tAttractor.pos.y-tAttractor.rest.y)**2);
+        if(moved<0.25) {
+          const sc=tAttractor.pos.clone().project(camera);
+          const sx=(sc.x+1)/2*W,sy=(-sc.y+1)/2*H;
+          _showProjectCard({data:tAttractor._orbData},sx,sy);
+        }
+      }
       tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
     }
     tAttractor.dragging=false;
@@ -3455,7 +3573,7 @@ function supernovaImpulse(wx, wy) {
 renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
 
-  // Project orb hit-test (Level 6)
+  // Project orb hit-test (Level 6) — card on click; drag handled via attractor system
   if(lvl === 5 && _projectOrbs.length) {
     for(const orb of _projectOrbs) {
       if(orb.hitTest(e.clientX, e.clientY)) {
@@ -3982,8 +4100,15 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     if(tAttractor){
       if(tAttractor._bouncingBH) {
         _applyThrow(tAttractor);
-        // No rest reset — bouncing BH is free-flying
       } else {
+        if(tAttractor._isProjectOrb) {
+          const moved=Math.sqrt((tAttractor.pos.x-tAttractor.rest.x)**2+(tAttractor.pos.y-tAttractor.rest.y)**2);
+          if(moved<0.25) {
+            const sc=tAttractor.pos.clone().project(camera);
+            const sx=(sc.x+1)/2*W,sy=(-sc.y+1)/2*H;
+            _showProjectCard({data:tAttractor._orbData},sx,sy);
+          }
+        }
         tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
       }
       tAttractor.dragging=false;
@@ -4715,6 +4840,8 @@ function tick(){
   }
 
   resolveCollisions();
+  // Decay zen-orb gravity spike exponentially back to 0
+  if(_zenGravSpike>0.01) _zenGravSpike*=Math.pow(0.018,dt); else _zenGravSpike=0;
   shapes.forEach(s=>s.update(dt));
   if(emitterShape)emitterShape.update(dt);
   attractors.forEach(a=>a.update(dt));
@@ -4756,7 +4883,7 @@ function tick(){
     
     // Waterfall: each tier has its own gravity multiplier so layers fall at different speeds
     const gravMult = P.waterfall ? (0.45 + pGravTier[i] * 0.55) : 1.0;
-    pv[b+1]-=P.gravity*gravMult*dt;
+    pv[b+1]-=(P.gravity+_zenGravSpike)*gravMult*dt;
     if(P.rain){pv[b]-=pp[b]*0.4*dt;pv[b+2]-=pp[b+2]*0.3*dt;}
 
     // ── Freefall XY bias: damp z toward 0 while particle is airborne ──
