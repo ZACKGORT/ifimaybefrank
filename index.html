@@ -964,14 +964,14 @@ const FLAVOR_TITLES = {
     `more often, <br>design is simply balance.`,
     `design may offer <br>pathways for intent.`,
     `design can be defined as "anything not created by nature"`,
-    `frankly,<br><br>design is still very much 'about' pixel-perfection, but the role of a designer is in optimizing for real-world physics. <br><br>perhaps craft matters most now?`,
+    `franklh, <br>make mass. <br>have gravity.`,
   ],
   salt: [
   `"the best part is no part"<br>— space.X`,
     `a single operator can control multiple streams.`,
     `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
     `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-    `frankly,<br><br>less posture; more position. <br>the more meaningful one's mass;<br>the greater one's gravity.`,
+    `frankly,<br><br>less posture; more position.`,
   ],
 };
 
@@ -1499,14 +1499,15 @@ class Attractor {
       this.core = new THREE.Mesh(coreGeo, coreMat);
       this.mesh.add(this.core);
 
-      // Point Light
-      this.light = new THREE.PointLight(0x88ccff, 1.4, 12);
+      // Point Light — cosmic blue tint, slightly brighter
+      this.light = new THREE.PointLight(0x88ccff, 2.2, 14);
       this.mesh.add(this.light);
 
-      // Glow corona — tight rings, subtle
+      // Glow corona — cosmic blue, more luminous
       const glowLayers = [
-        { r: this.radius * 1.5, color: 0x88ccff, opacity: 0.18 },
-        { r: this.radius * 2.0, color: 0x4488ff, opacity: 0.08 },
+        { r: this.radius * 1.5, color: 0x99ddff, opacity: 0.38 },
+        { r: this.radius * 2.2, color: 0x4499dd, opacity: 0.18 },
+        { r: this.radius * 3.5, color: 0x2266aa, opacity: 0.08 },
       ];
       this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
         const g = new THREE.Mesh(
@@ -1658,8 +1659,9 @@ class Attractor {
       if (this._adPoints) this._updateAccretionDisc(dt);
     } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 8.0) * 0.5;
-      this.glowMeshes[0].material.opacity = 0.12 + pulse * 0.07;
-      this.glowMeshes[1].material.opacity = 0.05 + pulse * 0.04;
+      this.glowMeshes[0].material.opacity = 0.28 + pulse * 0.14;
+      this.glowMeshes[1].material.opacity = 0.12 + pulse * 0.07;
+      this.glowMeshes[2].material.opacity = 0.04 + pulse * 0.03;
     }
 
     // Dynamic Scale Based on Pull Strength
@@ -2094,13 +2096,10 @@ function drawBlackHoleOverlay() {
         ovCtx.fillStyle = g; ovCtx.fill();
       });
     } else {
-      // NS hit by BH: shift glow to warm amber to indicate it's been caught
-      const captured = (lvl === 4 && bh._bhHitCount > 0);
-      const nsColA = captured ? '220,120,80' : '100,200,255';
-      const nsColB = captured ? '255,180,120' : '200,255,255';
+      // NS: cosmic blue glow, no amber shift
       [
-        { r: coreR * 3.0, a: captured ? 0.28 : 0.15, col: nsColA },
-        { r: coreR * 1.5, a: captured ? 0.5 : 0.3, col: nsColB }
+        { r: coreR * 3.5, a: 0.13, col: '80,180,255' },
+        { r: coreR * 1.8, a: 0.35, col: '160,220,255' },
       ].forEach(({ r, a, col }) => {
         const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
         g.addColorStop(0, `rgba(${col},${a})`);
@@ -2706,14 +2705,14 @@ function resolveCollisions(){
         const minDist = bhR + nsR;
 
         // ── Approach zone: BH gravity snatches NS into orbit ─────────────────
-        const captureZone = bhR * 5.5;
+        const captureZone = bhR * 3.0;
         if (!ns._bhCapture && dist < captureZone && dist > minDist) {
-          // Pull NS toward BH with circular-orbit tangential bias
-          const pullF = 0.18 / Math.max(dist * dist * 0.08, 0.5);
+          // Pull NS toward BH — gentler than before
+          const pullF = 0.07 / Math.max(dist * dist * 0.08, 0.5);
           const nx = dx / dist, ny = dy / dist;
           const tx = -ny, ty = nx; // tangent for orbit
-          ns.vel.x -= (nx * 0.7 - tx * 0.8) * pullF;
-          ns.vel.y -= (ny * 0.7 - ty * 0.8) * pullF;
+          ns.vel.x -= (nx * 0.4 - tx * 0.45) * pullF;
+          ns.vel.y -= (ny * 0.4 - ty * 0.45) * pullF;
         }
 
         // ── Hard collision: bounce + enter capture state ──────────────────────
@@ -2759,11 +2758,11 @@ function resolveCollisions(){
           const txO = -ry / r, tyO = rx / r;
           const vTan = ns.vel.x * txO + ns.vel.y * tyO;
           const vCirc = Math.sqrt(bh.pullStrength * 0.12 / r);
-          const nudge = (vCirc - vTan) * 0.08;
+          const nudge = (vCirc - vTan) * 0.04;
           ns.vel.x += txO * nudge;
           ns.vel.y += tyO * nudge;
-          // Slight pull inward to maintain orbit altitude
-          const radialPull = 0.04;
+          // Slight pull inward to maintain orbit altitude — gentler
+          const radialPull = 0.02;
           ns.vel.x -= (rx / r) * radialPull;
           ns.vel.y -= (ry / r) * radialPull;
 
