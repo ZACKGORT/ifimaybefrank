@@ -1060,8 +1060,8 @@ const LEVEL_COMPLETE_FLAVOR = {
     `go ahead and right-click those unused shapes.`,
     `that wasn't so bad.`,
     `if you moved the wormhole, that's like moving the goal posts, but a win is a win, I suppose.`,
-    `mass is gravity; gravity is influence.`,
-    `meanwhile, while I venture into the void:`,
+    `build the mass. the influence follows.`,
+    `this was always the point.`,
   ],
 };
 function getLevelComplete(lvlN) {
@@ -1094,10 +1094,10 @@ const FLAVOR_TITLES = {
   ],
   salt: [
   `"the best part is no part"<br>— space.X`,
-   `of course, take this all for a grain of salt.`,
-    `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
+    `a.i. enablement`,
+    `of course, take this all for a grain of salt.`, 
     `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-   `make mass; have gravity.`,
+    `make mass; have gravity.`,
   ],
 };
 
@@ -3663,6 +3663,7 @@ window.addEventListener('keydown',e=>{if(e.key==='Shift'){shiftDown=true;rotPrev
 window.addEventListener('keyup',e=>{if(e.key==='Shift'){shiftDown=false;if(dShape&&prevWP){/* resume normal drag from current pos */const wp=s2w(mX,mY);dOff.set(wp.x-dShape.pos.x,wp.y-dShape.pos.y,0);prevWP=wp.clone();}}});
 
 let tAttractor=null,aDragOff=new THREE.Vector3();
+let _discoDragging=false,_discoDragOff=new THREE.Vector3(),_discoThrowBuf=[];
 // Zen-orb particle gravity spike: spikes when BH touches a project orb, decays back
 let _zenGravSpike=0;
 
@@ -3725,6 +3726,16 @@ window.addEventListener('mousemove',e=>{
     updateShapeCoords(tAttractor.type, tAttractor);
     return;
   }
+
+  // Disco orb drag
+  if (_discoDragging) {
+    const wp = s2w(e.clientX, e.clientY);
+    _discoOrbPos.x = wp.x - _discoDragOff.x;
+    _discoOrbPos.y = wp.y - _discoDragOff.y;
+    _discoThrowBuf.push({ x: _discoOrbPos.x, y: _discoOrbPos.y, t: performance.now() });
+    if (_discoThrowBuf.length > 8) _discoThrowBuf.shift();
+    return;
+  }
   
   if(dShape){
     if(shiftDown&&dShape!==emitterShape){
@@ -3752,6 +3763,26 @@ window.addEventListener('mouseup',e=>{
     return;
   }
   if(e.button===0&&wormhole.dragging){wormhole.dragging=false;return;}
+  // Disco orb throw on release
+  if (e.button===0 && _discoDragging) {
+    _discoDragging = false;
+    // Compute throw velocity from recent positions
+    if (_discoThrowBuf.length >= 2) {
+      const recent = _discoThrowBuf.slice(-4);
+      let vx = 0, vy = 0, tw = 0;
+      for (let i = 1; i < recent.length; i++) {
+        const dt = (recent[i].t - recent[i-1].t) / 1000;
+        if (dt < 0.001) continue;
+        const w = i;
+        vx += ((recent[i].x - recent[i-1].x) / dt) * w;
+        vy += ((recent[i].y - recent[i-1].y) / dt) * w;
+        tw += w;
+      }
+      if (tw > 0) { _discoOrbVel.x = vx / tw; _discoOrbVel.y = vy / tw; }
+    }
+    _discoThrowBuf.length = 0;
+    return;
+  }
   if(e.button===0&&tAttractor){
     if(tAttractor._bouncingBH) {
       _applyThrow(tAttractor);
@@ -3874,6 +3905,24 @@ renderer.domElement.addEventListener('mousedown',e=>{
   ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
   
+  // ── Disco orb hit-test (level 6 salt mode) ──────────────────────────
+  if (_isDiscoMode && lvl === 5) {
+    const dsc = _discoOrbPos.clone().project(camera);
+    const dsx = (dsc.x + 1) / 2 * W, dsy = (-dsc.y + 1) / 2 * H;
+    const ddx = e.clientX - dsx, ddy = e.clientY - dsy;
+    const dscreenDist = Math.sqrt(ddx*ddx + ddy*ddy);
+    const dedge = new THREE.Vector3(_discoOrbPos.x + 1.15, _discoOrbPos.y, 0).project(camera);
+    const dvisualR = Math.abs((dedge.x + 1) / 2 * W - dsx);
+    if (dscreenDist < Math.max(18, dvisualR)) {
+      _discoDragging = true;
+      _discoThrowBuf.length = 0;
+      const wp = s2w(e.clientX, e.clientY);
+      _discoDragOff.set(wp.x - _discoOrbPos.x, wp.y - _discoOrbPos.y, 0);
+      _discoOrbVel.set(0, 0, 0);
+      return;
+    }
+  }
+
   // Screen-space hit test for attractors — 28px min touch target (desktop), larger for NS
   const MIN_CLICK_R = 14;
   let hitAttractor = null, hitDist = Infinity;
@@ -5804,7 +5853,7 @@ function _buildDiscoBall() {
     const coreMat = new THREE.MeshPhysicalMaterial({
       color: 0xffffff,
       emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: 2.5,
+      emissiveIntensity: 0.12,
       roughness: 0.04,
       metalness: 1.0,
       reflectivity: 1.0,
@@ -5996,10 +6045,10 @@ function _tickDisco(dt) {
       light.intensity = 7.0 + pulse * 3.5;
     });
 
-    // Core pulse — emissive color cycles through hues
+    // Core pulse — just a faint colour tint, darkness preserved
     if (_discoMesh) {
-      _discoMesh.material.emissiveIntensity = 2.0 + pulse * 1.2;
-      _discoMesh.material.emissive.setHSL((_discoHue / 360), 0.75, 0.65);
+      _discoMesh.material.emissiveIntensity = 0.08 + pulse * 0.12;
+      _discoMesh.material.emissive.setHSL((_discoHue / 360), 0.6, 0.5);
     }
 
     // Gentle spin
