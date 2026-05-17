@@ -535,11 +535,11 @@ body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.
   bottom:24px;left:50%;right:auto;top:auto;
   transform:translateX(-50%) scale(0.88);
   background:rgba(10,10,10,0.94);border:1px solid rgba(255,255,255,0.14);
-  backdrop-filter:blur(20px);border-radius:8px;padding:20px 26px 18px;
+  backdrop-filter:blur(20px);border-radius:8px;padding:18px 20px 16px;
   text-align:center;z-index:2000;pointer-events:none;
   opacity:0;transition:opacity 0.4s,transform 0.4s;
   box-shadow:0 8px 48px rgba(0,0,0,0.7);
-  cursor:grab;min-width:220px;
+  cursor:grab;min-width:180px;max-width:240px;
   user-select:none;-webkit-user-select:none;
 }
 #thank-you-toast.visible{opacity:1;transform:translateX(-50%) scale(1);pointer-events:auto;}
@@ -885,7 +885,7 @@ function showThankYouToast() {
   const bodyEl = t.querySelector('.tyt-body');
   if (bodyEl) {
     const n = _totalClickCount;
-    bodyEl.textContent = `thank you for your ${n} of clicks, much appreciated`;
+    bodyEl.textContent = `thank you for your ${n} click${n === 1 ? '' : 's'}, much appreciated`;
   }
 
   t.classList.add('visible');
@@ -1489,7 +1489,9 @@ let spillCount=0,spillSmooth=0;
 let lastSpillMsg=-1;
 let lastInteractTime=0;
 let hasInteracted=false;
-let _totalClickCount=0; // cumulative click counter for thank-you message
+let _totalClickCount=0; // cumulative click counter for thank-you message — counts every click/tap
+document.addEventListener('mousedown', e=>{ if(e.button===0) _totalClickCount++; }, true);
+document.addEventListener('touchstart', ()=>{ _totalClickCount++; }, {capture:true, passive:true});
 const SPILL_IDLE_MS=4000;
 const FILL_A=0.04,FLR=-9.0;
 
@@ -3727,7 +3729,7 @@ renderer.domElement.addEventListener('mousedown',e=>{
     }
   }
   // Empty-space click — supernova blast
-  else { _totalClickCount++; const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
+  else { const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
 });
 // ── SINGULARITY COLLAPSE (right-click hold / long-static-press) ───────────────
 // Threshold in ms before delete fires. Release early cancels.
@@ -4399,7 +4401,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
         if(orbHit) return;
         _hideProjectCard();
       }
-      if (te) { _totalClickCount++; const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
+      if (te) { const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
     }
   },{passive:false});
 })();
