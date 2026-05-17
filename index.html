@@ -1090,8 +1090,7 @@ const FLAVOR_TITLES = {
     `a single operator can control multiple streams.`,
     `honestly, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
     `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-    `of course, take this all for a grain of salt.`,
-    `make mass; have gravity.`,
+    `of course, take this all for a grain of salt.`, `make mass; have gravity.`,
   ],
 };
 
@@ -5668,7 +5667,7 @@ function _exitDisco() {
   // Restore emitter (respect level 6 rule)
   if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = (lvl !== 5);
   document.body.classList.remove('disco');
-  _discoClickTimes = []; // reset so you need a fresh burst to re-enter
+
 }
 
 // Hook into the tick loop for disco animation via the emitter update path
