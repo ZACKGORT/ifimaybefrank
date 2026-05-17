@@ -4277,26 +4277,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
             }
           }, 500);
         }
-        // Long-static-press to delete (non-emitter shapes) — starts collapse ring
-        if (sh.type !== 'panelstack') {
-          _lpTimer = setTimeout(() => {
-            if (!tMoved) {
-              // Commit collapse-delete
-              tShape = null; sh.dragging = false; tPrevWP = null;
-              if (dShape === sh) { dShape = null; prevWP = null; }
-              delShape(sh);
-              _collapseCancel(true);
-            }
-          }, COLLAPSE_THRESHOLD);
-          // Start visual ring immediately
-          const shSc = sh.pos.clone().project(camera);
-          const shSx = (shSc.x+1)/2*W, shSy = (-shSc.y+1)/2*H;
-          _collapseStartSx = shSx; _collapseStartSy = shSy;
-          _collapseStartT = performance.now();
-          _collapseTarget = { type: 'shape', ref: sh };
-          if (collapseRing) collapseRing.classList.add('active');
-          _collapseAnimFrame();
-        }
+
       }
     }
   },{passive:false});
@@ -4344,7 +4325,7 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
        _recordThrowPos(tAttractor);
     } else if(tShape){
       const wp=s2w(t.clientX,t.clientY);
-      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}_collapseCancel();}}
+      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}}}
       tShape.pos.set(wp.x-tOff.x,wp.y-tOff.y,0);
       if(tPrevWP)tShape.vel.set((wp.x-tPrevWP.x)*2.5,(wp.y-tPrevWP.y)*2.5,0);
       tPrevWP=wp.clone();
@@ -4375,7 +4356,6 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       revertToTitle();
     } else if(tShape){
       if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
-      _collapseCancel(); // cancel any pending collapse if released early
       if(!tMoved&&(Date.now()-tTime)<350){
         if(tShape.type==='panelstack'){
           const target=tShape._panelMorphVal<0.5?1:0;
