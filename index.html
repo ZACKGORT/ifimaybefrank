@@ -111,8 +111,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   box-shadow: 0 4px 24px rgba(255, 255, 255, 0.1);
 }
 
-#next-btn{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:transparent;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);padding:7px 20px;border-radius:4px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:none;z-index:500;opacity:0;pointer-events:none;}
-#next-btn.visible{opacity:1;pointer-events:auto;}
+#next-btn{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,0.85);color:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.08);padding:0;border-radius:4px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:none;z-index:500;opacity:1;pointer-events:auto;transition:border-color 0.3s,box-shadow 0.3s;overflow:hidden;}
+#next-btn-fill{position:absolute;inset:0;background:rgba(255,255,255,0.88);width:0%;transition:width 0.25s ease;border-radius:4px;pointer-events:none;}
+#next-btn-label{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;padding:7px 20px;transition:color 0.25s;}
+#next-btn.visible{border-color:rgba(255,255,255,0.55);box-shadow:0 0 18px rgba(255,255,255,0.2);}
+#next-btn.visible:hover{box-shadow:0 0 32px rgba(255,255,255,0.55),0 0 8px rgba(255,255,255,0.9);}
+#next-btn:not(.visible):hover{border-color:rgba(255,255,255,0.2);}
 
 #hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:0.22em;color:rgba(255,255,255,0.1);text-transform:uppercase;pointer-events:none;transition:opacity 1s;white-space:nowrap;z-index:10;}
 #shape-count{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:0.2em;color:rgba(255,255,255,0.12);text-transform:uppercase;pointer-events:none;}
@@ -290,7 +294,10 @@ body.paper #cta-btn{background:#111;color:#f0ece4;box-shadow:0 2px 16px rgba(0,0
 body.paper #cta-btn.paused{background:#f0ece4;color:#111;border:1px solid rgba(0,0,0,0.15);}
 body.paper #screenshot-btn{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.4);}
 body.paper #screenshot-btn:hover{color:rgba(0,0,0,0.8);border-color:rgba(0,0,0,0.2);background:rgba(255,255,255,0.5);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
-body.paper #next-btn{color:rgba(0,0,0,0.4);border-color:rgba(0,0,0,0.15);}
+body.paper #next-btn{border-color:rgba(0,0,0,0.1);}
+body.paper #next-btn-fill{background:rgba(0,0,0,0.82);}
+body.paper #next-btn-label{color:rgba(0,0,0,0.35);}
+body.paper #next-btn.visible #next-btn-label{color:rgba(0,0,0,0.85);}
 body.paper #flash-complete.on{background:rgba(0,0,0,0.06);}
 body.paper #spill-graph-label{color:rgba(0,0,0,0.2);}
 body.paper #theme-toggle{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.3);}
@@ -730,7 +737,7 @@ body.paper #project-card-close { color: rgba(0,0,0,0.25); }
   </div>
   <div id="level-nav-desc"></div>
 </div>
-<button id="next-btn">NEXT LEVEL →</button>
+<button id="next-btn"><div id="next-btn-fill"></div><span id="next-btn-label">NEXT LEVEL →</span></button>
 
 <div class="widget" id="spill-graph-widget">
   <div class="widget-header" id="spill-graph-header">
@@ -1165,6 +1172,19 @@ function setFlavor(flavor) {
   } else {
     if (typeof _exitDisco === 'function') _exitDisco();
   }
+
+  // Reflective floor follows salt flavor
+  if (typeof _setSaltFloor === 'function') _setSaltFloor(flavor === 'salt');
+
+  // Sugar-specific lights: off in salt, on in sugar (unless paper theme active)
+  if (flavor === 'salt') {
+    sugarFloorWashL.intensity  = 0;
+    sugarFloorWashL2.intensity = 0;
+    _pGlowActive = false;
+  } else if (!isPaper) {
+    sugarFloorWashL.intensity  = 2.8;
+    sugarFloorWashL2.intensity = 1.6;
+  }
 }
 
 
@@ -1326,7 +1346,27 @@ function _buildFloatText(lines, immediate) {
     });
     textChars = allChars;
     lvlTextAlphaTgt = 1;
+    // Track bottom of text block for dynamic next-btn positioning
+    _textBlockBottomY = y;
+    _positionNextBtn();
   }, delay);
+}
+
+// ── NEXT-BTN DYNAMIC POSITIONING ─────────────────────────────────────────────
+let _textBlockBottomY = 0;
+function _positionNextBtn() {
+  const btn = document.getElementById('next-btn');
+  if (!btn) return;
+  // Only reposition on desktop (mobile uses its own fixed layout)
+  if (window.innerWidth <= 600) return;
+  const GAP = 28; // px below last text row
+  const rawTop = (_textBlockBottomY > 0 ? _textBlockBottomY : H * 0.62) + GAP;
+  // Clamp so it never falls off screen
+  const clampedTop = Math.min(rawTop, H - 80);
+  btn.style.bottom = 'auto';
+  btn.style.top = clampedTop + 'px';
+  btn.style.left = PAD_X + 'px';
+  btn.style.transform = 'none';
 }
 
 // ── RENDERER ──────────────────────────────────────────────────────────────────
@@ -1350,8 +1390,118 @@ const rimL=new THREE.PointLight(0x9aaabb,1.1,80);rimL.position.set(-28,14,16);sc
 // Subtle floor bounce: warm upward fill from below the scene
 const fillL=new THREE.PointLight(0xffe8c0,0.35,60);fillL.position.set(0,-22,8);scene.add(fillL);
 
-const floorM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x050505,roughness:1.0}));
+// ── SUGAR FLOOR WASH ─────────────────────────────────────────────────────────
+// Low-angle warm light sitting just above the floor, illuminates shapes from below
+// and makes the floor catch light from objects above it. Sugar mode only.
+const sugarFloorWashL = new THREE.PointLight(0xfff0d0, 2.8, 55);
+sugarFloorWashL.position.set(0, -7.2, 4);
+scene.add(sugarFloorWashL);
+
+// Second floor wash from the left to fill shadows under shapes
+const sugarFloorWashL2 = new THREE.PointLight(0xffe0b0, 1.6, 45);
+sugarFloorWashL2.position.set(-8, -7.0, 2);
+scene.add(sugarFloorWashL2);
+
+// ── PARTICLE GLOW LIGHTS (sugar only) ────────────────────────────────────────
+// A pool of PointLights repositioned each frame to sample particles —
+// gives the particle swarm a warm self-illuminating glow on surrounding surfaces.
+const _PGLOW_COUNT = 10;
+const _pGlowLights = [];
+for (let i = 0; i < _PGLOW_COUNT; i++) {
+  const l = new THREE.PointLight(0xfff8e8, 0, 12);
+  scene.add(l);
+  _pGlowLights.push(l);
+}
+let _pGlowActive = false; // off — particles don't emit light
+
+function _tickParticleGlow() {
+  if (!_pGlowActive) {
+    _pGlowLights.forEach(l => { l.intensity = 0; });
+    return;
+  }
+  const N = Math.min(P.count, MP);
+  if (N < 1) return;
+  const step = Math.floor(N / _PGLOW_COUNT);
+  const t = Date.now() * 0.001;
+  _pGlowLights.forEach((l, i) => {
+    // Sample evenly across the live particle array, with a small random jitter each frame
+    const idx = ((i * step + Math.floor(Math.random() * step)) % N);
+    const b = idx * 3;
+    if (!pal[idx]) { l.intensity = 0; return; }
+    l.position.set(pp[b], pp[b+1], pp[b+2]);
+    // Gentle per-light pulse so they don't all peak together
+    l.intensity = 1.2 + Math.sin(t * 1.8 + i * 0.7) * 0.4;
+  });
+}
+
+const floorMat = new THREE.MeshPhysicalMaterial({
+  color: 0x050505,
+  roughness: 1.0,
+  metalness: 0.0,
+  clearcoat: 0.0,
+  clearcoatRoughness: 0.18,
+  reflectivity: 0.0,
+});
+const floorM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),floorMat);
 floorM.rotation.x=-Math.PI/2;floorM.position.y=-9;scene.add(floorM);
+
+// ── SALT FLOOR LIGHT POOLS ────────────────────────────────────────────────────
+// Coloured point lights near the floor that create the reflective light puddles
+// visible in alteredqualia's rotating_lights example. Only active in salt mode.
+const _saltFloorLights = [];
+const _saltFloorLightDefs = [
+  { color: 0xff3388, x: -6,  z:  2 },
+  { color: 0x3388ff, x:  6,  z:  2 },
+  { color: 0xff8833, x:  0,  z: -2 },
+  { color: 0x88ff33, x: -10, z: -4 },
+  { color: 0xaa33ff, x:  10, z: -4 },
+];
+_saltFloorLightDefs.forEach(def => {
+  const l = new THREE.PointLight(def.color, 0, 90); // very large radius = maximally diffuse
+  l.position.set(def.x, -3.0, def.z); // high above floor = very wide footprint
+  scene.add(l);
+  _saltFloorLights.push({ light: l, baseColor: def.color, ox: def.x, oz: def.z });
+});
+
+let _saltFloorHue = 0;
+let _saltFloorActive = false;
+
+function _setSaltFloor(active) {
+  _saltFloorActive = active;
+  if (active) {
+    floorMat.roughness    = 0.08;
+    floorMat.metalness    = 0.55;
+    floorMat.clearcoat    = 0.95;
+    floorMat.clearcoatRoughness = 0.72; // near-max = heavily frosted/sugar-glass blur
+    floorMat.reflectivity = 0.85;
+    floorMat.color.setHex(0x040408);
+    _saltFloorLights.forEach(({ light }) => { light.intensity = 1.6; }); // softer still
+  } else {
+    floorMat.roughness    = 1.0;
+    floorMat.metalness    = 0.0;
+    floorMat.clearcoat    = 0.0;
+    floorMat.reflectivity = 0.0;
+    floorMat.color.setHex(0x050505);
+    _saltFloorLights.forEach(({ light }) => { light.intensity = 0; });
+  }
+  floorMat.needsUpdate = true;
+}
+
+function _tickSaltFloor(dt) {
+  if (!_saltFloorActive) return;
+  _saltFloorHue = (_saltFloorHue + dt * 28) % 360;
+  _saltFloorLights.forEach(({ light, baseColor, ox, oz }, i) => {
+    // Slowly shift hue for each light independently
+    const hue = (_saltFloorHue + i * (360 / _saltFloorLights.length)) % 360;
+    light.color.setHSL(hue / 360, 0.85, 0.52);
+    // Gentle drift — wider sweep for maximally diffuse pools
+    const t = Date.now() * 0.00032 + i * 1.4;
+    light.position.x = ox + Math.sin(t) * 5.5;
+    light.position.z = oz + Math.cos(t * 0.7) * 3.5;
+    // Soft pulse
+    light.intensity = 1.6 + Math.sin(t * 1.3 + i) * 0.4;
+  });
+}
 
 // overlay canvas for targets (rendered in multi-pass WebGL)
 const _dpr = Math.min(devicePixelRatio, isMobile ? 3.0 : 2.0);
@@ -1490,8 +1640,8 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
-const THRESH=0.55;
-const LEVEL_THRESH=[0.55,0.55,0.55,0.30,0.55,0.55]; // level 4 wormhole: lower bar
+const THRESH=0.40;
+const LEVEL_THRESH=[0.40,0.40,0.40,0.22,0.40,0.40]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:0,r:2.8}]},
@@ -2386,7 +2536,12 @@ function initLevel(n){
   lvl=n;lvlDone=false;tCounts=[];spillCount=0;spillSmooth=0;lastSpillMsg=-1;
   spillHistory.length=0;
   _textMode='idle';_textTitleIdx=0;
-  document.getElementById('next-btn').classList.remove('visible');
+  const _nb=document.getElementById('next-btn');
+  _nb.classList.remove('visible');
+  const _nbf=document.getElementById('next-btn-fill');
+  if(_nbf)_nbf.style.width='0%';
+  const _nbl=document.getElementById('next-btn-label');
+  if(_nbl)_nbl.style.color='';
   tgts=LEVELS[n].targets.map((t,i)=>({x:t.x,r:t.r,fill:0,col:TCOL[i],met:false,idx:i}));
   document.getElementById('level-val').textContent='LVL '+(n+1);
   buildHUD();
@@ -3126,16 +3281,13 @@ function buildInit(){
       const allTypes = ['cube','sphere','pyramid'];
       lvl5Slots.forEach((pos, i) => {
         const type = allTypes[i % allTypes.length];
-        const orients = SDEFS[type].orients;
-        const rot = orients[Math.floor(Math.random()*orients.length)].clone();
+        const rot = SDEFS[type].orients[0].clone(); // always start at 12 o'clock
         shapes.push(new Shape(type, pos, rot, randSc(type)));
       });
     } else {
       SLOTS.forEach((slot,i)=>{
         const type=typePool[i];
-        const orients=SDEFS[type].orients;
-        const oi=Math.floor(Math.random()*orients.length);
-        const rot=orients[oi].clone();
+        const rot=SDEFS[type].orients[0].clone(); // always start at 12 o'clock
         const sc=randSc(type);
         shapes.push(new Shape(type,slot.pos,rot,sc));
       });
@@ -4570,6 +4722,15 @@ function countTgts(){
 }
 function updateHUD(){
   tgts.forEach((t,i)=>{const bar=document.getElementById('bar'+i),pct=document.getElementById('pct'+i),chk=document.getElementById('chk'+i);if(!bar)return;bar.style.width=(t.fill*100).toFixed(1)+'%';if(pct)pct.textContent=Math.round(t.fill*100)+'%';if(chk)chk.classList.toggle('done',t.met);});
+  // Drive next-btn fill based on avg target progress toward threshold
+  if(!lvlDone && tgts.length>0){
+    const th=lvlThresh();
+    const avgProgress=Math.min(1,tgts.reduce((s,t)=>s+(t.fill/th),0)/tgts.length);
+    const nbf=document.getElementById('next-btn-fill');
+    if(nbf)nbf.style.width=(avgProgress*100).toFixed(1)+'%';
+    const nbl=document.getElementById('next-btn-label');
+    if(nbl)nbl.style.color=avgProgress>0.6?`rgba(${Math.round(avgProgress*10)},${Math.round(avgProgress*10)},${Math.round(avgProgress*10)},${(0.2+avgProgress*0.8).toFixed(2)})`:'';
+  }
   // Level 5: update NS capture bars
   if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
@@ -4623,12 +4784,21 @@ function checkDone(){
     lvlDone=true;flashEl('flash-complete');
     _lvlDone[lvl]=true;
     if(typeof updateLevelNav==='function')updateLevelNav();
+    // Snap next-btn fill to 100%
+    const _nbf=document.getElementById('next-btn-fill');
+    if(_nbf)_nbf.style.width='100%';
+    const _nbl=document.getElementById('next-btn-label');
+    if(_nbl)_nbl.style.color='#0a0a0a';
     // Show completion statement in floating text
     const completionLine = getLevelComplete(lvl);
     _buildFloatText([completionLine], false);
     _textMode = 'idle'; // lock it — don't let shape grabs override until next level
     setTimeout(()=>{
-      if(lvl<LEVELS.length-1)document.getElementById('next-btn').classList.add('visible');
+      if(lvl<LEVELS.length-1){
+        const _nb = document.getElementById('next-btn');
+        _nb.classList.add('visible');
+        _positionNextBtn();
+      }
     },600);
   }
 }
@@ -4645,6 +4815,44 @@ document.getElementById('screenshot-btn').addEventListener('click',()=>{
   a.click();
 });
 document.getElementById('next-btn').addEventListener('click',()=>{if(lvl<LEVELS.length-1){lvl++;initLevel(lvl);tCounts=[];for(let i=0;i<MP;i++)spawn(i);buildInit();}});
+
+// ── NEXT-BTN WORLD LIGHT ──────────────────────────────────────────────────────
+// A PointLight that hovers at the button's world position, active while visible.
+const _nextBtnLight = new THREE.PointLight(0xfff8e8, 0, 20);
+scene.add(_nextBtnLight);
+let _nextBtnHovered = false;
+
+// Track hover for light activation
+(()=>{
+  const _nb = document.getElementById('next-btn');
+  _nb.addEventListener('mouseenter', () => { _nextBtnHovered = true; });
+  _nb.addEventListener('mouseleave', () => { _nextBtnHovered = false; });
+})();
+
+function _tickNextBtnLight() {
+  const btn = document.getElementById('next-btn');
+  if (!btn || !btn.classList.contains('visible') || !_nextBtnHovered) {
+    _nextBtnLight.intensity = 0;
+    return;
+  }
+  // Unproject button centre from screen → world
+  const r = btn.getBoundingClientRect();
+  const sx = r.left + r.width  * 0.5;
+  const sy = r.top  + r.height * 0.5;
+  const nx = (sx / W) * 2 - 1;
+  const ny = -(sy / H) * 2 + 1;
+  const v = new THREE.Vector3(nx, ny, 0.5).unproject(camera);
+  const d = v.sub(camera.position).normalize();
+  // Place it at z=0 plane (same as shapes)
+  const t = -camera.position.z / d.z;
+  _nextBtnLight.position.set(
+    camera.position.x + d.x * t,
+    camera.position.y + d.y * t,
+    0
+  );
+  // Strong pulse matching shape glow rhythm
+  _nextBtnLight.intensity = 4.0 + Math.sin(Date.now() * 0.003) * 0.8;
+}
 
 // ── LEVEL NAVIGATOR ───────────────────────────────────────────────────────────
 const LVL_DESCS=[
@@ -5395,8 +5603,10 @@ function applyTheme(paper) {
   scene.fog.color.setHex(bg);
   // Particle scene shares fog
 
-  // Floor
-  floorM.material.color.setHex(paper ? 0xece8df : 0x050505);
+  // Floor — only update if not in salt mode (salt mode manages its own floor)
+  if (!_saltFloorActive) {
+    floorMat.color.setHex(paper ? 0xece8df : 0x050505);
+  }
 
   // Lighting — brighten for paper, keep original for dark
   if (paper) {
@@ -5404,11 +5614,19 @@ function applyTheme(paper) {
     mainL.intensity = 2.2; mainL.color.setHex(0xfff8f0);
     rimL.intensity  = 0.6; rimL.color.setHex(0xc8d4e0);
     fillL.intensity = 0.2;
+    sugarFloorWashL.intensity  = 0;
+    sugarFloorWashL2.intensity = 0;
+    _pGlowActive = false;
   } else {
     scene.children.filter(c=>c.isAmbientLight).forEach(l=>{ l.intensity=0.07; });
     mainL.intensity = 3.8; mainL.color.setHex(0xfff5ee);
     rimL.intensity  = 1.1; rimL.color.setHex(0x9aaabb);
     fillL.intensity = 0.35;
+    // Only activate sugar floor wash when not in salt mode
+    if (!_saltFloorActive) {
+      sugarFloorWashL.intensity  = 2.8;
+      sugarFloorWashL2.intensity = 1.6;
+    }
   }
 
   // Shape materials
@@ -5690,6 +5908,9 @@ setTimeout(() => {
     emitterShape.update = function(dt) {
       _origEmitterUpdate(dt);
       _tickDisco(dt);
+      _tickSaltFloor(dt);
+      _tickNextBtnLight();
+      _tickParticleGlow();
     };
   }
 }, 200);
