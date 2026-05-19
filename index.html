@@ -3167,11 +3167,22 @@ function _syncOrbWidget(orb) {
     return;
   }
 
-  // Desktop: track the orb unless user has anchored it
-  if(el._userAnchored) return;
+  // Desktop: track the orb unless user has anchored it.
+  // If anchored, check whether the orb has drifted close to the widget —
+  // if so, re-pair (clear the anchor) so tracking resumes naturally.
   const sc = orb.pos.clone().project(camera);
   const sx = (sc.x+1)/2*W;
   const sy = (-sc.y+1)/2*H;
+  if(el._userAnchored) {
+    const wl = parseFloat(el.style.left) || 0;
+    const wt = parseFloat(el.style.top)  || 0;
+    const ww2 = (el.offsetWidth  || 170) / 2;
+    const wh2 = (el.offsetHeight ||  90) / 2;
+    const wcx = wl + ww2, wcy = wt + wh2;
+    const dist = Math.sqrt((sx - wcx) ** 2 + (sy - wcy) ** 2);
+    if(dist < 120) el._userAnchored = false;
+    else return;
+  }
   const ww = el.offsetWidth || 170;
   const wh = el.offsetHeight || 90;
   let wx = sx + 28;
