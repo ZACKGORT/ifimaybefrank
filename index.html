@@ -932,6 +932,40 @@ const CONTENT = {
 
 // ── TEXT CONTENT SYSTEM ───────────────────────────────────────────────────────
 // On level completion: one statement replaces the floating title
+
+
+// At rest: one title statement per level (default; overwritten by setFlavor)
+const LEVEL_TITLES = [
+  `design is necessary, if seemingly not needed.`,
+  `design is precise and concise.`,
+  `design is opinionated.`,
+  `design is intake. <br>output = mass; mass → gravity`,
+  `design is influence.`,
+  `my design.`,
+];
+
+// ── FLAVOR TITLES: SUGAR / SALT ───────────────────────────────────────────────
+// One statement per level per flavor. setFlavor() swaps these into LEVEL_TITLES.
+const FLAVOR_TITLES = {
+  sugar: [
+    `sometimes, <br>design isn't design.`,
+    `more often, <br>design is balance.`,
+    `"a user arrives <br>with intent, not a request"
+    <br>design shapes intent.`,
+    `design can be defined as <br>"anything not created by nature"`,
+    `design is intake. <br>output = mass; mass → gravity`,
+    `make mass; have gravity.`,
+  ],
+  salt: [
+  `"the best part is no part"<br>— space.X`,
+    `Look, I crafted this concept to convey in an abstract way the many things I have to say.
+    <br><br>please take this <br>with a pinch of salt.`,
+    `honestly folks, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
+    `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
+    `make mass; have gravity.`,
+  ],
+};
+
 // Per-flavor win statements (5 levels after removing old level 5)
 const LEVEL_COMPLETE_FLAVOR = {
   sugar: [
@@ -947,46 +981,19 @@ const LEVEL_COMPLETE_FLAVOR = {
     `go ahead and right-click those unused shapes.`,
     `that wasn't so bad.`,
     `if you moved the wormhole, that's like moving the goal posts, but a win is a win, I suppose.`,
-    `signal = gravity; gravity → infouence (maybe?).`,
+    `This  is supposed to be a metaphor for how I am navigating this paradigm; existing as a cosmic sponge and becoming my own signal — hoping to get pulled into a north star's orbit.`,
     `anyways :)`,
   ],
 };
+
 function getLevelComplete(lvlN) {
   const set = LEVEL_COMPLETE_FLAVOR[_currentFlavor] || LEVEL_COMPLETE_FLAVOR.sugar;
   return set[Math.min(lvlN, set.length - 1)];
 }
+
 // Legacy alias
 const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
 
-// At rest: one title statement per level (default; overwritten by setFlavor)
-const LEVEL_TITLES = [
-  `"the best part is no part"<br>— space.X`,
-  `think different — steve.jobs`,
-  `the more u practice, the luckier i get.<br>— gary.player`,
-  `intake = mass; mass → gravity`,
-  `signal, multipliedl = gravity; gravity → infouence.`,
-  ``,
-];
-
-// ── FLAVOR TITLES: SUGAR / SALT ───────────────────────────────────────────────
-// One statement per level per flavor. setFlavor() swaps these into LEVEL_TITLES.
-const FLAVOR_TITLES = {
-  sugar: [
-    `sometimes, <br>design isn't design.`,
-    `more often, <br>design is simply balance.`,
-    `design may offer <br>pathways for intent.`,
-    `design can be defined as "anything not created by nature"`,
-    `design is intake.`,
-    `make mass; have gravity.`,
-  ],
-  salt: [
-  `"the best part is no part"<br>— space.X`,
-    `kindly,<br>"take this with a pinch of salt"`,
-    `honestly folks, I wanted to include an auto-solve here, but it became prohibitively expensive from a compute standpoint.`,
-    `if the system allows it, <br>is it okay? is it ethical? <br>where does one draw the line?`,
-    `make mass; have gravity.`,
-  ],
-};
 
 // ── FLAVOR PROSE: mobile panel long-form copy (single source of truth) ─────────
 // Edit here; setFlavor() renders this into #mb-panel-sugar / #mb-panel-salt.
