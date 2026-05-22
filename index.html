@@ -26,6 +26,8 @@ canvas{display:block;}
 #snap-hint.visible{opacity:1;}
 /* text cursor canvas */
 #text-canvas{position:fixed;inset:0;pointer-events:none;z-index:200; transition: opacity 0.3s ease;}
+/* level text overlay */
+#level-copy{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:199;}
 
 #dispenser{position:fixed;z-index:300;top:18px;left:50%;transform:translateX(-50%);user-select:none;touch-action:none;}
 #cta-btn{display:flex;align-items:center;justify-content:center;gap:9px;background:#ffffff;color:#0a0a0a;border:none;padding:0 20px 0 18px;height:38px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:none;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,0.4);transition:box-shadow 0.15s,background 0.12s;white-space:nowrap;min-width:100px;}
@@ -40,6 +42,10 @@ canvas{display:block;}
 /* ── UNIFORM WIDGET WIDTH ── */
 .widget{width:200px!important;}
 
+#shape-inserter{right:16px;top:80px;left:auto;}
+#inserter-body{padding:8px 8px 10px;display:flex;flex-direction:column;gap:6px;}
+/* Shape buttons: 3-across horizontal row */
+#ins-btn-row{display:flex;gap:5px;}
 .ins-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;flex:1;transition:background 0.12s;}
 .ins-btn:hover{background:rgba(255,255,255,0.09);}
 .ins-btn svg{width:22px;height:22px;}
@@ -77,7 +83,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .chk-row{display:flex;align-items:center;justify-content:space-between;}
 
 #flash-complete,#flash-delete{position:fixed;inset:0;pointer-events:none;z-index:600;transition:background 0.1s;background:transparent;}
-#flash-complete.on{background:rgba(255,255,255,0.01);}
+#flash-complete.on{background:rgba(255,255,255,0.1);}
 #flash-delete.on{background:rgba(255,40,40,0.07);}
 
 #screenshot-btn {
@@ -105,16 +111,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   box-shadow: 0 4px 24px rgba(255, 255, 255, 0.1);
 }
 
-#next-btn{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,0.85);color:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.08);padding:0;border-radius:4px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:none;z-index:500;opacity:1;pointer-events:auto;transition:border-color 0.3s,box-shadow 0.3s;overflow:hidden;}
-#next-btn-fill{position:absolute;inset:0;background:rgba(255,255,255,0.88);width:0%;transition:width 0.25s ease;border-radius:4px;pointer-events:none;}
-#next-btn-label{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;padding:7px 20px;transition:color 0.25s;}
-#next-btn.visible{border-color:rgba(255,255,255,0.55);box-shadow:0 0 18px rgba(255,255,255,0.2);}
-#next-btn.visible:hover{box-shadow:0 0 32px rgba(255,255,255,0.55),0 0 8px rgba(255,255,255,0.9);}
-#next-btn:not(.visible):hover{border-color:rgba(255,255,255,0.2);}
+#next-btn{position:fixed;bottom:68px;left:50%;transform:translateX(-50%);background:transparent;color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.15);padding:7px 20px;border-radius:4px;font-family:'Helvetica Neue',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;cursor:none;z-index:500;opacity:0;pointer-events:none;}
+#next-btn.visible{opacity:1;pointer-events:auto;}
 
 #hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:0.22em;color:rgba(255,255,255,0.1);text-transform:uppercase;pointer-events:none;transition:opacity 1s;white-space:nowrap;z-index:10;}
 #shape-count{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:0.2em;color:rgba(255,255,255,0.12);text-transform:uppercase;pointer-events:none;}
 
+/* ── AUTHOR'S NOTE WIDGET ── */
+#author-note{left:16px;top:16px;right:auto;bottom:auto;}
+#anote-body{padding:10px 12px 12px;}
+#anote-eye{font-size:8px;letter-spacing:0.25em;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-bottom:7px;}
+#anote-text{font-size:9px;line-height:1.7;color:rgba(255,255,255,0.28);letter-spacing:0.04em;}
+#anote-text em{color:rgba(255,255,255,0.48);font-style:normal;}
+#anote-sig{margin-top:9px;font-size:8px;color:rgba(255,255,255,0.13);letter-spacing:0.12em;font-style:italic;}
+.widget-collapse{background:transparent;border:none;color:rgba(255,255,255,0.18);cursor:none;font-size:9px;padding:0 2px;line-height:1;transition:color 0.15s;}
+.widget-collapse:hover{color:rgba(255,255,255,0.5);}
+.widget-body{overflow:hidden;transition:max-height 0.25s ease,opacity 0.2s;}
+.widget-body.collapsed{max-height:0!important;opacity:0;}
+/* hide widget entirely — replaced by top-center toggle on desktop */
+#author-note{display:none!important;}
+@media (max-width:600px){#author-note{display:none!important;}}
 
 /* ── DESKTOP TOP-CENTER FLAVOR TOGGLE ── */
 #flavor-toggle{
@@ -142,6 +158,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 #flavor-toggle button.flv-active{color:rgba(255,255,255,1.0);}
 #flavor-toggle button:not(.flv-active){color:rgba(255,255,255,0.22);}
 #flavor-toggle button:not(.flv-active):hover{color:rgba(255,255,255,0.5);}
+body.paper #flavor-toggle button.flv-active{color:rgba(0,0,0,0.85);}
+body.paper #flavor-toggle button:not(.flv-active){color:rgba(0,0,0,0.22);}
+body.paper #flavor-toggle .flv-sep{color:rgba(0,0,0,0.15);}
 @media(max-width:600px){#flavor-toggle{display:none!important;}}
 /* ── SPILL GRAPH WIDGET ── */
 #spill-graph-widget{left:16px;bottom:16px;top:auto;right:auto;width:200px!important;}
@@ -151,6 +170,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 #spill-graph-label{font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.18em;text-transform:uppercase;}
 @media (max-width:600px){#spill-graph-widget{display:none!important;}}
 
+/* author note links */
+#anote-links{margin-top:9px;display:flex;gap:10px;flex-wrap:wrap;}
+#anote-links a{font-size:8px;color:rgba(255,255,255,0.22);letter-spacing:0.12em;text-decoration:none;text-transform:lowercase;transition:color 0.15s;}
+#anote-links a:hover{color:rgba(255,255,255,0.6);}
+/* mobile author note modal links */
+#mb-anote-links{margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;}
+#mb-anote-links a{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-decoration:none;padding:6px 0;}
+#mb-anote-links a:hover{color:rgba(255,255,255,0.7);}
 
 /* ── MOBILE FLAVOR TABS ── */
 #mb-flavor-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.07);margin:-2px 0 12px;}
@@ -168,6 +195,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   box-shadow:0 4px 32px rgba(0,0,0,0.35);
 }
 
+/* ── THEME TOGGLE ── */
+#theme-toggle{
+  position:fixed;right:16px;bottom:24px;z-index:400;
+  background:rgba(10,10,10,0.88);border:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(14px);border-radius:6px;
+  color:rgba(255,255,255,0.22);font-family:'Courier New',monospace;
+  font-size:9px;letter-spacing:0.28em;text-transform:uppercase;
+  padding:7px 12px;cursor:none;
+  transition:color 0.2s,border-color 0.2s,background 0.3s;
+  white-space:nowrap;
+}
+#theme-toggle:hover{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);}
+@media(max-width:600px){#theme-toggle{display:none!important;}}
 
 /* ── LEVEL NAVIGATOR WIDGET ── */
 #level-nav{
@@ -191,7 +231,70 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 .lvl-nav-btn.done{border-color:rgba(100,255,140,0.22);color:rgba(100,255,140,0.55);}
 .lvl-nav-btn.done.active{border-color:rgba(100,255,140,0.5);background:rgba(100,255,140,0.06);}
 #level-nav-desc{margin-top:6px;font-size:7.5px;line-height:1.6;color:rgba(255,255,255,0.18);letter-spacing:0.04em;min-height:22px;}
+body.paper #level-nav{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);}
+body.paper .lvl-nav-btn{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.3);}
+body.paper .lvl-nav-btn.active{background:rgba(0,0,0,0.07);border-color:rgba(0,0,0,0.3);color:rgba(0,0,0,0.7);}
+body.paper #level-nav-title{color:rgba(0,0,0,0.25);}
+body.paper #level-nav-desc{color:rgba(0,0,0,0.3);}
 @media(max-width:600px){#level-nav{display:none!important;}}
+
+/* ── PAPER THEME ── */
+body.paper{background:#f0ece4;}
+body.paper #cursor{background:rgba(8,8,8,0.85);box-shadow:0 0 8px rgba(0,0,0,0.15);}
+body.paper #snap-hint{background:linear-gradient(90deg,transparent,rgba(0,0,0,0.12),transparent);}
+
+body.paper .widget{
+  background:rgba(255,252,246,0.72)!important;
+  border-color:rgba(0,0,0,0.08)!important;
+  backdrop-filter:blur(20px);
+  box-shadow:0 2px 24px rgba(0,0,0,0.06),0 0 0 0.5px rgba(0,0,0,0.05);
+}
+body.paper .widget:hover{
+  background:rgba(255,252,246,0.88)!important;
+  border-color:rgba(0,0,0,0.13)!important;
+  box-shadow:0 4px 32px rgba(0,0,0,0.10),0 0 0 0.5px rgba(0,0,0,0.07)!important;
+}
+body.paper .widget-header{border-bottom-color:rgba(0,0,0,0.06)!important;}
+body.paper .widget-title{color:rgba(0,0,0,0.28);}
+body.paper .widget-sub{color:rgba(0,0,0,0.2);}
+body.paper .widget-collapse{color:rgba(0,0,0,0.22);}
+body.paper .widget-collapse:hover{color:rgba(0,0,0,0.55);}
+body.paper #panel-title{color:rgba(0,0,0,0.28);}
+body.paper #btn-pp{border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.35);}
+body.paper #btn-pp:hover{color:rgba(0,0,0,0.8);}
+body.paper #btn-pp.paused{color:rgba(180,100,0,0.8);}
+body.paper .ctrl-nm{color:rgba(0,0,0,0.28);}
+body.paper .ctrl-vl{color:rgba(0,0,0,0.45);}
+body.paper input[type=range]{background:rgba(0,0,0,0.1);}
+body.paper input[type=range]::-webkit-slider-thumb{background:rgba(0,0,0,0.45);}
+body.paper .div{background:rgba(0,0,0,0.06);}
+body.paper .tog{border-color:rgba(0,0,0,0.1);color:rgba(0,0,0,0.3);}
+body.paper .tog.on{color:rgba(0,0,0,0.75);border-color:rgba(0,0,0,0.35);}
+body.paper .chk-row .ctrl-nm{color:rgba(0,0,0,0.28);}
+body.paper .ins-btn{background:rgba(0,0,0,0.03);border-color:rgba(0,0,0,0.08);}
+body.paper .ins-btn:hover{background:rgba(0,0,0,0.07);}
+body.paper .ins-btn-lbl{color:rgba(0,0,0,0.3);}
+body.paper .ins-clear{border-color:rgba(200,40,40,0.15);color:rgba(180,40,40,0.38);}
+body.paper .ins-clear:hover{border-color:rgba(200,40,40,0.4);color:rgba(180,40,40,0.7);}
+body.paper .tbar-bg{background:rgba(0,0,0,0.07);}
+body.paper .tpct{color:rgba(0,0,0,0.3);}
+body.paper #anote-eye{color:rgba(0,0,0,0.28);}
+body.paper #anote-text{color:rgba(0,0,0,0.45);}
+body.paper #anote-text em{color:rgba(0,0,0,0.72);}
+body.paper #anote-sig{color:rgba(0,0,0,0.22);}
+body.paper #anote-links a{color:rgba(0,0,0,0.3);}
+body.paper #anote-links a:hover{color:rgba(0,0,0,0.7);}
+body.paper #hint{color:rgba(0,0,0,0.12);}
+body.paper #zckgrt-logo span{color:rgba(0,0,0,0.1);}
+body.paper #cta-btn{background:#111;color:#f0ece4;box-shadow:0 2px 16px rgba(0,0,0,0.15);}
+body.paper #cta-btn.paused{background:#f0ece4;color:#111;border:1px solid rgba(0,0,0,0.15);}
+body.paper #screenshot-btn{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.4);}
+body.paper #screenshot-btn:hover{color:rgba(0,0,0,0.8);border-color:rgba(0,0,0,0.2);background:rgba(255,255,255,0.5);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+body.paper #next-btn{color:rgba(0,0,0,0.4);border-color:rgba(0,0,0,0.15);}
+body.paper #flash-complete.on{background:rgba(0,0,0,0.06);}
+body.paper #spill-graph-label{color:rgba(0,0,0,0.2);}
+body.paper #theme-toggle{background:rgba(255,252,246,0.72);border-color:rgba(0,0,0,0.08);color:rgba(0,0,0,0.3);}
+body.paper #theme-toggle:hover{color:rgba(0,0,0,0.65);border-color:rgba(0,0,0,0.2);}
 
 
 /* ── FRANK LOGO ── */
@@ -218,29 +321,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   /* suppress custom cursor on touch */
   #cursor{display:none!important;}
   body{cursor:auto;}
-
-  /* ── MOBILE LEVEL NAV (always-visible prev/next in top bar) ── */
-  #mb-lvl-nav{
-    display:flex;align-items:center;gap:0;
-    border-left:1px solid rgba(255,255,255,0.06);
-    flex-shrink:0;
-  }
-  #mb-lvl-prev,#mb-lvl-next{
-    width:38px;height:48px;
-    display:flex;align-items:center;justify-content:center;
-    background:transparent;border:none;
-    font-family:'Helvetica Neue',Arial,sans-serif;font-size:18px;font-weight:300;
-    color:rgba(255,255,255,0.35);
-    cursor:pointer;-webkit-tap-highlight-color:transparent;
-    transition:color 0.12s,background 0.12s;
-  }
-  #mb-lvl-prev:active,#mb-lvl-next:active{color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.06);}
-  #mb-lvl-label{
-    font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;
-    text-transform:uppercase;color:rgba(255,255,255,0.42);
-    min-width:38px;text-align:center;pointer-events:none;
-    white-space:nowrap;
-  }
 
   /* ── TOP BAR: Flow + Controls only ── */
   #mobile-bar{
@@ -415,45 +495,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
 }
 @media (min-width:601px){#mobile-bar,.mb-panel,#mobile-bottom-rail,#mb-shape-hud{display:none!important;}}
 
-/* ── SINGULARITY COLLAPSE INDICATOR ── */
-#collapse-ring{
-  position:fixed;pointer-events:none;z-index:9998;
-  width:0;height:0;border-radius:50%;
-  border:2px solid rgba(255,80,80,0.0);
-  transform:translate(-50%,-50%);
-  transition:border-color 0.1s;
-  display:none;
-}
-#collapse-ring.active{display:block;border-color:rgba(255,80,80,0.6);}
-
+/* ── THANK YOU TOAST ── */
 #thank-you-toast{
   position:fixed;
-  /* Desktop: bottom center */
-  bottom:24px;left:50%;right:auto;top:auto;
-  transform:translateX(-50%) scale(0.88);
+  /* Desktop: bottom-right corner, above theme toggle */
+  right:16px;bottom:72px;left:auto;top:auto;
+  transform:scale(0.88);
   background:rgba(10,10,10,0.94);border:1px solid rgba(255,255,255,0.14);
-  backdrop-filter:blur(20px);border-radius:8px;padding:18px 20px 16px;
-  text-align:center;z-index:2000;pointer-events:none;
+  backdrop-filter:blur(20px);border-radius:8px;padding:20px 26px 18px;
+  text-align:left;z-index:2000;pointer-events:none;
   opacity:0;transition:opacity 0.4s,transform 0.4s;
   box-shadow:0 8px 48px rgba(0,0,0,0.7);
-  cursor:grab;min-width:180px;max-width:240px;
+  cursor:grab;min-width:220px;
   user-select:none;-webkit-user-select:none;
 }
-#thank-you-toast.visible{opacity:1;transform:translateX(-50%) scale(1);pointer-events:auto;}
+#thank-you-toast.visible{opacity:1;transform:scale(1);pointer-events:auto;}
 #thank-you-toast.dragging{cursor:grabbing;transition:none;}
 #thank-you-toast .tyt-title{font-family:'Instrument Serif',Georgia,serif;font-size:20px;color:rgba(255,255,248,0.92);margin-bottom:6px;letter-spacing:0.02em;}
 #thank-you-toast .tyt-body{font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.22em;color:rgba(255,255,255,0.35);text-transform:uppercase;}
 #thank-you-toast .tyt-email{font-family:'Courier New',monospace;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.6);margin-top:5px;display:block;}
-#thank-you-toast .tyt-links{display:flex;gap:14px;justify-content:center;margin-top:10px;}
-#thank-you-toast .tyt-links a{font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.14em;color:rgba(255,255,255,0.3);text-decoration:none;text-transform:uppercase;transition:color 0.15s;}
-#thank-you-toast .tyt-links a:hover{color:rgba(255,255,255,0.75);}
-/* Mobile: bottom-clamped, NOT full-width, tap to dismiss */
+/* Mobile: bottom-clamped, full-width-ish, tap to dismiss */
 @media(max-width:600px){
   #thank-you-toast{
-    right:16px;bottom:60px;left:16px;width:auto;border-radius:12px;
-    padding:18px 24px 22px;text-align:center;cursor:pointer;
-    transform:translateY(12px) scale(0.96);
-    border-bottom:1px solid rgba(255,255,255,0.14);
+    right:auto;bottom:0;left:0;width:100%;border-radius:12px 12px 0 0;
+    padding:18px 24px 28px;text-align:center;cursor:pointer;
+    transform:translateY(8px) scale(0.98);
+    border-bottom:none;
   }
   #thank-you-toast.visible{transform:translateY(0) scale(1);}
   #thank-you-toast::after{
@@ -462,63 +529,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
     color:rgba(255,255,255,0.18);text-transform:uppercase;
   }
 }
-
-/* ── DISCO THEME ── */
-body.disco{background:#0a0a0a;}
-body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
-/* ── PROJECT CARD ── */
-#project-card {
-  position: fixed;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  background: rgba(8,6,4,0.92);
-  border: 1px solid rgba(255,220,120,0.22);
-  border-radius: 6px;
-  padding: 16px 18px 14px;
-  min-width: 200px;
-  z-index: 900;
-  pointer-events: all;
-  box-shadow: 0 0 32px rgba(255,200,80,0.08);
-}
-#project-card-name {
-  font-family: 'Courier New', monospace;
-  font-size: 9px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255,220,120,0.55);
-  margin-bottom: 2px;
-}
-#project-card-link {
-  display: block;
-  font-family: 'Courier New', monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: rgba(255,240,180,0.9);
-  background: rgba(255,200,80,0.07);
-  border: 1px solid rgba(255,200,80,0.18);
-  border-radius: 4px;
-  padding: 7px 12px;
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
-}
-#project-card-link:hover { background: rgba(255,200,80,0.14); border-color: rgba(255,200,80,0.35); }
-#project-card-close {
-  position: absolute;
-  top: 6px; right: 9px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.2);
-  cursor: pointer;
-  background: none;
-  border: none;
-  font-family: monospace;
-  line-height: 1;
-  padding: 0;
-}
-#project-card-close:hover { color: rgba(255,255,255,0.5); }
-
+body.paper #thank-you-toast{background:rgba(255,252,246,0.95);border-color:rgba(0,0,0,0.1);}
+body.paper #thank-you-toast .tyt-title{color:rgba(10,8,6,0.88);}
+body.paper #thank-you-toast .tyt-body{color:rgba(0,0,0,0.35);}
+body.paper #thank-you-toast .tyt-email{color:rgba(0,0,0,0.6);}
+body.paper #thank-you-toast::after{color:rgba(0,0,0,0.2);}
 </style>
 </head>
 <body>
@@ -526,7 +541,6 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
 <div id="snap-hint"></div>
 <div id="flash-complete"></div>
 <div id="flash-delete"></div>
-<div id="collapse-ring"></div>
 <canvas id="text-canvas"></canvas>
 
 <div id="dispenser" style="display:none;">
@@ -546,26 +560,26 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
   </div>
   <div id="panel-body">
     <div id="panel-shapes-row" style="display:flex;gap:5px;margin-bottom:2px;flex-wrap:wrap;">
-      <button class="ins-btn" data-shape="cube">
+      <button class="ins-btn" data-shape="cube" style="flex:1 1 30%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 2L22 7V17L12 22L2 17V7L12 2Z" stroke="rgba(255,255,255,0.55)" stroke-width="1.1" fill="rgba(255,255,255,0.04)"/><path d="M12 2L12 22M2 7L22 7" stroke="rgba(255,255,255,0.2)" stroke-width="0.7"/></svg>
         <span class="ins-btn-lbl">Cube</span>
       </button>
-      <button class="ins-btn" data-shape="sphere">
+      <button class="ins-btn" data-shape="sphere" style="flex:1 1 30%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.55)" stroke-width="1.1" fill="rgba(255,255,255,0.04)"/><ellipse cx="12" cy="12" rx="9" ry="3.5" stroke="rgba(255,255,255,0.18)" stroke-width="0.7"/><line x1="12" y1="3" x2="12" y2="21" stroke="rgba(255,255,255,0.18)" stroke-width="0.7"/></svg>
         <span class="ins-btn-lbl">Sphere</span>
       </button>
-      <button class="ins-btn" data-shape="pyramid">
+      <button class="ins-btn" data-shape="pyramid" style="flex:1 1 30%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s;">
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22"><path d="M12 3L22 20H2L12 3Z" stroke="rgba(255,255,255,0.55)" stroke-width="1.1" fill="rgba(255,255,255,0.04)"/><path d="M12 3L2 20M12 3L22 20" stroke="rgba(255,255,255,0.18)" stroke-width="0.7"/></svg>
         <span class="ins-btn-lbl">Pyramid</span>
       </button>
-      <button class="ins-btn" data-shape="blackhole" style="display:none;">
+      <button class="ins-btn" data-shape="blackhole" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s; display:none;">
         <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
           <circle cx="12" cy="12" r="5" fill="rgba(0,0,0,0.8)" stroke="rgba(100,80,220,0.8)" stroke-width="1.5"/>
           <circle cx="12" cy="12" r="8" stroke="rgba(100,80,220,0.4)" stroke-width="1" stroke-dasharray="2 2"/>
         </svg>
         <span class="ins-btn-lbl">Singularity</span>
       </button>
-      <button class="ins-btn" data-shape="neutronstar" style="display:none;">
+      <button class="ins-btn" data-shape="neutronstar" style="flex:1 1 45%;display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 0 7px;cursor:none;color:#fff;transition:background 0.12s; display:none;">
          <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
            <circle cx="12" cy="12" r="3" fill="rgba(255,255,255,0.9)" stroke="rgba(100,200,255,0.8)" stroke-width="1.5"/>
            <line x1="12" y1="3" x2="12" y2="21" stroke="rgba(150,220,255,0.6)" stroke-width="1.5"/>
@@ -584,19 +598,14 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
     <div class="ctrl-row"><div class="ctrl-lbl"><span class="ctrl-nm">FONT SIZE</span><span class="ctrl-vl" id="v-font">24</span></div><input type="range" id="sl-font" min="8" max="48" step="1" value="24"></div>
     <div class="div"></div>
     <div class="chk-row"><span class="ctrl-nm">TEXT</span><button class="tog on" id="tog-text">ON</button></div>
-    <div class="chk-row" id="waterfall-row" style="margin-top:5px;display:none;"><span class="ctrl-nm">WATERFALL</span><button class="tog" id="tog-waterfall">OFF</button></div>
     <div class="div"></div>
     <button class="ins-clear" id="btn-clear2" style="width:100%;background:transparent;border:1px solid rgba(255,60,60,0.15);color:rgba(255,80,80,0.38);font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.1em;padding:5px 4px;cursor:none;text-transform:uppercase;border-radius:3px;transition:all 0.15s;">CLEAR ALL</button>
   </div>
 </div>
 
 <div id="hint"></div>
-<div id="project-card">
-  <button id="project-card-close">×</button>
-  <div id="project-card-name"></div>
-  <a id="project-card-link" target="_blank" rel="noopener"></a>
-</div>
 <div id="shape-count"></div>
+<button id="theme-toggle">PAPER</button>
 <button id="screenshot-btn" aria-label="Capture This Moment">
   <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -611,11 +620,10 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
     <button class="lvl-nav-btn" data-lvl="2">3</button>
     <button class="lvl-nav-btn" data-lvl="3">4</button>
     <button class="lvl-nav-btn" data-lvl="4">5</button>
-    <button class="lvl-nav-btn" data-lvl="5">✦</button>
   </div>
   <div id="level-nav-desc"></div>
 </div>
-<button id="next-btn"><div id="next-btn-fill"></div><span id="next-btn-label">NEXT LEVEL →</span></button>
+<button id="next-btn">NEXT LEVEL →</button>
 
 <div class="widget" id="spill-graph-widget">
   <div class="widget-header" id="spill-graph-header">
@@ -632,9 +640,9 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
 </div>
 
 <div id="flavor-toggle">
-  <button id="flv-sugar" class="flv-active" aria-label="Sugar">sugar</button>
+  <button id="flv-sugar" class="flv-active" aria-label="Sugar"><strong>sugar</strong></button>
   <span class="flv-sep">,</span>
-  <button id="flv-salt" aria-label="Salt">not salt</button>
+  <button id="flv-salt" aria-label="Salt"><em>not</em> <strong>salt</strong></button>
 </div>
 
 
@@ -642,11 +650,6 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
 
 <div id="mobile-bar">
   <button class="mb-btn" id="mb-note-btn"></button>
-  <div id="mb-lvl-nav">
-    <button id="mb-lvl-prev">‹</button>
-    <span id="mb-lvl-label">LVL 1</span>
-    <button id="mb-lvl-next">›</button>
-  </div>
 </div>
 <div class="mb-panel" id="mb-note-panel">
   <div id="mb-flavor-tabs">
@@ -703,7 +706,6 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="2" id="mb-lvl-3">3</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="3" id="mb-lvl-4">4</button>
     <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="4" id="mb-lvl-5">5</button>
-    <button class="mb-ctrl-btn mb-lvl-sel-btn" data-lvl="5" id="mb-lvl-6">✦</button>
   </div>
 </div>
 
@@ -753,12 +755,8 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
 </div>
 <div id="thank-you-toast">
   <div class="tyt-title">thank you</div>
-  <div class="tyt-body">thank you for your clicks, much appreciated</div>
+  <div class="tyt-body">say hi</div>
   <div class="tyt-email">zack@reasonably.cc</div>
-  <div class="tyt-links">
-    <a href="https://zackgort.com" target="_blank" rel="noopener">zackgort.com</a>
-    <a href="https://linkedin.com/in/zackgort" target="_blank" rel="noopener">linkedin</a>
-  </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -769,14 +767,6 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
 function showThankYouToast() {
   const t = document.getElementById('thank-you-toast');
   if (!t) return;
-
-  // Update body text with click count
-  const bodyEl = t.querySelector('.tyt-body');
-  if (bodyEl) {
-    const n = _totalClickCount;
-    bodyEl.textContent = `thank you for your ${n} click${n === 1 ? '' : 's'}, much appreciated`;
-  }
-
   t.classList.add('visible');
 
   // ── Mobile: tap anywhere on toast to dismiss ──────────────────────────────
@@ -789,10 +779,9 @@ function showThankYouToast() {
 
   // ── Desktop: draggable ────────────────────────────────────────────────────
   let _tDrag = false, _tOX = 0, _tOY = 0;
-  // Reset to CSS default bottom-center position
-  t.style.left = '50%'; t.style.bottom = '24px';
-  t.style.right = 'auto'; t.style.top = 'auto';
-  t.style.transform = 'translateX(-50%) scale(1)';
+  // Reset to CSS default position first
+  t.style.right = '16px'; t.style.bottom = '72px';
+  t.style.left = 'auto'; t.style.top = 'auto';
 
   function _tDown(e) {
     if (e.button !== 0) return;
@@ -801,9 +790,8 @@ function showThankYouToast() {
     const r = t.getBoundingClientRect();
     _tOX = e.clientX - r.left;
     _tOY = e.clientY - r.top;
+    t.style.right = 'auto'; t.style.bottom = 'auto';
     t.style.left = r.left + 'px'; t.style.top = r.top + 'px';
-    t.style.bottom = 'auto';
-    t.style.transform = 'none';
     e.preventDefault();
   }
   function _tMove(e) {
@@ -977,28 +965,18 @@ const LEVEL_COMPLETE_FLAVOR = {
   ],
 };
 
-function getLevelComplete(lvlN) {
-  const set = LEVEL_COMPLETE_FLAVOR[_currentFlavor] || LEVEL_COMPLETE_FLAVOR.sugar;
-  return set[Math.min(lvlN, set.length - 1)];
-}
-
-// Legacy alias
-const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
-
-
 // ── FLAVOR PROSE: mobile panel long-form copy (single source of truth) ─────────
 // Edit here; setFlavor() renders this into #mb-panel-sugar / #mb-panel-salt.
-// All strings use backticks — you can freely use " marks anywhere in your content.
 const FLAVOR_PROSE = {
   sugar: {
-    eyebrow: `Past to Present`,
-    body: `from bootstrap startups to a-list agencies working with blue-chip clients on a global stage. then, suddenly covid, then a.i., and now my career is caught in a void<br><br>well, this is what I am doing in my infinite space.`,
-    sig: `— the career of a left-handed autodidact`,
+    eyebrow: "On Directed Systems",
+    body: `In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What <em>reaches its target</em> is intention made physical.`,
+    sig: "— on the nature of frankly and agency",
   },
   salt: {
-    eyebrow: `Today & Tomorrow`,
-    body: `i think. i make. i write. i design.`,
-    sig: `— sans hubris`,
+    eyebrow: "On Influence",
+    body: `Design is different now. It is seen as an <em>impedance</em>. Process theater costs unnecessarily — a single operator can achieve success. teamwork makes the dream work. Each discipline brings essential <em>nuance and care for craft</em>. Success today is measured not in how accurately you hit your target, but how consistently you <em>create wayward influence</em>. Be your own gravitational center.`,
+    sig: "— on aim vs. influence",
   },
 };
 
@@ -1019,16 +997,6 @@ function _renderMobilePanel(flavor) {
     <div style="margin-top:8px;font-size:8px;color:rgba(255,255,255,0.14);letter-spacing:0.12em;font-style:italic;">${p.sig}</div>
     ${_PANEL_LINKS}`;
 }
-
-let _isDiscoMode = false;
-let _discoMesh = null;
-let _discoLights = [];
-let _discoBallGroup = null;
-let _discoHue = 0;
-// Level-6 bouncy disco-orb state (zen-orb physics)
-let _discoOrbPos = new THREE.Vector3(0, 2, 0);
-let _discoOrbVel = new THREE.Vector3(0, 0, 0);
-let _discoOrbPulseT = 0;
 
 let _currentFlavor = 'sugar';
 
@@ -1054,26 +1022,6 @@ function setFlavor(flavor) {
   // Render mobile panel from single source of truth
   _renderMobilePanel('sugar');
   _renderMobilePanel('salt');
-
-  // Disco ball follows salt flavor
-  if (flavor === 'salt') {
-    if (typeof _enterDisco === 'function') _enterDisco();
-  } else {
-    if (typeof _exitDisco === 'function') _exitDisco();
-  }
-
-  // Reflective floor follows salt flavor
-  if (typeof _setSaltFloor === 'function') _setSaltFloor(flavor === 'salt');
-
-  // Sugar-specific lights: off in salt, on in sugar (unless paper theme active)
-  if (flavor === 'salt') {
-    sugarFloorWashL.intensity  = 0;
-    sugarFloorWashL2.intensity = 0;
-    _pGlowActive = false;
-  } else {
-    sugarFloorWashL.intensity  = 2.8;
-    sugarFloorWashL2.intensity = 1.6;
-  }
 }
 
 
@@ -1085,7 +1033,6 @@ function nextShapeCopy(type) {
   _shapeCopyIdx[type]++;
   return [line];
 }
-
 
 // ── TEXT STATE MACHINE ────────────────────────────────────────────────────────
 // 'idle' | 'shape'
@@ -1119,7 +1066,7 @@ function showShapeText(type, obj) {
   } else {
     coordLine = `${type}  x: —  y: —  z: —`;
   }
-  _buildFloatText([coordLine], true);
+  _buildFloatText([coordLine], false);
 }
 
 // Live-update coordinate display while dragging
@@ -1174,24 +1121,9 @@ function _buildFloatText(lines, immediate) {
     // Level 5 has no shapes panel obscuring the scene — allow wider text column
     const effectiveMaxW = (lvl === 4) ? Math.min(W * 0.55, W - PAD_X - 180) : maxW;
 
-    // Expand any <br> tags into actual separate lines, preserving parent role
-    const expandedLines = [];
-    const expandedRoles = []; // 'headline' | 'body' for each expanded line
-    const expandedIsBr  = []; // true if this line is a <br> continuation (no extra gap before next)
-    lines.forEach((line, li) => {
-      const parentRole = li === 0 ? 'headline' : 'body';
-      const parts = line.split(/<br\s*\/?>/i);
-      parts.forEach((p, pi) => {
-        expandedLines.push(p);
-        expandedRoles.push(parentRole);
-        expandedIsBr.push(pi < parts.length - 1); // true for all but the last segment of a split
-      });
-    });
-    lines = expandedLines;
-
     let totalH = 0;
     lines.forEach((line, li) => {
-      const role = TYPO[expandedRoles[li]];
+      const role = li === 0 ? TYPO.headline : TYPO.body;
       const words = line.split(' ');
       let rowW = 0, rows = 1;
       words.forEach(w => {
@@ -1200,13 +1132,13 @@ function _buildFloatText(lines, immediate) {
         rowW += sw;
       });
       totalH += rows * role.lineH;
-      if (li < lines.length - 1) totalH += expandedIsBr[li] ? 0 : role.lineH * 0.55;
+      if (li < lines.length - 1) totalH += role.lineH * 0.55;
     });
     const PAD_TOP = Math.max(72, (H - totalH) * 0.42);
     const allChars = [];
     let y = PAD_TOP;
     lines.forEach((line, li) => {
-      const role = TYPO[expandedRoles[li]];
+      const role = li === 0 ? TYPO.headline : TYPO.body;
       const { charW, lineH } = role;
       const words = line.split(' ');
       let row = [], rowW = 0, rows = [];
@@ -1226,43 +1158,23 @@ function _buildFloatText(lines, immediate) {
             y: y + (Math.random() - 0.5) * 35,
             vx: (Math.random() - 0.5) * 1.8, vy: (Math.random() - 0.5) * 1.8,
             baseOp: role.op,
-            role: expandedRoles[li],
+            role: li === 0 ? 'headline' : 'body',
           });
         }
         y += lineH;
       });
-      if (li < lines.length - 1) y += expandedIsBr[li] ? 0 : role.lineH * 0.55;
+      if (li < lines.length - 1) y += role.lineH * 0.55;
     });
     textChars = allChars;
     lvlTextAlphaTgt = 1;
-    // Track bottom of text block for dynamic next-btn positioning
-    _textBlockBottomY = y;
-    _positionNextBtn();
   }, delay);
-}
-
-// ── NEXT-BTN DYNAMIC POSITIONING ─────────────────────────────────────────────
-let _textBlockBottomY = 0;
-function _positionNextBtn() {
-  const btn = document.getElementById('next-btn');
-  if (!btn) return;
-  // Only reposition on desktop (mobile uses its own fixed layout)
-  if (window.innerWidth <= 600) return;
-  const GAP = 28; // px below last text row
-  const rawTop = (_textBlockBottomY > 0 ? _textBlockBottomY : H * 0.62) + GAP;
-  // Clamp so it never falls off screen
-  const clampedTop = Math.min(rawTop, H - 80);
-  btn.style.bottom = 'auto';
-  btn.style.top = clampedTop + 'px';
-  btn.style.left = PAD_X + 'px';
-  btn.style.transform = 'none';
 }
 
 // ── RENDERER ──────────────────────────────────────────────────────────────────
 let W=window.innerWidth,H=window.innerHeight;
 const isMobile=window.innerWidth<=600;
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));renderer.setClearColor(0x0a0a0a);
+renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?2.0:1.5));renderer.setClearColor(0x0a0a0a);
 renderer.autoClear = false;
 document.body.appendChild(renderer.domElement);
 
@@ -1279,124 +1191,12 @@ const rimL=new THREE.PointLight(0x9aaabb,1.1,80);rimL.position.set(-28,14,16);sc
 // Subtle floor bounce: warm upward fill from below the scene
 const fillL=new THREE.PointLight(0xffe8c0,0.35,60);fillL.position.set(0,-22,8);scene.add(fillL);
 
-// ── SUGAR FLOOR WASH ─────────────────────────────────────────────────────────
-// Low-angle warm light sitting just above the floor, illuminates shapes from below
-// and makes the floor catch light from objects above it. Sugar mode only.
-const sugarFloorWashL = new THREE.PointLight(0xfff0d0, 2.8, 55);
-sugarFloorWashL.position.set(0, -7.2, 4);
-scene.add(sugarFloorWashL);
-
-// Second floor wash from the left to fill shadows under shapes
-const sugarFloorWashL2 = new THREE.PointLight(0xffe0b0, 1.6, 45);
-sugarFloorWashL2.position.set(-8, -7.0, 2);
-scene.add(sugarFloorWashL2);
-
-// ── PARTICLE GLOW LIGHTS (sugar only) ────────────────────────────────────────
-// A pool of PointLights repositioned each frame to sample particles —
-// gives the particle swarm a warm self-illuminating glow on surrounding surfaces.
-const _PGLOW_COUNT = 10;
-const _pGlowLights = [];
-for (let i = 0; i < _PGLOW_COUNT; i++) {
-  const l = new THREE.PointLight(0xfff8e8, 0, 12);
-  scene.add(l);
-  _pGlowLights.push(l);
-}
-let _pGlowActive = false; // off — particles don't emit light
-
-function _tickParticleGlow() {
-  if (!_pGlowActive) {
-    _pGlowLights.forEach(l => { l.intensity = 0; });
-    return;
-  }
-  const N = Math.min(P.count, MP);
-  if (N < 1) return;
-  const step = Math.floor(N / _PGLOW_COUNT);
-  const t = Date.now() * 0.001;
-  _pGlowLights.forEach((l, i) => {
-    // Sample evenly across the live particle array, with a small random jitter each frame
-    const idx = ((i * step + Math.floor(Math.random() * step)) % N);
-    const b = idx * 3;
-    if (!pal[idx]) { l.intensity = 0; return; }
-    l.position.set(pp[b], pp[b+1], pp[b+2]);
-    // Gentle per-light pulse so they don't all peak together
-    l.intensity = 1.2 + Math.sin(t * 1.8 + i * 0.7) * 0.4;
-  });
-}
-
-const floorMat = new THREE.MeshPhysicalMaterial({
-  color: 0x050505,
-  roughness: 1.0,
-  metalness: 0.0,
-  clearcoat: 0.0,
-  clearcoatRoughness: 0.18,
-  reflectivity: 0.0,
-});
-const floorM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),floorMat);
+const floorM=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshStandardMaterial({color:0x050505,roughness:1.0}));
 floorM.rotation.x=-Math.PI/2;floorM.position.y=-9;scene.add(floorM);
 
-// ── SALT FLOOR LIGHT POOLS ────────────────────────────────────────────────────
-// Coloured point lights near the floor that create the reflective light puddles
-// visible in alteredqualia's rotating_lights example. Only active in salt mode.
-const _saltFloorLights = [];
-const _saltFloorLightDefs = [
-  { color: 0xff3388, x: -6,  z:  2 },
-  { color: 0x3388ff, x:  6,  z:  2 },
-  { color: 0xff8833, x:  0,  z: -2 },
-  { color: 0x88ff33, x: -10, z: -4 },
-  { color: 0xaa33ff, x:  10, z: -4 },
-];
-_saltFloorLightDefs.forEach(def => {
-  const l = new THREE.PointLight(def.color, 0, 90); // very large radius = maximally diffuse
-  l.position.set(def.x, -3.0, def.z); // high above floor = very wide footprint
-  scene.add(l);
-  _saltFloorLights.push({ light: l, baseColor: def.color, ox: def.x, oz: def.z });
-});
-
-let _saltFloorHue = 0;
-let _saltFloorActive = false;
-
-function _setSaltFloor(active) {
-  _saltFloorActive = active;
-  if (active) {
-    floorMat.roughness    = 0.08;
-    floorMat.metalness    = 0.55;
-    floorMat.clearcoat    = 0.95;
-    floorMat.clearcoatRoughness = 0.72; // near-max = heavily frosted/sugar-glass blur
-    floorMat.reflectivity = 0.85;
-    floorMat.color.setHex(0x040408);
-    _saltFloorLights.forEach(({ light }) => { light.intensity = 1.6; }); // softer still
-  } else {
-    floorMat.roughness    = 1.0;
-    floorMat.metalness    = 0.0;
-    floorMat.clearcoat    = 0.0;
-    floorMat.reflectivity = 0.0;
-    floorMat.color.setHex(0x050505);
-    _saltFloorLights.forEach(({ light }) => { light.intensity = 0; });
-  }
-  floorMat.needsUpdate = true;
-}
-
-function _tickSaltFloor(dt) {
-  if (!_saltFloorActive) return;
-  _saltFloorHue = (_saltFloorHue + dt * 28) % 360;
-  _saltFloorLights.forEach(({ light, baseColor, ox, oz }, i) => {
-    // Slowly shift hue for each light independently
-    const hue = (_saltFloorHue + i * (360 / _saltFloorLights.length)) % 360;
-    light.color.setHSL(hue / 360, 0.85, 0.52);
-    // Gentle drift — wider sweep for maximally diffuse pools
-    const t = Date.now() * 0.00032 + i * 1.4;
-    light.position.x = ox + Math.sin(t) * 5.5;
-    light.position.z = oz + Math.cos(t * 0.7) * 3.5;
-    // Soft pulse
-    light.intensity = 1.6 + Math.sin(t * 1.3 + i) * 0.4;
-  });
-}
-
 // overlay canvas for targets (rendered in multi-pass WebGL)
-const _dpr = Math.min(devicePixelRatio, isMobile ? 3.0 : 2.0);
 const ov=document.createElement('canvas');
-ov.width=W*_dpr;ov.height=H*_dpr;const ovCtx=ov.getContext('2d');
-ovCtx.scale(_dpr,_dpr);
+ov.width=W;ov.height=H;const ovCtx=ov.getContext('2d');
 const ovTex = new THREE.CanvasTexture(ov);
 ovTex.minFilter = THREE.LinearFilter;
 const orthoScene = new THREE.Scene();
@@ -1413,10 +1213,8 @@ particleScene.fog = scene.fog;
 
 // ── TEXT CURSOR LAYER (ported from cx.html) ───────────────────────────────────
 const tc=document.getElementById('text-canvas');
-tc.width=W*_dpr;tc.height=H*_dpr;
-tc.style.width=W+'px';tc.style.height=H+'px';
+tc.width=W;tc.height=H;
 const tctx=tc.getContext('2d');
-tctx.scale(_dpr,_dpr);
 
 // cx.html cursor blob state
 let mX=W/2,mY=H/2,bX=W/2,bY=H/2,eX=W/2,eY=H/2,eVX=0,eVY=0;
@@ -1529,8 +1327,8 @@ makeDraggable(document.getElementById('panel'),document.getElementById('panel-he
 
 // ── GAME LEVELS ───────────────────────────────────────────────────────────────
 const TCOL=['#ffb347','#47d4ff','#ff6b8a'];
-const THRESH=0.40;
-const LEVEL_THRESH=[0.40,0.40,0.40,0.22,0.40,0.40]; // level 4 wormhole: lower bar
+const THRESH=0.55;
+const LEVEL_THRESH=[0.55,0.55,0.55,0.30]; // level 4 wormhole: lower bar
 function lvlThresh(){return LEVEL_THRESH[lvl]!==undefined?LEVEL_THRESH[lvl]:THRESH;}
 const LEVELS=[
   {targets:[{x:0,r:2.8}]},
@@ -1538,16 +1336,12 @@ const LEVELS=[
   {targets:[{x:-6.5,r:2.2},{x:0,r:2.0},{x:6.5,r:2.2}]},
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
   {targets:[],bouncingBlackHole:true,neutronStars:3},
-  {targets:[],zenOrb:true},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
 let lastSpillMsg=-1;
 let lastInteractTime=0;
 let hasInteracted=false;
-let _totalClickCount=0; // cumulative click counter for thank-you message — counts every click/tap
-document.addEventListener('mousedown', e=>{ if(e.button===0) _totalClickCount++; }, true);
-document.addEventListener('touchstart', ()=>{ _totalClickCount++; }, {capture:true, passive:true});
 const SPILL_IDLE_MS=4000;
 const FILL_A=0.04,FLR=-9.0;
 
@@ -1618,9 +1412,8 @@ const BH_SPRING_K = 5.0;
 const BH_DAMPING = 7.5;
 
 class Attractor {
-  constructor(type, pos, zenOrb) {
+  constructor(type, pos) {
     this.type = type;
-    this._zenOrb = zenOrb || false;
     this.pos = pos.clone();
     this.rest = pos.clone();
     this.vel = new THREE.Vector3();
@@ -1642,79 +1435,20 @@ class Attractor {
     this.mesh = new THREE.Group();
 
     if (this.type === 'blackhole') {
-      // Check if this is a zen orb variant
-      if (this._zenOrb) {
-        // Glowing glass orb — bright, luminous star-like sphere
-        const coreGeo = new THREE.SphereGeometry(this.radius, 64, 40);
-        const coreMat = new THREE.MeshPhysicalMaterial({
-          color: 0xffffff,
-          emissive: 0xffffff,
-          emissiveIntensity: 3.5,
-          roughness: 0.0,
-          metalness: 1.0,
-          reflectivity: 1.0,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.0,
-          transparent: true,
-          opacity: 0.97,
-        });
-        this.core = new THREE.Mesh(coreGeo, coreMat);
-        this.mesh.add(this.core);
-
-        // Point light — warm golden glow emanating from orb
-        this._zenLight = new THREE.PointLight(0xfff8e8, 6.0, 30);
-        this.mesh.add(this._zenLight);
-
-        // Glow corona layers — barely visible, just a breath of light
-        const glowLayers = [
-          { r: this.radius * 1.18, color: 0xffffff, opacity: 0.06 },
-          { r: this.radius * 1.55, color: 0xfff0d0, opacity: 0.03 },
-          { r: this.radius * 2.20, color: 0xffe090, opacity: 0.015 },
-          { r: this.radius * 3.60, color: 0xffcc60, opacity: 0.006 },
-        ];
-        this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
-          const g = new THREE.Mesh(
-            new THREE.SphereGeometry(r, 32, 20),
-            new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.BackSide, depthWrite: false })
-          );
-          this.mesh.add(g);
-          return g;
-        });
-
-        // No accretion disc for zen orb
-        this._adPoints = null;
-        this.mesh.position.copy(this.pos);
-        scene.add(this.mesh);
-        return;
-      }
-
-      // Core — luminous star/sun sphere (same look as zen orb)
-      const coreGeo = new THREE.SphereGeometry(this.radius, 64, 40);
+      // Core — obsidian black sphere
+      const coreGeo = new THREE.SphereGeometry(this.radius, 48, 32);
       const coreMat = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff,
-        emissive: 0xffffff,
-        emissiveIntensity: 3.5,
-        roughness: 0.0,
-        metalness: 1.0,
-        reflectivity: 1.0,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.0,
-        transparent: true,
-        opacity: 0.97,
+        color: 0x000000, roughness: 0.0, metalness: 1.0,
+        reflectivity: 1.0, clearcoat: 1.0, clearcoatRoughness: 0.0,
       });
       this.core = new THREE.Mesh(coreGeo, coreMat);
       this.mesh.add(this.core);
 
-      // Point light — warm golden glow
-      this._zenLight = new THREE.PointLight(0xfff8e8, 6.0, 30);
-      this.mesh.add(this._zenLight);
-
-      // Glow corona layers — warm sun halos
+      // Glow corona
       const glowLayers = [
-        { r: this.radius * 1.18, color: 0xffffff, opacity: 0.06 },
-        { r: this.radius * 1.55, color: 0xfff0d0, opacity: 0.03 },
-        { r: this.radius * 2.20, color: 0xffe090, opacity: 0.015 },
-        { r: this.radius * 3.60, color: 0xffcc60, opacity: 0.006 },
+        { r: this.radius * 1.35, color: 0x5533ff, opacity: 0.18 },
+        { r: this.radius * 1.65, color: 0x3311cc, opacity: 0.10 },
+        { r: this.radius * 2.10, color: 0x220088, opacity: 0.05 },
       ];
       this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
         const g = new THREE.Mesh(
@@ -1725,8 +1459,8 @@ class Attractor {
         return g;
       });
 
-      // No accretion disc for sun-style BH
-      this._adPoints = null;
+      // Accretion disc — particle system orbiting the BH
+      this._initAccretionDisc();
 
     } else {
       // Neutron Star
@@ -1738,15 +1472,14 @@ class Attractor {
       this.core = new THREE.Mesh(coreGeo, coreMat);
       this.mesh.add(this.core);
 
-      // Point Light — cosmic blue tint, slightly brighter
-      this.light = new THREE.PointLight(0x88ccff, 2.2, 14);
+      // Point Light
+      this.light = new THREE.PointLight(0x88ccff, 1.4, 12);
       this.mesh.add(this.light);
 
-      // Glow corona — cosmic blue, more luminous
+      // Glow corona — tight rings, subtle
       const glowLayers = [
-        { r: this.radius * 1.5, color: 0x99ddff, opacity: 0.38 },
-        { r: this.radius * 2.2, color: 0x4499dd, opacity: 0.18 },
-        { r: this.radius * 3.5, color: 0x2266aa, opacity: 0.08 },
+        { r: this.radius * 1.5, color: 0x88ccff, opacity: 0.18 },
+        { r: this.radius * 2.0, color: 0x4488ff, opacity: 0.08 },
       ];
       this.glowMeshes = glowLayers.map(({ r, color, opacity }) => {
         const g = new THREE.Mesh(
@@ -1891,32 +1624,15 @@ class Attractor {
     for (const pp of portalPairs) { if (pp.cooldown > 0) pp.cooldown -= dt; }
 
     if (this.type === 'blackhole') {
-      if (this._zenOrb) {
-        // Gentle breathing pulse for zen orb
-        const pulse = 0.5 + Math.sin(this._pulseT * 0.9) * 0.5;
-        const pulse2 = 0.5 + Math.sin(this._pulseT * 1.4 + 1.2) * 0.5;
-        this.glowMeshes[0].material.opacity = 0.04 + pulse * 0.025;
-        this.glowMeshes[1].material.opacity = 0.02 + pulse2 * 0.012;
-        this.glowMeshes[2].material.opacity = 0.008 + pulse * 0.007;
-        this.glowMeshes[3].material.opacity = 0.003 + pulse2 * 0.003;
-        if (this._zenLight) {
-          this._zenLight.intensity = 4.5 + pulse * 2.0;
-        }
-        if (this.core && this.core.material) {
-          this.core.material.emissiveIntensity = 3.0 + pulse * 1.0;
-        }
-      } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 2.2) * 0.5;
       this.glowMeshes[0].material.opacity = 0.14 + pulse * 0.08;
       this.glowMeshes[1].material.opacity = 0.07 + pulse * 0.04;
       this.glowMeshes[2].material.opacity = 0.03 + pulse * 0.025;
       if (this._adPoints) this._updateAccretionDisc(dt);
-      }
     } else {
       const pulse = 0.5 + Math.sin(this._pulseT * 8.0) * 0.5;
-      this.glowMeshes[0].material.opacity = 0.28 + pulse * 0.14;
-      this.glowMeshes[1].material.opacity = 0.12 + pulse * 0.07;
-      this.glowMeshes[2].material.opacity = 0.04 + pulse * 0.03;
+      this.glowMeshes[0].material.opacity = 0.12 + pulse * 0.07;
+      this.glowMeshes[1].material.opacity = 0.05 + pulse * 0.04;
     }
 
     // Dynamic Scale Based on Pull Strength
@@ -1976,15 +1692,9 @@ class Attractor {
         }
 
         // Wall bounces — only apply horizontal bounce if no wormhole teleport
-        // Soft energy boost on collision: gentle persistent kick so BH never fully loses momentum
-        const BH_WALL_BOOST = 0.18; // lateral nudge on side hits
-        const BH_FLOOR_BOOST = 0.22; // vertical nudge on floor hit
         if (this.pos.y - rEff < BY_FLOOR) {
           this.pos.y = BY_FLOOR + rEff;
-          if (this.vel.y < 0) {
-            this.vel.y = -this.vel.y * RESTITUTION + BH_FLOOR_BOOST;
-            this.vel.x *= FRICTION;
-          }
+          if (this.vel.y < 0) { this.vel.y = -this.vel.y * RESTITUTION; this.vel.x *= FRICTION; }
         }
         if (this.pos.y + rEff > BY_CEIL) {
           this.pos.y = BY_CEIL - rEff;
@@ -1993,11 +1703,11 @@ class Attractor {
         if (!teleported) {
           if (this.pos.x + rEff > edgeRW) {
             this.pos.x = edgeRW - rEff;
-            if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION - BH_WALL_BOOST;
+            if (this.vel.x > 0) this.vel.x = -this.vel.x * RESTITUTION;
           }
           if (this.pos.x - rEff < edgeLW) {
             this.pos.x = edgeLW + rEff;
-            if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION + BH_WALL_BOOST;
+            if (this.vel.x < 0) this.vel.x = -this.vel.x * RESTITUTION;
           }
         }
 
@@ -2161,23 +1871,6 @@ function applyAttractorForces(i, b, dt) {
       pv[b+1] += dy / dist * f;
       pv[b+2] += dz / dist * f;
 
-      // ── Gentle consumption: NS quietly absorbs nearby particles ─────────────
-      // Inner core: high absorption probability. Mid zone: sparse. Outer: just drag.
-      const innerR = influenceR * 0.35;
-      const midR   = influenceR * 0.65;
-      if (dist < innerR) {
-        if (Math.random() < 0.18) { spawn(i); return true; }
-      } else if (dist < midR) {
-        const t2 = 1.0 - (dist - innerR) / (midR - innerR);
-        if (Math.random() < 0.03 * t2 * t2) { spawn(i); return true; }
-      }
-      // Gentle drag — slows particles so they linger and eventually get consumed
-      const dragFade = Math.max(0, 1.0 - dist / influenceR);
-      const DRAG = dragFade * dragFade * dt * 4.5;
-      pv[b]   *= Math.max(0, 1.0 - DRAG);
-      pv[b+1] *= Math.max(0, 1.0 - DRAG);
-      pv[b+2] *= Math.max(0, 1.0 - DRAG * 0.5);
-
       // Orbital circularization for NS — level 4 only; level 5 is jet collimation
       const orbitThresh = lvl === 4 ? influenceR * 0.85 : influenceR * 0.55;
       if (dist < orbitThresh) {
@@ -2328,7 +2021,7 @@ function drawBlackHoleOverlay() {
     ovCtx.save();
     ovCtx.setLineDash([2, 5]); ovCtx.lineDashOffset = -t * 8;
     ovCtx.beginPath(); ovCtx.arc(sx, sy, pullR, 0, Math.PI * 2);
-    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.30)' : 'rgba(255,220,100,0.18)';
+    ovCtx.strokeStyle = bh.type === 'neutronstar' ? 'rgba(100,200,255,0.30)' : 'rgba(80,50,200,0.22)';
     ovCtx.lineWidth = 1; ovCtx.stroke();
     ovCtx.setLineDash([]);
 
@@ -2339,58 +2032,25 @@ function drawBlackHoleOverlay() {
     const coreR = Math.abs((bhEdge.x + 1) / 2 * W - sx);
 
     if (bh.type === 'blackhole') {
-      if (bh._zenOrb) {
-        // Warm luminous glow halos — golden star
-        [
-          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
-          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
-          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
-        ].forEach(({ r, a, col }) => {
-          const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
-          g.addColorStop(0, `rgba(${col},${a})`);
-          g.addColorStop(1, `rgba(${col},0)`);
-          ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
-          ovCtx.fillStyle = g; ovCtx.fill();
-        });
-        // Animated shimmer ring
-        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
-        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
-        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
-        ovCtx.lineWidth = 1; ovCtx.stroke();
-        ovCtx.setLineDash([]);
-        ovCtx.font = '8px Courier New';
-        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
-        ovCtx.textAlign = 'center';
-        ovCtx.fillText('ZEN ORB', sx, sy + coreR + 14);
-      } else {
-        // Sun-style warm golden halos (same as zen orb)
-        [
-          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
-          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
-          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
-        ].forEach(({ r, a, col }) => {
-          const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
-          g.addColorStop(0, `rgba(${col},${a})`);
-          g.addColorStop(1, `rgba(${col},0)`);
-          ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
-          ovCtx.fillStyle = g; ovCtx.fill();
-        });
-        // Animated shimmer ring
-        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
-        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
-        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
-        ovCtx.lineWidth = 1; ovCtx.stroke();
-        ovCtx.setLineDash([]);
-        ovCtx.font = '8px Courier New';
-        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
-        ovCtx.textAlign = 'center';
-        ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
-      }
-    } else {
-      // NS: cosmic blue glow, no amber shift
       [
-        { r: coreR * 3.5, a: 0.13, col: '80,180,255' },
-        { r: coreR * 1.8, a: 0.35, col: '160,220,255' },
+        { r: coreR * 2.8, a: 0.10, col: '80,50,220' },
+        { r: coreR * 1.8, a: 0.18, col: '60,30,180' },
+        { r: coreR * 1.2, a: 0.28, col: '30,10,100' }
+      ].forEach(({ r, a, col }) => {
+        const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
+        g.addColorStop(0, `rgba(${col},${a})`);
+        g.addColorStop(1, `rgba(${col},0)`);
+        ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
+        ovCtx.fillStyle = g; ovCtx.fill();
+      });
+    } else {
+      // NS hit by BH: shift glow to warm amber to indicate it's been caught
+      const captured = (lvl === 4 && bh._bhHitCount > 0);
+      const nsColA = captured ? '220,120,80' : '100,200,255';
+      const nsColB = captured ? '255,180,120' : '200,255,255';
+      [
+        { r: coreR * 3.0, a: captured ? 0.28 : 0.15, col: nsColA },
+        { r: coreR * 1.5, a: captured ? 0.5 : 0.3, col: nsColB }
       ].forEach(({ r, a, col }) => {
         const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
         g.addColorStop(0, `rgba(${col},${a})`);
@@ -2400,23 +2060,12 @@ function drawBlackHoleOverlay() {
       });
     }
 
-    // Nova shockwave flare — expanding ring when hit by a supernova click
-    if (bh._novaHitT && bh._novaHitT > 0) {
-      const ft = bh._novaHitT;
-      const flareR = coreR * (1.8 + (1 - ft) * 6.0);
-      const flareCol = bh.type === 'blackhole' ? '255,160,60' : '180,240,255';
-      ovCtx.beginPath();
-      ovCtx.arc(sx, sy, flareR, 0, Math.PI * 2);
-      ovCtx.strokeStyle = `rgba(${flareCol},${ft * 0.8})`;
-      ovCtx.lineWidth = 2.5 * ft;
-      ovCtx.stroke();
-      const fg = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, flareR * 0.8);
-      fg.addColorStop(0, `rgba(${flareCol},${ft * 0.25})`);
-      fg.addColorStop(1, `rgba(${flareCol},0)`);
-      ovCtx.beginPath(); ovCtx.arc(sx, sy, flareR * 0.8, 0, Math.PI * 2);
-      ovCtx.fillStyle = fg; ovCtx.fill();
+    if (bh.type !== 'neutronstar') {
+      ovCtx.font = '8px Courier New';
+      ovCtx.fillStyle = 'rgba(110,80,220,0.38)';
+      ovCtx.textAlign = 'center';
+      ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
     }
-
     ovCtx.restore();
   });
 }
@@ -2425,47 +2074,25 @@ function initLevel(n){
   lvl=n;lvlDone=false;tCounts=[];spillCount=0;spillSmooth=0;lastSpillMsg=-1;
   spillHistory.length=0;
   _textMode='idle';_textTitleIdx=0;
-  const _nb=document.getElementById('next-btn');
-  _nb.classList.remove('visible');
-  const _nbf=document.getElementById('next-btn-fill');
-  if(_nbf)_nbf.style.width='0%';
-  const _nbl=document.getElementById('next-btn-label');
-  if(_nbl)_nbl.style.color='';
+  document.getElementById('next-btn').classList.remove('visible');
   tgts=LEVELS[n].targets.map((t,i)=>({x:t.x,r:t.r,fill:0,col:TCOL[i],met:false,idx:i}));
   document.getElementById('level-val').textContent='LVL '+(n+1);
   buildHUD();
   buildTextChars(n);
   
-  // Restore emitter visibility (level 6 hides it)
-  if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = (n !== 5);
-
   const isLvl4 = n === 3; // wormhole level
   const isLvl5 = n === 4; // bouncing black hole sandbox (was level 6)
-  const isLvl6 = n === 5; // zen mode
-
-  // Level 6: hide flow panel, targets (game-hud), and spill widget; restore otherwise
-  // Keep mobile-bar and mobile-bottom-rail visible so logo + level select remain accessible
-  const _lvl6Widgets = ['panel','game-hud','spill-graph-widget','mb-shape-hud'];
-  _lvl6Widgets.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = isLvl6 ? 'none' : '';
-  });
-
-  // Level 6: hide the insert panel. Level 5: keep it (NS button lives there)
-  const insPanel = document.getElementById('insert-panel');
-  if (insPanel) insPanel.style.display = isLvl6 ? 'none' : '';
-  const mbInsert = document.getElementById('mb-insert-row');
-  if (mbInsert) mbInsert.style.display = isLvl6 ? 'none' : '';
+  const isAttractorLevel = false; // no level fully hides shapes in panel
 
   const dBH = document.querySelector('.ins-btn[data-shape="blackhole"]');
   if(dBH) dBH.style.display = 'none'; // BH not user-addable in any level
   const dNS = document.querySelector('.ins-btn[data-shape="neutronstar"]');
-  if(dNS) dNS.style.display = isLvl5 ? '' : 'none'; // NS addable on level 5 only
+  if(dNS) dNS.style.display = isLvl5 ? 'flex' : 'none';
   const dPortal = document.getElementById('btn-add-portal');
-  if(dPortal) dPortal.style.display = 'none';
+  if(dPortal) dPortal.style.display = isLvl5 ? 'flex' : 'none';
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
-    if(btn) btn.style.display = (isLvl5 || isLvl6) ? 'none' : '';
+    if(btn) btn.style.display = isLvl5 ? 'none' : '';
   });
 
   // Clear portals when leaving/entering level 5
@@ -2476,27 +2103,22 @@ function initLevel(n){
   const mNS = document.getElementById('mb-add-neutronstar');
   if(mNS) mNS.style.display = isLvl5 ? 'flex' : 'none';
   const mbCube = document.getElementById('mb-add-cube');
-  if(mbCube) mbCube.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
+  if(mbCube) mbCube.style.display = isLvl5 ? 'none' : 'flex';
   const mbSphere = document.getElementById('mb-add-sphere');
-  if(mbSphere) mbSphere.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
+  if(mbSphere) mbSphere.style.display = isLvl5 ? 'none' : 'flex';
   const mbPyramid = document.getElementById('mb-add-pyramid');
-  if(mbPyramid) mbPyramid.style.display = (isLvl5 || isLvl6) ? 'none' : 'flex';
-
-  const clearBtn = document.getElementById('btn-clear2');
-  if (clearBtn) clearBtn.textContent = isLvl5 ? 'CLEAR STARS' : 'CLEAR ALL';
-
-  // Destroy project orbs when leaving level 6
-  if (n !== 5) _destroyProjectOrbs();
+  if(mbPyramid) mbPyramid.style.display = isLvl5 ? 'none' : 'flex';
 
   destroyAttractors();
 
   // Level 4 (index 3): wormhole settings + spawn exit
   if (n === 3) {
-    P.count = 7000; P.gravity = 1.8; P.bounce = 0.75; P.size = 0.55;
+    P.count = 7000; P.gravity = 1.8; P.spread = 0.06; P.bounce = 0.75; P.size = 0.55;
     const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     setSl('sl-count', 7000); setVl('v-count', 7000);
     setSl('sl-grav', 1.8); setVl('v-grav', '1.8');
+    setSl('sl-spread', 0.06); setVl('v-spread', '0.06');
     setSl('sl-bounce', 0.75); setVl('v-bounce', '0.75');
     wormhole.active = true;
     wormhole.entranceX = LEVELS[n].wormholeX;
@@ -2537,86 +2159,14 @@ function initLevel(n){
     bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
     attractors.push(bounceBH);
 
-    // Spawn 3 neutron stars at staggered positions on load
-    const nsSpawnPositions = [
-      new THREE.Vector3(-5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
-      new THREE.Vector3( 0.0 + (Math.random()-0.5)*1.5, 2.5 + Math.random()*1.5, 0),
-      new THREE.Vector3( 5.5 + (Math.random()-0.5)*1.5, 1.5 + Math.random()*2.0, 0),
-    ];
-    nsSpawnPositions.forEach(pos => {
-      const ns = new Attractor('neutronstar', pos);
-      attractors.push(ns);
-    });
-
+    // Neutron stars: user adds manually via the NS button in the panel
     // Default shader — keep dry-salt for this level
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
-
-    // Level 5: waterfall ON by default
-    P.waterfall = true;
-    _wfPhase = 0;
-    const wfRow = document.getElementById('waterfall-row');
-    if (wfRow) wfRow.style.display = 'flex';
-    const wfTog = document.getElementById('tog-waterfall');
-    if (wfTog) { wfTog.textContent = 'ON'; wfTog.classList.add('on'); }
   } else {
     // Restore default dry-salt luminance shader for levels 1–4
     pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
     pMat.needsUpdate = true;
-
-    // Levels 1–4: waterfall OFF, hide the row
-    P.waterfall = false;
-    const wfRow = document.getElementById('waterfall-row');
-    if (wfRow) wfRow.style.display = 'none';
-    const wfTog = document.getElementById('tog-waterfall');
-    if (wfTog) { wfTog.textContent = 'OFF'; wfTog.classList.remove('on'); }
-  }
-  // Level 6 (index 5): clone of level 5 — bouncing BH, no NS, full-viewport rain from top
-  if (n === 5) {
-    P.count = 8000; P.gravity = 2.2; P.spread = 1.4; P.bounce = 0.82;
-    // Mobile: smaller particles = denser visual appearance
-    P.size = isMobile ? 0.42 : 0.70;
-    if (emitterShape) emitterShape.animateMorph(0);
-    const setSl = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
-    const setVl = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-    setSl('sl-count', 8000); setVl('v-count', 8000);
-    setSl('sl-grav', 0.6); setVl('v-grav', '0.6');
-    setSl('sl-spread', 1.4); setVl('v-spread', '1.40');
-    setSl('sl-bounce', 0.82); setVl('v-bounce', '0.82');
-    setSl('sl-size', 0.70); setVl('v-size', '0.70');
-
-    // Hide panelstack emitter — level 6 uses a full-viewport top emitter instead
-    if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = false;
-
-    // Spawn bouncing black hole — same as level 5
-    const bx = (Math.random() - 0.5) * 6;
-    const by = 0.5 + Math.random() * 2.0;
-    const bounceBH = new Attractor('blackhole', new THREE.Vector3(bx, by, 0));
-    bounceBH._bouncingBH = true;
-    bounceBH.radius *= 1.30;
-    bounceBH.consumeRadius *= 1.30;
-    bounceBH.pullStrength = 112.0 * (1.30 * 1.30);
-    const bhAng = Math.random() * Math.PI * 2;
-    bounceBH.vel.x = Math.cos(bhAng) * (4 + Math.random() * 3);
-    bounceBH.vel.y = Math.sin(bhAng) * (3 + Math.random() * 2);
-    attractors.push(bounceBH);
-
-    // No neutron stars on level 6
-
-    // Same particle shader as level 5
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
-    pMat.needsUpdate = true;
-
-    // Waterfall ON
-    P.waterfall = true;
-    _wfPhase = 0;
-    const wfRow = document.getElementById('waterfall-row');
-    if (wfRow) wfRow.style.display = 'flex';
-    const wfTog = document.getElementById('tog-waterfall');
-    if (wfTog) { wfTog.textContent = 'ON'; wfTog.classList.add('on'); }
-
-    // Spawn project orbs after a short settle delay
-    setTimeout(_spawnProjectOrbs, 600);
   }
   updateLevelNav();
 }
@@ -2747,7 +2297,7 @@ class Shape{
         const yOff=totalH/2 - i*(PANEL_H+GAP) - PANEL_H/2;
         const sc=Math.max(0.01,1.0-this._panelMorphVal*(t));
         const geo=new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc);
-        const mat=new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:0.55,metalness:0.02,emissive:new THREE.Color(0xffffff),emissiveIntensity:0.55,clearcoat:0.4,clearcoatRoughness:0.2});
+        const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:0.55,metalness:0.02});
         const mesh=new THREE.Mesh(geo,mat);
         mesh.position.y=yOff;
         const eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(BASE_W*sc,PANEL_H,BASE_W*sc),22);
@@ -2761,34 +2311,12 @@ class Shape{
       scene.add(this.mesh);
       return;
     }
-    const mat=new THREE.MeshPhysicalMaterial({
-      color:d.color, roughness:0.0, metalness:1.0,
-      emissive:new THREE.Color(d.color), emissiveIntensity:3.5,
-      reflectivity:1.0, clearcoat:1.0, clearcoatRoughness:0.0,
-      transparent:true, opacity:0.97,
-    });
+    const mat=new THREE.MeshStandardMaterial({color:d.color,roughness:d.rough,metalness:0.02});
     const geo=d.makeGeo(s);
     this.mesh=new THREE.Mesh(geo,mat);
     this.mesh.rotation.copy(this.cEul);this.mesh.position.copy(this.pos);
     const eg=new THREE.EdgesGeometry(d.makeGeo(s),22);
-    this.mesh.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.18})));
-    // ── Sun-style PointLight + glow corona ──
-    const shapeLight = new THREE.PointLight(0xfff8e8, 4.0, 20);
-    this.mesh.add(shapeLight);
-    const baseR = this.def.baseR * s;
-    const glowDefs = [
-      { r: baseR * 1.3,  color: 0xffffff,  opacity: 0.06 },
-      { r: baseR * 1.8,  color: 0xfff0d0,  opacity: 0.03 },
-      { r: baseR * 2.6,  color: 0xffe090,  opacity: 0.012 },
-      { r: baseR * 4.0,  color: 0xffcc60,  opacity: 0.005 },
-    ];
-    glowDefs.forEach(({ r, color, opacity }) => {
-      const g = new THREE.Mesh(
-        new THREE.SphereGeometry(r, 16, 10),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.BackSide, depthWrite: false })
-      );
-      this.mesh.add(g);
-    });
+    this.mesh.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x888888,transparent:true,opacity:0.22})));
     scene.add(this.mesh);
   }
   resize(sc){
@@ -2939,284 +2467,12 @@ const SLOTS=[
 const TYPES=['cube','sphere','pyramid'];
 let shapes=[];
 
-// ── PROJECT ORBS (Level 6) ────────────────────────────────────────────────────
-const PROJECT_DATA = [
-  { name: 'wolfie.love',    url: 'https://www.wolfie.love',    desc: 'a love letter in motion',    color: '#ff7eb3', colorHex: 0xff7eb3 },
-  { name: 'zackgort.com',   url: 'https://www.zackgort.com',   desc: 'portfolio & work',            color: '#7eb3ff', colorHex: 0x7eb3ff },
-  { name: 'neverever.land', url: 'https://www.neverever.land', desc: 'a place for lost things',    color: '#b3ff7e', colorHex: 0xb3ff7e },
-  { name: 'reasonably.cc',  url: 'https://www.reasonably.cc',  desc: 'calm tools for clear minds', color: '#ffb37e', colorHex: 0xffb37e },
-];
-
-let _projectOrbs = [];
-
-class ProjectOrb {
-  // Wraps a real neutron-star Attractor — gets all NS physics, drag & BH collision for free.
-  constructor(data, pos, index) {
-    this.data = data;
-    this.index = index;
-    this._attractor = new Attractor('neutronstar', pos.clone());
-    this._attractor._isProjectOrb = true;
-    this._attractor._orbData = data;
-    this._attractor._orbIndex = index;
-    this._attractor._bouncingNS = true;
-    const ang = Math.random() * Math.PI * 2;
-    this._attractor.vel.x = Math.cos(ang) * (1.5 + Math.random() * 1.5);
-    this._attractor.vel.y = Math.sin(ang) * (1.0 + Math.random() * 1.0);
-    // Apply unique color to NS core, light, and glow layers
-    const col = data.colorHex || 0xffffff;
-    if (this._attractor.core && this._attractor.core.material) {
-      this._attractor.core.material.color.setHex(col);
-      this._attractor.core.material.emissive.setHex(col);
-    }
-    if (this._attractor.light) this._attractor.light.color.setHex(col);
-    if (this._attractor.glowMeshes) this._attractor.glowMeshes.forEach(g => g.material.color.setHex(col));
-    // Proxy references so existing _projectOrbs code still works
-    this.pos    = this._attractor.pos;
-    this.vel    = this._attractor.vel;
-    this.radius = this._attractor.radius;
-    // Floating label sprite (no longer attached to mesh — widget replaces it)
-    // Keep a minimal billboard for orientation cue
-    const lc = document.createElement('canvas'); lc.width=256; lc.height=48;
-    const lctx = lc.getContext('2d');
-    lctx.font = 'bold 11px Courier New'; lctx.fillStyle = data.color || '#ffffff'; lctx.textAlign = 'center';
-    lctx.globalAlpha = 0.7;
-    lctx.fillText(data.name, 128, 30);
-    const lt = new THREE.CanvasTexture(lc);
-    const lm = new THREE.Mesh(new THREE.PlaneGeometry(2.2,0.42), new THREE.MeshBasicMaterial({map:lt,transparent:true,depthWrite:false}));
-    lm.position.y = -this._attractor.radius * 1.8 - 0.45;
-    this._attractor.mesh.add(lm); this._labelMesh = lm;
-  }
-  update(dt) {
-    // Physics handled by Attractor.update(); just billboard label
-    this._labelMesh.quaternion.copy(camera.quaternion);
-    // Sync floating widget position to orb screen coords
-    _syncOrbWidget(this);
-  }
-  hitTest(clientX,clientY) {
-    const ndc2=new THREE.Vector2((clientX/W)*2-1,-(clientY/H)*2+1);
-    const ray2=new THREE.Raycaster();ray2.setFromCamera(ndc2,camera);
-    return ray2.ray.intersectsSphere(new THREE.Sphere(this.pos,this.radius*3.5));
-  }
-  dispose() {
-    const idx = attractors.indexOf(this._attractor);
-    if (idx !== -1) attractors.splice(idx, 1);
-    this._attractor.dispose();
-    _removeOrbWidget(this.index);
-  }
-}
-
-function _spawnProjectOrbs() {
-  _destroyProjectOrbs();
-  const eL=s2w(0,H/2).x,eR=s2w(W,H/2).x,eT=s2w(W/2,0).y,eB=s2w(W/2,H).y;
-  const sX=eR-eL,sY=eT-eB;
-  PROJECT_DATA.forEach((data,i)=>{
-    const col=i%2,row=Math.floor(i/2);
-    const x=eL+sX*(0.25+col*0.5)+(Math.random()-0.5)*sX*0.12;
-    const y=eB+sY*(0.65+row*-0.3)+(Math.random()-0.5)*sY*0.08;
-    const orb = new ProjectOrb(data,new THREE.Vector3(x,y,0),i);
-    _projectOrbs.push(orb);
-    attractors.push(orb._attractor);
-    _createOrbWidget(orb);
-  });
-}
-
-function _destroyProjectOrbs() {
-  _projectOrbs.forEach(o=>o.dispose()); _projectOrbs=[];
-  // Remove all orb widgets
-  document.querySelectorAll('.orb-widget').forEach(el=>el.remove());
-}
-
-// ── ORB FLOATING WIDGETS ──────────────────────────────────────────────────────
-// Each orb gets a persistent movable widget. It tracks the orb in screen space
-// until the user drags it, then it stays put (user-anchored).
-
-function _createOrbWidget(orb) {
-  const d = orb.data, idx = orb.index;
-  const c = d.color || '#ffffff';
-  const cAlpha = c + '28';
-
-  const el = document.createElement('div');
-  el.id = `orb-widget-${idx}`;
-  el.className = 'orb-widget';
-  el.style.cssText = `
-    position:fixed;z-index:500;min-width:160px;max-width:190px;
-    background:rgba(6,4,2,0.88);
-    border:1px solid ${c}44;
-    border-left:2px solid ${c}bb;
-    border-radius:6px;backdrop-filter:blur(12px);
-    padding:10px 13px 11px;cursor:grab;
-    pointer-events:auto;user-select:none;touch-action:none;
-    box-shadow:0 0 18px ${c}18, 0 2px 12px rgba(0,0,0,0.5);
-    transition:box-shadow 0.2s,border-color 0.2s,min-width 0.2s,padding 0.2s;
-  `;
-
-  el.innerHTML = `
-    <div class="orb-widget-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
-      <div class="orb-widget-name" style="font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:${c}99;font-family:'Courier New',monospace;">${d.name}</div>
-      <button class="orb-widget-min" title="Minimize" style="background:none;border:none;padding:0 0 0 8px;cursor:pointer;color:rgba(255,255,255,0.22);font-size:13px;line-height:1;font-family:monospace;flex-shrink:0;transition:color 0.15s;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.22)'">–</button>
-    </div>
-    <div class="orb-widget-body">
-      <div style="font-size:9px;line-height:1.6;color:rgba(255,255,255,0.38);font-family:'Courier New',monospace;letter-spacing:0.04em;margin-bottom:8px;">${d.desc || ''}</div>
-      <a href="${d.url}" target="_blank" rel="noopener"
-         style="display:block;font-family:'Courier New',monospace;font-size:${isMobile?'11':'9'}px;letter-spacing:0.08em;
-                color:${c}cc;border:1px solid ${c}44;border-radius:3px;padding:${isMobile?'10px 9px':'5px 9px'};
-                text-decoration:none;text-align:center;transition:background 0.12s,border-color 0.12s;
-                -webkit-tap-highlight-color:transparent;"
-         onmouseover="this.style.background='${cAlpha}';this.style.borderColor='${c}99';"
-         onmouseout="this.style.background='transparent';this.style.borderColor='${c}44';">
-        ↗ visit
-      </a>
-    </div>
-  `;
-
-  // On mobile: anchor immediately in a grid layout, don't track the orb
-  el._userAnchored = isMobile;
-  el._minimized = false;
-
-  // Place initially off-screen; will be positioned on first _syncOrbWidget call
-  el.style.left = '-9999px'; el.style.top = '-9999px';
-  document.body.appendChild(el);
-
-  // Minimize button
-  const minBtn = el.querySelector('.orb-widget-min');
-  minBtn.addEventListener('pointerdown', e=>{ e.stopPropagation(); });
-  minBtn.addEventListener('click', e=>{
-    e.stopPropagation();
-    _minimizeOrbWidget(idx);
-  });
-
-  // Dragging — once user moves it, stop auto-tracking the orb
-  let wDrag=false, wOX=0, wOY=0, wMoved=false;
-  el.addEventListener('pointerdown', e=>{
-    if(e.target.tagName==='A'||e.target.closest('a'))return;
-    if(e.target.closest('.orb-widget-min'))return;
-    wDrag=true; wMoved=false;
-    el.setPointerCapture(e.pointerId);
-    const r=el.getBoundingClientRect(); wOX=e.clientX-r.left; wOY=e.clientY-r.top;
-    el.style.transition='none'; el.style.cursor='grabbing';
-    e.stopPropagation(); e.preventDefault();
-  });
-  el.addEventListener('pointermove', e=>{
-    if(!wDrag)return;
-    const dx=e.clientX-wOX-parseFloat(el.style.left||0);
-    const dy=e.clientY-wOY-parseFloat(el.style.top||0);
-    if(Math.abs(dx)>4||Math.abs(dy)>4) wMoved=true;
-    if(!wMoved)return;
-    el._userAnchored=true;
-    let nx=Math.max(0,Math.min(W-el.offsetWidth,e.clientX-wOX));
-    let ny=Math.max(0,Math.min(H-el.offsetHeight,e.clientY-wOY));
-    el.style.left=nx+'px'; el.style.top=ny+'px';
-    el.style.right='auto'; el.style.bottom='auto';
-    e.stopPropagation();
-  });
-  el.addEventListener('pointerup', ()=>{ if(wDrag){wDrag=false;el.style.cursor='grab';} });
-}
-
-function _minimizeOrbWidget(idx) {
-  const el = document.getElementById(`orb-widget-${idx}`);
-  if(!el || el._minimized) return;
-  el._minimized = true;
-  const body = el.querySelector('.orb-widget-body');
-  const minBtn = el.querySelector('.orb-widget-min');
-  if(body) body.style.display = 'none';
-  if(minBtn) minBtn.style.display = 'none';
-  el.style.minWidth = '0';
-  el.style.maxWidth = 'none';
-  el.style.padding = '6px 10px';
-  el.style.cursor = 'default';
-  // Name label stays, no grab cursor since user clicks the orb to restore
-  const name = el.querySelector('.orb-widget-name');
-  if(name) name.style.marginBottom = '0';
-  const header = el.querySelector('.orb-widget-header');
-  if(header) header.style.marginBottom = '0';
-}
-
-function _expandOrbWidget(idx) {
-  const el = document.getElementById(`orb-widget-${idx}`);
-  if(!el || !el._minimized) return;
-  el._minimized = false;
-  const body = el.querySelector('.orb-widget-body');
-  const minBtn = el.querySelector('.orb-widget-min');
-  if(body) body.style.display = '';
-  if(minBtn) minBtn.style.display = '';
-  el.style.minWidth = '160px';
-  el.style.maxWidth = '190px';
-  el.style.padding = '10px 13px 11px';
-  el.style.cursor = 'grab';
-  const name = el.querySelector('.orb-widget-name');
-  if(name) name.style.marginBottom = '';
-  const header = el.querySelector('.orb-widget-header');
-  if(header) header.style.marginBottom = '5px';
-}
-
-function _syncOrbWidget(orb) {
-  const el = document.getElementById(`orb-widget-${orb.index}`);
-  if(!el) return;
-
-  // Mobile: place in a stable grid on first call, then never move again
-  if(isMobile) {
-    if(el.style.left === '-9999px') {
-      // Grid: up to 2 columns, stacked from top with spacing
-      const cols = 2;
-      const col = orb.index % cols;
-      const row = Math.floor(orb.index / cols);
-      const ww = Math.min(160, (W - 12) / cols - 8);
-      const wx = 6 + col * (ww + 8);
-      const wy = 58 + row * 110; // below mobile top bar
-      el.style.width = ww + 'px';
-      el.style.minWidth = 'unset';
-      el.style.maxWidth = 'unset';
-      el.style.left = wx + 'px';
-      el.style.top = wy + 'px';
-      el.style.right = 'auto';
-      el.style.bottom = 'auto';
-    }
-    return;
-  }
-
-  // Desktop: track the orb unless user has anchored it.
-  // If anchored, check whether the orb has drifted close to the widget —
-  // if so, re-pair (clear the anchor) so tracking resumes naturally.
-  const sc = orb.pos.clone().project(camera);
-  const sx = (sc.x+1)/2*W;
-  const sy = (-sc.y+1)/2*H;
-  if(el._userAnchored) {
-    const wl = parseFloat(el.style.left) || 0;
-    const wt = parseFloat(el.style.top)  || 0;
-    const ww2 = (el.offsetWidth  || 170) / 2;
-    const wh2 = (el.offsetHeight ||  90) / 2;
-    const wcx = wl + ww2, wcy = wt + wh2;
-    const dist = Math.sqrt((sx - wcx) ** 2 + (sy - wcy) ** 2);
-    if(dist < 120) el._userAnchored = false;
-    else return;
-  }
-  const ww = el.offsetWidth || 170;
-  const wh = el.offsetHeight || 90;
-  let wx = sx + 28;
-  let wy = sy - wh/2;
-  wx = Math.max(4, Math.min(W-ww-4, wx));
-  wy = Math.max(4, Math.min(H-wh-4, wy));
-  el.style.left = wx+'px'; el.style.top = wy+'px';
-  el.style.right='auto'; el.style.bottom='auto';
-}
-
-function _removeOrbWidget(index) {
-  const el = document.getElementById(`orb-widget-${index}`);
-  if(el) el.remove();
-}
-
-// Orb click → expand its widget if minimized
-function _showProjectCard(orb) {
-  if(orb && orb.index != null) _expandOrbWidget(orb.index);
-}
-function _hideProjectCard() {}
-
 function buildInit(){
   shapes.forEach(s=>s.dispose());shapes=[];
   const isLvl4 = lvl === 3; // wormhole — has shapes
   const isLvl5 = lvl === 4; // black hole — no shapes
   const isLvl5new = lvl === 4; // bouncing BH sandbox — no shapes
-  const noShapes = isLvl5new || lvl === 5 || (isLvl4 && !LEVELS[lvl].shapes);
+  const noShapes = isLvl5new || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
@@ -3235,13 +2491,16 @@ function buildInit(){
       const allTypes = ['cube','sphere','pyramid'];
       lvl5Slots.forEach((pos, i) => {
         const type = allTypes[i % allTypes.length];
-        const rot = SDEFS[type].orients[0].clone(); // always start at 12 o'clock
+        const orients = SDEFS[type].orients;
+        const rot = orients[Math.floor(Math.random()*orients.length)].clone();
         shapes.push(new Shape(type, pos, rot, randSc(type)));
       });
     } else {
       SLOTS.forEach((slot,i)=>{
         const type=typePool[i];
-        const rot=SDEFS[type].orients[0].clone(); // always start at 12 o'clock
+        const orients=SDEFS[type].orients;
+        const oi=Math.floor(Math.random()*orients.length);
+        const rot=orients[oi].clone();
         const sc=randSc(type);
         shapes.push(new Shape(type,slot.pos,rot,sc));
       });
@@ -3251,40 +2510,13 @@ function buildInit(){
 }
 function addShape(t){shapes.push(new Shape(t,new THREE.Vector3((Math.random()-0.5)*4,0,0),null,randSc(t)));updateCnt();}
 function clearShapes(){
-  if (lvl === 4) {
-    // Level 5: clear neutron stars only — keep the bouncing BH
-    const nsToRemove = attractors.filter(a => a.type === 'neutronstar');
-    nsToRemove.forEach(a => a.dispose());
-    attractors = attractors.filter(a => a.type !== 'neutronstar');
-    updateCnt();
-    return;
-  }
   shapes.forEach(s=>s.dispose());shapes=[];
-  // Preserve black holes — only remove non-blackhole attractors
-  const toRemove = attractors.filter(a => a.type !== 'blackhole');
-  toRemove.forEach(a => a.dispose());
-  attractors = attractors.filter(a => a.type === 'blackhole');
+  attractors.forEach(a=>a.dispose());attractors=[];
   updateCnt();
 }
 function delShape(sh){const i=shapes.indexOf(sh);if(i<0)return;sh.dispose();shapes.splice(i,1);updateCnt();flashEl('flash-delete');}
 function updateCnt(){const e=document.getElementById('shape-count');e.textContent=shapes.length?shapes.length+' shapes':'';}
 function flashEl(id){const e=document.getElementById(id);e.classList.add('on');setTimeout(()=>e.classList.remove('on'),200);}
-function _wiggleAttractor(a){
-  // Quick physical wiggle: inject a small random velocity burst that the spring will damp
-  if(a.dragging)return;
-  const dirs=[[-1,0],[1,0],[0,-1],[0,1]];
-  const STEPS=4,STEP_T=55,AMP=1.8;
-  let step=0;
-  function doWiggle(){
-    if(step>=STEPS*2)return;
-    const d=dirs[step%dirs.length];
-    a.vel.x=d[0]*AMP*(step%2===0?1:-1);
-    a.vel.y=d[1]*AMP*(step%2===0?1:-1)*0.5;
-    step++;
-    setTimeout(doWiggle,STEP_T);
-  }
-  doWiggle();
-}
 buildInit();
 
 // ── PANEL STACK EMITTER — spawned after P & syncBounce are declared below ────
@@ -3299,38 +2531,6 @@ function resolveCollisions(){
       sa.pos.x-=nx*pen*wa;sa.pos.y-=ny*pen*wa;sb.pos.x+=nx*pen*wb;sb.pos.y+=ny*pen*wb;
       const dvx=sb.vel.x-sa.vel.x,dvy=sb.vel.y-sa.vel.y,dot=dvx*nx+dvy*ny;
       if(dot<0){const j=(1+0.5)*dot*0.5;if(!sa.dragging){sa.vel.x+=j*nx;sa.vel.y+=j*ny;}if(!sb.dragging){sb.vel.x-=j*nx;sb.vel.y-=j*ny;}}
-    }
-  }
-
-  // ── Zen orb ↔ Project orb bumper collisions ───────────────────────────────
-  if(lvl===5&&_projectOrbs.length){
-    const zenArr=attractors.filter(a=>a._bouncingBH);
-    const orbAtts=attractors.filter(a=>a._isProjectOrb);
-    for(const zen of zenArr){
-      const zenScale=Math.sqrt(zen.pullStrength/57.0);
-      const zenR=zen.radius*zenScale*1.1;
-      for(const orb of orbAtts){
-        if(orb.dragging)continue;
-        const dx=orb.pos.x-zen.pos.x,dy=orb.pos.y-zen.pos.y;
-        const dist=Math.sqrt(dx*dx+dy*dy)||0.001;
-        const minD=zenR+orb.radius;
-        if(dist<minD){
-          const nx=dx/dist,ny=dy/dist;
-          const pen=minD-dist;
-          zen.pos.x-=nx*pen*0.5;zen.pos.y-=ny*pen*0.5;
-          orb.pos.x+=nx*pen*0.5;orb.pos.y+=ny*pen*0.5;
-          const RESTITUTION=0.75;
-          const relDot=zen.vel.x*(-nx)+zen.vel.y*(-ny);
-          if(relDot>0){
-            zen.vel.x+=nx*relDot*(1+RESTITUTION);
-            zen.vel.y+=ny*relDot*(1+RESTITUTION);
-          }
-          // Kick the orb — it's a free NS so it bounces naturally
-          const kickStr=2.2+Math.sqrt(zen.vel.x**2+zen.vel.y**2)*0.18;
-          orb.vel.x+=nx*kickStr;orb.vel.y+=ny*kickStr;
-          _zenGravSpike=Math.max(_zenGravSpike,14.0);
-        }
-      }
     }
   }
   
@@ -3395,14 +2595,14 @@ function resolveCollisions(){
         const minDist = bhR + nsR;
 
         // ── Approach zone: BH gravity snatches NS into orbit ─────────────────
-        const captureZone = bhR * 3.0;
+        const captureZone = bhR * 5.5;
         if (!ns._bhCapture && dist < captureZone && dist > minDist) {
-          // Pull NS toward BH — gentler than before
-          const pullF = 0.07 / Math.max(dist * dist * 0.08, 0.5);
+          // Pull NS toward BH with circular-orbit tangential bias
+          const pullF = 0.18 / Math.max(dist * dist * 0.08, 0.5);
           const nx = dx / dist, ny = dy / dist;
           const tx = -ny, ty = nx; // tangent for orbit
-          ns.vel.x -= (nx * 0.4 - tx * 0.45) * pullF;
-          ns.vel.y -= (ny * 0.4 - ty * 0.45) * pullF;
+          ns.vel.x -= (nx * 0.7 - tx * 0.8) * pullF;
+          ns.vel.y -= (ny * 0.7 - ty * 0.8) * pullF;
         }
 
         // ── Hard collision: bounce + enter capture state ──────────────────────
@@ -3448,11 +2648,11 @@ function resolveCollisions(){
           const txO = -ry / r, tyO = rx / r;
           const vTan = ns.vel.x * txO + ns.vel.y * tyO;
           const vCirc = Math.sqrt(bh.pullStrength * 0.12 / r);
-          const nudge = (vCirc - vTan) * 0.04;
+          const nudge = (vCirc - vTan) * 0.08;
           ns.vel.x += txO * nudge;
           ns.vel.y += tyO * nudge;
-          // Slight pull inward to maintain orbit altitude — gentler
-          const radialPull = 0.02;
+          // Slight pull inward to maintain orbit altitude
+          const radialPull = 0.04;
           ns.vel.x -= (rx / r) * radialPull;
           ns.vel.y -= (ry / r) * radialPull;
 
@@ -3500,13 +2700,6 @@ window.addEventListener('pointermove',()=>{lastInteractTime=Date.now();hasIntera
 window.addEventListener('pointermove',e=>{if(!dDrag)return;const dx=e.clientX-(dX+dOX),dy=e.clientY-(dY+dOY);if(Math.abs(dx)>4||Math.abs(dy)>4)dMoved=true;dX=e.clientX-dOX;dY=e.clientY-dOY;const ns=dY<SNAPZONE;snapHint.classList.toggle('visible',ns);if(ns){dY=18;dX=Math.max(60,Math.min(W-60,dX));}posDsp(dX,dY);});
 window.addEventListener('pointerup',e=>{if(!dDrag)return;dDrag=false;snapHint.classList.remove('visible');if(dY<SNAPZONE){dY=18;}posDsp(Math.max(60,Math.min(W-60,dX)),dY);});
 function getSpout(){
-  // Level 6: full-viewport-width emitter from the very top of screen
-  if (lvl === 5) {
-    const topWorld = s2w(0, 0); // top-left world coord
-    const rightWorld = s2w(W, 0); // top-right world coord
-    const rx = topWorld.x + Math.random() * (rightWorld.x - topWorld.x);
-    return { x: rx, y: topWorld.y };
-  }
   if(emitterShape&&emitterShape.mesh){
     // bottom of stack = pos.y - half total height
     const totalH=emitterShape._totalH||3.5;
@@ -3518,7 +2711,7 @@ function getSpout(){
 
 // ── PARTICLES ─────────────────────────────────────────────────────────────────
 const MP=8000,pp=new Float32Array(MP*3),pv=new Float32Array(MP*3),ps=new Float32Array(MP),pa=new Float32Array(MP),pl=new Float32Array(MP),pal=new Uint8Array(MP);
-const P={count:isMobile?8000:8000,gravity:isMobile?3.3:4.2,spread:isMobile?0.65:1.25,bounce:0.36,size:isMobile?0.65:0.65,rain:false,waterfall:false};
+const P={count:isMobile?8000:8000,gravity:isMobile?3.3:4.2,spread:isMobile?0.65:1.25,bounce:0.36,size:isMobile?0.65:0.65,rain:false};
 
 // Derive bounce from count+size: more particles & larger size → more bounce
 function derivedBounce(){
@@ -3533,39 +2726,7 @@ function syncBounce(){
   if(sl)sl.value=P.bounce; if(vl)vl.textContent=P.bounce.toFixed(2);
 }
 
-// Waterfall wave clock — drives the heavy→thin→heavy cycle
-let _wfPhase = 0; // advances in tick(), 0–2π per wave cycle
-let _wfSavedP = null; // saved P settings to restore on toggle off
-
-// Per-particle gravity tier — assigned at spawn, used in tick
-const pGravTier = new Float32Array(MP); // 0=slow 1=mid 2=fast
-
-function spawn(i){
-  const b=i*3,sw=getSpout();
-  if(P.waterfall){
-    // Max spread — full emitter width
-    pp[b]  = sw.x + (Math.random()-0.5)*P.spread;
-    pp[b+1]= sw.y + Math.random()*0.3;
-    // Deep z layering: spread particles across several z planes for volumetric curtain
-    pp[b+2]= (Math.random()-0.5)*2.8;
-    // Tiny lateral drift
-    pv[b]  = (Math.random()-0.5)*0.03;
-    pv[b+2]= (Math.random()-0.5)*0.02;
-    // Three gravity tiers — fast core, mid spray, slow mist
-    const tier = Math.floor(Math.random()*3); // 0=mist 1=mid 2=heavy
-    pGravTier[i] = tier;
-    const speeds = [0.25, 0.45, 0.75];
-    const jitter  = [0.08, 0.18, 0.30];
-    pv[b+1]= -(speeds[tier] + Math.random()*jitter[tier]);
-    // Tiny particles — small size, long life so the scene stays dense
-    ps[i]  = 0.15 + Math.random()*0.22;
-    pl[i]  = 20 + Math.random()*10;
-    pa[i]  = Math.random()*pl[i];
-    pal[i] = 1;
-  } else {
-    pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=lvl===3?(22+Math.random()*10):(9+Math.random()*5);pa[i]=Math.random()*pl[i];pal[i]=1;
-  }
-}
+function spawn(i){const b=i*3,sw=getSpout();pp[b]=sw.x+(Math.random()-0.5)*P.spread;pp[b+1]=sw.y+0.2;pp[b+2]=(Math.random()-0.5)*1.2;pv[b]=(Math.random()-0.5)*0.08;pv[b+1]=-0.3-Math.random()*0.3;pv[b+2]=(Math.random()-0.5)*0.04;ps[i]=0.5+Math.random()*0.9;pl[i]=lvl===3?(22+Math.random()*10):(9+Math.random()*5);pa[i]=Math.random()*pl[i];pal[i]=1;}
 
 // ── PANEL STACK EMITTER — spawned here so P & syncBounce are in scope ─────────
 (function(){
@@ -3613,9 +2774,6 @@ window.addEventListener('keydown',e=>{if(e.key==='Shift'){shiftDown=true;rotPrev
 window.addEventListener('keyup',e=>{if(e.key==='Shift'){shiftDown=false;if(dShape&&prevWP){/* resume normal drag from current pos */const wp=s2w(mX,mY);dOff.set(wp.x-dShape.pos.x,wp.y-dShape.pos.y,0);prevWP=wp.clone();}}});
 
 let tAttractor=null,aDragOff=new THREE.Vector3();
-let _discoDragging=false,_discoDragOff=new THREE.Vector3(),_discoThrowBuf=[];
-// Zen-orb particle gravity spike: spikes when BH touches a project orb, decays back
-let _zenGravSpike=0;
 
 // ── Throw velocity tracking for bouncing BH ───────────────────────────────────
 // Ring buffer of recent world-space attractor positions while dragging
@@ -3676,16 +2834,6 @@ window.addEventListener('mousemove',e=>{
     updateShapeCoords(tAttractor.type, tAttractor);
     return;
   }
-
-  // Disco orb drag
-  if (_discoDragging) {
-    const wp = s2w(e.clientX, e.clientY);
-    _discoOrbPos.x = wp.x - _discoDragOff.x;
-    _discoOrbPos.y = wp.y - _discoDragOff.y;
-    _discoThrowBuf.push({ x: _discoOrbPos.x, y: _discoOrbPos.y, t: performance.now() });
-    if (_discoThrowBuf.length > 8) _discoThrowBuf.shift();
-    return;
-  }
   
   if(dShape){
     if(shiftDown&&dShape!==emitterShape){
@@ -3713,40 +2861,11 @@ window.addEventListener('mouseup',e=>{
     return;
   }
   if(e.button===0&&wormhole.dragging){wormhole.dragging=false;return;}
-  // Disco orb throw on release
-  if (e.button===0 && _discoDragging) {
-    _discoDragging = false;
-    // Compute throw velocity from recent positions
-    if (_discoThrowBuf.length >= 2) {
-      const recent = _discoThrowBuf.slice(-4);
-      let vx = 0, vy = 0, tw = 0;
-      for (let i = 1; i < recent.length; i++) {
-        const dt = (recent[i].t - recent[i-1].t) / 1000;
-        if (dt < 0.001) continue;
-        const w = i;
-        vx += ((recent[i].x - recent[i-1].x) / dt) * w;
-        vy += ((recent[i].y - recent[i-1].y) / dt) * w;
-        tw += w;
-      }
-      if (tw > 0) { _discoOrbVel.x = vx / tw; _discoOrbVel.y = vy / tw; }
-    }
-    _discoThrowBuf.length = 0;
-    return;
-  }
   if(e.button===0&&tAttractor){
     if(tAttractor._bouncingBH) {
       _applyThrow(tAttractor);
       // Don't reset rest for bouncing BH — it has no spring tether
     } else {
-      // Short tap on a project orb → show card instead of anchoring
-      if(tAttractor._isProjectOrb) {
-        const moved=Math.sqrt((tAttractor.pos.x-tAttractor.rest.x)**2+(tAttractor.pos.y-tAttractor.rest.y)**2);
-        if(moved<0.25) {
-          const sc=tAttractor.pos.clone().project(camera);
-          const sx=(sc.x+1)/2*W,sy=(-sc.y+1)/2*H;
-          _showProjectCard({data:tAttractor._orbData,index:tAttractor._orbIndex},sx,sy);
-        }
-      }
       tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
     }
     tAttractor.dragging=false;
@@ -3755,84 +2874,8 @@ window.addEventListener('mouseup',e=>{
   }
 });
 
-// ── SUPERNOVA IMPULSE ─────────────────────────────────────────────────────────
-const SUPERNOVA_R = 7.0;
-const SUPERNOVA_F = 18.0;
-const SUPERNOVA_LIFT = 4.0;
-function supernovaImpulse(wx, wy) {
-  const N = Math.min(P.count, MP);
-  for (let i = 0; i < N; i++) {
-    if (!pal[i]) continue;
-    const b = i * 3;
-    const dx = pp[b] - wx, dy = pp[b+1] - wy, dz = pp[b+2];
-    const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) || 0.001;
-    if (dist > SUPERNOVA_R) continue;
-    const t = 1 - dist / SUPERNOVA_R;
-    const f = SUPERNOVA_F * t * t;
-    pv[b]   += (dx / dist) * f;
-    pv[b+1] += (dy / dist) * f + SUPERNOVA_LIFT * t;
-    pv[b+2] += (dz / dist) * f;
-  }
-
-  // ── Level 6 disco orb: supernova shockwave blasts the disco ball ─────
-  if (_isDiscoMode && lvl === 5) {
-    const ddx = _discoOrbPos.x - wx, ddy = _discoOrbPos.y - wy;
-    const ddist = Math.sqrt(ddx*ddx + ddy*ddy) || 0.001;
-    if (ddist < 14.0) {
-      const tD = 1 - ddist / 14.0;
-      const fD = 10.0 * tD * tD;
-      _discoOrbVel.x += (ddx / ddist) * fD;
-      _discoOrbVel.y += (ddy / ddist) * fD + 1.5 * tD;
-    }
-  }
-
-  // ── Level 5 & 6: supernova shockwave blasts attractors ──────────────
-  if (lvl === 4 || lvl === 5) {
-    const NOVA_ATTRACTOR_R = 14.0;  // shockwave reach in world units
-    const NOVA_BH_F        = 10.0;  // kick on black hole (massive — resists but recoils)
-    const NOVA_NS_F        = 24.0;  // kick on neutron star (lighter — flung hard)
-    for (const a of attractors) {
-      if (a.dragging) continue;
-      const adx = a.pos.x - wx, ady = a.pos.y - wy;
-      const adist = Math.sqrt(adx*adx + ady*ady) || 0.001;
-      if (adist > NOVA_ATTRACTOR_R) continue;
-      const tA = 1 - adist / NOVA_ATTRACTOR_R;
-      const isBH = a.type === 'blackhole';
-      const force = (isBH ? NOVA_BH_F : NOVA_NS_F) * tA * tA;
-      // Radial blast away from epicentre
-      a.vel.x += (adx / adist) * force;
-      a.vel.y += (ady / adist) * force + (isBH ? 1.5 : 4.0) * tA;
-      // NS: add a random tangential spin kick for extra chaos
-      if (!isBH) {
-        const tx = -ady / adist, ty = adx / adist;
-        const spinDir = Math.random() < 0.5 ? 1 : -1;
-        a.vel.x += tx * force * 0.35 * spinDir;
-        a.vel.y += ty * force * 0.35 * spinDir;
-        // Break active BH capture so it flies free
-        a._bhCapture = null;
-        a._bhCaptureTimer = 0;
-      }
-      // Mark for glow flare (drawn in overlay, decayed each frame)
-      a._novaHitT = 0.6;
-    }
-  }
-
-  flashEl('flash-complete');
-}
-
 renderer.domElement.addEventListener('mousedown',e=>{
   if(e.button!==0||dDrag)return;
-
-  // Project orb hit-test (Level 6) — card on click; drag handled via attractor system
-  if(lvl === 5 && _projectOrbs.length) {
-    for(const orb of _projectOrbs) {
-      if(orb.hitTest(e.clientX, e.clientY)) {
-        _showProjectCard(orb, e.clientX, e.clientY);
-        return;
-      }
-    }
-    _hideProjectCard();
-  }
 
   // Portal pair drag hit-test (Level 6)
   if(lvl === 4 && portalPairs.length > 0) {
@@ -3855,24 +2898,6 @@ renderer.domElement.addEventListener('mousedown',e=>{
   ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
   
-  // ── Disco orb hit-test (level 6 salt mode) ──────────────────────────
-  if (_isDiscoMode && lvl === 5) {
-    const dsc = _discoOrbPos.clone().project(camera);
-    const dsx = (dsc.x + 1) / 2 * W, dsy = (-dsc.y + 1) / 2 * H;
-    const ddx = e.clientX - dsx, ddy = e.clientY - dsy;
-    const dscreenDist = Math.sqrt(ddx*ddx + ddy*ddy);
-    const dedge = new THREE.Vector3(_discoOrbPos.x + 1.15, _discoOrbPos.y, 0).project(camera);
-    const dvisualR = Math.abs((dedge.x + 1) / 2 * W - dsx);
-    if (dscreenDist < Math.max(18, dvisualR)) {
-      _discoDragging = true;
-      _discoThrowBuf.length = 0;
-      const wp = s2w(e.clientX, e.clientY);
-      _discoDragOff.set(wp.x - _discoOrbPos.x, wp.y - _discoOrbPos.y, 0);
-      _discoOrbVel.set(0, 0, 0);
-      return;
-    }
-  }
-
   // Screen-space hit test for attractors — 28px min touch target (desktop), larger for NS
   const MIN_CLICK_R = 14;
   let hitAttractor = null, hitDist = Infinity;
@@ -3912,160 +2937,32 @@ renderer.domElement.addEventListener('mousedown',e=>{
       showShapeText(sh.type, sh);
     }
   }
-  // Empty-space click — supernova blast
-  else { const wp=s2w(e.clientX,e.clientY); supernovaImpulse(wp.x, wp.y); }
 });
-// ── SINGULARITY COLLAPSE (right-click hold / long-static-press) ───────────────
-// Threshold in ms before delete fires. Release early cancels.
-const COLLAPSE_THRESHOLD = 600;
-const collapseRing = document.getElementById('collapse-ring');
-let _collapseTimer = null;
-let _collapseTarget = null; // { type: 'shape'|'attractor'|'portal', ref }
-let _collapseStartSx = 0, _collapseStartSy = 0;
-let _collapseStartT = 0;
-let _collapseRAF = null;
-
-function _collapseHitTest(cx, cy) {
-  // Portal pair removal (Level 4)
-  if (lvl === 4 && portalPairs.length > 0) {
-    // Check via removePortalPairAt — we need the hit without removing
-    // We'll store portal as special type and call removePortalPairAt on commit
-    const hitPortal = (() => {
-      for (const pp of portalPairs) {
-        if (pp._sAx !== undefined) {
-          const dA = Math.hypot(cx - pp._sAx, cy - pp._sAy);
-          if (dA < Math.max(28, pp._sAr || 28)) return { type: 'portal', ref: pp, side: 'a' };
-          const dB = Math.hypot(cx - pp._sBx, cy - pp._sBy);
-          if (dB < Math.max(28, pp._sBr || 28)) return { type: 'portal', ref: pp, side: 'b' };
-        }
-      }
-      return null;
-    })();
-    if (hitPortal) return hitPortal;
-  }
-  // Attractor hit-test
-  ndc.set((cx/W)*2-1,-(cy/H)*2+1);
+renderer.domElement.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  ndc.set((e.clientX/W)*2-1,-(e.clientY/H)*2+1);
   ray.setFromCamera(ndc,camera);
-  for (let i = 0; i < attractors.length; i++) {
+
+  // Portal pair right-click removal (Level 6)
+  if(lvl === 4 && removePortalPairAt(e.clientX, e.clientY)) return;
+  
+  for(let i=0; i<attractors.length; i++){
     const a = attractors[i];
-    if (ray.intersectObject(a.core, false).length) {
-      return { type: 'attractor', ref: a };
+    if(ray.intersectObject(a.core, false).length) {
+      if(tAttractor === a) tAttractor = null;
+      a.dispose();
+      attractors.splice(i, 1);
+      flashEl('flash-delete');
+      return;
     }
   }
-  // Shape hit-test
-  const hits = ray.intersectObjects(shapes.map(s=>s.mesh), true);
-  if (hits.length) {
-    const sh = shapes.find(s => s.mesh === hits[0].object || s.mesh.children.includes(hits[0].object));
-    if (sh) return { type: 'shape', ref: sh };
+  
+  const hits=ray.intersectObjects(shapes.map(s=>s.mesh),true);
+  if(hits.length){
+    const sh=shapes.find(s=>s.mesh===hits[0].object||s.mesh.children.includes(hits[0].object));
+    if(sh){if(dShape===sh){dShape=null;prevWP=null;}delShape(sh);}
   }
-  return null;
-}
-
-function _collapseDrawRing(sx, sy, progress) {
-  // progress 0→1; ring shrinks inward (singularity collapse)
-  if (!collapseRing) return;
-  const maxR = 36;
-  const r = maxR * (1 - progress * 0.65); // shrinks but stays visible
-  collapseRing.style.left = sx + 'px';
-  collapseRing.style.top  = sy + 'px';
-  collapseRing.style.width  = (r * 2) + 'px';
-  collapseRing.style.height = (r * 2) + 'px';
-  collapseRing.style.borderColor = `rgba(255,${Math.round(80 - progress*60)},${Math.round(60 - progress*60)},${0.4 + progress * 0.5})`;
-  collapseRing.style.boxShadow = `0 0 ${4 + progress*14}px rgba(255,40,40,${progress*0.5})`;
-}
-
-function _collapseStart(cx, cy) {
-  const hit = _collapseHitTest(cx, cy);
-  if (!hit) return false;
-  // Can't delete a black hole
-  if (hit.type === 'attractor' && hit.ref.type === 'blackhole') {
-    _wiggleAttractor(hit.ref);
-    return true; // consumed event
-  }
-  _collapseTarget = hit;
-  _collapseStartSx = cx;
-  _collapseStartSy = cy;
-  _collapseStartT = performance.now();
-  if (collapseRing) collapseRing.classList.add('active');
-  _collapseAnimFrame();
-  return true;
-}
-
-function _collapseAnimFrame() {
-  if (!_collapseTarget) return;
-  const elapsed = performance.now() - _collapseStartT;
-  const progress = Math.min(1, elapsed / COLLAPSE_THRESHOLD);
-
-  // Project current position for the ring
-  let sx = _collapseStartSx, sy = _collapseStartSy;
-  if (_collapseTarget.type === 'attractor') {
-    const sc = _collapseTarget.ref.pos.clone().project(camera);
-    sx = (sc.x + 1) / 2 * W;
-    sy = (-sc.y + 1) / 2 * H;
-  } else if (_collapseTarget.type === 'shape') {
-    const sc = _collapseTarget.ref.pos.clone().project(camera);
-    sx = (sc.x + 1) / 2 * W;
-    sy = (-sc.y + 1) / 2 * H;
-  }
-  _collapseDrawRing(sx, sy, progress);
-
-  if (progress < 1) {
-    _collapseRAF = requestAnimationFrame(_collapseAnimFrame);
-  } else {
-    _collapseCommit();
-  }
-}
-
-function _collapseCommit() {
-  if (!_collapseTarget) return;
-  const hit = _collapseTarget;
-  _collapseCancel(false); // clean up ring without nulling target yet
-  if (hit.type === 'portal') {
-    removePortalPairAt(_collapseStartSx, _collapseStartSy);
-  } else if (hit.type === 'attractor') {
-    const a = hit.ref;
-    if (tAttractor === a) tAttractor = null;
-    a.dispose();
-    const idx = attractors.indexOf(a);
-    if (idx >= 0) attractors.splice(idx, 1);
-    flashEl('flash-delete');
-  } else if (hit.type === 'shape') {
-    const sh = hit.ref;
-    if (dShape === sh) { dShape = null; prevWP = null; }
-    delShape(sh);
-  }
-  _collapseTarget = null;
-}
-
-function _collapseCancel(clearTarget = true) {
-  if (_collapseRAF) { cancelAnimationFrame(_collapseRAF); _collapseRAF = null; }
-  if (collapseRing) {
-    collapseRing.classList.remove('active');
-    collapseRing.style.boxShadow = '';
-  }
-  if (clearTarget) _collapseTarget = null;
-}
-
-// ── Right-click: start collapse on mousedown, prevent contextmenu ─────────────
-renderer.domElement.addEventListener('contextmenu', e => { e.preventDefault(); });
-
-renderer.domElement.addEventListener('mousedown', e => {
-  if (e.button !== 2) return; // right button only
-  e.preventDefault();
-  _collapseStart(e.clientX, e.clientY);
-}, true);
-
-window.addEventListener('mouseup', e => {
-  if (e.button === 2 && _collapseTarget) {
-    _collapseCancel();
-  }
-}, true);
-
-// Also cancel if right mouse leaves window
-window.addEventListener('mouseleave', () => {
-  if (_collapseTarget) _collapseCancel();
 });
-
 window.addEventListener('mouseup',e=>{
   if(e.button===0&&dShape){
     if(!dMov&&(Date.now()-dTime)<350){
@@ -4352,42 +3249,11 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
   });
   updateMbLvlBtns();
 
-  // ── Always-visible level prev/next in top bar ──────────────────────────────
-  const mbLvlPrev = document.getElementById('mb-lvl-prev');
-  const mbLvlNext = document.getElementById('mb-lvl-next');
-  const mbLvlLabel = document.getElementById('mb-lvl-label');
-  const LVL_LABELS = ['LVL 1','LVL 2','LVL 3','LVL 4','LVL 5','✦'];
-  function syncMbLvlLabel() {
-    if (mbLvlLabel) mbLvlLabel.textContent = LVL_LABELS[lvl] || ('LVL '+(lvl+1));
-    if (mbLvlPrev) mbLvlPrev.style.opacity = lvl === 0 ? '0.18' : '1';
-    if (mbLvlNext) mbLvlNext.style.opacity = lvl === LEVELS.length-1 ? '0.18' : '1';
-  }
-  if (mbLvlPrev) mbLvlPrev.addEventListener('click', () => {
-    if (lvl === 0) return;
-    const n = lvl - 1;
-    initLevel(n); tCounts=[]; for(let i=0;i<MP;i++) spawn(i); buildInit();
-    updateMbLvlBtns(); syncMbLvlLabel();
-  });
-  if (mbLvlNext) mbLvlNext.addEventListener('click', () => {
-    if (lvl === LEVELS.length-1) return;
-    const n = lvl + 1;
-    initLevel(n); tCounts=[]; for(let i=0;i<MP;i++) spawn(i); buildInit();
-    updateMbLvlBtns(); syncMbLvlLabel();
-  });
-  syncMbLvlLabel();
-  // Keep label in sync — updateLevelNav is called by every initLevel path
-  const _origUpdateLevelNav = updateLevelNav;
-  updateLevelNav = function() { _origUpdateLevelNav(); syncMbLvlLabel(); };
-
   // Touch for shapes/attractors: tap to cycle, drag to move, two-finger pinch to scale
   let tShape=null,tOff=new THREE.Vector3(),tPrevWP=null,tMoved=false,tTime=0;
   let pinchDist0=0,pinchSc0=1,aPinchPull0=0;
-  let _lpTimer=null; // longpress timer for emitter waterfall toggle
   function getTouchDist(e){if(e.touches.length<2)return 0;const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
   renderer.domElement.addEventListener('touchstart',e=>{
-    // Let orb-widget touches through — don't steal them
-    const t0=e.touches[0];
-    if(t0 && document.elementFromPoint(t0.clientX,t0.clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     const t=e.touches[0];
     mX=t.clientX;mY=t.clientY;bX=t.clientX;bY=t.clientY;
@@ -4447,26 +3313,10 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       });
       if(sh){tShape=sh;sh.dragging=true;sh.vel.set(0,0,0);const wp=s2w(t.clientX,t.clientY);tOff.set(wp.x-sh.pos.x,wp.y-sh.pos.y,0);tPrevWP=wp.clone();tMoved=false;tTime=Date.now();
         showShapeText(sh.type, sh);
-        // Longpress on emitter (panelstack) triggers waterfall toggle — level 5 only
-        if(sh.type==='panelstack' && lvl===4) {
-          _lpTimer = setTimeout(() => {
-            if(!tMoved) {
-              P.waterfall = !P.waterfall;
-              _wfPhase = 0;
-              for(let _i=0;_i<MP;_i++) spawn(_i);
-              // Sync desktop toggle
-              const wfTog = document.getElementById('tog-waterfall');
-              if(wfTog) { wfTog.textContent = P.waterfall?'ON':'OFF'; wfTog.classList.toggle('on', P.waterfall); }
-            }
-          }, 500);
-        }
-
       }
     }
   },{passive:false});
   renderer.domElement.addEventListener('touchmove',e=>{
-    const t0=e.touches[0];
-    if(t0 && document.elementFromPoint(t0.clientX,t0.clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     const t=e.touches[0];
     mX=t.clientX;mY=t.clientY;
@@ -4508,14 +3358,13 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
        _recordThrowPos(tAttractor);
     } else if(tShape){
       const wp=s2w(t.clientX,t.clientY);
-      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05){tMoved=true;if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}}}
+      if(tPrevWP){const dx=wp.x-tPrevWP.x,dy=wp.y-tPrevWP.y;if(Math.sqrt(dx*dx+dy*dy)>0.05)tMoved=true;}
       tShape.pos.set(wp.x-tOff.x,wp.y-tOff.y,0);
       if(tPrevWP)tShape.vel.set((wp.x-tPrevWP.x)*2.5,(wp.y-tPrevWP.y)*2.5,0);
       tPrevWP=wp.clone();
     }
   },{passive:false});
   renderer.domElement.addEventListener('touchend',e=>{
-    if(e.changedTouches[0] && document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY)?.closest('.orb-widget')) return;
     e.preventDefault();
     if(wormhole.active && wormhole.dragging) {
       wormhole.dragging=false; return;
@@ -4523,22 +3372,14 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
     if(tAttractor){
       if(tAttractor._bouncingBH) {
         _applyThrow(tAttractor);
+        // No rest reset — bouncing BH is free-flying
       } else {
-        if(tAttractor._isProjectOrb) {
-          const moved=Math.sqrt((tAttractor.pos.x-tAttractor.rest.x)**2+(tAttractor.pos.y-tAttractor.rest.y)**2);
-          if(moved<0.25) {
-            const sc=tAttractor.pos.clone().project(camera);
-            const sx=(sc.x+1)/2*W,sy=(-sc.y+1)/2*H;
-            _showProjectCard({data:tAttractor._orbData,index:tAttractor._orbIndex},sx,sy);
-          }
-        }
         tAttractor.rest.set(tAttractor.pos.x,tAttractor.pos.y,0);
       }
       tAttractor.dragging=false;
       tAttractor=null;
       revertToTitle();
     } else if(tShape){
-      if(_lpTimer){clearTimeout(_lpTimer);_lpTimer=null;}
       if(!tMoved&&(Date.now()-tTime)<350){
         if(tShape.type==='panelstack'){
           const target=tShape._panelMorphVal<0.5?1:0;
@@ -4551,21 +3392,6 @@ document.getElementById('sl-font').addEventListener('input',e=>setFontSize(parse
       tShape.rest.set(tShape.pos.x,tShape.pos.y,0);
       tShape.dragging=false;tShape=null;tPrevWP=null;
       revertToTitle();
-    } else if(!tAttractor && !tShape) {
-      // Quick tap on empty space — check project orbs first, then supernova
-      const te = e.changedTouches[0];
-      if (te && lvl === 5 && _projectOrbs.length) {
-        let orbHit = false;
-        for(const orb of _projectOrbs) {
-          if(orb.hitTest(te.clientX, te.clientY)) {
-            _showProjectCard(orb, te.clientX, te.clientY);
-            orbHit = true; break;
-          }
-        }
-        if(orbHit) return;
-        _hideProjectCard();
-      }
-      if (te) { const wp=s2w(te.clientX,te.clientY); supernovaImpulse(wp.x,wp.y); }
     }
   },{passive:false});
 })();
@@ -4600,19 +3426,6 @@ if(togTextBtn) {
       mbTextTog.textContent = textVisibleDesktop ? 'Aa On' : 'Aa Off';
       mbTextTog.classList.toggle('on', textVisibleDesktop);
     }
-  });
-}
-
-// ── WATERFALL TOGGLE ─────────────────────────────────────────────────────────
-const togWaterfall = document.getElementById('tog-waterfall');
-if(togWaterfall) {
-  togWaterfall.addEventListener('click', () => {
-    P.waterfall = !P.waterfall;
-    togWaterfall.textContent = P.waterfall ? 'ON' : 'OFF';
-    togWaterfall.classList.toggle('on', P.waterfall);
-    _wfPhase = 0; // restart wave from peak
-    // Respawn all so lifetimes update immediately
-    for(let i=0;i<MP;i++) spawn(i);
   });
 }
 
@@ -4736,16 +3549,7 @@ function countTgts(){
   updateSpillGraph();
 }
 function updateHUD(){
-  tgts.forEach((t,i)=>{const bar=document.getElementById('bar'+i),pct=document.getElementById('pct'+i),chk=document.getElementById('chk'+i);if(!bar)return;bar.style.width=(t.fill*100).toFixed(1)+'%';if(pct)pct.textContent=Math.round(t.fill*100)+'%';if(chk)chk.classList.toggle('done',t.met);});
-  // Drive next-btn fill based on avg target progress toward threshold
-  if(!lvlDone && tgts.length>0){
-    const th=lvlThresh();
-    const avgProgress=Math.min(1,tgts.reduce((s,t)=>s+(t.fill/th),0)/tgts.length);
-    const nbf=document.getElementById('next-btn-fill');
-    if(nbf)nbf.style.width=(avgProgress*100).toFixed(1)+'%';
-    const nbl=document.getElementById('next-btn-label');
-    if(nbl)nbl.style.color=avgProgress>0.6?`rgba(${Math.round(avgProgress*10)},${Math.round(avgProgress*10)},${Math.round(avgProgress*10)},${(0.2+avgProgress*0.8).toFixed(2)})`:'';
-  }
+  tgts.forEach((t,i)=>{const bar=document.getElementById('bar'+i),pct=document.getElementById('pct'+i),chk=document.getElementById('chk'+i);if(!bar)return;bar.style.width=(t.fill*100).toFixed(1)+'%';pct.textContent=Math.round(t.fill*100)+'%';chk.classList.toggle('done',t.met);});
   // Level 5: update NS capture bars
   if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
@@ -4775,9 +3579,6 @@ function updateHUD(){
 function checkDone(){
   if(lvlDone)return;
 
-  // Level 6: zen mode — no win condition
-  if (lvl === 5) return;
-
   // Level 5: win when all 3 NS have been caught in the BH's gravity well (hit by BH)
   if (lvl === 4) {
     const nsAll = attractors.filter(a => a.type === 'neutronstar');
@@ -4799,21 +3600,12 @@ function checkDone(){
     lvlDone=true;flashEl('flash-complete');
     _lvlDone[lvl]=true;
     if(typeof updateLevelNav==='function')updateLevelNav();
-    // Snap next-btn fill to 100%
-    const _nbf=document.getElementById('next-btn-fill');
-    if(_nbf)_nbf.style.width='100%';
-    const _nbl=document.getElementById('next-btn-label');
-    if(_nbl)_nbl.style.color='#0a0a0a';
     // Show completion statement in floating text
     const completionLine = getLevelComplete(lvl);
     _buildFloatText([completionLine], false);
     _textMode = 'idle'; // lock it — don't let shape grabs override until next level
     setTimeout(()=>{
-      if(lvl<LEVELS.length-1){
-        const _nb = document.getElementById('next-btn');
-        _nb.classList.add('visible');
-        _positionNextBtn();
-      }
+      if(lvl<LEVELS.length-1)document.getElementById('next-btn').classList.add('visible');
     },600);
   }
 }
@@ -4831,54 +3623,15 @@ document.getElementById('screenshot-btn').addEventListener('click',()=>{
 });
 document.getElementById('next-btn').addEventListener('click',()=>{if(lvl<LEVELS.length-1){lvl++;initLevel(lvl);tCounts=[];for(let i=0;i<MP;i++)spawn(i);buildInit();}});
 
-// ── NEXT-BTN WORLD LIGHT ──────────────────────────────────────────────────────
-// A PointLight that hovers at the button's world position, active while visible.
-const _nextBtnLight = new THREE.PointLight(0xfff8e8, 0, 20);
-scene.add(_nextBtnLight);
-let _nextBtnHovered = false;
-
-// Track hover for light activation
-(()=>{
-  const _nb = document.getElementById('next-btn');
-  _nb.addEventListener('mouseenter', () => { _nextBtnHovered = true; });
-  _nb.addEventListener('mouseleave', () => { _nextBtnHovered = false; });
-})();
-
-function _tickNextBtnLight() {
-  const btn = document.getElementById('next-btn');
-  if (!btn || !btn.classList.contains('visible') || !_nextBtnHovered) {
-    _nextBtnLight.intensity = 0;
-    return;
-  }
-  // Unproject button centre from screen → world
-  const r = btn.getBoundingClientRect();
-  const sx = r.left + r.width  * 0.5;
-  const sy = r.top  + r.height * 0.5;
-  const nx = (sx / W) * 2 - 1;
-  const ny = -(sy / H) * 2 + 1;
-  const v = new THREE.Vector3(nx, ny, 0.5).unproject(camera);
-  const d = v.sub(camera.position).normalize();
-  // Place it at z=0 plane (same as shapes)
-  const t = -camera.position.z / d.z;
-  _nextBtnLight.position.set(
-    camera.position.x + d.x * t,
-    camera.position.y + d.y * t,
-    0
-  );
-  // Strong pulse matching shape glow rhythm
-  _nextBtnLight.intensity = 4.0 + Math.sin(Date.now() * 0.003) * 0.8;
-}
-
 // ── LEVEL NAVIGATOR ───────────────────────────────────────────────────────────
 const LVL_DESCS=[
   'raw material. unimpeded fall.',
   'first surface. redirection begins.',
   'accumulation. wait for the spill.',
   'the split. two paths, one source.',
-  'build mass. earn gravity. influence follows.',
-  'open field. the sun moves itself.',
+  'gravity unbound. lure all three stars in.',
 ];
-const _lvlDone=[false,false,false,false,false,false];
+const _lvlDone=[false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
@@ -5319,18 +4072,9 @@ function tick(){
   }
 
   resolveCollisions();
-  // Decay zen-orb gravity spike exponentially back to 0
-  if(_zenGravSpike>0.01) _zenGravSpike*=Math.pow(0.018,dt); else _zenGravSpike=0;
   shapes.forEach(s=>s.update(dt));
   if(emitterShape)emitterShape.update(dt);
   attractors.forEach(a=>a.update(dt));
-  if(_projectOrbs.length) _projectOrbs.forEach(o=>o.update(dt));
-  // Decay supernova hit flare
-  if (lvl === 4 || lvl === 5) attractors.forEach(a=>{ if(a._novaHitT>0) a._novaHitT=Math.max(0,a._novaHitT-dt*1.8); });
-
-  // Advance waterfall wave phase — one full cycle every ~3.5s
-  if(P.waterfall) _wfPhase += dt * (Math.PI * 2 / 3.5);
-
   pMat.uniforms.uSz.value=P.size;
   const N=Math.min(P.count,MP);
 
@@ -5342,35 +4086,18 @@ function tick(){
   for(let i=0;i<N;i++){
     const b=i*3;
     if(!pal[i]){spawn(i);continue;}
-    pa[i]+=dt;if(pa[i]>pl[i]){
-      if(P.waterfall){
-        // Asymmetric wave: fast attack to max, long slow decay to near-zero, repeat
-        // t = 0→1 over one cycle
-        const pOffset = (i / N) * 0.18; // small phase spread for texture
-        const t = ((_wfPhase + pOffset) % (Math.PI * 2)) / (Math.PI * 2); // 0→1
-        // Shape: pow curve gives slow decay; the (1-t)^3 drops steeply near end
-        // then wraps instantly back to 1 — fast attack, long tail
-        const wave = Math.pow(1 - t, 2.2);
-        const spawnThreshold = 0.04 + wave * 0.96;
-        if(Math.random() < spawnThreshold){ spawn(i); } else { pa[i]=0; }
-        continue;
-      }
-      spawn(i);continue;
-    }
+    pa[i]+=dt;if(pa[i]>pl[i]){spawn(i);continue;}
     
     if(applyAttractorForces(i,b,dt)) continue;
     
-    // Waterfall: each tier has its own gravity multiplier so layers fall at different speeds
-    const gravMult = P.waterfall ? (0.45 + pGravTier[i] * 0.55) : 1.0;
-    pv[b+1]-=(P.gravity+_zenGravSpike)*gravMult*dt;
+    pv[b+1]-=P.gravity*dt;
     if(P.rain){pv[b]-=pp[b]*0.4*dt;pv[b+2]-=pp[b+2]*0.3*dt;}
 
     // ── Freefall XY bias: damp z toward 0 while particle is airborne ──
-    // In waterfall mode suppress z damping so the depth layers stay spread
     const airborne=pp[b+1]>-8.0;
-    if(airborne && !P.waterfall){
-      pp[b+2]*=0.88;
-      pv[b+2]*=0.80;
+    if(airborne){
+      pp[b+2]*=0.88;   // bleed z position back toward centre plane
+      pv[b+2]*=0.80;   // damp z velocity strongly while falling
     }
 
     pp[b]+=pv[b]*dt;pp[b+1]+=pv[b+1]*dt;pp[b+2]+=pv[b+2]*dt;
@@ -5501,12 +4228,9 @@ tick();
 window.addEventListener('resize',()=>{
   W=window.innerWidth;H=window.innerHeight;
   camera.aspect=W/H;camera.updateProjectionMatrix();
-  renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));
-  ov.width=W*_dpr;ov.height=H*_dpr;
-  ovCtx.setTransform(_dpr,0,0,_dpr,0,0);
-  tc.width=W*_dpr;tc.height=H*_dpr;
-  tc.style.width=W+'px';tc.style.height=H+'px';
-  tctx.setTransform(_dpr,0,0,_dpr,0,0);
+  renderer.setSize(W,H);
+  ov.width=W;ov.height=H;
+  tc.width=W;tc.height=H;
   // apply mobile zoom
   camera.position.z=isMobile?44:28;
   // rebuild text positions for new dimensions
@@ -5596,8 +4320,139 @@ document.querySelectorAll('.widget').forEach(w => {
 
 // ── MOBILE CAMERA ZOOM ON RESIZE ─────────────────────────────────────────────
 
-setTimeout(()=>{const _h=document.getElementById('hint');if(_h)_h.style.opacity='0';},8000);
+setTimeout(()=>{document.getElementById('hint').style.opacity='0';},8000);
 
+// ── PAPER THEME ───────────────────────────────────────────────────────────────
+let isPaper = false;
+
+// White shape material settings for paper theme
+const PAPER_SHAPE = { color: 0xffffff, roughness: 0.55, metalness: 0.02 };
+const PAPER_SHAPE_SPHERE  = { color: 0xffffff, roughness: 0.15, metalness: 0.02 };
+const PAPER_SHAPE_PYRAMID = { color: 0xffffff, roughness: 0.8, metalness: 0.02 };
+const DARK_SHAPE  = { color: 0xffffff, roughness: 0.55, metalness: 0.02 };
+
+function applyTheme(paper) {
+  isPaper = paper;
+  const body = document.body;
+  body.classList.toggle('paper', paper);
+
+  // Scene background + fog
+  const bg = paper ? 0xf0ece4 : 0x0a0a0a;
+  renderer.setClearColor(bg);
+  scene.fog.color.setHex(bg);
+  // Particle scene shares fog
+
+  // Floor
+  floorM.material.color.setHex(paper ? 0xece8df : 0x050505);
+
+  // Lighting — brighten for paper, keep original for dark
+  if (paper) {
+    scene.children.filter(c=>c.isAmbientLight).forEach(l=>{ l.intensity=0.55; });
+    mainL.intensity = 2.2; mainL.color.setHex(0xfff8f0);
+    rimL.intensity  = 0.6; rimL.color.setHex(0xc8d4e0);
+    fillL.intensity = 0.2;
+  } else {
+    scene.children.filter(c=>c.isAmbientLight).forEach(l=>{ l.intensity=0.07; });
+    mainL.intensity = 3.8; mainL.color.setHex(0xfff5ee);
+    rimL.intensity  = 1.1; rimL.color.setHex(0x9aaabb);
+    fillL.intensity = 0.35;
+  }
+
+  // Shape materials
+  shapes.forEach(sh => _applyShapeMat(sh, paper));
+
+  // Particle color — dark on paper, light on dark
+  // Swap blending and fragment shader color
+  if (paper) {
+    pMat.blending = THREE.NormalBlending;
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float c=exp(-d*10.0);float s=smoothstep(0.5,0.0,d)*0.5;float a=(c+s)*(1.0-vF*0.55);gl_FragColor=vec4(0.04,0.03,0.03,a*0.72);}`;
+  } else {
+    pMat.blending = THREE.AdditiveBlending;
+    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float c=exp(-d*10.0);float s=smoothstep(0.5,0.0,d)*0.5;float a=(c+s)*(1.0-vF*0.75);gl_FragColor=vec4(1.0,0.99,0.97,a*0.82);}`;
+  }
+  pMat.needsUpdate = true;
+
+  // Text color
+  _paperTextColor = paper ? 'rgba(10,8,6,' : 'rgba(255,255,248,';
+
+  // Theme button label
+  const btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = paper ? 'DARK' : 'PAPER';
+}
+
+function _applyShapeMat(sh, paper) {
+  const def = sh.def;
+  let p;
+  if (paper) {
+    p = sh.type==='sphere' ? PAPER_SHAPE_SPHERE : sh.type==='pyramid' ? PAPER_SHAPE_PYRAMID : PAPER_SHAPE;
+  } else {
+    p = { color: def.color, roughness: def.rough, metalness: 0.02 };
+  }
+  sh.mesh.material.color.setHex(p.color);
+  sh.mesh.material.roughness = p.roughness;
+  sh.mesh.material.metalness = p.metalness;
+  sh.mesh.material.needsUpdate = true;
+  // Edge color
+  sh.mesh.children.forEach(c => {
+    if (c.material && c.material.isLineBasicMaterial) {
+      c.material.color.setHex(paper ? 0x444444 : 0x888888);
+      c.material.opacity = paper ? 0.35 : 0.22;
+      c.material.needsUpdate = true;
+    }
+  });
+}
+
+// Intercept addShape to apply paper theme to new shapes
+const _origAddShape = addShape;
+addShape = function(t){
+  _origAddShape(t);
+  if(isPaper && shapes.length > 0) _applyShapeMat(shapes[shapes.length-1], true);
+}
+
+// Text color variable
+let _paperTextColor = 'rgba(255,255,248,';
+
+// Patch drawTextLayer to use theme-aware text color
+const _origDrawTextLayer = drawTextLayer;
+drawTextLayer = function(){
+  tctx.clearRect(0,0,W,H);
+  lvlTextAlpha+=(lvlTextAlphaTgt-lvlTextAlpha)*0.04;
+  if(textChars.length===0&&lvlTextAlpha<0.01)return;
+  bX+=(mX-bX)*BLOB_LERP;bY+=(mY-bY)*BLOB_LERP;
+  tctx.textBaseline='top';
+  const globalAlpha=Math.min(1,lvlTextAlpha);
+  if(globalAlpha<0.01)return;
+  for(const p of textChars){
+    const dx=p.x-bX,dy=p.y-bY,d=Math.sqrt(dx*dx+dy*dy);
+    p.vx+=(p.restX-p.x)*TETHER_K;
+    p.vy+=(p.restY-p.y)*TETHER_K;
+    if(d<REPEL_R&&d>0.5){const f=(1-d/REPEL_R);p.vx+=(dx/d)*f*f*14;p.vy+=(dy/d)*f*f*14;}
+    p.vx*=DAMP;p.vy*=DAMP;
+    p.x+=p.vx;p.y+=p.vy;
+    const fadeS=12,fadeE=38;
+    const proximity=Math.min(1,Math.max(0,(d-fadeS)/(fadeE-fadeS)));
+    const alpha=p.baseOp*globalAlpha*(0.35+proximity*0.65);
+    if(alpha>0.01){
+      const r=p.role==='headline'?TYPO.headline:TYPO.body;
+      tctx.font=`${r.weight} ${r.size}px ${r.family}`;
+      tctx.fillStyle=_paperTextColor+alpha.toFixed(3)+')';
+      tctx.fillText(p.ch,p.x,p.y);
+    }
+  }
+  const grad=tctx.createRadialGradient(bX,bY,0,bX,bY,BLOOM_R);
+  const bc=isPaper?'10,8,6':'255,255,248';
+  grad.addColorStop(0,`rgba(${bc},0.04)`);
+  grad.addColorStop(0.4,`rgba(${bc},0.015)`);
+  grad.addColorStop(1,`rgba(${bc},0)`);
+  tctx.fillStyle=grad;
+  tctx.beginPath();tctx.arc(bX,bY,BLOOM_R,0,Math.PI*2);tctx.fill();
+  tctx.fillStyle=`rgba(${bc},0.35)`;
+  tctx.beginPath();tctx.arc(eX,eY,4,0,Math.PI*2);tctx.fill();
+  tctx.fillStyle=`rgba(${bc},0.9)`;
+  tctx.beginPath();tctx.arc(mX,mY,1.5,0,Math.PI*2);tctx.fill();
+};
+
+document.getElementById('theme-toggle').addEventListener('click', ()=>applyTheme(!isPaper));
 
 // ── FLAVOR TOGGLE EVENT LISTENERS ────────────────────────────────────────────
 
@@ -5624,310 +4479,6 @@ document.querySelectorAll('.mb-flv-tab').forEach(tab => {
 
 // Init: prime FLAVOR_TITLES into LEVEL_TITLES on load (sugar = default = already set)
 setFlavor('sugar');
-
-// ── DISCO THEME ───────────────────────────────────────────────────────────────
-// Triggered by high click intensity. Replaces emitter with a disco ball.
-// Requires another burst of high intensity to exit.
-
-const DISCO_LIGHT_COLORS = [
-  0xff2266, 0xff6600, 0xffdd00, 0x00ff88,
-  0x00ccff, 0x8844ff, 0xff44cc, 0x44ffcc,
-];
-
-function _buildDiscoBall() {
-  if (_discoBallGroup) return;
-  _discoBallGroup = new THREE.Group();
-  _discoLights = [];
-
-  if (lvl === 5) {
-    // ── Level 6: zen-orb clone that looks like a disco ball ──────────────────
-    // Identical construction to the Attractor zen orb, but with disco materials
-    // and multi-colour orbiting lights instead of the warm golden ones.
-
-    const orbRadius = 1.001;
-
-    // Mirror-chrome core (zen orb geometry, disco surface)
-    const coreGeo = new THREE.SphereGeometry(orbRadius, 64, 40);
-    const coreMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: 0.12,
-      roughness: 0.04,
-      metalness: 1.0,
-      reflectivity: 1.0,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.0,
-      transparent: true,
-      opacity: 0.97,
-    });
-    _discoMesh = new THREE.Mesh(coreGeo, coreMat);
-    _discoBallGroup.add(_discoMesh);
-
-    // Tile-edge lines over the orb — reads as mirror tiles
-    const edgeGeo = new THREE.EdgesGeometry(new THREE.SphereGeometry(orbRadius * 1.01, 16, 12), 18);
-    _discoBallGroup.add(new THREE.LineSegments(
-      edgeGeo,
-      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22 })
-    ));
-
-    // Glow corona layers — same layout as zen orb but tinted rainbow
-    const glowColors = [0xffffff, 0xff88ff, 0x88ffff, 0xffff88];
-    const glowOpacities = [0.06, 0.03, 0.015, 0.006];
-    const glowRadii = [orbRadius * 1.18, orbRadius * 1.55, orbRadius * 2.20, orbRadius * 3.60];
-    glowRadii.forEach((r, gi) => {
-      const g = new THREE.Mesh(
-        new THREE.SphereGeometry(r, 32, 20),
-        new THREE.MeshBasicMaterial({
-          color: glowColors[gi], transparent: true,
-          opacity: glowOpacities[gi], side: THREE.BackSide, depthWrite: false,
-        })
-      );
-      _discoBallGroup.add(g);
-      _discoLights.push({ _isGlow: true, mesh: g, baseOpacity: glowOpacities[gi] });
-    });
-
-    // Multi-colour orbiting point lights (the disco magic)
-    const lightCount = 6;
-    for (let i = 0; i < lightCount; i++) {
-      const color = DISCO_LIGHT_COLORS[i % DISCO_LIGHT_COLORS.length];
-      const light = new THREE.PointLight(color, 9.0, 32);
-      const angle = (i / lightCount) * Math.PI * 2;
-      light.position.set(Math.cos(angle) * 2.6, Math.sin(angle) * 0.8, Math.sin(angle) * 2.6);
-      _discoBallGroup.add(light);
-      _discoLights.push(light);
-    }
-
-    // Spawn at random world-space position with a lively kick
-    const edgeLW = s2w(0, H / 2).x;
-    const edgeRW = s2w(W, H / 2).x;
-    const margin = 2.2;
-    const spawnX = edgeLW + margin + Math.random() * Math.max(0, (edgeRW - edgeLW) - margin * 2);
-    const spawnY = 1.5 + Math.random() * 3.0;
-    _discoOrbPos.set(spawnX, spawnY, 0);
-    const ang = Math.random() * Math.PI * 2;
-    _discoOrbVel.set(
-      Math.cos(ang) * (3.5 + Math.random() * 2.5),
-      Math.sin(ang) * (2.5 + Math.random() * 2.0),
-      0
-    );
-    _discoOrbPulseT = 0;
-    _discoBallGroup.position.copy(_discoOrbPos);
-
-  } else {
-    // ── Level 5 (and all others): original fixed-top disco ball ──────────────
-    const pos = emitterShape ? emitterShape.pos.clone() : new THREE.Vector3(0, 10, 0);
-    _discoBallGroup.position.copy(pos);
-
-    const ballGeo = new THREE.SphereGeometry(1.1, 32, 24);
-    const ballMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      metalness: 1.0,
-      roughness: 0.05,
-      reflectivity: 1.0,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.0,
-      emissive: new THREE.Color(0xffffff),
-      emissiveIntensity: 0.4,
-    });
-    _discoMesh = new THREE.Mesh(ballGeo, ballMat);
-    _discoBallGroup.add(_discoMesh);
-
-    const edgeGeo = new THREE.EdgesGeometry(new THREE.SphereGeometry(1.12, 16, 12), 18);
-    _discoBallGroup.add(new THREE.LineSegments(
-      edgeGeo,
-      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })
-    ));
-
-    const lightCount = 4;
-    for (let i = 0; i < lightCount; i++) {
-      const color = DISCO_LIGHT_COLORS[i % DISCO_LIGHT_COLORS.length];
-      const light = new THREE.PointLight(color, 8.0, 28);
-      const angle = (i / lightCount) * Math.PI * 2;
-      light.position.set(Math.cos(angle) * 2.4, Math.sin(angle) * 0.6, Math.sin(angle) * 2.4);
-      _discoBallGroup.add(light);
-      _discoLights.push(light);
-    }
-
-    const ambientDiscoLight = new THREE.PointLight(0xff88ff, 2.0, 40);
-    _discoBallGroup.add(ambientDiscoLight);
-    _discoLights.push(ambientDiscoLight);
-  }
-
-  scene.add(_discoBallGroup);
-}
-
-function _destroyDiscoBall() {
-  if (!_discoBallGroup) return;
-  scene.remove(_discoBallGroup);
-  _discoBallGroup.traverse(obj => {
-    if (obj.geometry) obj.geometry.dispose();
-    if (obj.material) { if (Array.isArray(obj.material)) obj.material.forEach(m=>m.dispose()); else obj.material.dispose(); }
-  });
-  _discoBallGroup = null;
-  _discoMesh = null;
-  _discoLights = [];
-}
-
-function _tickDisco(dt) {
-  if (!_discoBallGroup || !_isDiscoMode) return;
-
-  if (lvl === 5) {
-    // ── Level 6: bouncy zen-orb-style disco ball physics ─────────────────────
-    const GRAV      = 0.55;
-    const REST      = 0.78;
-    const FRICTION  = 0.985;
-    const BOOST_V   = 0.22;
-    const BOOST_H   = 0.18;
-    const BALL_R    = 1.15;
-    const MAX_SPD   = 20;
-
-    _discoOrbVel.y -= GRAV * dt;
-    _discoOrbPos.x += _discoOrbVel.x * dt;
-    _discoOrbPos.y += _discoOrbVel.y * dt;
-
-    const edgeLW = s2w(0, H / 2).x;
-    const edgeRW = s2w(W, H / 2).x;
-    const FLOOR = -7.2, CEIL = 11.5;
-
-    if (_discoOrbPos.y - BALL_R < FLOOR) {
-      _discoOrbPos.y = FLOOR + BALL_R;
-      if (_discoOrbVel.y < 0) { _discoOrbVel.y = -_discoOrbVel.y * REST + BOOST_V; _discoOrbVel.x *= FRICTION; }
-    }
-    if (_discoOrbPos.y + BALL_R > CEIL) {
-      _discoOrbPos.y = CEIL - BALL_R;
-      if (_discoOrbVel.y > 0) _discoOrbVel.y = -_discoOrbVel.y * REST;
-    }
-    if (_discoOrbPos.x - BALL_R < edgeLW) {
-      _discoOrbPos.x = edgeLW + BALL_R;
-      if (_discoOrbVel.x < 0) _discoOrbVel.x = -_discoOrbVel.x * REST + BOOST_H;
-    }
-    if (_discoOrbPos.x + BALL_R > edgeRW) {
-      _discoOrbPos.x = edgeRW - BALL_R;
-      if (_discoOrbVel.x > 0) _discoOrbVel.x = -_discoOrbVel.x * REST - BOOST_H;
-    }
-    const spd = Math.sqrt(_discoOrbVel.x**2 + _discoOrbVel.y**2);
-    if (spd > MAX_SPD) { _discoOrbVel.x *= MAX_SPD / spd; _discoOrbVel.y *= MAX_SPD / spd; }
-
-    _discoBallGroup.position.copy(_discoOrbPos);
-
-    // Zen-orb breathing pulse
-    _discoOrbPulseT += dt;
-    const pulse  = 0.5 + Math.sin(_discoOrbPulseT * 0.9) * 0.5;
-    const pulse2 = 0.5 + Math.sin(_discoOrbPulseT * 1.4 + 1.2) * 0.5;
-
-    // Animate glow corona layers (first 4 entries in _discoLights are glow objects)
-    const glowOpacities = [0.06, 0.03, 0.015, 0.006];
-    let glowIdx = 0;
-    _discoLights.forEach(entry => {
-      if (entry._isGlow && entry.mesh) {
-        const base = glowOpacities[glowIdx] || 0.01;
-        const p = (glowIdx % 2 === 0) ? pulse : pulse2;
-        entry.mesh.material.opacity = base + p * base * 0.5;
-        glowIdx++;
-      }
-    });
-
-    // Animate orbiting coloured lights
-    _discoHue = (_discoHue + dt * 140) % 360;
-    const orbLights = _discoLights.filter(l => !l._isGlow);
-    orbLights.forEach((light, i) => {
-      const hue = (_discoHue + i * (360 / orbLights.length)) % 360;
-      light.color.setHSL(hue / 360, 1.0, 0.6);
-      const angle = _discoOrbPulseT * 1.5 + (i / orbLights.length) * Math.PI * 2;
-      const orbitR = 2.4 + Math.sin(Date.now() * 0.001 + i) * 0.5;
-      light.position.set(
-        Math.cos(angle) * orbitR,
-        Math.sin(Date.now() * 0.0008 + i * 1.1) * 1.4,
-        Math.sin(angle) * orbitR
-      );
-      light.intensity = 7.0 + pulse * 3.5;
-    });
-
-    // Core pulse — just a faint colour tint, darkness preserved
-    if (_discoMesh) {
-      _discoMesh.material.emissiveIntensity = 0.08 + pulse * 0.12;
-      _discoMesh.material.emissive.setHSL((_discoHue / 360), 0.6, 0.5);
-    }
-
-    // Gentle spin
-    _discoBallGroup.rotation.y += dt * 1.2;
-    _discoBallGroup.rotation.x += dt * 0.25;
-
-  } else {
-    // ── Level 5 and others: fixed to emitter position, original behaviour ────
-    if (emitterShape) _discoBallGroup.position.copy(emitterShape.pos);
-
-    _discoBallGroup.rotation.y += dt * 1.4;
-    _discoBallGroup.rotation.x += dt * 0.3;
-
-    _discoHue = (_discoHue + dt * 120) % 360;
-    const plainLights = _discoLights.filter(l => !l._isGlow);
-    plainLights.forEach((light, i) => {
-      if (i === plainLights.length - 1) return; // skip ambient
-      const hue = (_discoHue + i * (360 / (plainLights.length - 1))) % 360;
-      light.color.setHSL(hue / 360, 1.0, 0.6);
-      const angle = _discoBallGroup.rotation.y * 1.5 + (i / (plainLights.length - 1)) * Math.PI * 2;
-      const orbitR = 2.2 + Math.sin(Date.now() * 0.001 + i) * 0.4;
-      light.position.set(
-        Math.cos(angle) * orbitR,
-        Math.sin(Date.now() * 0.0008 + i * 1.3) * 1.2,
-        Math.sin(angle) * orbitR
-      );
-    });
-
-    if (_discoMesh) {
-      _discoMesh.material.emissiveIntensity = 0.3 + 0.25 * Math.sin(Date.now() * 0.004);
-      const pHue = (_discoHue * 2) % 360;
-      _discoMesh.material.emissive.setHSL(pHue / 360, 0.7, 0.6);
-    }
-  }
-}
-
-function _enterDisco() {
-  if (_isDiscoMode) return;
-  _isDiscoMode = true;
-  // Hide the panelstack emitter
-  if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = false;
-  _buildDiscoBall();
-  document.body.classList.add('disco');
-}
-
-function _exitDisco() {
-  if (!_isDiscoMode) return;
-  _isDiscoMode = false;
-  _destroyDiscoBall();
-  // Restore emitter (respect level 6 rule: emitter stays hidden on lvl index 5)
-  if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = (lvl !== 5);
-  document.body.classList.remove('disco');
-}
-
-// Hook into the tick loop for disco animation via the emitter update path
-const _discoTickProxy = new THREE.Object3D();
-_discoTickProxy.onBeforeRender = () => {};
-scene.add(_discoTickProxy);
-
-// Patch tick() to call _tickDisco with real dt
-const _origTickFn = window.tick;
-// Since tick is defined as a plain function (not on window in strict mode),
-// we hook via requestAnimationFrame override — simpler: just add to emitterShape.update
-// Actually cleanest: add a one-liner at the emitterShape update site by patching
-// the Shape prototype update to call _tickDisco when disco is active.
-// But safest with no prototype pollution: use a MutationObserver-free hook.
-// We already have a clean spot: override the emitterShape reference's update().
-// We do this after emitterShape is guaranteed to exist:
-setTimeout(() => {
-  if (emitterShape) {
-    const _origEmitterUpdate = emitterShape.update.bind(emitterShape);
-    emitterShape.update = function(dt) {
-      _origEmitterUpdate(dt);
-      _tickDisco(dt);
-      _tickSaltFloor(dt);
-      _tickNextBtnLight();
-      _tickParticleGlow();
-    };
-  }
-}, 200);
-
 
 </script>
 </body>
