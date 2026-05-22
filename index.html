@@ -355,7 +355,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:8px;height
   #dispenser{top:58px!important;}
   /* text, screenshot, next-btn — safe middle position to avoid overlapping UI */
   #screenshot-btn{bottom:60px!important;top:auto!important;left:12px!important;cursor:pointer;z-index:398!important; transition: transform 0.25s ease, bottom 0.25s ease;}
-  #next-btn{bottom:56px!important;top:auto!important;cursor:pointer;}
+  #next-btn{bottom:auto!important;top:calc(40% + 54px)!important;cursor:pointer;}
   #shape-count{display:none!important;}
 
   /* ── SHAPE HUD: floating draggable widget ── */
@@ -612,18 +612,9 @@ body.disco #flash-complete.on{background:rgba(255,100,255,0.04);}
     <button class="lvl-nav-btn" data-lvl="3">4</button>
     <button class="lvl-nav-btn" data-lvl="4">5</button>
     <button class="lvl-nav-btn" data-lvl="5">✦</button>
-    <button class="lvl-nav-btn" data-lvl="6">🏀</button>
   </div>
   <div id="level-nav-desc"></div>
 </div>
-
-<!-- Basketball HUD -->
-<div id="bball-hud" style="display:none;position:fixed;top:50%;right:16px;transform:translateY(-50%);z-index:300;text-align:right;pointer-events:none;">
-  <div id="bball-score" style="font-family:'Helvetica Neue',Arial,sans-serif;font-weight:900;font-size:52px;color:rgba(255,255,255,0.88);line-height:1;text-shadow:0 0 30px rgba(255,200,80,0.35);letter-spacing:-0.02em;">0</div>
-  <div style="font-family:'Courier New',monospace;font-size:8px;letter-spacing:0.28em;color:rgba(255,255,255,0.18);text-transform:uppercase;margin-top:3px;">SCORE</div>
-  <div id="bball-streak" style="font-family:'Courier New',monospace;font-size:9px;letter-spacing:0.2em;color:rgba(255,180,60,0.55);text-transform:uppercase;margin-top:4px;min-height:14px;"></div>
-</div>
-<canvas id="aim-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:160;display:none;"></canvas>
 <button id="next-btn"><div id="next-btn-fill"></div><span id="next-btn-label">NEXT LEVEL →</span></button>
 
 <div class="widget" id="spill-graph-widget">
@@ -1000,14 +991,14 @@ const LEVEL_COMPLETE = LEVEL_COMPLETE_FLAVOR.sugar;
 // All strings use backticks — you can freely use " marks anywhere in your content.
 const FLAVOR_PROSE = {
   sugar: {
-    eyebrow: `On Directed Systems`,
-    body: `In 2026, <em>the material is still gravity</em> — what changes is the surface you place in its path. A deflection is not a correction. It is a position. The designer's gesture is now <em>the angle of the thing that catches</em>. What falls is given. What <em>reaches its target</em> is intention made physical.`,
-    sig: `— on the nature of frankly and agency`,
+    eyebrow: `Past to Present`,
+    body: `from bootstrap startups to a-list agencies working with blue-chip clients on a global stage. then, suddenly covid, then a.i., and now my career is caught in a void<br><br>well, this is what I am doing in my infinite space.`,
+    sig: `— the career of a left-handed autodidact`,
   },
   salt: {
-    eyebrow: `On Influence`,
-    body: `Design is different now. It is seen as an <em>impedance</em>. Process theater costs unnecessarily — a single operator can achieve success. teamwork makes the dream work. Each discipline brings essential <em>nuance and care for craft</em>. Success today is measured not in how accurately you hit your target, but how consistently you <em>create wayward influence</em>. Be your own gravitational center.`,
-    sig: `— on aim vs. influence`,
+    eyebrow: `Today & Tomorrow`,
+    body: `i think. i make. i write. i design.`,
+    sig: `— sans hubris`,
   },
 };
 
@@ -1548,7 +1539,6 @@ const LEVELS=[
   {targets:[{x:5.5,r:3.2}],wormhole:true,wormholeX:-3.0,wormholeR:2.4,shapes:true},
   {targets:[],bouncingBlackHole:true,neutronStars:3},
   {targets:[],zenOrb:true},
-  {targets:[],basketball:true},
 ];
 let lvl=0,tgts=[],lvlDone=false,tCounts=[];
 let spillCount=0,spillSmooth=0;
@@ -1560,29 +1550,6 @@ document.addEventListener('mousedown', e=>{ if(e.button===0) _totalClickCount++;
 document.addEventListener('touchstart', ()=>{ _totalClickCount++; }, {capture:true, passive:true});
 const SPILL_IDLE_MS=4000;
 const FILL_A=0.04,FLR=-9.0;
-
-// ── BASKETBALL HOISTED DECLARATIONS ── (referenced early by initLevel/spawn/getSpout)
-var _hoopGroup=null, _rimRingGeo=null, _rimRingPoints=null, _netGeo=null, _netPoints=null, _bbBall=null;
-var _rimRingVels=null, _rimRingPts=null, _rimRingAngles=null;
-var _rimCloudA=null,_rimCloudT=null,_rimCloudSA=null,_rimCloudST=null;
-var _netPts=null,_netVel=null,_netAge=null,_netLife=null,_netSpawnAngle=0;
-var _hoopGlowMeshes=[],_hoopPointLights=[];
-var _rimRingT=0;
-var _bulletTime=false,_bulletTimeScale=1.0,_bulletTimeMouse={x:0,y:0};
-var _btLockOn=0,_btLaunchVx=0,_btLaunchVy=0;
-var _aimDrag=false,_aimStart={x:0,y:0},_aimCurrent={x:0,y:0};
-var _hoopDragging=false,_hoopDragOffX=0,_hoopDragOffY=0;
-var _hoopVelX=0,_hoopVelY=0,_prevHoopX=0,_prevHoopY=0,_hoopDragStartT=0;
-var HOOP={
-  x:3.5,y:3.8,z:-1.5,rimR:1.85,rimTube:0.075,
-  boardW:3.6,boardH:2.6,boardDepth:0.12,
-  scored:false,scoreFlash:0,totalScore:0,streak:0,
-  _lastBallY:null,_inFrontOfRim:false,_passThroughArmed:false,
-  _rimTilt:0,_rimTiltVel:0,_rimTiltRest:0,
-  _rimSpringK:18.0,_rimDamp:5.5,_rimImpulseScale:1.4,
-  // diving-board secondary oscillator — lower damping, softer spring for edge wobble
-  _dbTilt:0,_dbVel:0,_dbSpringK:7.5,_dbDamp:1.8,_dbDecay:0.0,
-};
 
 // ── ATTRACTORS (Black Hole & Neutron Star) ────────────────────────────────────
 let attractors = [];
@@ -2651,38 +2618,6 @@ function initLevel(n){
     // Spawn project orbs after a short settle delay
     setTimeout(_spawnProjectOrbs, 600);
   }
-
-  // ── Level 7 (index 6): basketball ─────────────────────────────────────────
-  const isBball = (n === 6);
-  const bbHud = document.getElementById('bball-hud');
-  if (bbHud) bbHud.style.display = isBball ? '' : 'none';
-  const aimCv = document.getElementById('aim-canvas');
-  if (aimCv) aimCv.style.display = isBball ? '' : 'none';
-  if (isBball) {
-    P.count = 8000; P.gravity = 11.0; P.spread = 0.5; P.bounce = 0.10;
-    P.size = isMobile ? 0.32 : 0.52; P.waterfall = true; _wfPhase = 0;
-    const setSl = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
-    const setVl = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-    setSl('sl-count',8000); setVl('v-count',8000);
-    setSl('sl-grav',11.0);  setVl('v-grav','11.0');
-    setSl('sl-spread',0.5); setVl('v-spread','0.50');
-    setSl('sl-size',P.size); setVl('v-size',String(P.size));
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
-    pMat.needsUpdate = true;
-    if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = false;
-    ['panel','game-hud','spill-graph-widget'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
-    _buildHoop();
-    setTimeout(() => { _spawnBall(); for(let _i=0;_i<MP;_i++) spawn(_i); }, 200);
-    _buildFloatText(['drag to aim,<br>release to shoot.<br>right-click for bullet-time.'], false);
-  } else {
-    // Leaving basketball — tear down hoop/ball/net
-    if (_hoopGroup) { scene.remove(_hoopGroup); _hoopGroup.traverse(c=>{if(c.geometry)c.geometry.dispose();if(c.material){if(Array.isArray(c.material))c.material.forEach(m=>m.dispose());else c.material.dispose();}}); _hoopGroup=null; }
-    if (_bbBall) { const _bi=attractors.indexOf(_bbBall); if(_bi>=0)attractors.splice(_bi,1); _bbBall.dispose(); _bbBall=null; }
-    if (_rimRingPoints) { scene.remove(_rimRingPoints); _rimRingGeo.dispose(); _rimRingPoints=null; _rimRingGeo=null; }
-    if (_netPoints) { scene.remove(_netPoints); _netGeo.dispose(); _netPoints=null; _netGeo=null; }
-    if (_rimRingVels && _rimRingVels._mesh) { scene.remove(_rimRingVels._mesh); _rimRingVels._geo.dispose(); _rimRingVels=null; }
-    if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = (n !== 5);
-  }
   updateLevelNav();
 }
 function buildHUD(){
@@ -3281,7 +3216,7 @@ function buildInit(){
   const isLvl4 = lvl === 3; // wormhole — has shapes
   const isLvl5 = lvl === 4; // black hole — no shapes
   const isLvl5new = lvl === 4; // bouncing BH sandbox — no shapes
-  const noShapes = isLvl5new || lvl === 5 || lvl === 6 || (isLvl4 && !LEVELS[lvl].shapes);
+  const noShapes = isLvl5new || lvl === 5 || (isLvl4 && !LEVELS[lvl].shapes);
   ['cube','sphere','pyramid'].forEach(type=>{
     const btn = document.querySelector(`.ins-btn[data-shape="${type}"]`);
     if(btn) btn.parentElement && (btn.style.display = noShapes ? 'none' : '');
@@ -3565,10 +3500,15 @@ window.addEventListener('pointermove',()=>{lastInteractTime=Date.now();hasIntera
 window.addEventListener('pointermove',e=>{if(!dDrag)return;const dx=e.clientX-(dX+dOX),dy=e.clientY-(dY+dOY);if(Math.abs(dx)>4||Math.abs(dy)>4)dMoved=true;dX=e.clientX-dOX;dY=e.clientY-dOY;const ns=dY<SNAPZONE;snapHint.classList.toggle('visible',ns);if(ns){dY=18;dX=Math.max(60,Math.min(W-60,dX));}posDsp(dX,dY);});
 window.addEventListener('pointerup',e=>{if(!dDrag)return;dDrag=false;snapHint.classList.remove('visible');if(dY<SNAPZONE){dY=18;}posDsp(Math.max(60,Math.min(W-60,dX)),dY);});
 function getSpout(){
-  // Hoop is the global emitter on all levels
-  if (_hoopGroup) return { x: HOOP.x, y: HOOP.y, z: HOOP.z };
-  // Fallback if hoop not yet built
+  // Level 6: full-viewport-width emitter from the very top of screen
+  if (lvl === 5) {
+    const topWorld = s2w(0, 0); // top-left world coord
+    const rightWorld = s2w(W, 0); // top-right world coord
+    const rx = topWorld.x + Math.random() * (rightWorld.x - topWorld.x);
+    return { x: rx, y: topWorld.y };
+  }
   if(emitterShape&&emitterShape.mesh){
+    // bottom of stack = pos.y - half total height
     const totalH=emitterShape._totalH||3.5;
     const worldY=emitterShape.pos.y - totalH*0.5;
     return {x:emitterShape.pos.x, y:worldY};
@@ -3603,44 +3543,21 @@ const pGravTier = new Float32Array(MP); // 0=slow 1=mid 2=fast
 function spawn(i){
   const b=i*3,sw=getSpout();
   if(P.waterfall){
-    // Emit from hoop rim — applies on all levels including basketball
-    if (_hoopGroup) {
-      const angle2 = Math.random() * Math.PI * 2;
-      const r2 = Math.random() * HOOP.rimR * 0.98;
-      const emitX = HOOP.x + Math.cos(angle2) * r2;
-      const emitZ = HOOP.z + Math.sin(angle2) * r2;
-      const anchorX2 = HOOP.x + HOOP.rimR;
-      const leverArm2 = anchorX2 - emitX;
-      const tiltedY2 = HOOP.y + Math.sin(HOOP._rimTilt+HOOP._dbTilt) * leverArm2;
-      pp[b]   = emitX;
-      pp[b+1] = tiltedY2 + (Math.random()-0.5)*0.06;
-      pp[b+2] = emitZ;
-      const tier2 = Math.floor(Math.random()*3);
-      const speedTiers = [2.4, 4.2, 7.8];
-      const jitterTiers = [0.5, 1.0, 2.0];
-      const spd2 = speedTiers[tier2] + Math.random()*jitterTiers[tier2];
-      const radialOut = Math.random()*0.6;
-      pv[b]   = Math.cos(angle2)*radialOut + (Math.random()-0.5)*0.35;
-      pv[b+1] = -spd2;
-      pv[b+2] = Math.sin(angle2)*radialOut + (Math.random()-0.5)*0.3;
-      pGravTier[i] = tier2;
-      ps[i]  = 0.10 + Math.random()*0.20;
-      pl[i]  = 2.8 + Math.random()*4.5;
-      pa[i]  = Math.random()*pl[i]*0.35;
-      pal[i] = 1;
-      return;
-    }
-    // Fallback waterfall (no hoop yet)
+    // Max spread — full emitter width
     pp[b]  = sw.x + (Math.random()-0.5)*P.spread;
     pp[b+1]= sw.y + Math.random()*0.3;
+    // Deep z layering: spread particles across several z planes for volumetric curtain
     pp[b+2]= (Math.random()-0.5)*2.8;
+    // Tiny lateral drift
     pv[b]  = (Math.random()-0.5)*0.03;
     pv[b+2]= (Math.random()-0.5)*0.02;
-    const tier = Math.floor(Math.random()*3);
+    // Three gravity tiers — fast core, mid spray, slow mist
+    const tier = Math.floor(Math.random()*3); // 0=mist 1=mid 2=heavy
     pGravTier[i] = tier;
     const speeds = [0.25, 0.45, 0.75];
     const jitter  = [0.08, 0.18, 0.30];
     pv[b+1]= -(speeds[tier] + Math.random()*jitter[tier]);
+    // Tiny particles — small size, long life so the scene stays dense
     ps[i]  = 0.15 + Math.random()*0.22;
     pl[i]  = 20 + Math.random()*10;
     pa[i]  = Math.random()*pl[i];
@@ -3897,20 +3814,6 @@ function supernovaImpulse(wx, wy) {
       }
       // Mark for glow flare (drawn in overlay, decayed each frame)
       a._novaHitT = 0.6;
-    }
-  }
-
-  // ── Basketball: supernova shockwave blasts the zen orb (ball) ───────────
-  if (lvl === 6 && _bbBall && !_bbBall.dragging) {
-    const bdx = _bbBall.pos.x - wx, bdy = _bbBall.pos.y - wy;
-    const bdist = Math.sqrt(bdx*bdx + bdy*bdy) || 0.001;
-    if (bdist < 16.0) {
-      const tB = 1 - bdist / 16.0;
-      const fB = 11.0 * tB * tB;
-      _bbBall.vel.x += (bdx / bdist) * fB;
-      _bbBall.vel.y += (bdy / bdist) * fB + 2.5 * tB;
-      const spd = Math.sqrt(_bbBall.vel.x**2 + _bbBall.vel.y**2);
-      if (spd > _bbBall._bbMaxSpd) { const s = _bbBall._bbMaxSpd / spd; _bbBall.vel.x *= s; _bbBall.vel.y *= s; }
     }
   }
 
@@ -4185,32 +4088,6 @@ window.addEventListener('mouseup',e=>{
 window.addEventListener('wheel',e=>{
   e.preventDefault();
   const dir=e.deltaY>0?-1:1;
-  const isBball=lvl===6&&LEVELS[6]&&LEVELS[6].basketball;
-
-  // ── Basketball level: click-hold-scroll on ball = gravity, on hoop = rim size ──
-  if(isBball&&_hoopDragging){
-    // Hoop held: scroll scales rim radius
-    const RIM_MIN=0.7,RIM_MAX=4.8,RIM_STEP=0.10;
-    const prevR=HOOP.rimR;
-    HOOP.rimR=Math.max(RIM_MIN,Math.min(RIM_MAX,HOOP.rimR+dir*RIM_STEP));
-    // Scale rimTube proportionally so the tube-to-radius ratio stays constant
-    HOOP.rimTube=0.075*(HOOP.rimR/1.85);
-    // Reposition anchor-side point lights to match new radius
-    if(_hoopPointLights.length){
-      _hoopPointLights.forEach((light,i)=>{
-        const angle=(i/_hoopPointLights.length)*Math.PI*2;
-        light.position.set(Math.cos(angle)*HOOP.rimR,0,Math.sin(angle)*HOOP.rimR);
-      });
-    }
-    return;
-  }
-
-  if(isBball&&tAttractor&&tAttractor===_bbBall){
-    // Ball held: scroll scales gravity
-    const GRAV_MIN=0.5,GRAV_MAX=28.0,GRAV_STEP=0.55;
-    _bbBall._bbGravity=Math.max(GRAV_MIN,Math.min(GRAV_MAX,(_bbBall._bbGravity||7.2)+dir*GRAV_STEP));
-    return;
-  }
 
   if(tAttractor){
     if(tAttractor.type === 'blackhole') {
@@ -5000,9 +4877,8 @@ const LVL_DESCS=[
   'the split. two paths, one source.',
   'build mass. earn gravity. influence follows.',
   'open field. the sun moves itself.',
-  'drag to aim, release to shoot.',
 ];
-const _lvlDone=[false,false,false,false,false,false,false];
+const _lvlDone=[false,false,false,false,false,false];
 
 function updateLevelNav(){
   const sub=document.getElementById('level-nav-sub');
@@ -6052,606 +5928,6 @@ setTimeout(() => {
   }
 }, 200);
 
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// BASKETBALL LEVEL (index 6) — hoop, ball, rim ring, net, scoring, aim system
-// (all vars hoisted at top of script near FLR declaration)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const RIM_RING_COUNT  = 800;
-const RIM_CLOUD_COUNT = 1200;
-const NET_COUNT       = 4200;
-
-function _buildHoop() {
-  if (_hoopGroup) {
-    scene.remove(_hoopGroup);
-    _hoopGroup.traverse(c => { if(c.geometry)c.geometry.dispose(); if(c.material){if(Array.isArray(c.material))c.material.forEach(m=>m.dispose());else c.material.dispose();} });
-  }
-  _hoopGroup = new THREE.Group();
-  _hoopGroup.position.set(HOOP.x, HOOP.y, HOOP.z);
-  scene.add(_hoopGroup);
-  const rimLight = new THREE.PointLight(0xff4400, 3.5, 10);
-  rimLight.position.set(0,0,0);
-  _hoopGroup.add(rimLight);
-  _buildRimRing();
-}
-
-function _buildRimRing() {
-  if (_rimRingPoints) { scene.remove(_rimRingPoints); _rimRingGeo.dispose(); }
-  if (_rimRingVels) { scene.remove(_rimRingVels._mesh); _rimRingVels._geo.dispose(); }
-  if (_netPoints) { scene.remove(_netPoints); _netGeo.dispose(); }
-  _hoopGlowMeshes.forEach(m=>_hoopGroup.remove(m)); _hoopPointLights.forEach(l=>_hoopGroup.remove(l));
-  _hoopGlowMeshes=[]; _hoopPointLights=[];
-  _hoopGroup.children.filter(c=>c.isLight).forEach(l=>_hoopGroup.remove(l));
-
-  const lightCount=4;
-  for(let i=0;i<lightCount;i++){
-    const angle=(i/lightCount)*Math.PI*2;
-    const light=new THREE.PointLight(0xfff8e8,12.0,60);
-    light.position.set(Math.cos(angle)*HOOP.rimR,0,Math.sin(angle)*HOOP.rimR);
-    _hoopGroup.add(light); _hoopPointLights.push(light);
-  }
-
-  _rimRingPts=new Float32Array(RIM_RING_COUNT*3);
-  _rimRingAngles=new Float32Array(RIM_RING_COUNT);
-  for(let i=0;i<RIM_RING_COUNT;i++) _rimRingAngles[i]=(i/RIM_RING_COUNT)*Math.PI*2+Math.random()*0.04;
-  _rimRingGeo=new THREE.BufferGeometry();
-  _rimRingGeo.setAttribute('position',new THREE.BufferAttribute(_rimRingPts,3));
-  const ringMat=new THREE.ShaderMaterial({
-    uniforms:{uPulse:{value:1.0}},
-    vertexShader:`uniform float uPulse;void main(){gl_PointSize=4.2*uPulse;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader:`void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*22.0);float halo=exp(-d*7.0)*0.7;float bloom=smoothstep(0.5,0.0,d)*0.5;float a=(core*1.8+halo+bloom)*0.95;vec3 col=mix(vec3(1.0,0.92,0.72),vec3(1.0,0.98,0.95),core);gl_FragColor=vec4(col,a);}`,
-    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-  });
-  _rimRingPoints=new THREE.Points(_rimRingGeo,ringMat);
-  scene.add(_rimRingPoints);
-
-  const TUBE_R=0.22;
-  _rimCloudA=new Float32Array(RIM_CLOUD_COUNT); _rimCloudT=new Float32Array(RIM_CLOUD_COUNT);
-  _rimCloudSA=new Float32Array(RIM_CLOUD_COUNT); _rimCloudST=new Float32Array(RIM_CLOUD_COUNT);
-  const cloudPts=new Float32Array(RIM_CLOUD_COUNT*3);
-  for(let i=0;i<RIM_CLOUD_COUNT;i++){
-    _rimCloudA[i]=Math.random()*Math.PI*2; _rimCloudT[i]=Math.random()*Math.PI*2;
-    _rimCloudSA[i]=(1.6+Math.random()*1.8)*(Math.random()>0.5?1:-1);
-    _rimCloudST[i]=(3.0+Math.random()*4.0)*(Math.random()>0.5?1:-1);
-    const a=_rimCloudA[i],t=_rimCloudT[i];
-    const cx=HOOP.x+Math.cos(a)*HOOP.rimR,cz=HOOP.z+Math.sin(a)*HOOP.rimR;
-    const r=TUBE_R*(0.3+Math.random()*0.7);
-    cloudPts[i*3]=cx+Math.cos(a)*Math.cos(t)*r; cloudPts[i*3+1]=HOOP.y+Math.sin(t)*r; cloudPts[i*3+2]=cz+Math.sin(a)*Math.cos(t)*r;
-  }
-  const cloudGeo=new THREE.BufferGeometry();
-  cloudGeo.setAttribute('position',new THREE.BufferAttribute(cloudPts,3));
-  const cloudMat=new THREE.ShaderMaterial({
-    vertexShader:`void main(){gl_PointSize=2.6;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader:`void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*16.0);float halo=exp(-d*5.5)*0.5;float a=(core+halo)*0.78;vec3 col=mix(vec3(1.0,0.88,0.55),vec3(1.0,0.97,0.88),core);gl_FragColor=vec4(col,a);}`,
-    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-  });
-  const cloudPoints=new THREE.Points(cloudGeo,cloudMat);
-  scene.add(cloudPoints);
-  _rimRingVels={_mesh:cloudPoints,_geo:cloudGeo,_pts:cloudPts,_TUBE_R:TUBE_R};
-
-  // ── NET: particles fall from rim all the way to ground (FLR = -9.0) ────────
-  _netPts=new Float32Array(NET_COUNT*3); _netVel=new Float32Array(NET_COUNT*3);
-  _netAge=new Float32Array(NET_COUNT); _netLife=new Float32Array(NET_COUNT);
-  for(let i=0;i<NET_COUNT;i++){ _spawnNetParticle(i); _netAge[i]=Math.random()*_netLife[i]; }
-  _netGeo=new THREE.BufferGeometry();
-  _netGeo.setAttribute('position',new THREE.BufferAttribute(_netPts,3));
-  const netMat=new THREE.ShaderMaterial({
-    vertexShader:`void main(){gl_PointSize=3.2;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader:`void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*14.0);float halo=exp(-d*5.0)*0.55;float a=(core*1.6+halo)*0.88;vec3 col=mix(vec3(1.0,0.96,0.88),vec3(1.0,1.0,1.0),core);gl_FragColor=vec4(col,a);}`,
-    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
-  });
-  _netPoints=new THREE.Points(_netGeo,netMat);
-  scene.add(_netPoints);
-}
-
-function _spawnNetParticle(i) {
-  const b=i*3;
-  const angle=Math.random()*Math.PI*2;
-  const rFrac=0.25+Math.random()*0.75;
-  const spawnR=HOOP.rimR*rFrac;
-  const anchorX=HOOP.x+HOOP.rimR;
-  const spawnX=HOOP.x+Math.cos(angle)*spawnR;
-  const spawnZ=HOOP.z+Math.sin(angle)*spawnR;
-  const leverArm=anchorX-spawnX;
-  const spawnY=HOOP.y+Math.sin(HOOP._rimTilt+HOOP._dbTilt)*leverArm-0.04;
-  _netPts[b]=spawnX; _netPts[b+1]=spawnY; _netPts[b+2]=spawnZ;
-  const inwardFrac=rFrac*0.4;
-  const inwardSpd=inwardFrac*(0.8+Math.random()*0.7);
-  const tier=Math.floor(Math.random()*3);
-  const tierSpeeds=[0.6,1.3,2.4];
-  const downSpd=tierSpeeds[tier]+Math.random()*0.6;
-  _netVel[b]=-Math.cos(angle)*inwardSpd+(Math.random()-0.5)*0.1;
-  _netVel[b+1]=-downSpd;
-  _netVel[b+2]=-Math.sin(angle)*inwardSpd+(Math.random()-0.5)*0.08;
-  // Lifetime: long enough for particles to reach FLR (-9.0) from hoop (~3.8)
-  // Drop = ~12.8 units, slowest tier speed ~0.6+grav — use ~4s max life
-  const lifetimes=[3.8,2.2,1.0];
-  _netLife[i]=lifetimes[tier]+Math.random()*1.2;
-  _netAge[i]=0;
-}
-
-function _tickRimRing(dt) {
-  if(!_rimRingPts||!_rimRingPoints) return;
-  _rimRingT+=dt;
-  const ORBIT_SPEED=1.8;
-  const pulse=1.0+Math.sin(_rimRingT*2.1)*0.08;
-  if(_rimRingPoints.material.uniforms) _rimRingPoints.material.uniforms.uPulse.value=pulse;
-  const anchorX=HOOP.x+HOOP.rimR;
-  const combinedTiltVis=HOOP._rimTilt+HOOP._dbTilt;
-
-  for(let i=0;i<RIM_RING_COUNT;i++){
-    _rimRingAngles[i]+=ORBIT_SPEED*dt*(1.0+(i%11)*0.003);
-    const angle=_rimRingAngles[i];
-    const jR=Math.sin(_rimRingT*2.8+i*0.41)*0.04;
-    const jY=Math.sin(_rimRingT*2.3+i*0.57)*0.04;
-    const r=HOOP.rimR+jR;
-    const rx=HOOP.x+Math.cos(angle)*r;
-    const rz=HOOP.z+Math.sin(angle)*r;
-    const leverArm=anchorX-rx;
-    const tiltY=Math.sin(combinedTiltVis)*leverArm;
-    _rimRingPts[i*3]=rx; _rimRingPts[i*3+1]=HOOP.y+tiltY+jY; _rimRingPts[i*3+2]=rz;
-  }
-  _rimRingGeo.attributes.position.needsUpdate=true;
-
-  if(_rimRingVels&&_rimRingVels._pts){
-    const cv=_rimRingVels, TUBE_R=cv._TUBE_R;
-    for(let i=0;i<RIM_CLOUD_COUNT;i++){
-      _rimCloudA[i]+=_rimCloudSA[i]*dt; _rimCloudT[i]+=_rimCloudST[i]*dt;
-      const a=_rimCloudA[i],t=_rimCloudT[i];
-      const cx=HOOP.x+Math.cos(a)*HOOP.rimR, cz=HOOP.z+Math.sin(a)*HOOP.rimR;
-      const leverArm=anchorX-cx;
-      const cy=HOOP.y+Math.sin(combinedTiltVis)*leverArm;
-      const nr=Math.cos(t)*TUBE_R, ny=Math.sin(t)*TUBE_R;
-      cv._pts[i*3]=cx+Math.cos(a)*nr; cv._pts[i*3+1]=cy+ny; cv._pts[i*3+2]=cz+Math.sin(a)*nr;
-    }
-    cv._geo.attributes.position.needsUpdate=true;
-  }
-
-  // ── Net: fall to ground, react with FLR, settle/splash ──────────────────────
-  if(_netPts&&_netPoints){
-    const NET_GRAV_BASE=8.0;
-    const CONE_FORCE=3.8;
-    const NET_DAMPEN=0.94;
-    const NET_BOTTOM=FLR+0.05; // ground level — particles react here
-
-    for(let i=0;i<NET_COUNT;i++){
-      _netAge[i]+=dt;
-      if(_netAge[i]>=_netLife[i]){ _spawnNetParticle(i); continue; }
-      const b=i*3;
-      const gravMults=[0.32,0.75,2.2];
-      const tierIdx=i%3;
-      _netVel[b+1]-=NET_GRAV_BASE*gravMults[tierIdx]*dt;
-
-      // Inward cone force — tapers net shape, only applies above ground
-      const depthBelow=HOOP.y-_netPts[b+1];
-      if(depthBelow>0&&_netPts[b+1]>NET_BOTTOM){
-        const NET_DEPTH=HOOP.y-FLR; // full floor-to-hoop distance
-        const coneT=Math.min(1.0,depthBelow/NET_DEPTH);
-        const toCX=HOOP.x-_netPts[b], toCZ=HOOP.z-_netPts[b+2];
-        const toDist=Math.sqrt(toCX*toCX+toCZ*toCZ)+0.001;
-        const inF=CONE_FORCE*coneT*coneT;
-        _netVel[b]+=(toCX/toDist)*inF*dt;
-        _netVel[b+2]+=(toCZ/toDist)*inF*dt;
-      }
-
-      _netVel[b]*=NET_DAMPEN; _netVel[b+1]*=NET_DAMPEN; _netVel[b+2]*=NET_DAMPEN;
-      _netPts[b]+=_netVel[b]*dt; _netPts[b+1]+=_netVel[b+1]*dt; _netPts[b+2]+=_netVel[b+2]*dt;
-
-      // Ground reaction — bounce/settle like scene particles
-      if(_netPts[b+1]<NET_BOTTOM){
-        _netPts[b+1]=NET_BOTTOM;
-        const vy=_netVel[b+1];
-        const COR=P.bounce*Math.max(0.05,1.0-Math.abs(vy)*0.09);
-        if(vy<0){ _netVel[b+1]=-vy*COR; }
-        _netVel[b]*=0.55; _netVel[b+2]*=0.55;
-      }
-    }
-    _netGeo.attributes.position.needsUpdate=true;
-  }
-
-  const lightCount=_hoopPointLights.length;
-  _hoopPointLights.forEach((light,i)=>{
-    const angle=_rimRingT*1.1+(i/lightCount)*Math.PI*2;
-    light.position.set(Math.cos(angle)*HOOP.rimR,Math.sin(_rimRingT*0.7+i)*0.3,Math.sin(angle)*HOOP.rimR);
-    light.intensity=1.0+pulse*5.0;
-  });
-}
-
-const BALL_SPAWN={x:-4.5,y:-2.0,z:0};
-
-function _spawnBall(){
-  if(_bbBall){_bbBall.dispose();const _bi=attractors.indexOf(_bbBall);if(_bi>=0)attractors.splice(_bi,1);}
-  const pos=new THREE.Vector3(BALL_SPAWN.x,BALL_SPAWN.y,0);
-  const ball=new Attractor('blackhole',pos,true);
-  ball._bouncingBH=true; ball._isBBall=true;
-  ball.radius=0.72; ball.consumeRadius=0.001; ball.pullStrength=32.0;
-  ball.vel.set(0,-0.4,0);
-  ball._bbGravity=7.2; ball._bbRestitution=0.62; ball._bbFriction=0.985; ball._bbMaxSpd=32;
-  attractors.push(ball); _bbBall=ball;
-  HOOP._lastBallY=null; HOOP._passThroughArmed=false;
-  HOOP._dbTilt=0; HOOP._dbVel=0;
-}
-
-function _tickBBall(dt){
-  if(!_bbBall||_bbBall.dragging) return;
-  const b=_bbBall;
-  const GRAV=b._bbGravity||7.2;
-  b.vel.y-=GRAV*dt; b.pos.x+=b.vel.x*dt; b.pos.y+=b.vel.y*dt;
-
-  // ── Primary rim spring (stiff, well-damped — keeps rim roughly level) ──────
-  const rimTiltSpring=-HOOP._rimSpringK*HOOP._rimTilt;
-  const rimTiltDamp=-HOOP._rimDamp*HOOP._rimTiltVel;
-  HOOP._rimTiltVel+=(rimTiltSpring+rimTiltDamp)*dt;
-  HOOP._rimTilt+=HOOP._rimTiltVel*dt;
-  HOOP._rimTilt=Math.max(-0.32,Math.min(0.32,HOOP._rimTilt));
-
-  // ── Diving-board secondary oscillator (soft spring, low damping = wobble) ──
-  const dbSpring=-HOOP._dbSpringK*HOOP._dbTilt;
-  const dbDamp=-HOOP._dbDamp*HOOP._dbVel;
-  HOOP._dbVel+=(dbSpring+dbDamp)*dt;
-  HOOP._dbTilt+=HOOP._dbVel*dt;
-  HOOP._dbTilt=Math.max(-0.38,Math.min(0.38,HOOP._dbTilt));
-
-  const rimCX=HOOP.x,rimCZ=HOOP.z;
-  const rdx=b.pos.x-rimCX,rdz=(b.pos.z||0)-rimCZ;
-  const radDist=Math.sqrt(rdx*rdx+rdz*rdz);
-  const ballR=b.radius*Math.sqrt(b.pullStrength/57.0)*0.7;
-
-  if(radDist>0.001){
-    const closestRingX=rimCX+(rdx/radDist)*HOOP.rimR;
-    const closestRingZ=rimCZ+(rdz/radDist)*HOOP.rimR;
-    const anchorX=HOOP.x+HOOP.rimR;
-    const rimOffsetFromAnchor=anchorX-closestRingX;
-    // Combined tilt: primary + diving-board oscillator
-    const combinedTilt=HOOP._rimTilt+HOOP._dbTilt;
-    const tiltedRingY=HOOP.y+Math.sin(combinedTilt)*rimOffsetFromAnchor;
-    const toX=b.pos.x-closestRingX,toY=b.pos.y-tiltedRingY,toZ=(b.pos.z||0)-closestRingZ;
-    const toRimDist=Math.sqrt(toX*toX+toY*toY+toZ*toZ);
-    const minDist=HOOP.rimTube+ballR;
-    if(toRimDist<minDist&&toRimDist>0.001){
-      const nx=toX/toRimDist,ny=toY/toRimDist,nz=toZ/toRimDist;
-      const pen=minDist-toRimDist;
-      b.pos.x+=nx*pen*1.1; b.pos.y+=ny*pen*1.1;
-      if(b.pos.z!==undefined) b.pos.z+=nz*pen*1.1;
-      const vDotN=b.vel.x*nx+b.vel.y*ny+(b.vel.z||0)*nz;
-      if(vDotN<0){
-        // leverFrac: 0 = right edge (anchor), 1 = left edge (free end)
-        const leverFrac=Math.max(0,rimOffsetFromAnchor)/(HOOP.rimR*2);
-        const REST_RIM=0.55+leverFrac*0.32;
-        b.vel.x-=(1+REST_RIM)*vDotN*nx; b.vel.y-=(1+REST_RIM)*vDotN*ny;
-        if(b.vel.z!==undefined) b.vel.z-=(1+REST_RIM)*vDotN*nz;
-        b.vel.x*=0.85+leverFrac*0.08; b.vel.y*=0.85+leverFrac*0.08;
-        const impactSpeed=Math.abs(vDotN);
-
-        // ── Directional diving-board edge detection ──────────────────────────
-        // leverFrac near 1 = left (free) edge; leverFrac near 0 = right (anchor) edge
-        const leftEdgeFrac =Math.max(0,(leverFrac-0.52)/0.48);  // ramps 0→1 across left half
-        const rightEdgeFrac=Math.max(0,((1.0-leverFrac)-0.52)/0.48); // ramps 0→1 across right half
-
-        if(leftEdgeFrac>0.02){
-          // Left edge hit: free end dips down, then oscillates back up — like a springboard
-          // Downward component of impact drives the tip; ball bouncing inward adds lateral kick
-          const downImpact=Math.max(0,-ny)*impactSpeed;
-          const dbImpulse=(downImpact*2.0)*leftEdgeFrac*2.8;
-          HOOP._dbVel+=dbImpulse;   // positive = left side dips (leverArm is max here)
-          HOOP._rimTiltVel+=downImpact*leftEdgeFrac*HOOP._rimImpulseScale*0.5;
-        }
-
-        if(rightEdgeFrac>0.02){
-          // Right edge hit: anchor-side dips — free left end kicks upward then wobbles down
-          const downImpact=Math.max(0,-ny)*impactSpeed;
-          const dbImpulse=downImpact*rightEdgeFrac*1.6;
-          HOOP._dbVel-=dbImpulse;   // negative = right side dips, left end rises first
-          HOOP._rimTiltVel-=downImpact*rightEdgeFrac*HOOP._rimImpulseScale*0.35;
-        }
-
-        HOOP.scoreFlash=Math.max(HOOP.scoreFlash,0.22+leverFrac*0.18);
-      }
-    }
-  }
-
-  const edgeL2=s2w(0,H/2).x-1.5, edgeR2=s2w(W,H/2).x+1.5;
-  const BY_FLOOR=FLR+ballR+0.05; // ball rests on FLR ground
-  const BY_CEIL=22.0;
-  if(b.pos.y-ballR<BY_FLOOR){
-    b.pos.y=BY_FLOOR+ballR;
-    if(b.vel.y<0){ b.vel.y=-b.vel.y*(b._bbRestitution||0.62); b.vel.x*=b._bbFriction||0.985; }
-  }
-  if(b.pos.y+ballR>BY_CEIL){ b.pos.y=BY_CEIL-ballR; if(b.vel.y>0) b.vel.y=-b.vel.y*0.5; }
-  if(b.pos.x-ballR<edgeL2){ b.pos.x=edgeL2+ballR; if(b.vel.x<0) b.vel.x=-b.vel.x*0.72; }
-  if(b.pos.x+ballR>edgeR2){ b.pos.x=edgeR2-ballR; if(b.vel.x>0) b.vel.x=-b.vel.x*0.72; }
-
-  const spd=Math.sqrt(b.vel.x**2+b.vel.y**2);
-  if(spd>(b._bbMaxSpd||24)){const s=b._bbMaxSpd/spd;b.vel.x*=s;b.vel.y*=s;}
-
-  const rimXZDist=Math.sqrt((b.pos.x-HOOP.x)**2+((b.pos.z||0)-HOOP.z)**2);
-  const ballAboveRim=b.pos.y>HOOP.y+ballR+0.05;
-  const ballInsideRim=rimXZDist<HOOP.rimR*0.88;
-  const ballBelowRim=b.pos.y<HOOP.y-0.12;
-  if(!HOOP._passThroughArmed&&ballAboveRim&&ballInsideRim) HOOP._passThroughArmed=true;
-  if(HOOP._passThroughArmed&&ballBelowRim&&ballInsideRim&&b.vel.y<0){ HOOP._passThroughArmed=false; _registerScore(); }
-  if(HOOP._passThroughArmed&&!ballInsideRim) HOOP._passThroughArmed=false;
-
-  b.mesh.position.set(b.pos.x,b.pos.y,b.pos.z||0);
-  b.mesh.updateMatrixWorld(true);
-}
-
-function _registerScore(){
-  HOOP.totalScore++; HOOP.streak++; HOOP.scoreFlash=1.0; HOOP.scored=true;
-  setTimeout(()=>{HOOP.scored=false;},2200);
-  const sc=document.getElementById('bball-score'); if(sc) sc.textContent=HOOP.totalScore;
-  const st=document.getElementById('bball-streak');
-  if(st){ if(HOOP.streak>=3) st.textContent=HOOP.streak+'x STREAK'; else if(HOOP.streak>=2) st.textContent='× '+HOOP.streak; else st.textContent=''; }
-  _buildFloatText([`+${HOOP.totalScore} — ${HOOP.streak>1?HOOP.streak+'x streak':'good shot'}`],true);
-  if(_hoopGroup){ const rimL=_hoopGroup.children.find(c=>c.isLight); if(rimL){rimL.intensity=6.0;setTimeout(()=>{rimL.intensity=1.2;},400);} }
-  HOOP._rimTiltVel+=0.6*(Math.random()>0.5?1:-1);
-  _scoreBurst();
-}
-
-function _scoreBurst(){
-  const N=Math.min(P.count,MP); let count=0; const BURST=320;
-  for(let i=0;i<N&&count<BURST;i++){
-    if(!pal[i]||pa[i]>pl[i]*0.6){
-      const b=i*3;
-      const angle=Math.random()*Math.PI*2;
-      const rimR=HOOP.rimR*(0.3+Math.random()*0.9);
-      pp[b]=HOOP.x+Math.cos(angle)*rimR; pp[b+1]=HOOP.y+(Math.random()-0.1)*0.4; pp[b+2]=HOOP.z+Math.sin(angle)*rimR;
-      const speed=4.0+Math.random()*9.0, upBias=0.4+Math.random()*1.8;
-      pv[b]=Math.cos(angle)*speed*(0.6+Math.random()*0.8); pv[b+1]=upBias*speed*0.55; pv[b+2]=Math.sin(angle)*speed*(0.6+Math.random()*0.8);
-      ps[i]=0.14+Math.random()*0.28; pl[i]=1.4+Math.random()*1.8; pa[i]=0; pal[i]=1; pGravTier[i]=Math.floor(Math.random()*3); count++;
-    }
-  }
-}
-
-// ── AIM & THROW SYSTEM ────────────────────────────────────────────────────────
-// _aimDrag vars hoisted at top
-function _getAimCanvas(){ return document.getElementById('aim-canvas'); }
-
-function _drawAim(){
-  const ac=_getAimCanvas(); if(!ac) return;
-  const dpr=window.devicePixelRatio||1;
-  if(ac.width!==W*dpr){ac.width=W*dpr;ac.height=H*dpr;}
-  const ctx=ac.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
-  if(!_aimDrag||!_bbBall) return;
-  const bsc=_bbBall.pos.clone().project(camera);
-  const bsx=(bsc.x+1)/2*W, bsy=(-bsc.y+1)/2*H;
-  const dx=_aimStart.x-_aimCurrent.x, dy=_aimStart.y-_aimCurrent.y;
-  const dist=Math.sqrt(dx*dx+dy*dy), maxDrag=200, power=Math.min(dist/maxDrag,1.0);
-  const STEPS=48, vx0=dx/maxDrag*30, vy0=-dy/maxDrag*30, GRAV_SIM=7.2;
-  ctx.save(); ctx.strokeStyle=`rgba(255,220,80,${0.22+power*0.55})`; ctx.lineWidth=1.5; ctx.setLineDash([4,6]); ctx.beginPath();
-  let px=_bbBall.pos.x,py=_bbBall.pos.y,pvx=vx0,pvy=vy0,first=true;
-  for(let s=0;s<STEPS;s++){
-    const simDt=0.075; pvy-=GRAV_SIM*simDt; px+=pvx*simDt; py+=pvy*simDt;
-    const psc=new THREE.Vector3(px,py,0).project(camera);
-    const psx=(psc.x+1)/2*W, psy=(-psc.y+1)/2*H;
-    if(first){ctx.moveTo(psx,psy);first=false;}else ctx.lineTo(psx,psy);
-  }
-  ctx.stroke(); ctx.setLineDash([]);
-  const powerR=10+power*22;
-  ctx.beginPath(); ctx.arc(bsx,bsy,powerR,-Math.PI/2,-Math.PI/2+power*Math.PI*2);
-  ctx.strokeStyle=`rgba(255,200,60,${0.4+power*0.5})`; ctx.lineWidth=2; ctx.stroke();
-  ctx.restore();
-}
-
-// ── BULLET TIME ───────────────────────────────────────────────────────────────
-function _btComputeArc(){
-  if(!_bulletTime||!_bbBall) return false;
-  const GRAV_SIM=7.2, MAX_V=30;
-  const mw=s2w(_bulletTimeMouse.x,_bulletTimeMouse.y);
-  const dx=mw.x-_bbBall.pos.x, dy=mw.y-_bbBall.pos.y;
-  const dist=Math.sqrt(dx*dx+dy*dy);
-  const tFlight=Math.max(0.4,Math.min(2.4,dist/8.0));
-  let vx=dx/tFlight, vy=dy/tFlight+0.5*GRAV_SIM*tFlight;
-  const mag=Math.sqrt(vx*vx+vy*vy);
-  if(mag>MAX_V){vx*=MAX_V/mag;vy*=MAX_V/mag;}
-  _btLaunchVx=vx; _btLaunchVy=vy;
-  const STEPS=60, simDt=tFlight/STEPS;
-  let px=_bbBall.pos.x,py=_bbBall.pos.y,pvx=vx,pvy=vy,minHoopDist=Infinity;
-  const arcPts=[];
-  for(let s=0;s<STEPS;s++){
-    pvy-=GRAV_SIM*simDt; px+=pvx*simDt; py+=pvy*simDt;
-    const psc=new THREE.Vector3(px,py,0).project(camera);
-    arcPts.push({sx:(psc.x+1)/2*W,sy:(-psc.y+1)/2*H,wx:px,wy:py});
-    const hd=Math.sqrt((px-HOOP.x)**2+(py-HOOP.y)**2);
-    if(hd<minHoopDist) minHoopDist=hd;
-  }
-  const targetLockOn=minHoopDist<HOOP.rimR*1.1?1.0:0.0;
-  _btLockOn+=(targetLockOn-_btLockOn)*0.18;
-  return{arcPts,tFlight,vx,vy};
-}
-
-function _drawBulletTimeOverlay(){
-  if(!_bulletTime||!_bbBall) return;
-  const ac=_getAimCanvas(); if(!ac) return;
-  const dpr=window.devicePixelRatio||1;
-  if(ac.width!==W*dpr){ac.width=W*dpr;ac.height=H*dpr;}
-  const ctx=ac.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,W,H);
-  const vg=ctx.createRadialGradient(W/2,H/2,W*0.2,W/2,H/2,W*0.78);
-  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,`rgba(0,0,0,0.28)`);
-  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
-  const arc=_btComputeArc(); if(!arc) return;
-  const{arcPts,tFlight}=arc, n=arcPts.length;
-  const bsc=_bbBall.pos.clone().project(camera);
-  const bsx=(bsc.x+1)/2*W,bsy=(-bsc.y+1)/2*H;
-  const hsc=new THREE.Vector3(HOOP.x,HOOP.y,HOOP.z).project(camera);
-  const hsx=(hsc.x+1)/2*W,hsy=(-hsc.y+1)/2*H;
-  const locked=_btLockOn;
-  const arcR=255,arcG=Math.round(180+locked*75),arcB=Math.round(40+locked*160);
-  ctx.save();
-  ctx.beginPath(); ctx.setLineDash([]); ctx.lineWidth=7+locked*5;
-  ctx.strokeStyle=`rgba(${arcR},${arcG},${arcB},${0.08+locked*0.14})`;
-  for(let s=0;s<n;s++) s===0?ctx.moveTo(arcPts[s].sx,arcPts[s].sy):ctx.lineTo(arcPts[s].sx,arcPts[s].sy);
-  ctx.stroke();
-  ctx.lineWidth=1.8+locked*0.8; ctx.setLineDash([6,5]); ctx.lineDashOffset=-(Date.now()*0.04%11);
-  for(let s=1;s<n;s++){
-    const alpha=(1-s/n)*(0.55+locked*0.45);
-    ctx.beginPath(); ctx.strokeStyle=`rgba(${arcR},${arcG},${arcB},${alpha})`;
-    ctx.moveTo(arcPts[s-1].sx,arcPts[s-1].sy); ctx.lineTo(arcPts[s].sx,arcPts[s].sy); ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  const last=arcPts[n-1];
-  ctx.beginPath(); ctx.arc(last.sx,last.sy,5+locked*3,0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${arcR},${arcG},${arcB},${0.55+locked*0.45})`; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.beginPath(); ctx.arc(bsx,bsy,12+locked*4,0,Math.PI*2);
-  ctx.strokeStyle=`rgba(255,255,230,${0.3+locked*0.25})`; ctx.lineWidth=1.5; ctx.stroke();
-  const hoopPulse=0.5+Math.sin(Date.now()*0.005)*0.5;
-  ctx.beginPath(); ctx.arc(hsx,hsy,20-locked*4,0,Math.PI*2);
-  ctx.strokeStyle=`rgba(${arcR},${arcG},${arcB},${(0.35+locked*0.55)*0.7})`; ctx.lineWidth=1.2; ctx.stroke();
-  ctx.beginPath(); ctx.arc(hsx,hsy,3+locked*3,0,Math.PI*2);
-  ctx.fillStyle=`rgba(${arcR},${arcG},${arcB},${0.35+locked*0.55})`; ctx.fill();
-  ctx.font='600 9px "Helvetica Neue",Arial,sans-serif';
-  ctx.fillStyle=`rgba(${arcR},${arcG},${arcB},${0.35+locked*0.3})`; ctx.textAlign='center';
-  ctx.fillText(locked>0.6?'LOCKED · CLICK TO FIRE':'BULLET TIME · AIM WITH MOUSE · CLICK TO FIRE · RIGHT-CLICK TO EXIT',W/2,H-24);
-  ctx.restore();
-}
-
-function _drawScoreFlash(){
-  if(HOOP.scoreFlash<=0) return;
-  HOOP.scoreFlash=Math.max(0,HOOP.scoreFlash-0.028);
-  const ac=_getAimCanvas(); if(!ac||_aimDrag) return;
-  const ctx=ac.getContext('2d'); const f=HOOP.scoreFlash;
-  const hsc=new THREE.Vector3(HOOP.x,HOOP.y,HOOP.z).project(camera);
-  const hsx=(hsc.x+1)/2*W, hsy=(-hsc.y+1)/2*H;
-  const grd=ctx.createRadialGradient(hsx,hsy,0,hsx,hsy,180*f);
-  grd.addColorStop(0,`rgba(255,180,40,${f*0.45})`);
-  grd.addColorStop(0.4,`rgba(255,120,20,${f*0.18})`);
-  grd.addColorStop(1,'rgba(255,80,0,0)');
-  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-}
-
-// ── INPUT: drag-aim (touch), bullet-time fire (click), spacebar dribble ──────
-(function _initBBallInput(){
-  const canvas=renderer.domElement;
-  function _isBBallActive(){ return LEVELS[6]&&LEVELS[6].basketball&&lvl===6&&_bbBall; }
-
-  canvas.addEventListener('mousedown',e=>{
-    if(e.button!==0||!_isBBallActive()) return;
-    if(_hoopDragging) return;
-    if(_bulletTime){
-      _bbBall.vel.x=_btLaunchVx; _bbBall.vel.y=_btLaunchVy; _bbBall._wasThrown=true; HOOP.streak=0;
-      _bulletTime=false;
-      const ac=_getAimCanvas(); if(ac) ac.getContext('2d').clearRect(0,0,ac.width,ac.height);
-      e.stopImmediatePropagation();
-    }
-  },{capture:true});
-
-  window.addEventListener('mousemove',e=>{ if(!_aimDrag) return; _aimCurrent.x=e.clientX; _aimCurrent.y=e.clientY; });
-  window.addEventListener('mouseup',e=>{
-    if(!_aimDrag||e.button!==0) return;
-    _aimDrag=false;
-    const ac=_getAimCanvas(); if(ac) ac.getContext('2d').clearRect(0,0,ac.width,ac.height);
-  });
-
-  canvas.addEventListener('touchstart',e=>{
-    if(!_isBBallActive()) return;
-    if(_hoopDragging) return;
-    if(_bulletTime){
-      _bbBall.vel.x=_btLaunchVx; _bbBall.vel.y=_btLaunchVy; _bbBall._wasThrown=true; HOOP.streak=0;
-      _bulletTime=false;
-      const ac=_getAimCanvas(); if(ac) ac.getContext('2d').clearRect(0,0,ac.width,ac.height);
-      e.stopImmediatePropagation(); return;
-    }
-    const t=e.touches[0]; _aimDrag=true;
-    _aimStart.x=t.clientX; _aimStart.y=t.clientY; _aimCurrent.x=t.clientX; _aimCurrent.y=t.clientY;
-    e.stopImmediatePropagation();
-  },{capture:true,passive:false});
-
-  canvas.addEventListener('touchmove',e=>{ if(!_aimDrag) return; _aimCurrent.x=e.touches[0].clientX; _aimCurrent.y=e.touches[0].clientY; e.preventDefault(); },{capture:true,passive:false});
-  canvas.addEventListener('touchend',e=>{
-    if(!_aimDrag) return; _aimDrag=false;
-    if(!_bbBall) return;
-    const dx=_aimStart.x-_aimCurrent.x, dy=_aimStart.y-_aimCurrent.y;
-    const dist=Math.sqrt(dx*dx+dy*dy), maxDrag=160, power=Math.min(dist/maxDrag,1.0);
-    if(power>0.03){ _bbBall.vel.x=(dx/maxDrag)*28; _bbBall.vel.y=(-dy/maxDrag)*28; }
-    e.stopImmediatePropagation();
-  },{capture:true,passive:false});
-})();
-
-window.addEventListener('keydown',e=>{
-  if(e.code!=='Space'||!_bbBall||!(LEVELS[6]&&LEVELS[6].basketball)) return;
-  e.preventDefault();
-  _bbBall.vel.y=-22; _bbBall.vel.x+=(Math.random()-0.5)*1.5; HOOP._rimTiltVel+=(Math.random()-0.3)*0.8;
-});
-
-window.addEventListener('contextmenu',e=>{
-  if(!(LEVELS[6]&&LEVELS[6].basketball&&lvl===6)) return;
-  e.preventDefault();
-  _bulletTime=!_bulletTime;
-  if(!_bulletTime){ const ac=_getAimCanvas(); if(ac){const ctx=ac.getContext('2d');ctx.clearRect(0,0,ac.width,ac.height);} }
-},true);
-
-window.addEventListener('mousemove',e=>{ _bulletTimeMouse.x=e.clientX; _bulletTimeMouse.y=e.clientY; });
-
-// ── HOOP DRAG ─────────────────────────────────────────────────────────────────
-// _hoopDragging vars hoisted at top
-
-
-function _hoopScreenPos(){ const sc=new THREE.Vector3(HOOP.x,HOOP.y,HOOP.z).project(camera); return{sx:(sc.x+1)/2*W,sy:(-sc.y+1)/2*H}; }
-function _hoopHitTest(cx,cy){
-  const{sx,sy}=_hoopScreenPos();
-  const edgeW=new THREE.Vector3(HOOP.x+HOOP.boardW*0.55,HOOP.y,HOOP.z).project(camera);
-  const edgeH=new THREE.Vector3(HOOP.x,HOOP.y+HOOP.boardH*0.55,HOOP.z).project(camera);
-  const screenHW=Math.abs((edgeW.x+1)/2*W-sx);
-  const screenHH=Math.abs((-edgeH.y+1)/2*H-sy);
-  return Math.abs(cx-sx)<Math.max(screenHW,40)&&Math.abs(cy-sy)<Math.max(screenHH,40);
-}
-renderer.domElement.addEventListener('mousedown',e=>{
-  if(e.button!==0||!_hoopGroup||_aimDrag) return;
-  if(_hoopHitTest(e.clientX,e.clientY)){
-    _hoopDragging=true; const wp=s2w(e.clientX,e.clientY);
-    _hoopDragOffX=wp.x-HOOP.x; _hoopDragOffY=wp.y-HOOP.y;
-    _hoopVelX=_hoopVelY=0; _prevHoopX=HOOP.x; _prevHoopY=HOOP.y;
-    _hoopDragStartT=performance.now(); e.stopImmediatePropagation();
-  }
-},{capture:true});
-window.addEventListener('pointermove',e=>{
-  if(!_hoopDragging||!_hoopGroup) return;
-  const wp=s2w(e.clientX,e.clientY);
-  const nx=wp.x-_hoopDragOffX, ny=wp.y-_hoopDragOffY;
-  const dt2=Math.max(0.001,(performance.now()-_hoopDragStartT)/1000);
-  _hoopVelX=(nx-_prevHoopX)/dt2; _hoopVelY=(ny-_prevHoopY)/dt2;
-  _prevHoopX=HOOP.x; _prevHoopY=HOOP.y; _hoopDragStartT=performance.now();
-  HOOP.x=nx; HOOP.y=ny; _hoopGroup.position.set(HOOP.x,HOOP.y,HOOP.z);
-});
-window.addEventListener('pointerup',e=>{ if(!_hoopDragging) return; _hoopDragging=false; });
-renderer.domElement.addEventListener('touchstart',e=>{
-  if(!_hoopGroup||_aimDrag) return;
-  const t=e.touches[0];
-  if(_hoopHitTest(t.clientX,t.clientY)){
-    _hoopDragging=true; const wp=s2w(t.clientX,t.clientY);
-    _hoopDragOffX=wp.x-HOOP.x; _hoopDragOffY=wp.y-HOOP.y;
-    _hoopVelX=_hoopVelY=0; _prevHoopX=HOOP.x; _prevHoopY=HOOP.y;
-    _hoopDragStartT=performance.now(); e.stopImmediatePropagation();
-  }
-},{capture:true,passive:false});
-renderer.domElement.addEventListener('touchmove',e=>{
-  if(!_hoopDragging) return;
-  const t=e.touches[0], wp=s2w(t.clientX,t.clientY);
-  _prevHoopX=HOOP.x; _prevHoopY=HOOP.y;
-  HOOP.x=wp.x-_hoopDragOffX; HOOP.y=wp.y-_hoopDragOffY;
-  _hoopGroup.position.set(HOOP.x,HOOP.y,HOOP.z); e.preventDefault();
-},{capture:true,passive:false});
-renderer.domElement.addEventListener('touchend',e=>{ if(_hoopDragging){_hoopDragging=false;e.stopImmediatePropagation();} },{capture:true,passive:false});
-
-// ── TICK HOOK: run basketball systems each frame via emitter update ────────────
-setTimeout(()=>{
-  if(emitterShape){
-    const _prevBBUpdate=emitterShape.update.bind(emitterShape);
-    emitterShape.update=function(dt){
-      _prevBBUpdate(dt);
-      if(LEVELS[6]&&LEVELS[6].basketball&&lvl===6){
-        const targetScale=_bulletTime?0.08:1.0;
-        _bulletTimeScale+=( targetScale-_bulletTimeScale)*Math.min(1.0,dt*6.0);
-        const scaledDt=dt*Math.max(0.07,_bulletTimeScale);
-        if(_bbBall&&!_bbBall.dragging) _tickBBall(scaledDt);
-        _tickRimRing(scaledDt);
-        if(_bulletTime){ _drawBulletTimeOverlay(); _drawScoreFlash(); }
-        else { _drawAim(); _drawScoreFlash(); }
-      }
-    };
-  }
-},400); // runs after disco patch (200ms) so we wrap it cleanly
 
 </script>
 </body>
