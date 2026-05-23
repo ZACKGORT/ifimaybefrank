@@ -1425,6 +1425,7 @@ const ovPlane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), ovMat);
 orthoScene.add(ovPlane);
 
 let _ovFrame=0;
+let _chromePhysFrame=0; // Chrome-only: sub-sample physics and overlay work
 
 // Particle Scene (rendered after shapes and targets so it sits on top)
 const particleScene = new THREE.Scene();
@@ -2320,7 +2321,8 @@ function drawBlackHoleOverlay() {
   const t = Date.now() * 0.001;
 
   // ── BH shadow casting onto shapes ───────────────────────────────────────────
-  // For each black hole, project a soft shadow ellipse onto each shape below it
+  // Skipped on Chrome — most expensive part of this function (O(BH×shapes) gradients)
+  if (!isChrome) {
   attractors.forEach(bh => {
     if (bh.type !== 'blackhole') return;
     const bhC = bh.pos.clone().project(camera);
@@ -2363,6 +2365,7 @@ function drawBlackHoleOverlay() {
       ovCtx.restore();
     });
   });
+  } // end !isChrome shadow block
 
   attractors.forEach(bh => {
     const c = bh.pos.clone().project(camera);
@@ -2390,57 +2393,73 @@ function drawBlackHoleOverlay() {
     if (bh.type === 'blackhole') {
       if (bh._zenOrb) {
         // Warm luminous glow halos — golden star
-        [
-          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
-          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
-          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
-        ].forEach(({ r, a, col }) => {
+        // Chrome: single halo; others: full 3-layer stack
+        const zenHalos = isChrome
+          ? [{ r: coreR * 2.8, a: 0.05, col: '255,220,120' }]
+          : [
+              { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
+              { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
+              { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
+            ];
+        zenHalos.forEach(({ r, a, col }) => {
           const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
           g.addColorStop(0, `rgba(${col},${a})`);
           g.addColorStop(1, `rgba(${col},0)`);
           ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
           ovCtx.fillStyle = g; ovCtx.fill();
         });
-        // Animated shimmer ring
-        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
-        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
-        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
-        ovCtx.lineWidth = 1; ovCtx.stroke();
-        ovCtx.setLineDash([]);
-        ovCtx.font = '8px Courier New';
-        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
-        ovCtx.textAlign = 'center';
-        ovCtx.fillText('ZEN ORB', sx, sy + coreR + 14);
+        // Animated shimmer ring — skip on Chrome
+        if (!isChrome) {
+          ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
+          ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
+          ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
+          ovCtx.lineWidth = 1; ovCtx.stroke();
+          ovCtx.setLineDash([]);
+          ovCtx.font = '8px Courier New';
+          ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
+          ovCtx.textAlign = 'center';
+          ovCtx.fillText('ZEN ORB', sx, sy + coreR + 14);
+        }
       } else {
-        // Sun-style warm golden halos (same as zen orb)
-        [
-          { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
-          { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
-          { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
-        ].forEach(({ r, a, col }) => {
+        // Sun-style warm golden halos
+        // Chrome: single halo; others: full 3-layer stack
+        const bhHalos = isChrome
+          ? [{ r: coreR * 2.8, a: 0.05, col: '255,220,120' }]
+          : [
+              { r: coreR * 4.5, a: 0.02, col: '255,200,80' },
+              { r: coreR * 2.8, a: 0.04, col: '255,240,140' },
+              { r: coreR * 1.4, a: 0.08, col: '255,255,220' },
+            ];
+        bhHalos.forEach(({ r, a, col }) => {
           const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
           g.addColorStop(0, `rgba(${col},${a})`);
           g.addColorStop(1, `rgba(${col},0)`);
           ovCtx.beginPath(); ovCtx.arc(sx, sy, r, 0, Math.PI * 2);
           ovCtx.fillStyle = g; ovCtx.fill();
         });
-        // Animated shimmer ring
-        ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
-        ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
-        ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
-        ovCtx.lineWidth = 1; ovCtx.stroke();
-        ovCtx.setLineDash([]);
-        ovCtx.font = '8px Courier New';
-        ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
-        ovCtx.textAlign = 'center';
-        ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
+        // Animated shimmer ring — skip on Chrome
+        if (!isChrome) {
+          ovCtx.setLineDash([3, 7]); ovCtx.lineDashOffset = -t * 5;
+          ovCtx.beginPath(); ovCtx.arc(sx, sy, coreR * 1.7, 0, Math.PI * 2);
+          ovCtx.strokeStyle = `rgba(255,240,180,0.18)`;
+          ovCtx.lineWidth = 1; ovCtx.stroke();
+          ovCtx.setLineDash([]);
+          ovCtx.font = '8px Courier New';
+          ovCtx.fillStyle = 'rgba(255,220,100,0.28)';
+          ovCtx.textAlign = 'center';
+          ovCtx.fillText('SINGULARITY', sx, sy + coreR + 14);
+        }
       }
     } else {
       // NS: cosmic blue glow, no amber shift
-      [
-        { r: coreR * 3.5, a: 0.13, col: '80,180,255' },
-        { r: coreR * 1.8, a: 0.35, col: '160,220,255' },
-      ].forEach(({ r, a, col }) => {
+      // Chrome: single halo; others: 2-layer stack
+      const nsHalos = isChrome
+        ? [{ r: coreR * 2.2, a: 0.28, col: '120,200,255' }]
+        : [
+            { r: coreR * 3.5, a: 0.13, col: '80,180,255' },
+            { r: coreR * 1.8, a: 0.35, col: '160,220,255' },
+          ];
+      nsHalos.forEach(({ r, a, col }) => {
         const g = ovCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
         g.addColorStop(0, `rgba(${col},${a})`);
         g.addColorStop(1, `rgba(${col},0)`);
@@ -5460,7 +5479,9 @@ function tick(){
     return;
   }
 
-  resolveCollisions();
+  if (isChrome) _chromePhysFrame++;
+  // Chrome: run shape collision resolution every other frame (imperceptible at this scale)
+  if (!isChrome || _chromePhysFrame % 2 === 0) resolveCollisions();
   // Decay zen-orb gravity spike exponentially back to 0
   if(_zenGravSpike>0.01) _zenGravSpike*=Math.pow(0.018,dt); else _zenGravSpike=0;
   shapes.forEach(s=>s.update(dt));
@@ -5626,8 +5647,12 @@ function tick(){
   for(let i=N;i<MP;i++){if(pal[i]){pal[i]=0;pp[i*3+1]=-9999;}}
   pGeo.attributes.position.needsUpdate=true;
 
-  countTgts();updateHUD();checkDone();
-  _ovFrame++;if(_ovFrame%2===0){ drawOverlay(); drawBlackHoleOverlay(); ovTex.needsUpdate = true; }
+  // Chrome: sample HUD every 3rd frame (drives progress bars, not physics)
+  if (!isChrome || _chromePhysFrame % 3 === 0) { countTgts(); updateHUD(); checkDone(); }
+  _ovFrame++;
+  // Chrome: draw overlay every 4th frame; others every 2nd
+  const _ovStride = isChrome ? 4 : 2;
+  if(_ovFrame % _ovStride === 0){ drawOverlay(); drawBlackHoleOverlay(); ovTex.needsUpdate = true; }
 
   // text cursor layer drawn every frame (above 3js, below widgets)
   drawTextLayer();
