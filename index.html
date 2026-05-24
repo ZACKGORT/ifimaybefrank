@@ -1277,11 +1277,17 @@ const isMobile=window.innerWidth<=600;
 const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 
 // Centralized particle limits — Chrome gets lower ceilings to recover frame rate
+// Fix perf: large Chrome desktop windows get a further area-based reduction
+// A 1920×1080 window = 2.07M px; scale count down proportionally above a 1280×720 baseline
+const _chromeDeskAreaScale = (!isMobile && isChrome)
+  ? Math.min(1.0, (1280 * 720) / (window.innerWidth * window.innerHeight))
+  : 1.0;
 const BASE_COUNT = isMobile
   ? (isChrome ? 3000 : 4000)
-  : (isChrome ? 5000 : 8000);
-const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));renderer.setClearColor(0x0a0a0a);
+  : (isChrome ? Math.round(5000 * _chromeDeskAreaScale) : 8000);
+// Fix perf: disable MSAA on Chrome desktop — expensive fill cost at large viewports; only enable on non-Chrome desktop
+const renderer=new THREE.WebGLRenderer({antialias:(!isMobile && !isChrome),preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:(isChrome?1.0:2.0)));renderer.setClearColor(0x0a0a0a);
 renderer.autoClear = false;
 document.body.appendChild(renderer.domElement);
 
@@ -1412,7 +1418,8 @@ function _tickSaltFloor(dt) {
 }
 
 // overlay canvas for targets (rendered in multi-pass WebGL)
-const _dpr = Math.min(devicePixelRatio, isMobile ? 3.0 : 2.0);
+// Fix perf: overlay canvas DPR — mobile 1.0, Chrome desktop 1.0 (matches renderer DPR cap), others 2.0
+const _dpr = Math.min(devicePixelRatio, isMobile ? 1.0 : (isChrome ? 1.0 : 2.0));
 const ov=document.createElement('canvas');
 ov.width=W*_dpr;ov.height=H*_dpr;const ovCtx=ov.getContext('2d');
 ovCtx.scale(_dpr,_dpr);
@@ -2617,7 +2624,7 @@ function initLevel(n){
     });
 
     // Default shader — keep dry-salt for this level
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.fragmentShader = (isChrome ? `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float a=(1.0-d*2.0)*(1.0-vF*0.72);gl_FragColor=vec4(0.96,0.97,0.93,a*0.88);}` : `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`);
     pMat.needsUpdate = true;
 
     // Level 5: waterfall ON by default
@@ -2629,7 +2636,7 @@ function initLevel(n){
     if (wfTog) { wfTog.textContent = 'ON'; wfTog.classList.add('on'); }
   } else {
     // Restore default dry-salt luminance shader for levels 1–4
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.fragmentShader = (isChrome ? `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float a=(1.0-d*2.0)*(1.0-vF*0.72);gl_FragColor=vec4(0.96,0.97,0.93,a*0.88);}` : `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`);
     pMat.needsUpdate = true;
 
     // Levels 1–4: waterfall OFF, hide the row
@@ -2672,7 +2679,7 @@ function initLevel(n){
     // No neutron stars on level 6
 
     // Same particle shader as level 5
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.fragmentShader = (isChrome ? `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float a=(1.0-d*2.0)*(1.0-vF*0.72);gl_FragColor=vec4(0.96,0.97,0.93,a*0.88);}` : `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`);
     pMat.needsUpdate = true;
 
     // Waterfall ON
@@ -2702,7 +2709,7 @@ function initLevel(n){
     setSl('sl-grav',11.0);  setVl('v-grav','11.0');
     setSl('sl-spread',0.5); setVl('v-spread','0.50');
     setSl('sl-size',P.size); setVl('v-size',String(P.size));
-    pMat.fragmentShader = `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`;
+    pMat.fragmentShader = (isChrome ? `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float a=(1.0-d*2.0)*(1.0-vF*0.72);gl_FragColor=vec4(0.96,0.97,0.93,a*0.88);}` : `varying float vF;void main(){vec2 uv=gl_PointCoord-0.5;float d=length(uv);if(d>0.5)discard;float core=exp(-d*28.0);float halo=exp(-d*9.0)*(1.0-exp(-d*4.0))*1.4;float bloom=smoothstep(0.5,0.0,d)*0.6;float brightness=core*1.8+halo+bloom;float a=brightness*(1.0-vF*0.72);float warmth=1.0-d*0.9;gl_FragColor=vec4(min(1.0,0.96+core*0.04),min(1.0,0.97+warmth*0.02*core),min(1.0,0.93+core*0.07),a*0.88);}`);
     pMat.needsUpdate = true;
     if (emitterShape && emitterShape.mesh) emitterShape.mesh.visible = false;
     ['panel','game-hud','spill-graph-widget'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
@@ -5668,7 +5675,7 @@ tick();
 window.addEventListener('resize',()=>{
   W=window.innerWidth;H=window.innerHeight;
   camera.aspect=W/H;camera.updateProjectionMatrix();
-  renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?3.0:2.0));
+  renderer.setSize(W,H);renderer.setPixelRatio(Math.min(devicePixelRatio,isMobile?1.5:(isChrome?1.0:2.0)));
   ov.width=W*_dpr;ov.height=H*_dpr;
   ovCtx.setTransform(_dpr,0,0,_dpr,0,0);
   tc.width=W*_dpr;tc.height=H*_dpr;
