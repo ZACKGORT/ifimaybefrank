@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>zackgort — a self-study</title>
+<title>frankly — a self-study, by zack</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -173,6 +173,7 @@
   /* ── Scroll sizer — invisible, drives document height ── */
   #scroll-sizer { visibility:hidden; pointer-events:none; position:relative; z-index:0; }
   #page { margin-left:calc(42vw + 80px); margin-right:48px; padding:0 0 200px; max-width:520px; }
+  #chapter-nav { display: none; }
   #site-header { padding:64px 0 48px; border-bottom:1px solid transparent; }
   #site-title   { font-size:11px; line-height:1; }
   #site-subtitle{ font-size:clamp(28px,5vw,48px); margin-top:10px; line-height:1.1; }
@@ -464,14 +465,15 @@
 <!-- Logo canvas — sits behind bar, rendered by JS particle system -->
 <canvas id="logo-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:298;width:100%;height:100%;"></canvas>
 
-<!-- About Widget — docks left of logo -->
+<!-- About Widget — top-left -->
 <div id="about-widget" class="fw" data-widget style="left:0;">
   <div class="fw-topbar" data-drag-handle>
     <span class="fw-title">About</span>
     <span class="fw-toggle">−</span>
   </div>
   <div class="fw-body">
-    one analytical sentence per role across twenty years of design work — philadelphia to new york to independent. a thought-experiment in holding a career all at once. cursor repels. right-click adjusts radius. the sentence is the irreducible unit.
+    one analytical sentence per role across twenty years of design work — philadelphia to new york to independent. a thought-experiment in holding a career all at once. cursor repels. right-click adjusts radius. the sentence is the irreducible unit.<br><br>
+    <a href="https://linkedin.com/in/zackgort" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg);opacity:0.55;text-decoration:none;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.55'">linkedin/in/zackgort ↗</a>
   </div>
 </div>
 
@@ -484,7 +486,7 @@
   <div class="fw-body">
     <div class="link-entry">
       <button class="link-row-btn" data-href="https://zackgort.com">
-        <span class="link-row-label">zackgort.com</span>
+        <span class="link-row-label">zackgort.com — homebase</span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -493,8 +495,8 @@
       </div>
     </div>
     <div class="link-entry">
-      <button class="link-row-btn" data-href="https://ifimaybefrank.com">
-        <span class="link-row-label">ifimaybefrank.com</span>
+      <button class="link-row-btn" data-href="https://ifimaybefrank.com/craft">
+        <span class="link-row-label">ifimaybefrank.com — a position on craft</span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -504,7 +506,7 @@
     </div>
     <div class="link-entry">
       <button class="link-row-btn" data-href="https://reasonably.cc">
-        <span class="link-row-label">reasonably.cc</span>
+        <span class="link-row-label">reasonably.cc — craft in prudence</span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -513,8 +515,8 @@
       </div>
     </div>
     <div class="link-entry">
-      <button class="link-row-btn" data-href="https://dab.cx">
-        <span class="link-row-label">dab.cx</span>
+      <button class="link-row-btn" data-href="https://zack.cx">
+        <span class="link-row-label">zack.cx — craft.experience</span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -524,7 +526,7 @@
     </div>
     <div class="link-entry">
       <button class="link-row-btn" data-href="https://wolfie.love">
-        <span class="link-row-label">wolfie.love</span>
+        <span class="link-row-label">wolfie.love </span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -533,8 +535,8 @@
       </div>
     </div>
     <div class="link-entry">
-      <button class="link-row-btn" data-href="https://linkedin.com/in/zackgort">
-        <span class="link-row-label">linkedin/in/zackgort</span>
+      <button class="link-row-btn" data-href="https://dab.cx">
+        <span class="link-row-label">sandbox Explorations</span>
         <span class="link-row-chevron">›</span>
       </button>
       <div class="link-preview">
@@ -546,7 +548,7 @@
 </div>
 
 
-<!-- Resume Widget — docks right of Links -->
+<!-- Resume Widget — top-right corner -->
 <div id="resume-widget" class="fw collapsed" data-widget>
   <div class="fw-topbar" data-drag-handle>
     <span class="fw-title">Résumé</span>
@@ -608,7 +610,7 @@
 <script>
 // ── Data ──────────────────────────────────────────────────────────────────
 const TRACKS = [
-  { id:1,  album:'Opening Perspective',   year:'',        text:"I design systems for people. Sometimes that system is a commerce platform. Sometimes it's a navigation model. Sometimes it's an interaction framework. Sometimes it's simply clarity." },
+  { id:1,  album:'I think. I make. I design.',   year:'',        text:"I design systems for people. Sometimes that system is a commerce platform. Sometimes it's a navigation model. Sometimes it's an interaction framework. Sometimes it's simply clarity." },
   { id:2,  album:'Opening Perspective',   year:'',        text:"Over the last two decades, I've worked across startups, agencies, enterprise organizations, proprietary commerce platforms, fintech ecosystems, SaaS products, editorial systems, mobile applications, and increasingly, self-authored digital experiments." },
   { id:3,  album:'Opening Perspective',   year:'',        text:"The through-line has remained surprisingly consistent: understanding complexity deeply enough to make it feel intuitive to someone else." },
   { id:4,  album:'Opening Perspective',   year:'',        text:"My earlier career lived primarily inside traditional UX and product environments. My current explorations increasingly blend systems thinking, interaction design, AI-assisted workflows, product architecture, storytelling through interface, authored digital environments, adaptive flows, and code-native prototyping." },
@@ -646,6 +648,7 @@ const TRACKS = [
   { id:29, album:'Present Outlook',       year:'2026',    text:"Not toward novelty for its own sake. Toward systems that feel more human despite growing technical complexity." },
   { id:30, album:'Present Outlook',       year:'2026',    text:"Making difficult things feel understandable. And ideally, meaningful." },
 ];
+
 const PULL_QUOTES = {
   'Opening Perspective': "understanding complexity deeply enough to make it feel intuitive to someone else.",
   'The Through-Line':    "translating complexity into human understanding.",
@@ -980,7 +983,7 @@ function buildParticles(){
   const hTop=headerEl.getBoundingClientRect().top+scrollOff;
   pushLine('zackgort — a self-study',FS.siteLabel,leftEdge,hTop+64+FS.siteLabel.size);
   const subtitleY=hTop+64+FS.siteLabel.size*FS.siteLabel.lh+10;
-  pushWrapped('I think. I make. I design..',FS.siteTitle,leftEdge,subtitleY+FS.siteTitle.size,maxW);
+  pushWrapped('Frankly,',FS.siteTitle,leftEdge,subtitleY+FS.siteTitle.size,maxW);
 
   // Chapters
   chapterEls.forEach((chEl,i)=>{
@@ -1073,11 +1076,12 @@ function buildFrameParticles(){
   for(let y=y0+dvh;y<y1;y+=dvh){ addDash(x0,y); addDash(x1,y); }
 }
 
-// Image sits on the LEFT, top-aligned to viewport top, text in right column.
-// On narrow viewports (mobile) it fills the full width and floats behind content.
-const IMG_COL_RATIO = 0.42;   // fraction of viewport width for the image column
-const IMG_GAP       = 32;     // px gap between image column and text column
-const CTRL_BAR_H    = 30;     // height of the fixed controls bar at top-right
+// Image bleeds across columns — compositional, not structural.
+// It is sized relative to viewport, placed so its right edge
+// intrudes into the text column for editorial overlap.
+const IMG_COL_RATIO = 0.42;   // still used for text leftEdge reference
+const IMG_GAP       = 32;
+const CTRL_BAR_H    = 30;
 
 function eraRegion(){
   const isMobile = W < 700;
@@ -1381,7 +1385,7 @@ document.fonts.ready.then(()=>{
 // ══════════════════════════════════════════════════════════════════
 const logoCanvas = document.getElementById('logo-canvas');
 const logoCtx = logoCanvas.getContext('2d');
-const LOGO_TEXT = 'zack';
+const LOGO_TEXT = 'if i may be frank';
 const LOGO_FONT_SIZE = 18;
 const LOGO_FONT = `500 ${LOGO_FONT_SIZE}px "DM Mono", monospace`;
 const BAR_H = 34;
@@ -1492,8 +1496,7 @@ function getBarH() {
   return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bar-h')) || 34;
 }
 
-// ── Position docked widgets: About top-left | Résumé top-center | Links top-right ──
-// Uses offsetWidth (intrinsic width) so expanded-widget transforms never corrupt neighbours.
+// ── Position docked widgets: About+Links top-left | Résumé top-right ──
 function dockWidgets() {
   const aboutW   = document.getElementById('about-widget');
   const linksW   = document.getElementById('links-widget');
@@ -1502,14 +1505,24 @@ function dockWidgets() {
   const vW       = window.innerWidth;
   const isMobileD = vW < 700;
 
-  // About: always top-left
+  // About: top-left
   if (!aboutW.dataset.dragged) {
     aboutW.style.top = '0px'; aboutW.style.left = '0px';
     aboutW.style.bottom = 'auto'; aboutW.style.right = 'auto';
     aboutW.style.transform = 'none';
   }
 
-  // Résumé: top-center on desktop; on mobile collapsed = bottom tab, expanded = fullscreen
+  // Links: immediately right of About, top-left cluster
+  if (!linksW.dataset.dragged) {
+    const aW = aboutW.offsetWidth;
+    linksW.style.top    = '0px';
+    linksW.style.left   = aW + 'px';
+    linksW.style.bottom = 'auto';
+    linksW.style.right  = 'auto';
+    linksW.style.transform = 'none';
+  }
+
+  // Résumé: top-right; expanded clamps to right edge
   if (resumeW && !resumeW.dataset.dragged) {
     if (isMobileD) {
       if (resumeW.classList.contains('collapsed')) {
@@ -1527,23 +1540,14 @@ function dockWidgets() {
       }
       resumeW.style.transform = 'none';
     } else {
+      // Collapsed or expanded: always flush to right edge
       const rW = resumeW.offsetWidth;
       resumeW.style.top    = '0px';
-      resumeW.style.left   = Math.round((vW - rW) / 2) + 'px';
+      resumeW.style.left   = (vW - rW) + 'px';
       resumeW.style.bottom = 'auto';
       resumeW.style.right  = 'auto';
       resumeW.style.transform = 'none';
     }
-  }
-
-  // Links: top-right (flush to right edge)
-  if (!linksW.dataset.dragged) {
-    const lW = linksW.offsetWidth;
-    linksW.style.top    = '0px';
-    linksW.style.left   = (vW - lW) + 'px';
-    linksW.style.bottom = 'auto';
-    linksW.style.right  = 'auto';
-    linksW.style.transform = 'none';
   }
 
   if (!chapterW.dataset.dragged) {
@@ -2149,12 +2153,21 @@ if (resumeTopbar) {
     resumeWidget.classList.toggle('collapsed');
     if (resumeToggle) resumeToggle.textContent = wasCollapsed ? '−' : '+';
     if (wasCollapsed) {
-      // Expanding — start render loop
+      // Expanding — collapse all other widgets first
+      document.querySelectorAll('.fw').forEach(w => {
+        if (w === resumeWidget || w.classList.contains('collapsed')) return;
+        w.classList.add('collapsed');
+        const t = w.querySelector('.fw-toggle');
+        if (t) t.textContent = '+';
+        if (w.id === 'links-widget') {
+          document.querySelectorAll('.link-entry.open').forEach(e => e.classList.remove('open'));
+        }
+      });
+      // Start render loop; dockWidgets pins to right edge
       rActive = true;
       requestAnimationFrame(() => {
         if (!resumeWidget.dataset.dragged) dockWidgets();
         initResumeCanvas();
-        clampExpandedWidget(resumeWidget);
         invalidateWidgetRepel();
         resumeLoop();
       });
@@ -2172,6 +2185,19 @@ if (resumeTopbar) {
 document.getElementById('btn-theme').addEventListener('click', () => {
   if (rActive) setTimeout(() => buildResumeParticles(), 40);
 }, true);
+
+// Click outside resume closes it
+document.addEventListener('mousedown', e => {
+  if (!resumeWidget || resumeWidget.classList.contains('collapsed')) return;
+  if (!resumeWidget.contains(e.target) && !e.target.closest('#controls-bar')) {
+    resumeWidget.classList.add('collapsed');
+    if (resumeToggle) resumeToggle.textContent = '+';
+    rActive = false;
+    if (rRAF) { cancelAnimationFrame(rRAF); rRAF = null; }
+    if (!resumeWidget.dataset.dragged) dockWidgets();
+    invalidateWidgetRepel();
+  }
+});
 
 // ESC collapse: listen for custom event fired by the global ESC handler
 if (resumeWidget) {
