@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Open Letter — weighted writing</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -30,45 +31,100 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   color:var(--muted);opacity:.32;transition:opacity .2s ease;pointer-events:none;
 }
 
+/* ── the "frankly" mark — a tiny kinetic wordmark clamped to the
+   opposite corner from Open Letter. Each letter's weight/width/italic
+   responds to cursor proximity via Roboto Flex's variable axes (the
+   text-pressure technique), just scaled way down and recolored for a
+   light page instead of the original's full-bleed black canvas. */
+.frankly-mark{
+  position:fixed;bottom:20px;right:26px;z-index:60;
+  pointer-events:none;line-height:1;
+}
+.frankly-mark h1{
+  margin:0;font-family:'Roboto Flex',sans-serif;text-transform:lowercase;
+  font-weight:100;font-size:clamp(13px,1.6vw,16px);color:var(--muted);
+  white-space:nowrap;letter-spacing:0;
+}
+.frankly-mark span{display:inline-block}
+
+@media(max-width:640px){
+  .frankly-mark{bottom:14px;right:16px}
+  .frankly-mark h1{font-size:12px}
+}
+
 .chrome{
   position:fixed;top:22px;right:26px;z-index:60;
   display:flex;align-items:center;gap:16px;
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
-  opacity:.34;transition:opacity .2s ease;
 }
-.chrome:hover,.chrome:focus-within{opacity:1}
-.chrome-sep{color:var(--rule);user-select:none}
+.chrome-sep{color:#5a5a57;user-select:none}
 .chrome-emdash{text-decoration:none;transition:color .15s;cursor:pointer}
 .chrome-emdash:hover{color:var(--ink)}
-.chrome-status{color:var(--muted);letter-spacing:.06em}
+.chrome-status{color:#5a5a57;letter-spacing:.06em;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .chrome-link{
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
   background:none;border:none;color:var(--ink);cursor:pointer;padding:2px 0;
-  border-bottom:1px solid transparent;transition:border-color .15s;
+  border-bottom:1px solid transparent;transition:border-color .15s,opacity .15s;
 }
 .chrome-link.active{border-bottom-color:var(--ink)}
 .chrome-link:disabled{opacity:.3;cursor:default;pointer-events:none}
 .chrome-link.primary{font-weight:600}
 .chrome-link.confirm{color:#7A3324;border-bottom-color:#7A3324}
 
+/* ── Write — a single direct action now, no attached menu: clicking
+   it always starts a brand-new blank note (see resetCompose() in the
+   nav-switching JS below) rather than showing whatever's currently
+   loaded. Compose itself doubles as the homepage — it's what the
+   page opens on and what Write always returns you to. */
+
 /* ── HUD — a separate floating cluster from the nav above, opposite
    corner, for the compose actions themselves (New/Print/Save/Delete)
    rather than view navigation. The bordered pill gives it a distinct
-   "instrument panel" feel instead of reading as more nav links. */
+   "instrument panel" feel instead of reading as more nav links.
+   Both this and the nav render at full opacity — a low-opacity resting
+   state (as this used to have) blends even pure black text down to
+   roughly mid-gray against white, well under WCAG AA's 4.5:1 minimum
+   for normal-sized text. "Quiet until needed" now comes from small
+   size and restrained color choices instead of transparency, so it
+   never trades away legibility to get there. */
 .hud{
   position:fixed;top:22px;left:26px;z-index:60;
   display:flex;align-items:center;gap:14px;
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
-  opacity:.34;transition:opacity .2s ease;
-  background:rgba(var(--ink-rgb),.04);border:1px solid var(--rule);border-radius:22px;
-  padding:8px 16px;
+  background:rgba(var(--ink-rgb),.05);border:1px solid var(--rule);border-radius:22px;
+  padding:8px 16px;transition:background .2s ease;
 }
-.hud:hover,.hud:focus-within{opacity:1}
+.hud:hover,.hud:focus-within{background:rgba(var(--ink-rgb),.07)}
+
+/* ── save toast — "Saved" is a one-time confirmation, not an ongoing
+   state, so it gets a brief top-center toast rather than sitting in
+   the HUD indefinitely. "Saving…" / "Retrying…" / the local-only
+   fallback stay in the HUD, since those describe an ongoing condition
+   worth having visible the whole time it applies. */
+.save-toast{
+  position:fixed;top:22px;left:50%;z-index:90;
+  transform:translateX(-50%) translateY(-10px);
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--ink);color:#fff;padding:8px 18px;border-radius:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease;
+}
+.save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:640px){
   .brand-mark{bottom:14px;left:16px;font-size:12px}
-  .chrome{top:14px;right:16px;gap:11px;font-size:10px}
-  .hud{top:14px;left:16px;gap:9px;font-size:10px;padding:6px 12px}
+  /* nav moves below the HUD rather than sharing its row — two fixed,
+     independently-sized elements racing for the same horizontal band
+     will eventually collide no matter how tight the HUD's content is
+     trimmed; stacking them removes the collision by construction */
+  .hud{top:14px;left:16px;gap:8px;font-size:10px;padding:6px 11px}
+  .chrome{top:54px;right:16px;gap:11px;font-size:10px}
+  /* "Update & file" / "Seal & file" → just "Update" / "Seal" — the
+     worst-case HUD (mid-edit, with Delete showing, saving in
+     progress) is otherwise five items fighting for room on a
+     320–375px screen; every character here is real width budget */
+  .hud-suffix{display:none}
+  .chrome-status{max-width:70px}
 }
 
 /* ── VIEWS ── */
@@ -119,7 +175,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:transparent;color:var(--ink);
   min-height:1.2em;text-align:left;
 }
-.block-editable:empty:before{content:attr(data-placeholder);color:inherit;font-style:italic}
+.block-editable:empty:before{content:attr(data-placeholder);color:inherit;font-style:italic;white-space:pre-line;opacity:1;transition:opacity .2s ease}
+/* once you're actually focused into the block (text-focus), the
+   placeholder recedes to a faint hint rather than sitting at full
+   ink strength competing with your cursor */
+.block.active .block-editable:empty:before{opacity:.28}
 
 /* columns respond to viewport width live — 3-up steps down to 2 on a
    tablet-width window, and everything collapses to a single column
@@ -154,7 +214,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 @page{ size: letter; margin: 1in; }
 @media print{
   body{background:#fff}
-  .brand-mark, .chrome, .hud, .view, .skip-link{ display:none !important; }
+  .brand-mark, .chrome, .hud, .frankly-mark, .save-toast, .view, .skip-link{ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
@@ -386,26 +446,33 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .skip-link{position:fixed;top:-100px;left:12px;z-index:999;background:var(--ink);color:#fff;padding:10px 16px;font-size:13px;text-decoration:none;transition:top .15s}
 .skip-link:focus-visible{top:12px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+/* the writing surface itself opts back out — the passage border
+   already shifts to signal focus (see .block.active), so a second,
+   heavier keyboard-focus ring around the text just boxes in the
+   words you're trying to write */
+.block-editable:focus-visible{outline:none}
 </style>
 </head>
 <body>
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
-<div class="brand-mark">Open Letter</div>
+<div class="brand-mark">© Zack Gort</div>
+<div class="frankly-mark" id="franklyMark"></div>
 <nav class="chrome" aria-label="Navigation">
-  <button class="chrome-link active" data-view="compose">Write</button>
+  <button class="chrome-link active" data-view="compose" id="navWrite">Write</button>
   <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
   <button class="chrome-link" data-view="archive">Archive</button>
 </nav>
 
 <div class="hud" id="composeHud" aria-label="Writing actions">
   <span class="chrome-status" id="saveStatus"></span>
-  <button class="chrome-link" id="btnNew">New</button>
   <button class="chrome-link" id="btnPrint">Print</button>
   <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
-  <button class="chrome-link primary" id="btnSeal" disabled>Seal &amp; file</button>
+  <button class="chrome-link primary" id="btnSeal" disabled><span id="btnSealMain">Seal</span><span class="hud-suffix"> &amp; file</span></button>
 </div>
+
+<div class="save-toast" id="saveToast" role="status" aria-live="polite"></div>
 
 <!-- ══════════════════ COMPOSE ══════════════════ -->
 <main class="view active" id="view-compose">
@@ -561,7 +628,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       { text:"Or, imagine your are Cerci, and you adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths to feed.", font:'newsreader', weight:500, italic:false, size:22, tracking:0, leading:145, fill:55, layout:'single', list:'none' },
       { text:'Or Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:22, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
       { text:'Or, since the Laestrygonians decided to show up in their Sunday best (you know, the cannibal giants Homer wrote about; with Nolan\'s shiny new armor), well we can now have an actual battle, with real loss through terror and trajedy, rather than just Monthy Pythoning it "run away!"', font:'newsreader', weight:700, italic:false, size:24, tracking:0, leading:140, fill:0, layout:'single', list:'none' },
-      { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in a super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
+      { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
       { text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' }
     ];
   }
@@ -572,7 +639,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   const btnDelete    = document.getElementById('btnDelete');
   const addBlockBtn  = document.getElementById('addBlockBtn');
   const btnSeal      = document.getElementById('btnSeal');
-  const btnNew       = document.getElementById('btnNew');
+  const btnSealMain  = document.getElementById('btnSealMain');
+  const navWrite     = document.getElementById('navWrite');
   const tabs         = document.querySelectorAll('.chrome-link[data-view]');
   const viewCompose  = document.getElementById('view-compose');
   const viewArchive  = document.getElementById('view-archive');
@@ -775,7 +843,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       textarea.className = 'block-editable';
       textarea.contentEditable = 'true';
       textarea.spellcheck = true;
-      textarea.dataset.placeholder = i === 0 ? 'Start with the thought that matters most…' : 'Keep going — a new weight for a new turn…';
+      textarea.dataset.placeholder = i === 0 ? 'shape your intent.' : 'Keep going — a new weight for a new turn…';
       textarea.textContent = b.text;
       textarea.style.whiteSpace = 'pre-wrap';
       applyStyle(textarea, b);
@@ -796,6 +864,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
           e.preventDefault();
           const marker = nextListMarker(textarea.textContent, b.list);
           document.execCommand('insertText', false, '\n' + marker);
+        } else if (e.key === 'Escape'){
+          textarea.blur();
         }
       });
 
@@ -1188,7 +1258,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   });
 
   // ── VIEW SWITCHING ──
-  tabs.forEach(t => t.addEventListener('click', () => showView(t.dataset.view)));
+  // Write is a direct action, not a toggle showing whatever's currently
+  // loaded: every click starts a brand-new blank note. Archive just
+  // switches to the archive view.
+  navWrite.addEventListener('click', () => {
+    resetCompose();
+    showView('compose');
+  });
+  tabs.forEach(t => {
+    if (t === navWrite) return; // handled above
+    t.addEventListener('click', () => showView(t.dataset.view));
+  });
   function showView(name){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.view === name));
     viewCompose.classList.toggle('active', name === 'compose');
@@ -1202,8 +1282,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     // Delete is further scoped to only when there's an actual filed
     // letter currently loaded for editing, not a fresh blank one
     btnDelete.style.display = (composeOnly && editingEntryId) ? '' : 'none';
-    btnSeal.textContent = editingEntryId ? 'Update & file' : 'Seal & file';
+    btnSealMain.textContent = editingEntryId ? 'Update' : 'Seal';
     if (name === 'archive') renderArchive();
+    // entering compose (fresh, resumed, or opened from the archive)
+    // always drops focus straight into the writing surface — the
+    // element isn't laid out/visible until the .active class above
+    // takes effect, so wait a frame before focusing it
+    if (composeOnly) focusComposeSurface();
+  }
+
+  function focusComposeSurface(){
+    requestAnimationFrame(() => {
+      const last = blockStack.querySelector('.block:last-child .block-editable');
+      if (last) last.focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    });
   }
 
   // ── RESILIENT STORAGE (best-effort persistence; never load-bearing) ──
@@ -1234,8 +1327,22 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       window.storage.delete(key,false).catch(()=>{});
     }
   };
+  const saveToastEl = document.getElementById('saveToast');
+  let saveToastTimer = null;
+  function showSaveToast(message){
+    saveToastEl.textContent = message;
+    saveToastEl.classList.add('show');
+    clearTimeout(saveToastTimer);
+    saveToastTimer = setTimeout(() => saveToastEl.classList.remove('show'), 1800);
+  }
+
   function setSaveStatus(state){
-    const labels = { saved:'Saved', saving:'Saving…', retry:'Retrying…', 'local-only':'Saved on this page only' };
+    if (state === 'saved'){
+      saveStatusEl.textContent = '';
+      showSaveToast('Saved');
+      return;
+    }
+    const labels = { saving:'Saving…', retry:'Retrying…', 'local-only':'Saved on this page only' };
     saveStatusEl.textContent = labels[state] || '';
   }
 
@@ -1294,7 +1401,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     showView('archive');
   }
   btnSeal.addEventListener('click', sealCurrentLetter);
-  btnNew.addEventListener('click', () => { resetCompose(); showView('compose'); });
   btnPrint.addEventListener('click', () => { printBlocks(blocks); });
 
   function fmtDate(iso){
@@ -1488,6 +1594,73 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     resetCompose();
     showView('archive');
   });
+
+  // ── "frankly" kinetic wordmark ── adapted from the text-pressure
+  // technique: each letter's variable-font weight/width/italic axes
+  // respond to distance from the cursor, anywhere on the page. Scaled
+  // down to a small corner signature rather than the original's
+  // full-bleed black-canvas demo, and reactive to the whole window
+  // rather than a fixed-height container.
+  (function initFranklyMark(){
+    const franklyRoot = document.getElementById('franklyMark');
+    if (!franklyRoot) return;
+
+    const h1 = document.createElement('h1');
+    franklyRoot.appendChild(h1);
+
+    const franklyChars = 'frankly'.split('');
+    const franklySpans = franklyChars.map(ch => {
+      const span = document.createElement('span');
+      span.dataset.char = ch;
+      span.textContent = ch;
+      h1.appendChild(span);
+      return span;
+    });
+
+    const franklyMouse = { x: -9999, y: -9999 };
+    const franklyCursor = { x: -9999, y: -9999 };
+
+    function franklyDist(a, b){
+      const dx = b.x - a.x, dy = b.y - a.y;
+      return Math.sqrt(dx*dx + dy*dy);
+    }
+    function franklyAttr(distance, maxDist, minVal, maxVal){
+      const val = maxVal - Math.abs((maxVal * distance) / maxDist);
+      return Math.max(minVal, val + minVal);
+    }
+
+    window.addEventListener('mousemove', (e) => { franklyCursor.x = e.clientX; franklyCursor.y = e.clientY; });
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (t){ franklyCursor.x = t.clientX; franklyCursor.y = t.clientY; }
+    }, { passive:true });
+
+    function franklyAnimate(){
+      franklyMouse.x += (franklyCursor.x - franklyMouse.x) / 15;
+      franklyMouse.y += (franklyCursor.y - franklyMouse.y) / 15;
+
+      const titleRect = h1.getBoundingClientRect();
+      const maxDist = Math.max(titleRect.width / 2, 40);
+
+      franklySpans.forEach(span => {
+        const rect = span.getBoundingClientRect();
+        const center = { x: rect.x + rect.width/2, y: rect.y + rect.height/2 };
+        const d = franklyDist(franklyMouse, center);
+
+        const wdth = Math.floor(franklyAttr(d, maxDist, 70, 130));
+        const wght = Math.floor(franklyAttr(d, maxDist, 100, 700));
+        const ital = franklyAttr(d, maxDist, 0, 1).toFixed(2);
+
+        const settings = "'wght' " + wght + ", 'wdth' " + wdth + ", 'ital' " + ital;
+        if (span.style.fontVariationSettings !== settings){
+          span.style.fontVariationSettings = settings;
+        }
+      });
+
+      requestAnimationFrame(franklyAnimate);
+    }
+    requestAnimationFrame(franklyAnimate);
+  })();
 
   // ── INIT ──
   // Priority for what compose opens with: (1) a genuine in-progress
