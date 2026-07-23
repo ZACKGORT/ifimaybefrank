@@ -38,6 +38,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 .chrome:hover,.chrome:focus-within{opacity:1}
 .chrome-sep{color:var(--rule);user-select:none}
+.chrome-emdash{text-decoration:none;transition:color .15s;cursor:pointer}
+.chrome-emdash:hover{color:var(--ink)}
 .chrome-status{color:var(--muted);letter-spacing:.06em}
 .chrome-link{
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
@@ -49,9 +51,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .chrome-link.primary{font-weight:600}
 .chrome-link.confirm{color:#7A3324;border-bottom-color:#7A3324}
 
+/* ── HUD — a separate floating cluster from the nav above, opposite
+   corner, for the compose actions themselves (New/Print/Save/Delete)
+   rather than view navigation. The bordered pill gives it a distinct
+   "instrument panel" feel instead of reading as more nav links. */
+.hud{
+  position:fixed;top:22px;left:26px;z-index:60;
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  opacity:.34;transition:opacity .2s ease;
+  background:rgba(var(--ink-rgb),.04);border:1px solid var(--rule);border-radius:22px;
+  padding:8px 16px;
+}
+.hud:hover,.hud:focus-within{opacity:1}
+
 @media(max-width:640px){
   .brand-mark{bottom:14px;left:16px;font-size:12px}
   .chrome{top:14px;right:16px;gap:11px;font-size:10px}
+  .hud{top:14px;left:16px;gap:9px;font-size:10px;padding:6px 12px}
 }
 
 /* ── VIEWS ── */
@@ -137,7 +154,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 @page{ size: letter; margin: 1in; }
 @media print{
   body{background:#fff}
-  .brand-mark, .chrome, .view, .skip-link{ display:none !important; }
+  .brand-mark, .chrome, .hud, .view, .skip-link{ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
@@ -376,17 +393,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
 <div class="brand-mark">Open Letter</div>
-<nav class="chrome" aria-label="Writing controls">
+<nav class="chrome" aria-label="Navigation">
   <button class="chrome-link active" data-view="compose">Write</button>
-  <span class="chrome-sep">·</span>
+  <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
   <button class="chrome-link" data-view="archive">Archive</button>
-  <span class="chrome-sep">|</span>
+</nav>
+
+<div class="hud" id="composeHud" aria-label="Writing actions">
   <span class="chrome-status" id="saveStatus"></span>
   <button class="chrome-link" id="btnNew">New</button>
   <button class="chrome-link" id="btnPrint">Print</button>
   <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
   <button class="chrome-link primary" id="btnSeal" disabled>Seal &amp; file</button>
-</nav>
+</div>
 
 <!-- ══════════════════ COMPOSE ══════════════════ -->
 <main class="view active" id="view-compose">
@@ -560,6 +579,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   const shelf        = document.getElementById('shelf');
   const archiveEmpty = document.getElementById('archiveEmpty');
   const saveStatusEl = document.getElementById('saveStatus');
+  const composeHud   = document.getElementById('composeHud');
   const composeTagline = document.getElementById('composeTagline');
   const btnListView  = document.getElementById('btnListView');
   const btnGridView  = document.getElementById('btnGridView');
@@ -1173,15 +1193,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     tabs.forEach(t => t.classList.toggle('active', t.dataset.view === name));
     viewCompose.classList.toggle('active', name === 'compose');
     viewArchive.classList.toggle('active', name === 'archive');
-    // New / Print / Seal are compose-only actions — showing them while
+    // the HUD (New/Print/Save/Delete) is compose-only — showing it while
     // browsing the archive would be misleading (Print, in particular,
     // would otherwise print the live draft instead of whatever you're
     // actually looking at)
     const composeOnly = name === 'compose';
-    saveStatusEl.style.display = composeOnly ? '' : 'none';
-    btnNew.style.display = composeOnly ? '' : 'none';
-    btnPrint.style.display = composeOnly ? '' : 'none';
-    btnSeal.style.display = composeOnly ? '' : 'none';
+    composeHud.style.display = composeOnly ? '' : 'none';
     // Delete is further scoped to only when there's an actual filed
     // letter currently loaded for editing, not a fresh blank one
     btnDelete.style.display = (composeOnly && editingEntryId) ? '' : 'none';
