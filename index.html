@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='72' font-size='72' text-anchor='middle' font-family='Georgia,serif'%3E%F0%9D%92%BE%3C/text%3E%3C/svg%3E">
-<title>Frankly,</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='75' font-size='80' font-weight='900' text-anchor='middle' font-family='Arial,Helvetica,sans-serif'%3EF%3C/text%3E%3C/svg%3E">
+<title>Franky,</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
@@ -29,8 +29,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .brand-mark{
   position:fixed;bottom:22px;left:26px;z-index:60;
   font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:14px;
-  color:var(--muted);opacity:.32;transition:opacity .2s ease;pointer-events:none;
+  color:var(--muted);opacity:.32;transition:opacity .2s ease;
+  background:none;border:none;padding:0;cursor:pointer;
 }
+.brand-mark:hover,.brand-mark:focus-visible{opacity:.7}
 
 /* ── the "frankly" mark — a tiny kinetic wordmark clamped to the
    opposite corner from Open Letter. Each letter's weight/width/italic
@@ -131,6 +133,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 /* ── VIEWS ── */
 .view{display:none}
 .view.active{display:block}
+
+/* ══════════════════════════════════════════
+   HOME — the front door. One statement, no
+   controls, no HUD; the doctrine this whole tool
+   runs on, stated once and left alone rather than
+   explained. Everything else (Write/Archive) is a
+   deliberate step away from here.
+══════════════════════════════════════════ */
+.home-wrap{
+  max-width:1000px;margin:0 auto;min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:16vh 6vw;
+}
+.home-statement{
+  font-family:'Fraunces',serif;font-style:italic;font-weight:600;
+  font-size:clamp(34px,6vw,76px);line-height:1.08;
+  max-width:14ch;color:var(--ink);margin-bottom:32px;
+}
+.home-doctrine{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);max-width:48ch;line-height:1.7;
+}
 
 /* ══════════════════════════════════════════
    COMPOSE
@@ -458,10 +482,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
-<div class="brand-mark">Open Letter</div>
+<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">Open Letter</div>
 <div class="frankly-mark" id="franklyMark"></div>
 <nav class="chrome" aria-label="Navigation">
-  <button class="chrome-link active" data-view="compose" id="navWrite">Write</button>
+  <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
   <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
   <button class="chrome-link" data-view="archive">Archive</button>
 </nav>
@@ -475,8 +499,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
 <div class="save-toast" id="saveToast" role="status" aria-live="polite"></div>
 
+<!-- ══════════════════ HOME ══════════════════ -->
+<main class="view active" id="view-home">
+  <div class="home-wrap">
+    <p class="home-statement">Some things are better said plainly than said perfectly.</p>
+    <p class="home-doctrine">The doctrine of Open Letter — write frankly, give each sentence exactly the weight it's earned, and leave the rest alone.</p>
+  </div>
+</main>
+
 <!-- ══════════════════ COMPOSE ══════════════════ -->
-<main class="view active" id="view-compose">
+<main class="view" id="view-compose">
   <div class="compose-wrap">
     <p class="compose-tagline" id="composeTagline">Give each passage the weight it deserves — set its size, spacing, rhythm, and fill as you write it.</p>
     <div class="stack" id="blockStack"></div>
@@ -642,7 +674,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   const btnSeal      = document.getElementById('btnSeal');
   const btnSealMain  = document.getElementById('btnSealMain');
   const navWrite     = document.getElementById('navWrite');
+  const brandHome    = document.getElementById('brandHome');
   const tabs         = document.querySelectorAll('.chrome-link[data-view]');
+  const viewHome     = document.getElementById('view-home');
   const viewCompose  = document.getElementById('view-compose');
   const viewArchive  = document.getElementById('view-archive');
   const shelf        = document.getElementById('shelf');
@@ -1270,14 +1304,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     if (t === navWrite) return; // handled above
     t.addEventListener('click', () => showView(t.dataset.view));
   });
+  // the brand mark doubles as the home link — click or keyboard-activate
+  // (it's a div with role="button", so Enter/Space need wiring by hand)
+  brandHome.addEventListener('click', () => showView('home'));
+  brandHome.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); showView('home'); }
+  });
   function showView(name){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.view === name));
+    viewHome.classList.toggle('active', name === 'home');
     viewCompose.classList.toggle('active', name === 'compose');
     viewArchive.classList.toggle('active', name === 'archive');
     // the HUD (New/Print/Save/Delete) is compose-only — showing it while
-    // browsing the archive would be misleading (Print, in particular,
-    // would otherwise print the live draft instead of whatever you're
-    // actually looking at)
+    // browsing the archive (or the homepage) would be misleading (Print,
+    // in particular, would otherwise print the live draft instead of
+    // whatever you're actually looking at)
     const composeOnly = name === 'compose';
     composeHud.style.display = composeOnly ? '' : 'none';
     // Delete is further scoped to only when there's an actual filed
@@ -1669,6 +1710,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   // filed letter, so returning to the page continues where you left
   // off rather than greeting you with a blank page or the demo; (3)
   // only a brand-new session with nothing filed yet sees the demo.
+  // Note: the page itself now always lands on the homepage/manifesto
+  // view first — this pre-population just means compose is ready with
+  // the right content the moment it's opened (e.g. from the archive).
   async function initApp(){
     await loadEntriesFromStorage();
     renderArchive();
@@ -1697,7 +1741,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
     renderStack();
     updateSealEnabled();
-    showView('compose');
+    showView('home');
   }
   initApp();
 })();
