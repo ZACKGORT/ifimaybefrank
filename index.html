@@ -47,6 +47,11 @@ html[data-theme="dark"]{
   --danger:#c96a4c;
 }
 html,body{height:100%}
+/* kills pull-to-refresh and the rubber-band edge-swipe that Chrome/Edge
+   read as back/forward navigation. (iOS Safari's system edge-swipe-back
+   gesture lives outside the page and can't be suppressed from web
+   content — this only reaches browsers that honor overscroll-behavior.) */
+html{overscroll-behavior:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webkit-font-smoothing:antialiased}
 
 /* ── MINIMAL CHROME ──
@@ -182,29 +187,62 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    deliberate step away from here.
 ══════════════════════════════════════════ */
 
-/* ── custom "write" cursor — the homepage is itself an invitation to
-   start writing, so the pointer is replaced with a small label that
-   says so; clicking anywhere on it opens a fresh compose layer. The
-   real system cursor is hidden only while #view-home is the active
-   view (see cursor:none below and the .active gate in JS), so every
-   other view keeps the normal pointer. */
-#view-home.active{cursor:none}
-.write-cursor{
-  position:fixed;top:0;left:0;z-index:200;
-  pointer-events:none;
+/* ── custom cursor — replaces the system pointer across the whole app
+   (home, compose, and archive alike) with a dot + inertia-deforming
+   ellipse, plus a "Write" label that only makes sense on the homepage.
+   Suppressed via body.write-native-cursor whenever the pointer is over
+   actual text or an interactive control, so typing, selection, and
+   ordinary button/link affordances are never fought with. */
+body.custom-cursor-active{cursor:none}
+.write-cursor-dot,
+.write-cursor-ellipse,
+.write-cursor-pill{
+  position:fixed;top:0;left:0;z-index:200;pointer-events:none;
   transform:translate(-9999px,-9999px);
+  opacity:0;transition:opacity .18s ease;will-change:transform;
+}
+.write-cursor-dot.visible,
+.write-cursor-ellipse.visible,
+.write-cursor-pill.visible{opacity:1}
+
+/* the dot sits exactly at the real pointer position, standing in for
+   the system cursor with zero lag */
+.write-cursor-dot{
+  width:6px;height:6px;margin:-3px 0 0 -3px;
+  border-radius:50%;background:var(--ink);
+}
+/* the ellipse shares the dot's exact position but carries its own
+   stretch/rotation state, which the JS eases toward whatever the
+   pointer's current velocity calls for — elongating along the
+   direction of travel and relaxing back to a circle at rest, so it
+   reads as a soft mass with real inertia rather than a decal */
+.write-cursor-ellipse{
+  width:34px;height:34px;margin:-17px 0 0 -17px;
+  border:1.5px solid var(--ink);border-radius:50%;opacity:0;
+}
+.write-cursor-ellipse.visible{opacity:.32}
+
+/* "Write" itself — tethered to the dot on a short elastic leash (see
+   the JS leash-clamp) rather than tracking it 1:1 */
+.write-cursor-pill{
   display:flex;align-items:center;gap:6px;
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   color:var(--on-ink);background:var(--ink);
-  padding:8px 15px 8px 12px;border-radius:20px;
-  white-space:nowrap;opacity:0;
-  transition:opacity .15s ease;
-  will-change:transform;
+  padding:8px 15px 8px 12px;border-radius:999px;white-space:nowrap;
 }
-.write-cursor.visible{opacity:1}
-.write-cursor .write-cursor-dot{
+.write-cursor-pill .write-cursor-pill-dot{
   width:5px;height:5px;border-radius:50%;background:var(--on-ink);flex:none;
 }
+
+/* the moment the pointer is over actual text or an interactive control,
+   drop the override entirely — a plain `auto` here means every element
+   underneath goes back to whatever cursor it already declares (pointer
+   on buttons/links, a text caret inside contenteditable, etc.), rather
+   than this file guessing a single native cursor for every case */
+body.custom-cursor-active.write-native-cursor{cursor:auto}
+.write-native-cursor .write-cursor-dot,
+.write-native-cursor .write-cursor-ellipse,
+.write-native-cursor .write-cursor-pill{opacity:0 !important}
 .home-wrap{
   max-width:1000px;margin:0 auto;min-height:100vh;
   display:flex;flex-direction:column;justify-content:center;
@@ -303,7 +341,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 @page{ size: letter; margin: 1in; }
 @media print{
   body{background:#fff}
-  .brand-mark, .chrome, .hud, .frankly-mark, .save-toast, .view, .skip-link{ display:none !important; }
+  .brand-mark, .chrome, .hud, .frankly-mark, .save-toast, .view, .skip-link,
+  .write-cursor-dot, .write-cursor-ellipse, .write-cursor-pill{ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
@@ -651,14 +690,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
 <div class="save-toast" id="saveToast" role="status" aria-live="polite"></div>
 
+<!-- custom cursor — lives outside any single view so it persists across
+     home/compose/archive instead of vanishing whenever view-home isn't
+     the active one -->
+<div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
+<div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+<div class="write-cursor-pill" id="writeCursorPill" aria-hidden="true">
+  <span class="write-cursor-pill-dot"></span>Write
+</div>
+
 <!-- ══════════════════ HOME ══════════════════ -->
 <main class="view active" id="view-home">
   <div class="home-wrap">
     <p class="home-statement">Frankly,</p>
     <p class="home-doctrine">Shape influences input and output; <br>what is written &amp; how it is read,</p>
-  </div>
-  <div class="write-cursor" id="writeCursor" aria-hidden="true">
-    <span class="write-cursor-dot"></span>Write
   </div>
 </main>
 
@@ -858,7 +903,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   const viewHome     = document.getElementById('view-home');
   const viewCompose  = document.getElementById('view-compose');
   const viewArchive  = document.getElementById('view-archive');
-  const writeCursor  = document.getElementById('writeCursor');
+  const writeCursorDot     = document.getElementById('writeCursorDot');
+  const writeCursorEllipse = document.getElementById('writeCursorEllipse');
+  const writeCursorPill    = document.getElementById('writeCursorPill');
   const shelf        = document.getElementById('shelf');
   const archiveEmpty = document.getElementById('archiveEmpty');
   const saveStatusEl = document.getElementById('saveStatus');
@@ -1752,6 +1799,62 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     });
   });
 
+  // ── touch: long-press to focus, tap outside to escape ──
+  // On touchscreens, an ordinary tap on a passage is often just the
+  // start of a scroll gesture, not intent to edit — so entering edit
+  // mode is gated on a genuine long-press instead of a plain tap.
+  // Nothing here calls preventDefault: native scrolling and native
+  // caret placement/typing (once a passage is already focused) stay
+  // completely untouched. A short tap is only rejected after the fact
+  // — if the browser granted focus anyway, it's immediately handed
+  // back on the next tick, so the flow never blocks the touch itself,
+  // it just declines to keep the keyboard open for it.
+  const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  if (IS_TOUCH){
+    const LONG_PRESS_MS = 450;
+    const MOVE_CANCEL_PX = 10;
+    let touchEditable = null, touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+
+    blockStack.addEventListener('touchstart', (e) => {
+      const editable = e.target.closest('.block-editable');
+      touchEditable = editable || null;
+      if (!editable) return;
+      const t = e.touches[0];
+      touchStartX = t.clientX; touchStartY = t.clientY; touchStartTime = Date.now();
+    }, { passive:true });
+
+    blockStack.addEventListener('touchmove', (e) => {
+      if (!touchEditable) return;
+      const t = e.touches[0];
+      if (Math.hypot(t.clientX - touchStartX, t.clientY - touchStartY) > MOVE_CANCEL_PX){
+        touchEditable = null; // moved enough to be a scroll/drag, not a press
+      }
+    }, { passive:true });
+
+    blockStack.addEventListener('touchend', () => {
+      if (!touchEditable) return;
+      const held = Date.now() - touchStartTime;
+      const editable = touchEditable;
+      const block = editable.closest('.block');
+      const alreadyActive = block && block.classList.contains('active');
+      touchEditable = null;
+      if (held >= LONG_PRESS_MS || alreadyActive) return; // qualifies, or was already in edit mode — leave native behavior alone
+      setTimeout(() => { if (document.activeElement === editable) editable.blur(); }, 0);
+    });
+
+    // tapping anywhere outside the currently active passage (and outside
+    // its own control row/popovers) exits edit mode rather than leaving
+    // the keyboard open on a passage that's no longer the focus of attention
+    document.addEventListener('touchend', (e) => {
+      const activeBlock = document.querySelector('.block.active');
+      if (!activeBlock || activeBlock.contains(e.target)) return;
+      if (e.target.closest('.font-picker-panel, .link-popover')) return;
+      if (document.activeElement && typeof document.activeElement.blur === 'function'){
+        document.activeElement.blur();
+      }
+    });
+  }
+
   addBlockBtn.addEventListener('click', () => {
     blocks.push(defaultBlock());
     renderStack();
@@ -1799,10 +1902,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     // element isn't laid out/visible until the .active class above
     // takes effect, so wait a frame before focusing it
     if (composeOnly) focusComposeSurface();
-    // the custom "write" cursor only belongs on the homepage — hide it
-    // immediately on navigating away so it can't linger over compose
-    // or the archive before the next mousemove updates it
-    if (name !== 'home' && writeCursor) writeCursor.classList.remove('visible');
+    // the "Write" pill only belongs on the homepage — hide it immediately
+    // on navigating away so it can't linger over compose or the archive
+    // before the next mousemove updates it. The dot and ellipse stay,
+    // since the custom cursor now runs across every view.
+    if (name !== 'home'){
+      writeCursorPill.classList.remove('visible');
+    }
   }
 
   function focusComposeSurface(){
@@ -1845,55 +1951,123 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     });
   })();
 
-  // ── homepage "write" cursor ──
-  // Replaces the system pointer with a small "write" label while
-  // #view-home is active (system cursor is hidden via #view-home.active
-  // {cursor:none} in CSS), and turns any click on the homepage into the
-  // same action as the Write nav link: a brand-new blank compose layer.
+  // ── custom cursor ──
+  // Three independent layers stand in for the system pointer across
+  // the whole app now (home, compose, and archive alike): a dot locked
+  // exactly to the real pointer position, a halo ellipse around it
+  // that stretches/rotates with the pointer's velocity and relaxes
+  // back to a circle at rest (inertia, purely as deformation — its
+  // position never lags), and the "Write" pill, tethered to the dot
+  // on a short elastic leash that eases toward it but is clamped to a
+  // maximum distance. The pill itself only makes sense as a call to
+  // action on the homepage, so it's suppressed everywhere else even
+  // though the dot and ellipse keep going. The moment the pointer sits
+  // over actual text or anything interactive (contenteditable,
+  // buttons, links, form controls), every custom layer is hidden and
+  // the real cursor takes over — typing, selection, and normal
+  // button/link affordances are never fought with.
   (function initWriteCursor(){
-    if (!writeCursor) return;
+    if (!writeCursorDot || !writeCursorEllipse || !writeCursorPill) return;
 
     function isHomeActive(){
       return viewHome.classList.contains('active');
     }
 
-    const CURSOR_MARGIN = 12;
-    const CURSOR_OFFSET = 14;
+    const NATIVE_SELECTOR = [
+      'button', 'a', 'input', 'textarea', 'select', 'label',
+      '[contenteditable="true"]', '[role="button"]',
+      '.home-statement', '.home-doctrine', '.archive-title', '.archive-sub', '.compose-tagline'
+    ].join(', ');
+
+    const LEASH_MAX = 777;      // px — the pill can never sit further than this from the dot
+    const LEASH_LERP = 0.16;    // how eagerly the pill eases toward the dot each frame
+    const ELLIPSE_LERP = 0.22;  // how eagerly the halo's deformation eases toward its target
+    const SPEED_SATURATE = 34;  // px/frame of pointer travel that maxes out the stretch
+    const MAX_STRETCH = 0.6;    // extra elongation, as a fraction, at full speed
+
+    let ptrX = 0, ptrY = 0;
+    let prevFrameX = 0, prevFrameY = 0, frameInit = false;
+    let ellAngle = 0, ellScaleX = 1, ellScaleY = 1;
+    let pillX = 0, pillY = 0, pillInited = false;
+    let rafId = null;
+
+    function shortAngleLerp(current, target, factor){
+      const diff = ((target - current + 540) % 360) - 180;
+      return current + diff * factor;
+    }
+
+    function step(){
+      if (!frameInit){ prevFrameX = ptrX; prevFrameY = ptrY; frameInit = true; }
+      const dx = ptrX - prevFrameX;
+      const dy = ptrY - prevFrameY;
+      prevFrameX = ptrX; prevFrameY = ptrY;
+
+      const speed = Math.hypot(dx, dy);
+      const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
+      const stretch = Math.min(speed / SPEED_SATURATE, 1) * MAX_STRETCH;
+
+      ellAngle = shortAngleLerp(ellAngle, angleTarget, ELLIPSE_LERP);
+      ellScaleX += ((1 + stretch) - ellScaleX) * ELLIPSE_LERP;
+      ellScaleY += ((1 - stretch * 0.45) - ellScaleY) * ELLIPSE_LERP;
+
+      writeCursorEllipse.style.transform =
+        'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' + ellScaleY + ')';
+
+      // leash: ease toward the dot, then clamp so the gap never exceeds
+      // LEASH_MAX — a taut leash pulls the pill along instead of letting
+      // it fall further behind
+      pillX += (ptrX - pillX) * LEASH_LERP;
+      pillY += (ptrY - pillY) * LEASH_LERP;
+      let ldx = pillX - ptrX, ldy = pillY - ptrY;
+      const ldist = Math.hypot(ldx, ldy);
+      if (ldist > LEASH_MAX){
+        const k = LEASH_MAX / ldist;
+        pillX = ptrX + ldx * k;
+        pillY = ptrY + ldy * k;
+      }
+      writeCursorPill.style.transform = 'translate(' + pillX + 'px,' + pillY + 'px)';
+
+      rafId = requestAnimationFrame(step);
+    }
+    function startLoop(){ if (!rafId) rafId = requestAnimationFrame(step); }
+    function stopLoop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } }
+
+    function hideAll(){
+      writeCursorDot.classList.remove('visible');
+      writeCursorEllipse.classList.remove('visible');
+      writeCursorPill.classList.remove('visible');
+      document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
+      stopLoop();
+    }
 
     window.addEventListener('mousemove', (e) => {
-      if (!isHomeActive()){
-        writeCursor.classList.remove('visible');
-        return;
+      const overNative = !!e.target.closest(NATIVE_SELECTOR);
+      document.body.classList.add('custom-cursor-active');
+      document.body.classList.toggle('write-native-cursor', overNative);
+
+      ptrX = e.clientX; ptrY = e.clientY;
+
+      writeCursorDot.style.transform = 'translate(' + ptrX + 'px,' + ptrY + 'px)';
+      writeCursorDot.classList.add('visible');
+      writeCursorEllipse.classList.add('visible');
+      writeCursorPill.classList.toggle('visible', isHomeActive());
+
+      if (!pillInited){
+        // on first appearance the pill starts right at the dot rather
+        // than flying in from an arbitrary offset — the leash then
+        // naturally opens up a gap as the pointer moves
+        pillX = ptrX; pillY = ptrY; pillInited = true;
       }
-      writeCursor.classList.add('visible');
 
-      // The pill is normally offset down-right of the pointer, but that
-      // offset alone would let it run past the viewport edge (and sit
-      // under the corner nav links that live there) whenever the mouse
-      // gets close to the right or bottom of the window. Measuring the
-      // pill itself and flipping the offset to the opposite side of the
-      // pointer whenever it would overflow keeps "Write" fully visible
-      // and clear of that edge chrome no matter where the pointer is.
-      const w = writeCursor.offsetWidth;
-      const h = writeCursor.offsetHeight;
-
-      let x = e.clientX + CURSOR_OFFSET;
-      if (x + w > window.innerWidth - CURSOR_MARGIN){
-        x = e.clientX - CURSOR_OFFSET - w;
-      }
-      x = Math.max(CURSOR_MARGIN, x);
-
-      let y = e.clientY + CURSOR_OFFSET;
-      if (y + h > window.innerHeight - CURSOR_MARGIN){
-        y = e.clientY - CURSOR_OFFSET - h;
-      }
-      y = Math.max(CURSOR_MARGIN, y);
-
-      writeCursor.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      startLoop();
     });
-    document.addEventListener('mouseleave', () => writeCursor.classList.remove('visible'));
+    document.addEventListener('mouseleave', hideAll);
 
-    viewHome.addEventListener('click', () => {
+    viewHome.addEventListener('click', (e) => {
+      // clicking directly on the statement text (or any other native-
+      // cursor element) is left alone — no reason to swallow a text
+      // selection just to also open compose
+      if (e.target.closest(NATIVE_SELECTOR)) return;
       resetCompose();
       showView('compose');
     });
