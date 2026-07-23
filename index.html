@@ -822,6 +822,22 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     ];
   }
 
+  function statementsDemoBlocks(){
+    // "Statements — as expressed." — a short open letter on
+    // presentation, kept as a real archived piece rather than a
+    // one-off. The second bullet pair links back to zack.cx; the
+    // closing bullet links to the greenpoint.webp image (picked up
+    // automatically as an image-preview chip by the existing
+    // isImageLink/thumbnail logic, since it resolves to a .webp).
+    return [
+      { text:'Statements — as expressed.', font:'fraunces', weight:600, italic:true, size:90, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Not just in prose, but in presentation.', font:'jakarta', weight:700, italic:false, size:64, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection.', font:'jakarta', weight:400, italic:false, size:24, tracking:0, leading:150, fill:70, layout:'single', list:'none', link:'' },
+      { text:'• Where form is a result of function.\n• Where function meets utility, in shaping  form.', font:'fraunces', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'bullet', link:'https://zack.cx' },
+      { text:'• A space where heroes and decorum do not inherently deserve prime screen real-estate.', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }
+    ];
+  }
+
   const blockStack   = document.getElementById('blockStack');
   const printPhantom = document.getElementById('printPhantom');
   const btnPrint     = document.getElementById('btnPrint');
@@ -2105,6 +2121,42 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       }
     }
     persist.trySet('meta:odysseySeed', JSON.stringify({ blocksJSON: odysseySeedJSON }));
+
+    // "Statements — as expressed." — same pristine-refresh pattern as
+    // the two letters above: identified by its own opening line,
+    // seeded once, and only auto-synced to the canonical copy while
+    // no manual edit has touched it since.
+    const isStatementsEntry = e => e && e.blocks && e.blocks[0] &&
+      typeof e.blocks[0].text === 'string' &&
+      e.blocks[0].text.indexOf('Statements — as expressed.') !== -1;
+
+    const statementsSeedBlocks = statementsDemoBlocks();
+    const statementsSeedJSON = JSON.stringify(statementsSeedBlocks);
+    const priorStatementsSeedRaw = await persist.tryGet('meta:statementsSeed');
+    let priorStatementsSeedJSON = null;
+    if (priorStatementsSeedRaw && priorStatementsSeedRaw.value){
+      try{ priorStatementsSeedJSON = JSON.parse(priorStatementsSeedRaw.value).blocksJSON || null; }catch(e){ /* ignore corrupt */ }
+    }
+
+    const existingStatementsIdx = entriesCache.findIndex(isStatementsEntry);
+    if (existingStatementsIdx === -1){
+      const statementsEntry = {
+        id: 'entry_statements_' + Date.now(),
+        blocks: statementsSeedBlocks,
+        createdAt: new Date().toISOString()
+      };
+      entriesCache.unshift(statementsEntry);
+      persist.trySet('entries:' + statementsEntry.id, JSON.stringify(statementsEntry));
+    } else {
+      const existingStatements = entriesCache[existingStatementsIdx];
+      const existingStatementsJSON = JSON.stringify(existingStatements.blocks);
+      const statementsIsPristine = priorStatementsSeedJSON === null || priorStatementsSeedJSON === existingStatementsJSON;
+      if (statementsIsPristine && existingStatementsJSON !== statementsSeedJSON){
+        existingStatements.blocks = statementsSeedBlocks;
+        persist.trySet('entries:' + existingStatements.id, JSON.stringify(existingStatements));
+      }
+    }
+    persist.trySet('meta:statementsSeed', JSON.stringify({ blocksJSON: statementsSeedJSON }));
   }
 
   // ── VIEW MODE (grid / list) ──
