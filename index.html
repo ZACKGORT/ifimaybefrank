@@ -250,7 +250,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 
 .stack{display:flex;flex-direction:column}
-.block{padding:28px 0;border-bottom:1px solid var(--rule)}
+.block{padding:28px 0;border-bottom:1px solid var(--rule);position:relative}
 .block:first-child{padding-top:0}
 
 .block-editable{
@@ -302,7 +302,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
   #printTarget .block-editable[data-layout="col3"]{ column-count:2; column-gap:1.8em; }
+  #printTarget .block-editable a{ color:#000 !important; }
+  .print-media-page{
+    display:flex !important;flex-direction:column;align-items:center;justify-content:center;
+    gap:.35in;height:9in;text-align:center;
+  }
+  .print-media-page:not(:first-child){ break-before:page; }
+  .print-media-page:not(:last-child){ break-after:page; }
+  .print-media-page img{ max-width:100%;max-height:6in;object-fit:contain; }
+  .print-media-caption{ color:#000 !important;max-width:6.5in; }
+  .print-media-link{ font-family:var(--mono);font-size:11px;color:#000 !important;word-break:break-all; }
 }
+.print-media-page{ display:none; }
 
 /* ── control row (mirrors the Fort-style spec bar) ──
    Collapsed by default; blooms open only while this block is the
@@ -388,6 +399,80 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:transparent;border:1px solid var(--rule);border-radius:4px;cursor:pointer;color:var(--muted);
 }
 .italic-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+
+/* ── link control ──
+   A small chain-glyph trigger, matching the italic toggle's footprint,
+   that opens a tiny popover for entering a URL. Whether that URL turns
+   out to be an image is decided later (see isImageLink/testImageLink)
+   — this control itself doesn't know or care. */
+.link-ctrl{position:relative}
+.link-toggle{
+  font-family:var(--chrome-font);font-size:13px;line-height:1;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:1px solid var(--rule);border-radius:4px;cursor:pointer;color:var(--muted);
+}
+.link-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.link-popover{
+  position:absolute;top:calc(100% + 10px);left:0;z-index:70;
+  width:min(320px, calc(100vw - 60px));
+  background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  box-shadow:0 16px 40px var(--shadow);
+  padding:14px;display:none;flex-direction:column;gap:10px;
+}
+.link-popover.open{display:flex}
+.link-popover-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+}
+.link-popover input[type="url"]{
+  width:100%;font-family:var(--chrome-font);font-size:13px;color:var(--ink);
+  background:transparent;border:none;border-bottom:1px solid var(--rule);
+  outline:none;padding:4px 0 6px;
+}
+.link-popover input[type="url"]:focus{border-bottom-color:var(--ink)}
+.link-popover-row{display:flex;align-items:center;gap:10px}
+.link-popover-apply{
+  font-family:var(--chrome-font);font-size:12px;font-weight:600;color:var(--ink);
+  background:transparent;border:1px solid var(--rule);border-radius:6px;
+  padding:6px 12px;cursor:pointer;transition:border-color .15s;
+}
+.link-popover-apply:hover{border-color:var(--surface-border-soft)}
+.link-popover-remove{
+  font-family:var(--chrome-font);font-size:12px;color:var(--muted);
+  background:transparent;border:none;cursor:pointer;padding:6px 0;
+}
+.link-popover-remove:hover{color:var(--danger)}
+.link-popover-hint{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.5}
+
+/* the little pill that marks a passage as linked, once the popover
+   closes — sits clear of the text itself rather than inline with it,
+   since a passage stays plain text underneath */
+.link-chip{
+  position:absolute;top:6px;right:0;z-index:20;
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);
+  background:var(--surface);border:1px solid var(--rule);border-radius:20px;
+  padding:4px 10px 4px 8px;cursor:pointer;text-decoration:none;max-width:220px;
+  opacity:.55;transition:opacity .15s ease,border-color .15s ease,color .15s ease;
+}
+.link-chip:hover,.link-chip:focus-visible{opacity:1;border-color:var(--surface-border-soft);color:var(--ink)}
+.link-chip-glyph{flex:none;font-size:11px}
+.link-chip-host{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* floating cursor-follow thumbnail — one shared element, reused by
+   every image link on the page, repositioned via rAF lerp rather than
+   snapping straight to the pointer */
+.link-thumb{
+  position:fixed;top:0;left:0;z-index:200;
+  width:220px;max-height:220px;
+  background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+  box-shadow:0 20px 48px var(--shadow);
+  padding:6px;pointer-events:none;
+  opacity:0;transform:translate3d(-9999px,-9999px,0) scale(.96);
+  transition:opacity .16s ease, scale .16s ease;
+  will-change:transform;
+}
+.link-thumb.visible{opacity:1;transform-origin:top left}
+.link-thumb img{display:block;width:100%;max-height:200px;object-fit:contain;border-radius:5px}
 
 .range-track{position:relative;width:110px;height:16px;display:flex;align-items:center}
 .range-track input[type=range]{
@@ -647,7 +732,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   function defaultBlock(overrides){
     return Object.assign({
       text:'', font:'jakarta', weight:700, italic:false,
-      size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none'
+      size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:''
     }, overrides || {});
   }
   function openingBlock(){
@@ -792,6 +877,149 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     return 'color-mix(in srgb, var(--ink) ' + (100 - bgPct) + '%, var(--bg) ' + bgPct + '%)';
   }
 
+  // ── LINKS ──────────────────────────────────────────────────────────
+  // A passage can carry one link. Whether that link happens to point
+  // at an image isn't declared by the writer — it's inferred, first by
+  // extension (fast, synchronous, good enough for print, which can't
+  // wait on a network round trip) and then confirmed by actually
+  // loading it (used to decide whether hovering shows a thumbnail).
+  // Results are cached per-URL so repeat renders don't re-fetch.
+  const imageLinkCache = new Map(); // url -> true | false | undefined(pending)
+
+  function looksLikeImageUrl(url){
+    let pathname = url;
+    try{ pathname = new URL(url, window.location.href).pathname; }
+    catch(e){ pathname = url.split('?')[0].split('#')[0]; }
+    return /\.(png|jpe?g|gif|webp|avif|svg|bmp)$/i.test(pathname);
+  }
+
+  // authoritative for print (synchronous): trust a confirmed load
+  // result if we have one, otherwise fall back to the extension guess
+  function isImageLink(url){
+    if (!url) return false;
+    const cached = imageLinkCache.get(url);
+    if (cached === false) return false;
+    if (cached === true) return true;
+    return looksLikeImageUrl(url);
+  }
+
+  function testImageLink(url, onResolved){
+    if (!url) return;
+    if (imageLinkCache.has(url)){
+      const v = imageLinkCache.get(url);
+      if (v !== undefined && onResolved) onResolved(v);
+      return;
+    }
+    imageLinkCache.set(url, undefined);
+    const probe = new Image();
+    probe.onload = () => { imageLinkCache.set(url, true); if (onResolved) onResolved(true); };
+    probe.onerror = () => { imageLinkCache.set(url, false); if (onResolved) onResolved(false); };
+    probe.src = url;
+  }
+
+  function hostnameFor(url){
+    try{ return new URL(url, window.location.href).hostname.replace(/^www\./,''); }
+    catch(e){ return url.replace(/^https?:\/\//,'').split('/')[0]; }
+  }
+
+  // one shared floating thumbnail, reused by whichever link chip is
+  // currently hovered, repositioned every frame by lerping toward the
+  // cursor rather than snapping to it
+  const linkThumb = document.createElement('div');
+  linkThumb.className = 'link-thumb';
+  linkThumb.setAttribute('aria-hidden', 'true');
+  const linkThumbImg = document.createElement('img');
+  linkThumb.appendChild(linkThumbImg);
+  document.body.appendChild(linkThumb);
+
+  let thumbCurX = 0, thumbCurY = 0, thumbTgtX = 0, thumbTgtY = 0, thumbRAF = null;
+  const THUMB_LERP = 0.16, THUMB_OFFSET_X = 22, THUMB_OFFSET_Y = 22;
+
+  function thumbStep(){
+    thumbCurX += (thumbTgtX - thumbCurX) * THUMB_LERP;
+    thumbCurY += (thumbTgtY - thumbCurY) * THUMB_LERP;
+    linkThumb.style.transform = 'translate3d(' + thumbCurX + 'px,' + thumbCurY + 'px,0)';
+    thumbRAF = requestAnimationFrame(thumbStep);
+  }
+  function startThumbLoop(){ if (!thumbRAF) thumbRAF = requestAnimationFrame(thumbStep); }
+  function stopThumbLoop(){ if (thumbRAF){ cancelAnimationFrame(thumbRAF); thumbRAF = null; } }
+
+  function positionThumbTarget(e){
+    const w = 220, h = 220; // matches .link-thumb sizing
+    let x = e.clientX + THUMB_OFFSET_X;
+    let y = e.clientY + THUMB_OFFSET_Y;
+    if (x + w > window.innerWidth - 8) x = e.clientX - w - THUMB_OFFSET_X;
+    if (y + h > window.innerHeight - 8) y = e.clientY - h - THUMB_OFFSET_Y;
+    thumbTgtX = x; thumbTgtY = y;
+  }
+
+  function showThumbFor(url, e){
+    linkThumbImg.src = url;
+    thumbCurX = e.clientX + THUMB_OFFSET_X;
+    thumbCurY = e.clientY + THUMB_OFFSET_Y;
+    positionThumbTarget(e);
+    linkThumb.classList.add('visible');
+    startThumbLoop();
+  }
+  function hideThumb(){
+    linkThumb.classList.remove('visible');
+    stopThumbLoop();
+  }
+
+  // renders (or removes) the small pill marking a passage as linked.
+  // Lives just outside the contenteditable text, since a passage's
+  // text content itself stays plain — the link is metadata on the
+  // block, not markup inside it.
+  function renderLinkChip(blockEl, b){
+    let chip = blockEl.querySelector(':scope > .link-chip');
+    if (!b.link){
+      if (chip) chip.remove();
+      return;
+    }
+    if (!chip){
+      chip = document.createElement('a');
+      chip.className = 'link-chip';
+      chip.target = '_blank';
+      chip.rel = 'noopener noreferrer';
+      const glyph = document.createElement('span');
+      glyph.className = 'link-chip-glyph';
+      glyph.textContent = '↗';
+      const host = document.createElement('span');
+      host.className = 'link-chip-host';
+      chip.append(glyph, host);
+      blockEl.appendChild(chip);
+    }
+    chip.href = b.link;
+    chip.querySelector('.link-chip-host').textContent = hostnameFor(b.link);
+
+    let hoverBound = chip.dataset.hoverBound === '1';
+    if (!hoverBound){
+      chip.addEventListener('mousemove', (e) => {
+        if (isImageLink(chip.href)) positionThumbTarget(e);
+      });
+      chip.addEventListener('mouseenter', (e) => {
+        testImageLink(chip.href, (isImg) => {
+          if (isImg && chip.matches(':hover')) showThumbFor(chip.href, e);
+        });
+        if (imageLinkCache.get(chip.href) === true) showThumbFor(chip.href, e);
+      });
+      chip.addEventListener('mouseleave', hideThumb);
+      chip.addEventListener('focus', (e) => {
+        if (imageLinkCache.get(chip.href) === true){
+          thumbTgtX = thumbCurX = 24; thumbTgtY = thumbCurY = 24;
+          linkThumbImg.src = chip.href;
+          linkThumb.classList.add('visible');
+          startThumbLoop();
+        }
+      });
+      chip.addEventListener('blur', hideThumb);
+      chip.dataset.hoverBound = '1';
+    }
+    // kick off (or reuse the cached result of) the real image test as
+    // soon as a link is set, so the first hover doesn't have to wait
+    testImageLink(b.link);
+  }
+
   function applyStyle(el, b){
     el.style.fontFamily     = fontFamilyFor(b.font);
     el.style.fontWeight     = b.weight;
@@ -871,6 +1099,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     let cumulative = 0;
     const pages = [[]];
     blocksArr.forEach(b => {
+      // an image-linked passage always claims a full printed page of
+      // its own (see buildPrintable), so it always starts a fresh
+      // page here too, and the next passage starts fresh after it
+      if (b.link && isImageLink(b.link)){
+        if (pages[pages.length - 1].length) pages.push([]);
+        pages[pages.length - 1].push(b);
+        pages.push([]);
+        cumulative = 0;
+        return;
+      }
       const wrapper = document.createElement('div');
       wrapper.className = 'block';
       const clone = document.createElement('div');
@@ -888,6 +1126,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         cumulative += h;
       }
     });
+    if (!pages[pages.length - 1].length) pages.pop();
     return pages;
   }
 
@@ -931,12 +1170,48 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   function buildPrintable(blocksArr){
     printTarget.innerHTML = '';
     blocksArr.forEach(b => {
+      // an image link gets its own dedicated page: the image itself,
+      // the passage's text as a caption beneath it, and the raw URL
+      // as a plain line under that — rather than folding into the
+      // regular text flow like every other passage
+      if (b.link && isImageLink(b.link)){
+        const page = document.createElement('div');
+        page.className = 'print-media-page';
+
+        const img = document.createElement('img');
+        img.src = b.link;
+        img.alt = b.text || '';
+
+        const caption = document.createElement('div');
+        caption.className = 'print-media-caption';
+        caption.textContent = b.text;
+        applyStyle(caption, b);
+
+        const linkLine = document.createElement('a');
+        linkLine.className = 'print-media-link';
+        linkLine.href = b.link;
+        linkLine.textContent = b.link;
+
+        page.append(img, caption, linkLine);
+        printTarget.appendChild(page);
+        return;
+      }
+
       const wrapper = document.createElement('div');
       wrapper.className = 'block';
       const el = document.createElement('div');
       el.className = 'block-editable';
-      el.textContent = b.text;
       applyStyle(el, b);
+      if (b.link){
+        const a = document.createElement('a');
+        a.href = b.link;
+        a.textContent = b.text;
+        a.style.color = 'inherit';
+        a.style.textDecoration = 'underline';
+        el.appendChild(a);
+      } else {
+        el.textContent = b.text;
+      }
       wrapper.appendChild(el);
       printTarget.appendChild(wrapper);
     });
@@ -1184,6 +1459,85 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         applyStyle(textarea,b); saveDraft();
       });
 
+      // link — a single URL for the whole passage. Turning it on
+      // reveals a small chip beside the text (see renderLinkChip);
+      // whether that chip also shows a hover thumbnail depends on
+      // whether the URL actually resolves to an image, decided later.
+      const linkWrap = document.createElement('div');
+      linkWrap.className = 'ctrl link-ctrl';
+
+      const linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'ctrl link-toggle' + (b.link ? ' active' : '');
+      linkBtn.textContent = '🔗';
+      linkBtn.title = 'Add a link to this passage';
+      linkBtn.setAttribute('aria-pressed', b.link ? 'true' : 'false');
+
+      const linkPopover = document.createElement('div');
+      linkPopover.className = 'link-popover';
+      const linkPopLabel = document.createElement('div');
+      linkPopLabel.className = 'link-popover-label';
+      linkPopLabel.textContent = 'Link';
+      const linkInput = document.createElement('input');
+      linkInput.type = 'url';
+      linkInput.placeholder = 'https://…';
+      linkInput.value = b.link || '';
+      linkInput.spellcheck = false;
+      const linkRow = document.createElement('div');
+      linkRow.className = 'link-popover-row';
+      const linkApply = document.createElement('button');
+      linkApply.type = 'button';
+      linkApply.className = 'link-popover-apply';
+      linkApply.textContent = 'Apply';
+      const linkRemove = document.createElement('button');
+      linkRemove.type = 'button';
+      linkRemove.className = 'link-popover-remove';
+      linkRemove.textContent = 'Remove';
+      linkRemove.style.display = b.link ? '' : 'none';
+      const linkHint = document.createElement('div');
+      linkHint.className = 'link-popover-hint';
+      linkHint.textContent = 'If this points to an image, it reveals on hover and prints on its own page.';
+      linkRow.append(linkApply, linkRemove);
+      linkPopover.append(linkPopLabel, linkInput, linkRow, linkHint);
+
+      function commitLink(url){
+        b.link = url;
+        linkBtn.classList.toggle('active', !!b.link);
+        linkBtn.setAttribute('aria-pressed', b.link ? 'true' : 'false');
+        linkRemove.style.display = b.link ? '' : 'none';
+        renderLinkChip(block, b);
+        saveDraft();
+      }
+      linkApply.addEventListener('click', () => {
+        const raw = linkInput.value.trim();
+        commitLink(raw);
+        closeLinkPopover();
+      });
+      linkInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter'){ e.preventDefault(); linkApply.click(); }
+        else if (e.key === 'Escape'){ closeLinkPopover(); e.stopPropagation(); }
+      });
+      linkRemove.addEventListener('click', () => {
+        linkInput.value = '';
+        commitLink('');
+        closeLinkPopover();
+      });
+
+      function openLinkPopover(){
+        document.querySelectorAll('.link-popover.open').forEach(p => { if (p !== linkPopover) p.classList.remove('open'); });
+        document.querySelectorAll('.font-picker-panel.open').forEach(p => p.classList.remove('open'));
+        linkPopover.classList.add('open');
+        linkInput.value = b.link || '';
+        linkInput.focus();
+      }
+      function closeLinkPopover(){ linkPopover.classList.remove('open'); }
+      linkBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        linkPopover.classList.contains('open') ? closeLinkPopover() : openLinkPopover();
+      });
+      linkWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeLinkPopover(); e.stopPropagation(); } });
+      linkWrap.append(linkBtn, linkPopover);
+
       // size slider
       const sizeCtrl = document.createElement('div');
       sizeCtrl.className = 'ctrl';
@@ -1343,9 +1697,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         saveDraft();
       });
 
-      controls.append(fontWrap, weightWrap, italicBtn, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, removeBtn);
+      controls.append(fontWrap, weightWrap, italicBtn, linkWrap, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, removeBtn);
       block.append(controls, textarea);
       blockStack.appendChild(block);
+      renderLinkChip(block, b);
 
       // bloom the control row in only while focus is somewhere inside
       // this block (the textarea itself, or one of its own controls);
@@ -1366,6 +1721,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   document.addEventListener('click', (e) => {
     document.querySelectorAll('.font-picker-panel.open').forEach(panel => {
       const wrap = panel.closest('.font-picker');
+      if (wrap && !wrap.contains(e.target)) panel.classList.remove('open');
+    });
+    document.querySelectorAll('.link-popover.open').forEach(panel => {
+      const wrap = panel.closest('.link-ctrl');
       if (wrap && !wrap.contains(e.target)) panel.classList.remove('open');
     });
   });
