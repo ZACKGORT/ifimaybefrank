@@ -47,6 +47,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .chrome-link.active{border-bottom-color:var(--ink)}
 .chrome-link:disabled{opacity:.3;cursor:default;pointer-events:none}
 .chrome-link.primary{font-weight:600}
+.chrome-link.confirm{color:#7A3324;border-bottom-color:#7A3324}
 
 @media(max-width:640px){
   .brand-mark{bottom:14px;left:16px;font-size:12px}
@@ -136,7 +137,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 @page{ size: letter; margin: 1in; }
 @media print{
   body{background:#fff}
-  .brand-mark, .chrome, .view, .letter-overlay, .skip-link{ display:none !important; }
+  .brand-mark, .chrome, .view, .skip-link{ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
@@ -146,18 +147,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 /* ── control row (mirrors the Fort-style spec bar) ──
    Collapsed by default; blooms open only while this block is the
    active one (focus is somewhere inside it), so a page of several
-   passages doesn't show every control row at once. */
+   passages doesn't show every control row at once. Sits above the
+   passage (not below), and while open, clamps to the top of the
+   viewport as you scroll through a long passage — so it stays
+   reachable rather than scrolling out of view with the text. */
 .block-controls{
   display:flex;align-items:center;flex-wrap:wrap;gap:22px;
-  margin-top:0;padding-top:0;max-height:0;opacity:0;overflow:hidden;
+  margin-bottom:0;padding-bottom:0;max-height:0;opacity:0;overflow:hidden;
   transform:translateY(-6px) scaleY(.94);transform-origin:top left;
   pointer-events:none;
   transition:max-height .38s cubic-bezier(.22,1,.36,1), opacity .22s ease,
-             transform .3s cubic-bezier(.22,1,.36,1), margin-top .3s ease, padding-top .3s ease;
+             transform .3s cubic-bezier(.22,1,.36,1), margin-bottom .3s ease, padding-bottom .3s ease;
 }
 .block.active .block-controls{
-  margin-top:22px;padding-top:14px;max-height:120px;opacity:1;
+  margin-bottom:22px;padding-bottom:14px;max-height:120px;opacity:1;
   transform:translateY(0) scaleY(1);pointer-events:auto;overflow:visible;
+  position:sticky;top:60px;z-index:30;
+  background:var(--bg);border-bottom:1px solid var(--rule);
 }
 .block{transition:border-color .25s ease}
 .block.active{border-color:#d5d5d1}
@@ -281,7 +287,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 /* ══════════════════════════════════════════
    ARCHIVE
 ══════════════════════════════════════════ */
-.archive-wrap{max-width:1040px;margin:0 auto;padding:56px 32px 100px}
+.archive-wrap{max-width:1280px;margin:0 auto;padding:56px 32px 100px}
 .archive-head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:40px}
 .archive-title{font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin-bottom:6px}
 .archive-sub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -297,98 +303,67 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
 .archive-empty{border:1px dashed var(--rule);padding:60px 24px;text-align:center;color:var(--muted);font-size:15px}
 
-.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
-.letter-card{background:#fff;padding:26px 24px;cursor:pointer;display:flex;flex-direction:column;min-height:200px;transition:background .15s;text-align:left;border:none;width:100%;font:inherit;color:inherit}
-.letter-card:hover{background:#fafafa}
-.lc-head{color:var(--ink);line-height:1.05;margin-bottom:14px;word-break:break-word;overflow:hidden;max-height:2.3em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.lc-snip{font-size:13px;color:#555;line-height:1.5;margin-top:auto;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.lc-date{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:14px}
+/* ── shared card internals (grid + list both use these) ── */
+.letter-card{
+  background:transparent;cursor:pointer;text-align:left;border:none;width:100%;
+  font:inherit;color:inherit;position:relative;transition:background .18s;
+}
+.letter-card:hover{background:rgba(var(--ink-rgb),.03)}
+.lc-num{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);font-variant-numeric:tabular-nums}
+.lc-arrow{font-size:14px;color:var(--muted);transition:color .15s,transform .15s}
+.letter-card:hover .lc-arrow{color:var(--ink);transform:translateX(3px)}
+.lc-head{
+  color:var(--ink);line-height:1.08;word-break:break-word;
+  overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;
+}
+.lc-desc{font-size:13px;font-weight:400;line-height:1.5;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical}
+.lc-meta-type{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lc-meta-year{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--muted)}
 
-/* list mode — same cards, laid out as compact rows instead of a grid */
-.shelf.list-mode{display:flex;flex-direction:column;grid-template-columns:unset}
+/* ── GRID (default) — numbered tiles, 4-up, matching the reference:
+   number + corner arrow at top, headline + description filling the
+   middle, a ruled meta row pinned to the bottom of every tile ── */
+.shelf{display:grid;grid-template-columns:repeat(4,1fr);border-left:1px solid var(--rule)}
+.shelf .letter-card{
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:20px 20px 18px;min-height:220px;
+  border-top:1px solid var(--rule);border-right:1px solid var(--rule);
+}
+.shelf .letter-card:nth-last-child(-n+4){border-bottom:1px solid var(--rule)}
+.shelf .lc-num{margin-bottom:12px}
+.shelf .lc-arrow{position:absolute;top:16px;right:16px}
+.shelf .lc-body{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.shelf .lc-head{-webkit-line-clamp:6;font-size:clamp(15px,1.6vw,22px) !important}
+.shelf .lc-desc{-webkit-line-clamp:3;margin-top:auto;padding-top:12px}
+.shelf .lc-meta{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);
+}
+@media(max-width:900px){
+  .shelf{grid-template-columns:repeat(2,1fr)}
+  .shelf .letter-card:nth-last-child(-n+4){border-bottom:none}
+  .shelf .letter-card:nth-last-child(-n+2){border-bottom:1px solid var(--rule)}
+}
+
+/* ── LIST — full-width rows: num | headline+description | meta | arrow,
+   matching the base (non-grid) work-row column layout ── */
+.shelf.list-mode{display:block;border-left:none}
 .shelf.list-mode .letter-card{
-  flex-direction:row;align-items:center;gap:24px;min-height:0;padding:16px 22px;
-  border-bottom:1px solid var(--rule);
+  display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;align-items:center;gap:20px;
+  padding:26px 20px;min-height:0;border-top:1px solid var(--rule);border-right:none;
 }
-.shelf.list-mode .letter-card:last-child{border-bottom:none}
-.shelf.list-mode .lc-head{
-  max-height:none;-webkit-line-clamp:1;flex:0 0 auto;max-width:38%;margin-bottom:0;font-size:22px !important;line-height:1.1 !important;
-}
-.shelf.list-mode .lc-snip{-webkit-line-clamp:1;margin-top:0;flex:1;min-width:0}
-.shelf.list-mode .lc-date{margin-top:0;flex:none;white-space:nowrap}
+.shelf.list-mode .letter-card:first-child{border-top:none}
+.shelf.list-mode .letter-card:nth-last-child(-n+4){border-bottom:none}
+.shelf.list-mode .lc-num{align-self:start;padding-top:4px}
+.shelf.list-mode .lc-body{display:flex;flex-direction:column;gap:8px;min-width:0}
+.shelf.list-mode .lc-head{-webkit-line-clamp:2;font-size:clamp(18px,2.2vw,28px) !important;margin-bottom:0}
+.shelf.list-mode .lc-desc{-webkit-line-clamp:2;margin-top:0;padding-top:0}
+.shelf.list-mode .lc-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-top:0;padding-top:0;border-top:none}
+.shelf.list-mode .lc-arrow{position:static;margin-left:4px}
 
 @media(max-width:640px){
-  .shelf.list-mode .letter-card{flex-wrap:wrap}
-  .shelf.list-mode .lc-head{max-width:100%}
-  .shelf.list-mode .lc-snip{display:none}
-}
-
-/* ── FULL-VIEW LETTER OVERLAY ──
-   Reading a sealed letter as it actually reads/prints: real passages,
-   real styling, grouped into pages the same way print pagination
-   would. Edit lives in the header; Print/Delete sit at the very
-   bottom of the pages themselves, after the last sheet, rather than
-   pinned to the modal chrome. */
-.letter-overlay{
-  display:block;position:fixed;inset:0;z-index:200;
-  background:rgba(20,18,15,.5);
-  opacity:0;pointer-events:none;transition:opacity .25s ease;
-}
-.letter-overlay.open{opacity:1;pointer-events:auto}
-.letter-overlay-panel{
-  position:absolute;left:0;right:0;bottom:0;max-height:88vh;
-  background:#fff;border-top:1px solid var(--rule);border-radius:16px 16px 0 0;
-  overflow-y:auto;-webkit-overflow-scrolling:touch;
-  transform:translateY(100%);transition:transform .32s cubic-bezier(.16,1,.3,1);
-  padding-bottom:0;
-}
-.letter-overlay.open .letter-overlay-panel{transform:translateY(0)}
-.letter-overlay-header{
-  position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px 0;
-}
-.lo-btn{
-  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-  background:rgba(var(--ink-rgb),.06);border:none;border-radius:20px;color:var(--ink);cursor:pointer;
-  padding:8px 16px;
-}
-.lo-btn:hover{background:rgba(var(--ink-rgb),.1)}
-.lo-close{
-  position:sticky;top:12px;left:calc(100% - 48px);
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  font-family:var(--chrome-font);font-size:20px;line-height:1;color:var(--muted);
-  background:rgba(var(--ink-rgb),.06);border:none;border-radius:50%;cursor:pointer;z-index:2;
-}
-.lo-close:hover{color:var(--ink);background:rgba(var(--ink-rgb),.1)}
-
-.letter-pages{display:flex;flex-direction:column;align-items:center;gap:28px;padding:8px 24px 0}
-.letter-page-sheet{
-  width:816px;max-width:100%;min-height:1056px;flex:none;box-sizing:border-box;
-  background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.08);border:1px solid var(--rule);
-  padding:96px;position:relative;overflow:visible;
-}
-.letter-page-sheet .block{padding:20px 0;border-bottom:1px solid var(--rule-soft)}
-.letter-page-sheet .block:first-child{padding-top:0}
-.letter-page-sheet .block:last-child{border-bottom:none}
-.letter-page-number{
-  position:absolute;bottom:28px;right:36px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
-}
-.letter-pages-footer{
-  display:flex;justify-content:center;gap:14px;padding:8px 24px 32px;
-}
-.lo-action{
-  font-family:var(--chrome-font);font-size:13px;font-weight:600;color:var(--ink);
-  background:transparent;border:1px solid var(--rule);border-radius:20px;padding:9px 20px;cursor:pointer;
-  transition:background .15s,border-color .15s;
-}
-.lo-action:hover{background:var(--rule-soft)}
-.lo-action.danger{color:#7A3324;border-color:rgba(122,51,36,.3)}
-.lo-action.danger:hover{background:rgba(122,51,36,.06)}
-.lo-action.confirm{background:#7A3324;color:#fff;border-color:#7A3324}
-
-@media(max-width:900px){
-  .letter-page-sheet{width:100%;min-height:0;padding:48px 28px}
+  .shelf.list-mode .letter-card{grid-template-columns:28px 1fr auto;padding:18px 16px}
+  .shelf.list-mode .lc-meta{display:none}
 }
 
 .skip-link{position:fixed;top:-100px;left:12px;z-index:999;background:var(--ink);color:#fff;padding:10px 16px;font-size:13px;text-decoration:none;transition:top .15s}
@@ -409,6 +384,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   <span class="chrome-status" id="saveStatus"></span>
   <button class="chrome-link" id="btnNew">New</button>
   <button class="chrome-link" id="btnPrint">Print</button>
+  <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
   <button class="chrome-link primary" id="btnSeal" disabled>Seal &amp; file</button>
 </nav>
 
@@ -445,17 +421,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     <div class="shelf" id="shelf"></div>
   </div>
 </section>
-
-<!-- ══════════════════ FULL-VIEW LETTER OVERLAY ══════════════════ -->
-<div class="letter-overlay" id="letterOverlay">
-  <div class="letter-overlay-panel">
-    <div class="letter-overlay-header">
-      <button class="lo-btn" id="loEdit">Edit</button>
-      <button class="lo-close" id="loClose" aria-label="Close">×</button>
-    </div>
-    <div class="letter-pages" id="letterPages"></div>
-  </div>
-</div>
 
 <!-- hidden print source — populated right before window.print() with
      either the live draft or an archived letter, so printing never
@@ -563,9 +528,29 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     ];
   }
 
+  function odysseyDemoBlocks(){
+    // an actual piece written in the tool during testing — kept as a
+    // real example of the weight controls doing rhetorical work rather
+    // than just demonstrating themselves
+    return [
+      { text:"I have an opinion on Nolan's 'The Odyssey'.", font:'jakarta', weight:800, italic:false, size:86, tracking:-12, leading:100, fill:0, layout:'single', list:'none' },
+      { text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:40, tracking:-6, leading:108, fill:0, layout:'single', list:'none' },
+      { text:"humbly, I offer just one change from Homer's original poem that would improve upon what Nolan was already setting the audience up for.", font:'fraunces', weight:600, italic:true, size:26, tracking:0, leading:145, fill:20, layout:'single', list:'none' },
+      { text:"1. Instead of 11 ships getting destroyed at the beginning, let most of the ships survive before they meet Polyphemus.  This effectively gives Nolan more to work with as the protagonist levels through the episodic 'final bosses'.\n2. Cut time given to final fight and give that to Polyphemus / Cerci /  / Laestrygonians (the cannibal giants)", font:'mono', weight:500, italic:false, size:13, tracking:0, leading:155, fill:90, layout:'single', list:'number' },
+      { text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none' },
+      { text:'The encounter with Polyphemus could adapt Homer\'s original layout to show something visually more impressive.  More men.  More ships. More stakes. Adapt the encounter with Polyphemus such that logically, it stands to reason that discovering a trove of food from a giant would be sufficient to feed the 1000 soldiers.  Give screentime to creative liberty in how the protagonist and his men cleverly enjoy success before a critical failure causes the giant to become a threat (same logistical workings as the horse out of sand introduction). Perhaps here, we lose a just one or two boats.', font:'jakarta', weight:400, italic:false, size:15, tracking:0, leading:158, fill:75, layout:'single', list:'none' },
+      { text:"Or, imagine your are Cerci, and you adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths to feed.", font:'newsreader', weight:500, italic:false, size:22, tracking:0, leading:145, fill:55, layout:'single', list:'none' },
+      { text:'Or Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:22, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
+      { text:'Or, since the Laestrygonians decided to show up in their Sunday best (you know, the cannibal giants Homer wrote about; with Nolan\'s shiny new armor), well we can now have an actual battle, with real loss through terror and trajedy, rather than just Monthy Pythoning it "run away!"', font:'newsreader', weight:700, italic:false, size:24, tracking:0, leading:140, fill:0, layout:'single', list:'none' },
+      { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
+      { text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' }
+    ];
+  }
+
   const blockStack   = document.getElementById('blockStack');
   const printPhantom = document.getElementById('printPhantom');
   const btnPrint     = document.getElementById('btnPrint');
+  const btnDelete    = document.getElementById('btnDelete');
   const addBlockBtn  = document.getElementById('addBlockBtn');
   const btnSeal      = document.getElementById('btnSeal');
   const btnNew       = document.getElementById('btnNew');
@@ -578,10 +563,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   const composeTagline = document.getElementById('composeTagline');
   const btnListView  = document.getElementById('btnListView');
   const btnGridView  = document.getElementById('btnGridView');
-  const letterOverlay = document.getElementById('letterOverlay');
-  const letterPages  = document.getElementById('letterPages');
-  const loEdit       = document.getElementById('loEdit');
-  const loClose      = document.getElementById('loClose');
   const printTarget  = document.getElementById('printTarget');
 
   function escapeHtml(s){
@@ -591,6 +572,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   function fontFamilyFor(id){
     const f = FONTS.find(x => x.id === id);
     return f ? f.family : FONTS[0].family;
+  }
+
+  // shared by the font and weight specimen panels: preview cards show
+  // whatever the passage actually says (truncated), not a fixed sample
+  const PREVIEW_CHAR_LIMIT = 60;
+  function previewTextFor(el){
+    const raw = (el.textContent || '').trim();
+    return raw.length
+      ? (raw.length > PREVIEW_CHAR_LIMIT ? raw.slice(0, PREVIEW_CHAR_LIMIT).trim() + '…' : raw)
+      : 'Aa Bb Cc — the weight of it';
   }
 
   function applyStyle(el, b){
@@ -769,6 +760,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       textarea.style.whiteSpace = 'pre-wrap';
       applyStyle(textarea, b);
       textarea.addEventListener('input', () => {
+        // contenteditable can leave a stray empty text node or <br>
+        // behind after backspacing everything out, which is enough to
+        // make :empty stop matching — normalize so the placeholder
+        // reliably reappears the moment a passage is genuinely blank
+        if (textarea.textContent.trim() === '' && textarea.childNodes.length > 0){
+          textarea.textContent = '';
+        }
         b.text = textarea.textContent;
         updateSealEnabled();
         saveDraft();
@@ -848,6 +846,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
           b.font = f.id;
           fontLabel.textContent = f.label;
           refreshSwatch();
+          refreshWeightSwatch();
           fontPanel.querySelectorAll('.font-picker-card').forEach(c => c.classList.toggle('selected', c === card));
           closeFontPanel();
           applyStyle(textarea,b); saveDraft();
@@ -858,12 +857,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       // pulls whatever the passage actually says right now (not a
       // snapshot from when the panel was built), so previews stay
       // current even after typing more
-      const PREVIEW_CHAR_LIMIT = 60;
       function refreshPanelPreviewText(){
-        const raw = (textarea.textContent || '').trim();
-        const preview = raw.length
-          ? (raw.length > PREVIEW_CHAR_LIMIT ? raw.slice(0, PREVIEW_CHAR_LIMIT).trim() + '…' : raw)
-          : 'Aa Bb Cc — the weight of it';
+        const preview = previewTextFor(textarea);
         panelSamples.forEach(el => { el.textContent = preview; });
       }
 
@@ -882,19 +877,87 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       fontWrap.append(fontTrigger, fontPanel);
 
 
-      // weight select
+      // weight picker — same interaction model as the font picker: a
+      // swatch trigger opens a specimen panel, each option previewed
+      // live in the passage's current typeface and actual text
       const weightWrap = document.createElement('div');
-      weightWrap.className = 'ctrl select-wrap';
-      const weightSel = document.createElement('select');
-      weightSel.className = 'ctrl-select';
+      weightWrap.className = 'ctrl font-picker';
+
+      const weightTrigger = document.createElement('button');
+      weightTrigger.type = 'button';
+      weightTrigger.className = 'font-picker-trigger';
+      weightTrigger.title = 'Change weight';
+      const weightSwatch = document.createElement('span');
+      weightSwatch.className = 'font-swatch';
+      weightSwatch.textContent = 'Aa';
+      const weightLabel = document.createElement('span');
+      weightLabel.className = 'font-picker-label';
+      weightLabel.textContent = WEIGHTS.find(w => w.v === b.weight).label;
+      const weightChevron = document.createElement('span');
+      weightChevron.className = 'dd-chevron';
+      weightChevron.textContent = '⌄';
+      weightTrigger.append(weightSwatch, weightLabel, weightChevron);
+
+      function refreshWeightSwatch(){
+        weightSwatch.style.fontFamily = fontFamilyFor(b.font);
+        weightSwatch.style.fontWeight = b.weight;
+        weightSwatch.style.fontStyle = b.italic ? 'italic' : 'normal';
+      }
+      refreshWeightSwatch();
+
+      const weightPanel = document.createElement('div');
+      weightPanel.className = 'font-picker-panel';
+      const weightPanelSamples = [];
       WEIGHTS.forEach(w => {
-        const opt = document.createElement('option');
-        opt.value = w.v; opt.textContent = w.label;
-        if (w.v === b.weight) opt.selected = true;
-        weightSel.appendChild(opt);
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'font-picker-card' + (w.v === b.weight ? ' selected' : '');
+
+        const name = document.createElement('div');
+        name.className = 'fp-name';
+        name.textContent = w.label + ' · ' + w.v;
+
+        const sample = document.createElement('div');
+        sample.className = 'fp-sample';
+        sample.style.fontWeight = w.v;
+        weightPanelSamples.push(sample);
+
+        card.append(name, sample);
+        card.addEventListener('click', () => {
+          b.weight = w.v;
+          weightLabel.textContent = w.label;
+          refreshWeightSwatch();
+          weightPanel.querySelectorAll('.font-picker-card').forEach(c => c.classList.toggle('selected', c === card));
+          closeWeightPanel();
+          applyStyle(textarea,b); saveDraft();
+        });
+        weightPanel.appendChild(card);
       });
-      weightSel.addEventListener('change', () => { b.weight = parseInt(weightSel.value,10); applyStyle(textarea,b); saveDraft(); });
-      weightWrap.appendChild(weightSel);
+
+      function refreshWeightPanel(){
+        const preview = previewTextFor(textarea);
+        const family = fontFamilyFor(b.font);
+        const style = b.italic ? 'italic' : 'normal';
+        weightPanelSamples.forEach(el => {
+          el.textContent = preview;
+          el.style.fontFamily = family;
+          el.style.fontStyle = style;
+        });
+      }
+
+      function openWeightPanel(){
+        refreshWeightPanel();
+        document.querySelectorAll('.font-picker-panel.open').forEach(p => { if (p !== weightPanel) p.classList.remove('open'); });
+        weightPanel.classList.add('open');
+      }
+      function closeWeightPanel(){ weightPanel.classList.remove('open'); }
+      weightTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        weightPanel.classList.contains('open') ? closeWeightPanel() : openWeightPanel();
+      });
+      weightWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWeightPanel(); });
+
+      weightWrap.append(weightTrigger, weightPanel);
 
       // italic toggle
       const italicBtn = document.createElement('button');
@@ -906,6 +969,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         b.italic = !b.italic;
         italicBtn.classList.toggle('active', b.italic);
         italicBtn.setAttribute('aria-pressed', b.italic ? 'true' : 'false');
+        refreshWeightSwatch();
         applyStyle(textarea,b); saveDraft();
       });
 
@@ -1069,7 +1133,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       });
 
       controls.append(fontWrap, weightWrap, italicBtn, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, removeBtn);
-      block.append(textarea, controls);
+      block.append(controls, textarea);
       blockStack.appendChild(block);
 
       // bloom the control row in only while focus is somewhere inside
@@ -1109,6 +1173,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     tabs.forEach(t => t.classList.toggle('active', t.dataset.view === name));
     viewCompose.classList.toggle('active', name === 'compose');
     viewArchive.classList.toggle('active', name === 'archive');
+    // New / Print / Seal are compose-only actions — showing them while
+    // browsing the archive would be misleading (Print, in particular,
+    // would otherwise print the live draft instead of whatever you're
+    // actually looking at)
+    const composeOnly = name === 'compose';
+    saveStatusEl.style.display = composeOnly ? '' : 'none';
+    btnNew.style.display = composeOnly ? '' : 'none';
+    btnPrint.style.display = composeOnly ? '' : 'none';
+    btnSeal.style.display = composeOnly ? '' : 'none';
+    // Delete is further scoped to only when there's an actual filed
+    // letter currently loaded for editing, not a fresh blank one
+    btnDelete.style.display = (composeOnly && editingEntryId) ? '' : 'none';
+    btnSeal.textContent = editingEntryId ? 'Update & file' : 'Seal & file';
     if (name === 'archive') renderArchive();
   }
 
@@ -1157,20 +1234,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     }
     setSaveStatus('saving');
     draftTimer = setTimeout(() => {
-      persist.trySet('draft:current', JSON.stringify(blocks));
+      persist.trySet('draft:current', JSON.stringify({ blocks, editingEntryId }));
     }, 900);
-  }
-
-  async function loadDraft(){
-    const res = await persist.tryGet('draft:current');
-    if (res && res.value){
-      try{
-        const parsed = JSON.parse(res.value);
-        if (Array.isArray(parsed) && parsed.length) blocks = parsed;
-      }catch(e){ /* ignore corrupt draft */ }
-    }
-    renderStack();
-    updateSealEnabled();
   }
 
   function resetCompose(){
@@ -1244,6 +1309,45 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       persist.trySet('entries:' + demoEntry.id, JSON.stringify(demoEntry));
     }
     persist.trySet('meta:demoSeeded', 'true');
+
+    // the Odyssey essay — a real piece written while testing — is kept
+    // as a permanent example, and kept in sync with edits to the
+    // canonical copy in source. It's identified by its opening line
+    // rather than by id (older sessions seeded it under a different,
+    // timestamp-suffixed id), and only auto-refreshed while it's still
+    // pristine — if it's been edited further since it was seeded, that
+    // edit is left alone rather than silently overwritten.
+    const isOdysseyEntry = e => e && e.blocks && e.blocks[0] &&
+      typeof e.blocks[0].text === 'string' &&
+      e.blocks[0].text.indexOf("Nolan's 'The Odyssey'") !== -1;
+
+    const odysseySeedBlocks = odysseyDemoBlocks();
+    const odysseySeedJSON = JSON.stringify(odysseySeedBlocks);
+    const priorSeedRaw = await persist.tryGet('meta:odysseySeed');
+    let priorSeedJSON = null;
+    if (priorSeedRaw && priorSeedRaw.value){
+      try{ priorSeedJSON = JSON.parse(priorSeedRaw.value).blocksJSON || null; }catch(e){ /* ignore corrupt */ }
+    }
+
+    const existingIdx = entriesCache.findIndex(isOdysseyEntry);
+    if (existingIdx === -1){
+      const odysseyEntry = {
+        id: 'entry_odyssey_' + Date.now(),
+        blocks: odysseySeedBlocks,
+        createdAt: new Date().toISOString()
+      };
+      entriesCache.unshift(odysseyEntry);
+      persist.trySet('entries:' + odysseyEntry.id, JSON.stringify(odysseyEntry));
+    } else {
+      const existing = entriesCache[existingIdx];
+      const existingJSON = JSON.stringify(existing.blocks);
+      const pristine = priorSeedJSON === null || priorSeedJSON === existingJSON;
+      if (pristine && existingJSON !== odysseySeedJSON){
+        existing.blocks = odysseySeedBlocks;
+        persist.trySet('entries:' + existing.id, JSON.stringify(existing));
+      }
+    }
+    persist.trySet('meta:odysseySeed', JSON.stringify({ blocksJSON: odysseySeedJSON }));
   }
 
   // ── VIEW MODE (grid / list) ──
@@ -1255,6 +1359,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   btnGridView.addEventListener('click', () => setArchiveViewMode('grid'));
   btnListView.addEventListener('click', () => setArchiveViewMode('list'));
 
+  // pulls just the first sentence out of a block of text — used for the
+  // archive card's description line, mirroring "preview of the first
+  // sentence" rather than dumping the whole rest of the letter in
+  function firstSentence(text){
+    const trimmed = text.trim();
+    const match = trimmed.match(/^[^.!?]*[.!?]/);
+    if (match) return match[0].trim();
+    return trimmed.length > 140 ? trimmed.slice(0,140).trim() + '…' : trimmed;
+  }
+
   function renderArchive(){
     if (entriesCache.length === 0){
       shelf.innerHTML = '';
@@ -1263,15 +1377,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     }
     archiveEmpty.style.display = 'none';
     shelf.innerHTML = '';
-    entriesCache.forEach(entry => {
+    entriesCache.forEach((entry, i) => {
       const firstWithText = entry.blocks.find(b => b.text.trim().length > 0) || entry.blocks[0];
       const restText = entry.blocks
         .filter(b => b !== firstWithText)
         .map(b => b.text.trim()).filter(Boolean).join(' ');
+      const descText = restText ? firstSentence(restText) : 'No further passages.';
+      const passageCount = entry.blocks.filter(b => b.text.trim().length > 0).length;
 
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'letter-card';
+
+      const num = document.createElement('div');
+      num.className = 'lc-num';
+      num.textContent = String(i + 1).padStart(2, '0');
+
+      const arrow = document.createElement('div');
+      arrow.className = 'lc-arrow';
+      arrow.textContent = '→';
+
+      const body = document.createElement('div');
+      body.className = 'lc-body';
 
       const head = document.createElement('div');
       head.className = 'lc-head';
@@ -1285,123 +1412,103 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       head.style.color = 'rgb(' + hv + ',' + hv + ',' + hv + ')';
       head.textContent = firstWithText.text.trim() || '(untitled)';
 
-      const snip = document.createElement('div');
-      snip.className = 'lc-snip';
-      snip.textContent = restText || 'No further passages.';
+      const desc = document.createElement('div');
+      desc.className = 'lc-desc';
+      desc.textContent = descText;
 
-      const date = document.createElement('div');
-      date.className = 'lc-date';
-      date.textContent = fmtDate(entry.createdAt);
+      body.append(head, desc);
 
-      card.append(head, snip, date);
-      card.addEventListener('click', () => openLetterOverlay(entry));
+      const meta = document.createElement('div');
+      meta.className = 'lc-meta';
+      const metaType = document.createElement('span');
+      metaType.className = 'lc-meta-type';
+      metaType.textContent = passageCount + (passageCount === 1 ? ' passage' : ' passages');
+      const metaYear = document.createElement('span');
+      metaYear.className = 'lc-meta-year';
+      metaYear.textContent = fmtDate(entry.createdAt);
+      meta.append(metaType, metaYear);
+
+      card.append(num, arrow, body, meta);
+      card.addEventListener('click', () => openForEditing(entry));
       shelf.appendChild(card);
     });
   }
 
-  // ── FULL-VIEW LETTER OVERLAY ──
-  function renderLetterPages(entryBlocks){
-    letterPages.innerHTML = '';
-    const pages = paginateBlocks(entryBlocks);
-    pages.forEach((pageBlocks, pi) => {
-      const sheet = document.createElement('div');
-      sheet.className = 'letter-page-sheet';
-      pageBlocks.forEach(b => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'block';
-        const el = document.createElement('div');
-        el.className = 'block-editable';
-        el.textContent = b.text;
-        applyStyle(el, b);
-        wrapper.appendChild(el);
-        sheet.appendChild(wrapper);
-      });
-      const num = document.createElement('div');
-      num.className = 'letter-page-number';
-      num.textContent = 'Page ' + (pi + 1) + ' of ' + pages.length;
-      sheet.appendChild(num);
-      letterPages.appendChild(sheet);
-    });
-
-    // Print / Delete live at the very bottom of the pages themselves —
-    // part of the scrollable content, not the modal's fixed chrome
-    const footer = document.createElement('div');
-    footer.className = 'letter-pages-footer';
-
-    const printBtn = document.createElement('button');
-    printBtn.type = 'button';
-    printBtn.className = 'lo-action';
-    printBtn.textContent = 'Print this letter';
-    printBtn.addEventListener('click', () => printBlocks(entryBlocks));
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.type = 'button';
-    deleteBtn.className = 'lo-action danger';
-    deleteBtn.textContent = 'Delete';
-    let confirming = false;
-    deleteBtn.addEventListener('click', () => {
-      if (!confirming){
-        confirming = true;
-        deleteBtn.textContent = 'Confirm delete?';
-        deleteBtn.classList.add('confirm');
-        setTimeout(() => {
-          if (confirming){
-            confirming = false;
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.classList.remove('confirm');
-          }
-        }, 3000);
-        return;
-      }
-      deleteCurrentOverlayEntry();
-    });
-
-    footer.append(printBtn, deleteBtn);
-    letterPages.appendChild(footer);
-  }
-
-  let overlayEntryId = null;
-  function openLetterOverlay(entry){
-    overlayEntryId = entry.id;
-    renderLetterPages(entry.blocks);
-    letterOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLetterOverlay(){
-    overlayEntryId = null;
-    letterOverlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-  function deleteCurrentOverlayEntry(){
-    const idx = entriesCache.findIndex(e => e.id === overlayEntryId);
-    if (idx !== -1){
-      persist.tryDelete('entries:' + entriesCache[idx].id);
-      entriesCache.splice(idx, 1);
-    }
-    closeLetterOverlay();
-    renderArchive();
-  }
-  loEdit.addEventListener('click', () => {
-    const entry = entriesCache.find(e => e.id === overlayEntryId);
-    if (!entry) return;
+  // clicking a letter opens it straight into edit — Print (already in
+  // the nav) and Delete work directly against whatever's loaded, since
+  // editing an archived letter just loads its real blocks into compose
+  function openForEditing(entry){
     blocks = JSON.parse(JSON.stringify(entry.blocks));
     editingEntryId = entry.id;
     renderStack();
     updateSealEnabled();
-    closeLetterOverlay();
     showView('compose');
-  });
-  loClose.addEventListener('click', closeLetterOverlay);
-  letterOverlay.addEventListener('click', (e) => {
-    if (e.target === letterOverlay) closeLetterOverlay();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && letterOverlay.classList.contains('open')) closeLetterOverlay();
+  }
+
+  let deleteConfirming = false;
+  btnDelete.addEventListener('click', () => {
+    if (!deleteConfirming){
+      deleteConfirming = true;
+      btnDelete.textContent = 'Confirm delete?';
+      btnDelete.classList.add('confirm');
+      setTimeout(() => {
+        if (deleteConfirming){
+          deleteConfirming = false;
+          btnDelete.textContent = 'Delete';
+          btnDelete.classList.remove('confirm');
+        }
+      }, 3000);
+      return;
+    }
+    deleteConfirming = false;
+    btnDelete.textContent = 'Delete';
+    btnDelete.classList.remove('confirm');
+    const idx = entriesCache.findIndex(e => e.id === editingEntryId);
+    if (idx !== -1){
+      persist.tryDelete('entries:' + entriesCache[idx].id);
+      entriesCache.splice(idx, 1);
+    }
+    resetCompose();
+    showView('archive');
   });
 
   // ── INIT ──
-  loadDraft();
-  loadEntriesFromStorage().then(renderArchive);
+  // Priority for what compose opens with: (1) a genuine in-progress
+  // draft — unsaved work always wins; (2) otherwise, the most recently
+  // filed letter, so returning to the page continues where you left
+  // off rather than greeting you with a blank page or the demo; (3)
+  // only a brand-new session with nothing filed yet sees the demo.
+  async function initApp(){
+    await loadEntriesFromStorage();
+    renderArchive();
+
+    const draftRes = await persist.tryGet('draft:current');
+    let resumed = false;
+    if (draftRes && draftRes.value){
+      try{
+        const parsed = JSON.parse(draftRes.value);
+        // backward-compatible with the older draft shape (a bare array)
+        const draftBlocks = Array.isArray(parsed) ? parsed : parsed.blocks;
+        const draftEditingId = Array.isArray(parsed) ? null : (parsed.editingEntryId || null);
+        if (Array.isArray(draftBlocks) && draftBlocks.length){
+          blocks = draftBlocks;
+          editingEntryId = draftEditingId;
+          resumed = true;
+        }
+      }catch(e){ /* ignore corrupt draft */ }
+    }
+
+    if (!resumed && entriesCache.length){
+      const latest = entriesCache[0];
+      blocks = JSON.parse(JSON.stringify(latest.blocks));
+      editingEntryId = latest.id;
+    }
+
+    renderStack();
+    updateSealEnabled();
+    showView('compose');
+  }
+  initApp();
 })();
 </script>
 </body>
