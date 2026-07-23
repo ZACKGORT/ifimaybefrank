@@ -346,7 +346,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   #printTarget .block-editable a{ color:#000 !important; }
   .print-media-page{
     display:flex !important;flex-direction:column;align-items:center;justify-content:center;
-    gap:.35in;height:9in;text-align:center;
+    gap:.35in;height:9in;box-sizing:border-box;text-align:center;break-inside:avoid;
   }
   .print-media-page:not(:first-child){ break-before:page; }
   .print-media-page:not(:last-child){ break-after:page; }
