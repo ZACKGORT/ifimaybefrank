@@ -298,6 +298,22 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   background:transparent;color:var(--ink);
   min-height:1.2em;text-align:left;
 }
+/* the live editing surface scales each passage's own chosen size
+   down proportionately as the viewport narrows — down to ~55% of
+   whatever desktop size was dialed in (never below 14px, so nothing
+   goes illegible), rather than reproducing a desktop-authored size
+   (which can be as large as 200px) verbatim on a phone. Print and the
+   pagination phantom deliberately don't get this rule — they read the
+   inline font-size set directly in JS, so a printed page always
+   reflects the literal size chosen, independent of the editing
+   window's current width. */
+#blockStack .block-editable{
+  font-size: clamp(
+    max(14px, calc(var(--bsize) * 0.55px)),
+    calc(var(--bsize) * 0.25px + var(--bsize) * 0.08333vw),
+    calc(var(--bsize) * 1px)
+  ) !important;
+}
 .block-editable:empty:before{content:attr(data-placeholder);color:inherit;font-style:italic;white-space:pre-line;opacity:1;transition:opacity .2s ease}
 /* once you're actually focused into the block (text-focus), the
    placeholder recedes to a faint hint rather than sitting at full
@@ -317,6 +333,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   .block-editable[data-layout="col2"],
   .block-editable[data-layout="col3"]{column-count:1;column-gap:normal}
 }
+
 
 /* a 3-up column doesn't fit a 6.5in printed page column comfortably,
    so print (and the hidden measurement phantom that predicts print
@@ -891,14 +908,14 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   }
 
   function statementsDemoBlocks(){
-    // "Statements — as expressed." — a short open letter on
+    // "Stated — as expressed." — a short open letter on
     // presentation, kept as a real archived piece rather than a
     // one-off. The second bullet pair links back to zack.cx; the
     // closing bullet links to the greenpoint.webp image (picked up
     // automatically as an image-preview chip by the existing
     // isImageLink/thumbnail logic, since it resolves to a .webp).
     return [
-      { text:'Statements — as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Stated — as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' },
       { text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:45, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' },
       { text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words — btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:23, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' },
       { text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' },
@@ -1230,6 +1247,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     el.style.fontWeight     = b.weight;
     el.style.fontStyle      = b.italic ? 'italic' : 'normal';
     el.style.fontSize       = b.size + 'px';
+    // also exposed as a plain custom property (no unit) so the live
+    // editing surface can derive a fluid, viewport-scaled font-size
+    // from it in CSS (see "#blockStack .block-editable" below) without
+    // touching how print/the pagination phantom render — those always
+    // want the literal chosen size regardless of the current window
+    // width, so they keep reading the inline font-size above.
+    el.style.setProperty('--bsize', b.size);
     el.style.letterSpacing  = (b.tracking/1000) + 'em';
     el.style.lineHeight     = (b.leading/100);
     // column count itself is decided by CSS media queries (see
@@ -1241,6 +1265,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const v = typeof b.fill === 'number' ? b.fill : 0;
     el.style.color = fillColor(v);
   }
+
 
   // strips any existing bullet/number markers from each line, then
   // reapplies the requested list type — so toggling a passage into a
@@ -2469,13 +2494,16 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     }
     persist.trySet('meta:odysseySeed', JSON.stringify({ blocksJSON: odysseySeedJSON }));
 
-    // "Statements — as expressed." — same pristine-refresh pattern as
-    // the two letters above: identified by its own opening line,
-    // seeded once, and only auto-synced to the canonical copy while
-    // no manual edit has touched it since.
+    // "Stated — as expressed." — same pristine-refresh pattern as
+    // the two letters above: identified by the stable tail of its
+    // opening line (not the full title, which can itself change —
+    // e.g. "Statements" → "Stated" — without losing track of an
+    // already-archived copy and duplicating it), seeded once, and
+    // only auto-synced to the canonical copy while no manual edit
+    // has touched it since.
     const isStatementsEntry = e => e && e.blocks && e.blocks[0] &&
       typeof e.blocks[0].text === 'string' &&
-      e.blocks[0].text.indexOf('Statements — as expressed.') !== -1;
+      e.blocks[0].text.indexOf('— as expressed.') !== -1;
 
     const statementsSeedBlocks = statementsDemoBlocks();
     const statementsSeedJSON = JSON.stringify(statementsSeedBlocks);
