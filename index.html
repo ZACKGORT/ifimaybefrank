@@ -1475,13 +1475,39 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       return viewHome.classList.contains('active');
     }
 
+    const CURSOR_MARGIN = 12;
+    const CURSOR_OFFSET = 14;
+
     window.addEventListener('mousemove', (e) => {
       if (!isHomeActive()){
         writeCursor.classList.remove('visible');
         return;
       }
       writeCursor.classList.add('visible');
-      writeCursor.style.transform = 'translate(' + (e.clientX + 14) + 'px,' + (e.clientY + 14) + 'px)';
+
+      // The pill is normally offset down-right of the pointer, but that
+      // offset alone would let it run past the viewport edge (and sit
+      // under the corner nav links that live there) whenever the mouse
+      // gets close to the right or bottom of the window. Measuring the
+      // pill itself and flipping the offset to the opposite side of the
+      // pointer whenever it would overflow keeps "Write" fully visible
+      // and clear of that edge chrome no matter where the pointer is.
+      const w = writeCursor.offsetWidth;
+      const h = writeCursor.offsetHeight;
+
+      let x = e.clientX + CURSOR_OFFSET;
+      if (x + w > window.innerWidth - CURSOR_MARGIN){
+        x = e.clientX - CURSOR_OFFSET - w;
+      }
+      x = Math.max(CURSOR_MARGIN, x);
+
+      let y = e.clientY + CURSOR_OFFSET;
+      if (y + h > window.innerHeight - CURSOR_MARGIN){
+        y = e.clientY - CURSOR_OFFSET - h;
+      }
+      y = Math.max(CURSOR_MARGIN, y);
+
+      writeCursor.style.transform = 'translate(' + x + 'px,' + y + 'px)';
     });
     document.addEventListener('mouseleave', () => writeCursor.classList.remove('visible'));
 
