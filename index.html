@@ -941,6 +941,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
           document.execCommand('insertText', false, '\n' + marker);
         } else if (e.key === 'Escape'){
           textarea.blur();
+          e.stopPropagation();
         }
       });
 
@@ -1037,7 +1038,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         e.stopPropagation();
         fontPanel.classList.contains('open') ? closeFontPanel() : openFontPanel();
       });
-      fontWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeFontPanel(); });
+      fontWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeFontPanel(); e.stopPropagation(); } });
 
       fontWrap.append(fontTrigger, fontPanel);
 
@@ -1120,7 +1121,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
         e.stopPropagation();
         weightPanel.classList.contains('open') ? closeWeightPanel() : openWeightPanel();
       });
-      weightWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeWeightPanel(); });
+      weightWrap.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ closeWeightPanel(); e.stopPropagation(); } });
 
       weightWrap.append(weightTrigger, weightPanel);
 
@@ -1412,6 +1413,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       showView('compose');
     });
   })();
+
+  // ── ESC → archive ──
+  // From the letter page (compose), Escape is a quick "step back" to
+  // the archive — but only once nothing more local is claiming the
+  // key first: a focused passage just exits text-editing focus on its
+  // first Escape (stopPropagation in the textarea handler above), and
+  // an open font/weight picker just closes on its first Escape too.
+  // Only an Escape with no such local target reaches here and steps
+  // back to the archive.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && viewCompose.classList.contains('active')){
+      showView('archive');
+    }
+  });
 
   // ── RESILIENT STORAGE ──
   // Backed by real localStorage (not window.storage, which only exists
