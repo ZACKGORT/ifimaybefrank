@@ -16,8 +16,31 @@
   --rule:#e6e6e4;
   --rule-soft:#f0f0ee;
   --muted:#8a8a86;
+  --on-ink:#ffffff;
+  --surface:#ffffff;
+  --surface-border:#d5d5d1;
+  --surface-border-soft:#c7c7c3;
+  --shadow:rgba(0,0,0,.13);
+  --danger:#7A3324;
   --chrome-font:'Plus Jakarta Sans',sans-serif;
   --mono:'IBM Plex Mono',monospace;
+}
+/* ── dark theme — a straight palette swap on the same variables, so
+   every rule that already reads var(--bg)/var(--ink)/etc. picks it up
+   automatically. Toggled by adding data-theme="dark" to <html>. */
+html[data-theme="dark"]{
+  --bg:#121212;
+  --ink:#f1f0ea;
+  --ink-rgb:241,240,234;
+  --rule:#2c2c29;
+  --rule-soft:#1c1c1a;
+  --muted:#93938d;
+  --on-ink:#111111;
+  --surface:#1a1a18;
+  --surface-border:#3a3a36;
+  --surface-border-soft:#4a4a45;
+  --shadow:rgba(0,0,0,.45);
+  --danger:#c96a4c;
 }
 html,body{height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webkit-font-smoothing:antialiased}
@@ -60,10 +83,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   display:flex;align-items:center;gap:16px;
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
 }
-.chrome-sep{color:#5a5a57;user-select:none}
+.chrome-sep{color:var(--muted);user-select:none}
 .chrome-emdash{text-decoration:none;transition:color .15s;cursor:pointer}
 .chrome-emdash:hover{color:var(--ink)}
-.chrome-status{color:#5a5a57;letter-spacing:.06em;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+.chrome-status{color:var(--muted);letter-spacing:.06em;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .chrome-link{
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
   background:none;border:none;color:var(--ink);cursor:pointer;padding:2px 0;
@@ -72,7 +95,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .chrome-link.active{border-bottom-color:var(--ink)}
 .chrome-link:disabled{opacity:.3;cursor:default;pointer-events:none}
 .chrome-link.primary{font-weight:600}
-.chrome-link.confirm{color:#7A3324;border-bottom-color:#7A3324}
+.chrome-link.confirm{color:var(--danger);border-bottom-color:var(--danger)}
+
+/* ── theme toggle — a plain circle sitting right after Archive: hollow
+   for light (the default), filled for dark. No icon glyph, matching
+   how sparse the rest of the chrome already is. */
+.theme-toggle{
+  width:14px;height:14px;border-radius:50%;flex:none;
+  border:1.5px solid var(--ink);background:transparent;padding:0;
+  cursor:pointer;transition:background .2s ease,border-color .2s ease;
+}
+.theme-toggle:hover{border-color:var(--muted)}
+.theme-toggle[aria-pressed="true"]{background:var(--ink)}
 
 /* ── Write — a single direct action now, no attached menu: clicking
    it always starts a brand-new blank note (see resetCompose() in the
@@ -108,7 +142,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   position:fixed;top:22px;left:50%;z-index:90;
   transform:translateX(-50%) translateY(-10px);
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-  background:var(--ink);color:#fff;padding:8px 18px;border-radius:20px;
+  background:var(--ink);color:var(--on-ink);padding:8px 18px;border-radius:20px;
   opacity:0;pointer-events:none;
   transition:opacity .25s ease,transform .25s ease;
 }
@@ -155,7 +189,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   transform:translate(-9999px,-9999px);
   display:flex;align-items:center;gap:6px;
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-  color:#fff;background:var(--ink);
+  color:var(--on-ink);background:var(--ink);
   padding:8px 15px 8px 12px;border-radius:20px;
   white-space:nowrap;opacity:0;
   transition:opacity .15s ease;
@@ -163,7 +197,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 .write-cursor.visible{opacity:1}
 .write-cursor .write-cursor-dot{
-  width:5px;height:5px;border-radius:50%;background:#fff;flex:none;
+  width:5px;height:5px;border-radius:50%;background:var(--on-ink);flex:none;
 }
 .home-wrap{
   max-width:1000px;margin:0 auto;min-height:100vh;
@@ -292,7 +326,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:var(--bg);border-bottom:1px solid var(--rule);
 }
 .block{transition:border-color .25s ease}
-.block.active{border-color:#d5d5d1}
+.block.active{border-color:var(--surface-border)}
 .ctrl{display:flex;align-items:center;gap:8px}
 .ctrl-label{font-size:12.5px;color:var(--muted);white-space:nowrap}
 
@@ -313,7 +347,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   border:1px solid var(--rule);border-radius:7px;outline:none;
   padding:4px 11px 4px 5px;cursor:pointer;transition:border-color .15s;
 }
-.font-picker-trigger:hover{border-color:#c7c7c3}
+.font-picker-trigger:hover{border-color:var(--surface-border-soft)}
 .font-swatch{
   display:inline-flex;align-items:center;justify-content:center;
   min-width:30px;height:26px;font-size:15px;line-height:1;
@@ -328,8 +362,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .font-picker-panel{
   position:absolute;top:calc(100% + 10px);left:0;z-index:70;
   width:min(420px, calc(100vw - 60px));max-height:60vh;overflow-y:auto;
-  background:#fff;border:1px solid var(--rule);border-radius:12px;
-  box-shadow:0 16px 40px rgba(0,0,0,.13);
+  background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  box-shadow:0 16px 40px var(--shadow);
   padding:8px;display:none;flex-direction:column;gap:2px;
 }
 .font-picker-panel.open{display:flex}
@@ -340,7 +374,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .font-picker-card:hover{background:var(--rule-soft)}
 .font-picker-card.selected{background:var(--ink)}
 .font-picker-card.selected .fp-name,
-.font-picker-card.selected .fp-sample{color:#fff}
+.font-picker-card.selected .fp-sample{color:var(--on-ink)}
 .fp-name{
   font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
   color:var(--muted);margin-bottom:7px;
@@ -353,7 +387,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   width:24px;height:24px;display:flex;align-items:center;justify-content:center;
   background:transparent;border:1px solid var(--rule);border-radius:4px;cursor:pointer;color:var(--muted);
 }
-.italic-toggle.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.italic-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 
 .range-track{position:relative;width:110px;height:16px;display:flex;align-items:center}
 .range-track input[type=range]{
@@ -363,10 +397,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .range-track input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
 .range-track input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
-  background:#fff;border:1.5px solid var(--ink);margin-top:-6px;
+  background:var(--surface);border:1.5px solid var(--ink);margin-top:-6px;
 }
 .range-track input[type=range]::-moz-range-thumb{
-  width:13px;height:13px;border-radius:50%;background:#fff;border:1.5px solid var(--ink);
+  width:13px;height:13px;border-radius:50%;background:var(--surface);border:1.5px solid var(--ink);
 }
 .ctrl-value{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px}
 .fill-swatch{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule);flex:none;display:inline-block}
@@ -378,8 +412,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:transparent;border:1px solid var(--rule);border-radius:5px;cursor:pointer;
   transition:color .15s,border-color .15s,background .15s;
 }
-.list-btn:hover{border-color:#c7c7c3}
-.list-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.list-btn:hover{border-color:var(--surface-border-soft)}
+.list-btn.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 
 .layout-group{display:flex;gap:6px}
 .layout-btn.locked{opacity:.25;pointer-events:none}
@@ -401,7 +435,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:transparent;border:1px dashed var(--rule);border-radius:6px;
   padding:14px 20px;width:100%;text-align:left;cursor:pointer;transition:color .15s,border-color .15s;
 }
-.add-block-btn:hover{color:var(--ink);border-color:#c7c7c3}
+.add-block-btn:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 
 @media(max-width:640px){
   .compose-wrap{padding:max(90px,12vh) 18px 200px}
@@ -426,8 +460,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:transparent;border:1px solid var(--rule);border-radius:6px;color:var(--muted);cursor:pointer;
   transition:color .15s,border-color .15s,background .15s;
 }
-.view-toggle-btn:hover{border-color:#c7c7c3}
-.view-toggle-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.view-toggle-btn:hover{border-color:var(--surface-border-soft)}
+.view-toggle-btn.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 
 .archive-empty{border:1px dashed var(--rule);padding:60px 24px;text-align:center;color:var(--muted);font-size:15px}
 
@@ -494,7 +528,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   .shelf.list-mode .lc-meta{display:none}
 }
 
-.skip-link{position:fixed;top:-100px;left:12px;z-index:999;background:var(--ink);color:#fff;padding:10px 16px;font-size:13px;text-decoration:none;transition:top .15s}
+.skip-link{position:fixed;top:-100px;left:12px;z-index:999;background:var(--ink);color:var(--on-ink);padding:10px 16px;font-size:13px;text-decoration:none;transition:top .15s}
 .skip-link:focus-visible{top:12px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 /* the writing surface itself opts back out — the passage border
@@ -514,6 +548,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
   <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
   <button class="chrome-link" data-view="archive">Archive</button>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Toggle dark theme" title="Toggle dark theme"></button>
 </nav>
 
 <div class="hud" id="composeHud" aria-label="Writing actions">
@@ -528,8 +563,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 <!-- ══════════════════ HOME ══════════════════ -->
 <main class="view active" id="view-home">
   <div class="home-wrap">
-    <p class="home-statement">If I may be frank,</p>
-    <p class="home-doctrine">Shape your intent.</p>
+    <p class="home-statement">Frankly,</p>
+    <p class="home-doctrine">Shape influences input and output; <br>what is written &amp; how it is read,</p>
   </div>
   <div class="write-cursor" id="writeCursor" aria-hidden="true">
     <span class="write-cursor-dot"></span>Write
@@ -747,6 +782,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       : 'Aa Bb Cc — the weight of it';
   }
 
+  // maps a passage's 0–200 "fill" value to an actual color, blended
+  // between the current theme's ink and background rather than a
+  // fixed literal gray — fill:0 stays full-strength ink (readable in
+  // both light and dark) and higher fill fades toward the page, in
+  // either theme, instead of just fading toward literal white
+  function fillColor(v){
+    const bgPct = Math.max(0, Math.min(100, (v/200)*100));
+    return 'color-mix(in srgb, var(--ink) ' + (100 - bgPct) + '%, var(--bg) ' + bgPct + '%)';
+  }
+
   function applyStyle(el, b){
     el.style.fontFamily     = fontFamilyFor(b.font);
     el.style.fontWeight     = b.weight;
@@ -761,7 +806,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
     // as the window is resized, not just on initial load.
     el.dataset.layout = b.layout || 'single';
     const v = typeof b.fill === 'number' ? b.fill : 0;
-    el.style.color = 'rgb(' + v + ',' + v + ',' + v + ')';
+    el.style.color = fillColor(v);
   }
 
   // strips any existing bullet/number markers from each line, then
@@ -1191,7 +1236,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       const fillTrack = document.createElement('div'); fillTrack.className='range-track';
       const fillRange = document.createElement('input');
       fillRange.type='range'; fillRange.min=0; fillRange.max=200; fillRange.value=b.fill;
-      function paintSwatch(v){ fillSwatch.style.background = 'rgb(' + v + ',' + v + ',' + v + ')'; }
+      function paintSwatch(v){ fillSwatch.style.background = fillColor(v); }
       paintSwatch(b.fill);
       fillRange.addEventListener('input', () => {
         b.fill = parseInt(fillRange.value,10);
@@ -1385,6 +1430,38 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       window.scrollTo(0, 0);
     });
   }
+
+  // ── dark theme toggle ──
+  // A plain on/off preference: defaults to the system's color-scheme
+  // the first time the page loads, then remembers whatever the person
+  // explicitly picks from here on.
+  (function initThemeToggle(){
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+    const STORAGE_KEY = 'openletter-theme';
+    const root = document.documentElement;
+
+    function applyTheme(theme){
+      if (theme === 'dark'){
+        root.setAttribute('data-theme', 'dark');
+        toggle.setAttribute('aria-pressed', 'true');
+      } else {
+        root.removeAttribute('data-theme');
+        toggle.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    let saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch(e){ /* private mode, etc. */ }
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(saved || (prefersDark ? 'dark' : 'light'));
+
+    toggle.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem(STORAGE_KEY, next); } catch(e){ /* ignore */ }
+    });
+  })();
 
   // ── homepage "write" cursor ──
   // Replaces the system pointer with a small "write" label while
@@ -1751,7 +1828,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       head.style.fontSize = cappedSize + 'px';
       head.style.lineHeight = (firstWithText.leading/100);
       const hv = typeof firstWithText.fill === 'number' ? firstWithText.fill : 0;
-      head.style.color = 'rgb(' + hv + ',' + hv + ',' + hv + ')';
+      head.style.color = fillColor(hv);
       head.textContent = firstWithText.text.trim() || '(untitled)';
 
       const desc = document.createElement('div');
