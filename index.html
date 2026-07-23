@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <title>Frankly,</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -898,12 +898,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     // automatically as an image-preview chip by the existing
     // isImageLink/thumbnail logic, since it resolves to a .webp).
     return [
-      { text:'Statements — as expressed.', font:'fraunces', weight:600, italic:true, size:90, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' },
-      { text:'Not just in prose, but in presentation.', font:'jakarta', weight:700, italic:false, size:64, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' },
-      { text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection.', font:'jakarta', weight:400, italic:false, size:24, tracking:0, leading:150, fill:70, layout:'single', list:'none', link:'' },
-      { text:'• Where form is a result of function.\n• Where shape influences thought.', font:'fraunces', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'bullet', link:'https://zack.cx' },
-      { text:'• A space where heroes and decorum do not inherently deserve prime screen real-estate.', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' },
-      { text:'"write more by writing less."', font:'newsreader', weight:500, italic:true, size:34, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'' }
+      { text:'Statements — as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:45, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words — btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:23, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' },
+      { text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' },
+      { text:'• They say a \'photo is worth a thousand words\' … frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' },
+      { text:'"write more by writing less." — zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' }
     ];
   }
 
@@ -1791,28 +1791,32 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       trackCtrl.className = 'ctrl';
       const trackLabel = document.createElement('span'); trackLabel.className='ctrl-label'; trackLabel.textContent='Letter spacing';
       const trackTrack = document.createElement('div'); trackTrack.className='range-track';
+      const trackVal = document.createElement('span'); trackVal.className='ctrl-value'; trackVal.textContent = b.tracking;
       mountSlider(trackTrack, {
         min: -30, max: 150, step: 1, value: b.tracking,
         onInput: (v) => {
           b.tracking = Math.round(v);
+          trackVal.textContent = b.tracking;
           applyStyle(textarea,b); saveDraft();
         }
       });
-      trackCtrl.append(trackLabel, trackTrack);
+      trackCtrl.append(trackLabel, trackTrack, trackVal);
 
       // line height slider
       const leadCtrl = document.createElement('div');
       leadCtrl.className = 'ctrl';
       const leadLabel = document.createElement('span'); leadLabel.className='ctrl-label'; leadLabel.textContent='Line height';
       const leadTrack = document.createElement('div'); leadTrack.className='range-track';
+      const leadVal = document.createElement('span'); leadVal.className='ctrl-value'; leadVal.textContent = b.leading+'%';
       mountSlider(leadTrack, {
         min: 95, max: 190, step: 1, value: b.leading,
         onInput: (v) => {
           b.leading = Math.round(v);
+          leadVal.textContent = b.leading+'%';
           applyStyle(textarea,b); saveDraft();
         }
       });
-      leadCtrl.append(leadLabel, leadTrack);
+      leadCtrl.append(leadLabel, leadTrack, leadVal);
 
       // fill (monochrome grayscale — black through gray)
       const fillCtrl = document.createElement('div');
