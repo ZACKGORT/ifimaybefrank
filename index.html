@@ -1372,8 +1372,24 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   // it's the live draft (nav Print button) or an archived letter (the
   // overlay's Print action) — the live compose state is never touched
   // by printing something else.
+  // resolves once `img` has finished loading (success or failure) —
+  // never rejects, and gives up after IMG_LOAD_TIMEOUT so one dead
+  // link can't hang printing forever
+  const IMG_LOAD_TIMEOUT = 8000;
+  function waitForImage(img){
+    if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+    return new Promise((resolve) => {
+      let done = false;
+      const finish = () => { if (!done){ done = true; resolve(); } };
+      img.addEventListener('load', finish, { once:true });
+      img.addEventListener('error', finish, { once:true });
+      setTimeout(finish, IMG_LOAD_TIMEOUT);
+    });
+  }
+
   function buildPrintable(blocksArr){
     printTarget.innerHTML = '';
+    const imgLoads = [];
     blocksArr.forEach(b => {
       // an image link gets its own dedicated page: the image itself,
       // the passage's text as a caption beneath it, and the raw URL
@@ -1386,6 +1402,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         const img = document.createElement('img');
         img.src = b.link;
         img.alt = b.text || '';
+        imgLoads.push(waitForImage(img));
 
         const caption = document.createElement('div');
         caption.className = 'print-media-caption';
@@ -1420,11 +1437,21 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       wrapper.appendChild(el);
       printTarget.appendChild(wrapper);
     });
+    return Promise.all(imgLoads);
   }
   function printBlocks(blocksArr){
-    buildPrintable(blocksArr);
-    window.print();
+    // wait for every image to actually finish loading (or time out)
+    // before opening the print dialog — printing the instant the
+    // <img> tags are inserted races the network fetch and can print
+    // a blank/broken image if it hasn't arrived yet. The extra double
+    // rAF after that gives layout one more frame to settle so the
+    // print engine measures final positions/heights, not mid-load ones.
+    buildPrintable(blocksArr).then(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+    });
   }
+
+
 
   function renderStack(){
     blockStack.innerHTML = '';
