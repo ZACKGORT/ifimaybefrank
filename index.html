@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <title>Frankly,</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -80,7 +80,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   font-weight:100;font-size:clamp(12px, 9.333px + 0.741vw, 16px);color:var(--muted);
   white-space:nowrap;letter-spacing:0;
 }
-.frankly-mark span{display:inline-block}
+.pressure-char{display:inline-block}
 
 .chrome{
   position:fixed;top:22px;right:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
@@ -2644,72 +2644,101 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     showView('archive');
   });
 
-  // ── "frankly" kinetic wordmark ── adapted from the text-pressure
-  // technique: each letter's variable-font weight/width/italic axes
-  // respond to distance from the cursor, anywhere on the page. Scaled
-  // down to a small corner signature rather than the original's
-  // full-bleed black-canvas demo, and reactive to the whole window
-  // rather than a fixed-height container.
-  (function initFranklyMark(){
-    const franklyRoot = document.getElementById('franklyMark');
-    if (!franklyRoot) return;
+  // ── "text pressure" system ── adapted from the text-pressure
+  // technique: each letter's variable-font axes (weight, width,
+  // optical size, italic — whichever the caller opts into) ease
+  // toward a value driven by distance from the cursor, anywhere on
+  // the page. One shared eased cursor + one shared rAF loop drives
+  // every registered headline, so the corner wordmark and any other
+  // opted-in heading all react in lockstep rather than each running
+  // its own independent loop.
+  const pressureCursorTarget = { x: -9999, y: -9999 };
+  const pressureCursor = { x: -9999, y: -9999 };
+  const pressureInstances = [];
 
-    const h1 = document.createElement('h1');
-    franklyRoot.appendChild(h1);
+  window.addEventListener('mousemove', (e) => { pressureCursorTarget.x = e.clientX; pressureCursorTarget.y = e.clientY; });
+  window.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (t){ pressureCursorTarget.x = t.clientX; pressureCursorTarget.y = t.clientY; }
+  }, { passive:true });
 
-    const franklyChars = 'frankly'.split('');
-    const franklySpans = franklyChars.map(ch => {
+  function pressureDist(a, b){
+    const dx = b.x - a.x, dy = b.y - a.y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  function pressureAttr(distance, maxDist, minVal, maxVal){
+    const val = maxVal - Math.abs((maxVal * distance) / maxDist);
+    return Math.max(minVal, val + minVal);
+  }
+
+  // Wraps `el`'s current text into one span per character (so each
+  // can carry its own font-variation-settings), leaving plain spaces
+  // as real text nodes so word wrap/spacing still behaves normally.
+  // `axes` maps a variable-font axis tag to an [min, max] range, e.g.
+  // { wght:[100,900], wdth:[70,130], ital:[0,1] } — 'ital' is kept to
+  // two decimal places, every other axis is a whole number.
+  function initPressureText(el, axes){
+    if (!el) return;
+    const text = el.textContent;
+    el.textContent = '';
+    const spans = [];
+    [...text].forEach(ch => {
+      if (ch === ' '){ el.appendChild(document.createTextNode(' ')); return; }
       const span = document.createElement('span');
+      span.className = 'pressure-char';
       span.dataset.char = ch;
       span.textContent = ch;
-      h1.appendChild(span);
-      return span;
+      el.appendChild(span);
+      spans.push(span);
     });
+    pressureInstances.push({ el, spans, axes });
+  }
 
-    const franklyMouse = { x: -9999, y: -9999 };
-    const franklyCursor = { x: -9999, y: -9999 };
+  function pressureAnimate(){
+    pressureCursor.x += (pressureCursorTarget.x - pressureCursor.x) / 15;
+    pressureCursor.y += (pressureCursorTarget.y - pressureCursor.y) / 15;
 
-    function franklyDist(a, b){
-      const dx = b.x - a.x, dy = b.y - a.y;
-      return Math.sqrt(dx*dx + dy*dy);
-    }
-    function franklyAttr(distance, maxDist, minVal, maxVal){
-      const val = maxVal - Math.abs((maxVal * distance) / maxDist);
-      return Math.max(minVal, val + minVal);
-    }
-
-    window.addEventListener('mousemove', (e) => { franklyCursor.x = e.clientX; franklyCursor.y = e.clientY; });
-    window.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      if (t){ franklyCursor.x = t.clientX; franklyCursor.y = t.clientY; }
-    }, { passive:true });
-
-    function franklyAnimate(){
-      franklyMouse.x += (franklyCursor.x - franklyMouse.x) / 15;
-      franklyMouse.y += (franklyCursor.y - franklyMouse.y) / 15;
-
-      const titleRect = h1.getBoundingClientRect();
-      const maxDist = Math.max(titleRect.width / 2, 40);
-
-      franklySpans.forEach(span => {
-        const rect = span.getBoundingClientRect();
-        const center = { x: rect.x + rect.width/2, y: rect.y + rect.height/2 };
-        const d = franklyDist(franklyMouse, center);
-
-        const wdth = Math.floor(franklyAttr(d, maxDist, 70, 130));
-        const wght = Math.floor(franklyAttr(d, maxDist, 100, 700));
-        const ital = franklyAttr(d, maxDist, 0, 1).toFixed(2);
-
-        const settings = "'wght' " + wght + ", 'wdth' " + wdth + ", 'ital' " + ital;
+    pressureInstances.forEach(({ el, spans, axes }) => {
+      const rect = el.getBoundingClientRect();
+      const maxDist = Math.max(rect.width / 2, 40);
+      spans.forEach(span => {
+        const r = span.getBoundingClientRect();
+        const center = { x: r.x + r.width/2, y: r.y + r.height/2 };
+        const d = pressureDist(pressureCursor, center);
+        const settings = Object.keys(axes).map(tag => {
+          const [minV, maxV] = axes[tag];
+          const raw = pressureAttr(d, maxDist, minV, maxV);
+          const v = tag === 'ital' ? raw.toFixed(2) : Math.floor(raw);
+          return "'" + tag + "' " + v;
+        }).join(', ');
         if (span.style.fontVariationSettings !== settings){
           span.style.fontVariationSettings = settings;
         }
       });
+    });
 
-      requestAnimationFrame(franklyAnimate);
+    requestAnimationFrame(pressureAnimate);
+  }
+
+  (function initPressureTargets(){
+    const franklyRoot = document.getElementById('franklyMark');
+    if (franklyRoot){
+      const h1 = document.createElement('h1');
+      h1.textContent = 'frankly';
+      franklyRoot.appendChild(h1);
+      initPressureText(h1, { wght:[100,700], wdth:[70,130], ital:[0,1] });
     }
-    requestAnimationFrame(franklyAnimate);
+    // Fraunces stands in for Roboto Flex's wght/wdth/ital here — it
+    // only exposes wght and opsz (optical size) as continuous axes,
+    // so the "pressure" reads as the letterforms getting heavier and
+    // more display-cut up close, rather than stretching wide.
+    initPressureText(document.querySelector('.home-statement'), { wght:[350,850], opsz:[20,144] });
+    initPressureText(document.querySelector('.archive-title'), { wght:[350,850], opsz:[9,60] });
+
+    requestAnimationFrame(pressureAnimate);
   })();
+
+
 
   // ── INIT ──
   // Priority for what compose opens with: (1) a genuine in-progress
