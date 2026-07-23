@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frankly,</title>
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="shortcut icon" href="/favicon.ico">
@@ -60,8 +59,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    quiet cluster of controls, both dimmed until you actually need
    them, so the page reads as a blank canvas rather than an app. */
 .brand-mark{
-  position:fixed;bottom:22px;left:26px;z-index:60;
-  font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:14px;
+  position:fixed;bottom:clamp(14px, 8.667px + 1.481vw, 22px);left:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(12px, 10.667px + 0.37vw, 14px);
   color:var(--muted);opacity:.32;transition:opacity .2s ease;
   background:none;border:none;padding:0;cursor:pointer;
 }
@@ -73,30 +72,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    text-pressure technique), just scaled way down and recolored for a
    light page instead of the original's full-bleed black canvas. */
 .frankly-mark{
-  position:fixed;bottom:20px;right:26px;z-index:60;
+  position:fixed;bottom:clamp(14px, 10px + 1.111vw, 20px);right:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
   pointer-events:none;line-height:1;
 }
 .frankly-mark h1{
   margin:0;font-family:'Roboto Flex',sans-serif;text-transform:lowercase;
-  font-weight:100;font-size:clamp(13px,1.6vw,16px);color:var(--muted);
+  font-weight:100;font-size:clamp(12px, 9.333px + 0.741vw, 16px);color:var(--muted);
   white-space:nowrap;letter-spacing:0;
 }
 .frankly-mark span{display:inline-block}
 
-@media(max-width:640px){
-  .frankly-mark{bottom:14px;right:16px}
-  .frankly-mark h1{font-size:12px}
-}
-
 .chrome{
-  position:fixed;top:22px;right:26px;z-index:60;
-  display:flex;align-items:center;gap:16px;
-  font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  position:fixed;top:22px;right:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
+  display:flex;align-items:center;gap:clamp(11px, 7.667px + 0.926vw, 16px);
+  font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
 }
 .chrome-sep{color:var(--muted);user-select:none}
 .chrome-emdash{text-decoration:none;transition:color .15s;cursor:pointer}
 .chrome-emdash:hover{color:var(--ink)}
-.chrome-status{color:var(--muted);letter-spacing:.06em;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+.chrome-status{color:var(--muted);letter-spacing:.06em;display:inline-block;max-width:clamp(70px, 36.667px + 9.259vw, 120px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .chrome-link{
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
   background:none;border:none;color:var(--ink);cursor:pointer;padding:2px 0;
@@ -135,11 +129,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    size and restrained color choices instead of transparency, so it
    never trades away legibility to get there. */
 .hud{
-  position:fixed;top:22px;left:26px;z-index:60;
-  display:flex;align-items:center;gap:14px;
-  font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
+  position:fixed;top:clamp(14px, 8.667px + 1.481vw, 22px);left:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
+  display:flex;align-items:center;gap:clamp(8px, 4px + 1.111vw, 14px);
+  font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
   background:rgba(var(--ink-rgb),.16);border:1px solid var(--rule);border-radius:22px;
-  padding:8px 16px;transition:background .2s ease;
+  padding:clamp(6px, 4.667px + 0.37vw, 8px) clamp(11px, 7.667px + 0.926vw, 16px);transition:background .2s ease;
   backdrop-filter:blur(20px) saturate(180%);
   -webkit-backdrop-filter:blur(20px) saturate(180%);
 }
@@ -161,19 +155,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:640px){
-  .brand-mark{bottom:14px;left:16px;font-size:12px}
   /* nav moves below the HUD rather than sharing its row — two fixed,
      independently-sized elements racing for the same horizontal band
      will eventually collide no matter how tight the HUD's content is
-     trimmed; stacking them removes the collision by construction */
-  .hud{top:14px;left:16px;gap:8px;font-size:10px;padding:6px 11px}
-  .chrome{top:54px;right:16px;gap:11px;font-size:10px}
+     trimmed; stacking them removes the collision by construction.
+     This is a genuine layout-mode switch (stacked vs. inline), not a
+     magnitude, so it stays a hard breakpoint while every size/spacing
+     value around it (above) now scales fluidly with viewport width. */
+  .chrome{top:54px}
   /* "Update & file" / "Seal & file" → just "Update" / "Seal" — the
      worst-case HUD (mid-edit, with Delete showing, saving in
      progress) is otherwise five items fighting for room on a
-     320–375px screen; every character here is real width budget */
+     320–375px screen; this is a discrete on/off, not a size, so it
+     stays a breakpoint too. */
   .hud-suffix{display:none}
-  .chrome-status{max-width:70px}
 }
 
 /* ── VIEWS ── */
@@ -264,7 +259,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 ══════════════════════════════════════════ */
 /* top clearance uses max() so a short/narrow window never lets the
    giant headline scroll up under the fixed chrome */
-.compose-wrap{max-width:1680px;margin:0 auto;min-height:100vh;padding:max(120px,16vh) 5vw 40vh}
+.compose-wrap{max-width:1680px;margin:0 auto;min-height:100vh;padding:max(clamp(90px, 70px + 5.556vw, 120px), clamp(12vh, 9.333vh + 0.741vw, 16vh)) clamp(16px, 5vw, 84px) min(clamp(200px, -66.667px + 74.074vw, 600px), 40vh)}
 .compose-tagline{
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
   margin-bottom:40px;max-width:52ch;
@@ -369,7 +364,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
    viewport as you scroll through a long passage — so it stays
    reachable rather than scrolling out of view with the text. */
 .block-controls{
-  display:flex;align-items:center;flex-wrap:wrap;gap:22px;
+  display:flex;align-items:center;flex-wrap:wrap;gap:clamp(14px, 8.667px + 1.481vw, 22px);
   margin-bottom:0;padding-bottom:0;max-height:0;opacity:0;overflow:hidden;
   transform:translateY(-6px) scaleY(.94);transform-origin:top left;
   pointer-events:none;
@@ -527,11 +522,28 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
    ride the same --ink/--rule vars as everything else so it follows
    the light/dark toggle for free; no icons, no hover-grow — just the
    elastic drag feel, sized to fit inline in the block toolbar. */
-.range-track{position:relative;width:110px;height:20px;display:flex;align-items:center;cursor:grab;touch-action:none;user-select:none}
+.range-track{position:relative;width:clamp(88px, 73.333px + 4.074vw, 110px);height:20px;display:flex;align-items:center;cursor:grab;touch-action:none;user-select:none}
 .range-track:active{cursor:grabbing}
 .range-track-wrap{display:flex;flex-grow:1;transform-origin:center}
 .range-track-bg{position:relative;height:4px;flex-grow:1;overflow:hidden;border-radius:9999px;background:var(--rule)}
 .range-track-fill{position:absolute;height:100%;left:0;top:0;background:var(--ink);border-radius:9999px}
+
+/* native fallback for coarse-pointer (touch) devices — the elastic
+   drag-past-edge trick relies on continuous pointermove/hover-style
+   tracking that doesn't translate well to touch, so touch devices get
+   a plain, larger-thumbed native slider instead, in the same vars. */
+.range-track input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin:0;cursor:pointer;
+}
+.range-track input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rule)}
+.range-track input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
+.range-track input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--surface);border:1.5px solid var(--ink);margin-top:-9px;
+}
+.range-track input[type=range]::-moz-range-thumb{
+  width:18px;height:18px;border-radius:50%;background:var(--surface);border:1.5px solid var(--ink);
+}
 .ctrl-value{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px}
 .fill-swatch{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule);flex:none;display:inline-block}
 
@@ -568,9 +580,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .add-block-btn:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 
 @media(max-width:640px){
-  .compose-wrap{padding:max(90px,12vh) 18px 200px}
-  .block-controls{gap:14px}
-  .range-track{width:88px}
+  /* layout-group jumping to the end of the flex row is a discrete
+     ordering change, not a magnitude, so it stays a breakpoint —
+     everything else in this row (gap, track width) now scales
+     fluidly above instead of snapping here. */
   .layout-group{margin-left:0;order:99}
 }
 
@@ -642,7 +655,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .shelf.list-mode{display:block;border-left:none}
 .shelf.list-mode .letter-card{
   display:grid;grid-template-columns:36px minmax(0,1fr) auto auto;align-items:center;gap:20px;
-  padding:26px 20px;min-height:0;border-top:1px solid var(--rule);border-right:none;
+  padding:clamp(18px, 12.667px + 1.481vw, 26px) clamp(16px, 13.333px + 0.741vw, 20px);min-height:0;border-top:1px solid var(--rule);border-right:none;
 }
 .shelf.list-mode .letter-card:first-child{border-top:none}
 .shelf.list-mode .letter-card:nth-last-child(-n+4){border-bottom:none}
@@ -654,7 +667,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .shelf.list-mode .lc-arrow{position:static;margin-left:4px;order:4}
 
 @media(max-width:640px){
-  .shelf.list-mode .letter-card{grid-template-columns:28px 1fr auto;padding:18px 16px}
+  /* meta disappearing entirely (to hand its column back to the
+     headline) is a discrete presence/absence change, not something
+     that can fade in gradually, so this stays a breakpoint; the
+     padding around it (above) now scales fluidly instead. */
+  .shelf.list-mode .letter-card{grid-template-columns:28px 1fr auto}
   .shelf.list-mode .lc-meta{display:none}
 }
 
@@ -672,7 +689,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
-<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">IfIMayBeFrank</div>
+<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">Open Letter</div>
 <div class="frankly-mark" id="franklyMark"></div>
 <nav class="chrome" aria-label="Navigation">
   <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
@@ -935,6 +952,29 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     return raw.length
       ? (raw.length > PREVIEW_CHAR_LIMIT ? raw.slice(0, PREVIEW_CHAR_LIMIT).trim() + '…' : raw)
       : 'Aa Bb Cc — the weight of it';
+  }
+
+  // ── slider entry point ───────────────────────────────────────────
+  // The elastic drag-past-edge trick depends on continuous pointermove
+  // tracking and a hover-capable pointer; on touch it just fights the
+  // browser's own scroll/drag gestures. So touch/coarse-pointer devices
+  // get a plain native <input type=range> instead, same vars, same
+  // wiring — everything else gets the elastic version. Checked once at
+  // mount time via the same media feature CSS uses for hover styles.
+  const IS_COARSE_POINTER = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+
+  function mountSlider(container, opts){
+    if (IS_COARSE_POINTER){
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.min = opts.min; input.max = opts.max;
+      if (opts.step) input.step = opts.step;
+      input.value = opts.value;
+      input.addEventListener('input', () => opts.onInput(parseFloat(input.value)));
+      container.appendChild(input);
+      return { getValue: () => parseFloat(input.value), setValue: (v) => { input.value = v; } };
+    }
+    return mountElasticSlider(container, opts);
   }
 
   // ── elastic range track ──────────────────────────────────────────
@@ -1709,7 +1749,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       const sizeLabel = document.createElement('span'); sizeLabel.className='ctrl-label'; sizeLabel.textContent='Size';
       const sizeTrack = document.createElement('div'); sizeTrack.className='range-track';
       const sizeVal = document.createElement('span'); sizeVal.className='ctrl-value'; sizeVal.textContent = b.size+'px';
-      mountElasticSlider(sizeTrack, {
+      mountSlider(sizeTrack, {
         min: 10, max: 200, step: 1, value: b.size,
         onInput: (v) => {
           b.size = Math.round(v);
@@ -1724,7 +1764,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       trackCtrl.className = 'ctrl';
       const trackLabel = document.createElement('span'); trackLabel.className='ctrl-label'; trackLabel.textContent='Letter spacing';
       const trackTrack = document.createElement('div'); trackTrack.className='range-track';
-      mountElasticSlider(trackTrack, {
+      mountSlider(trackTrack, {
         min: -30, max: 150, step: 1, value: b.tracking,
         onInput: (v) => {
           b.tracking = Math.round(v);
@@ -1738,7 +1778,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       leadCtrl.className = 'ctrl';
       const leadLabel = document.createElement('span'); leadLabel.className='ctrl-label'; leadLabel.textContent='Line height';
       const leadTrack = document.createElement('div'); leadTrack.className='range-track';
-      mountElasticSlider(leadTrack, {
+      mountSlider(leadTrack, {
         min: 95, max: 190, step: 1, value: b.leading,
         onInput: (v) => {
           b.leading = Math.round(v);
@@ -1755,7 +1795,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       const fillTrack = document.createElement('div'); fillTrack.className='range-track';
       function paintSwatch(v){ fillSwatch.style.background = fillColor(v); }
       paintSwatch(b.fill);
-      mountElasticSlider(fillTrack, {
+      mountSlider(fillTrack, {
         min: 0, max: 200, step: 1, value: b.fill,
         onInput: (v) => {
           b.fill = Math.round(v);
