@@ -128,10 +128,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   position:fixed;top:22px;left:26px;z-index:60;
   display:flex;align-items:center;gap:14px;
   font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;
-  background:rgba(var(--ink-rgb),.05);border:1px solid var(--rule);border-radius:22px;
+  background:rgba(var(--ink-rgb),.16);border:1px solid var(--rule);border-radius:22px;
   padding:8px 16px;transition:background .2s ease;
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
 }
-.hud:hover,.hud:focus-within{background:rgba(var(--ink-rgb),.07)}
+.hud:hover,.hud:focus-within{background:rgba(var(--ink-rgb),.24)}
 
 /* ── save toast — "Saved" is a one-time confirmation, not an ongoing
    state, so it gets a brief top-center toast rather than sitting in
@@ -816,7 +818,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
       { text:'The encounter with Polyphemus could adapt Homer\'s original layout to show something visually more impressive.  More men.  More ships. More stakes. Adapt the encounter with Polyphemus such that logically, it stands to reason that discovering a trove of food from a giant would be sufficient to feed the 1000 soldiers.  Give screentime to creative liberty in how the protagonist and his men cleverly enjoy success before a critical failure causes the giant to become a threat (same logistical workings as the horse out of sand introduction). Perhaps here, we lose a just one or two boats.', font:'jakarta', weight:400, italic:false, size:36, tracking:0, leading:158, fill:75, layout:'single', list:'none' },
       { text:"Or, imagine your are Cerci, and you adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths to feed.", font:'newsreader', weight:500, italic:false, size:22, tracking:0, leading:145, fill:55, layout:'single', list:'none' },
       { text:'Or Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:22, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
-      { text:'Or, since the Laestrygonians decided to show up in their Sunday best (you know, the cannibal giants Homer wrote about; with Nolan\'s shiny new armor), well we can now have an actual battle, with real loss through terror and trajedy, rather than just Monthy Pythoning it "run away!"', font:'newsreader', weight:700, italic:false, size:24, tracking:0, leading:140, fill:0, layout:'single', list:'none' },
+      { text:'Or, since the Laestrygonians decided to show up in their Sunday best (you know, the cannibal giants Homer wrote about; with Nolan\'s shiny new armor), well we can now have an actual battle, with real loss through terror and trajedy, rather than just Monthy Pythoning it "run away!"', font:'newsreader', weight:700, italic:false, size:44, tracking:0, leading:140, fill:0, layout:'single', list:'none' },
       { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
       { text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' }
     ];
