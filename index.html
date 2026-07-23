@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frankly,</title>
 <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="shortcut icon" href="/favicon.ico">
@@ -519,19 +520,18 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .link-thumb.visible{opacity:1;transform-origin:top left}
 .link-thumb img{display:block;width:100%;max-height:200px;object-fit:contain;border-radius:5px}
 
-.range-track{position:relative;width:110px;height:16px;display:flex;align-items:center}
-.range-track input[type=range]{
-  -webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;margin:0;cursor:pointer;
-}
-.range-track input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--rule)}
-.range-track input[type=range]::-moz-range-track{height:1px;background:var(--rule)}
-.range-track input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:13px;height:13px;border-radius:50%;
-  background:var(--surface);border:1.5px solid var(--ink);margin-top:-6px;
-}
-.range-track input[type=range]::-moz-range-thumb{
-  width:13px;height:13px;border-radius:50%;background:var(--surface);border:1.5px solid var(--ink);
-}
+/* ── elastic range track — a compact port of the react-bits "Elastic
+   Slider": no thumb, just a filled bar that lets you drag anywhere,
+   and the whole track stretches/compresses toward the drag direction
+   when you pull past either edge, springing back on release. Colors
+   ride the same --ink/--rule vars as everything else so it follows
+   the light/dark toggle for free; no icons, no hover-grow — just the
+   elastic drag feel, sized to fit inline in the block toolbar. */
+.range-track{position:relative;width:110px;height:20px;display:flex;align-items:center;cursor:grab;touch-action:none;user-select:none}
+.range-track:active{cursor:grabbing}
+.range-track-wrap{display:flex;flex-grow:1;transform-origin:center}
+.range-track-bg{position:relative;height:4px;flex-grow:1;overflow:hidden;border-radius:9999px;background:var(--rule)}
+.range-track-fill{position:absolute;height:100%;left:0;top:0;background:var(--ink);border-radius:9999px}
 .ctrl-value{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px}
 .fill-swatch{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule);flex:none;display:inline-block}
 
@@ -672,7 +672,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
-<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">Open Letter</div>
+<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">IfIMayBeFrank</div>
 <div class="frankly-mark" id="franklyMark"></div>
 <nav class="chrome" aria-label="Navigation">
   <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
@@ -935,6 +935,101 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     return raw.length
       ? (raw.length > PREVIEW_CHAR_LIMIT ? raw.slice(0, PREVIEW_CHAR_LIMIT).trim() + '…' : raw)
       : 'Aa Bb Cc — the weight of it';
+  }
+
+  // ── elastic range track ──────────────────────────────────────────
+  // Compact vanilla-JS port of the react-bits "Elastic Slider", stripped
+  // of its icons and hover-grow so it drops into the block toolbar as a
+  // straight swap for the old native <input type=range>: drag anywhere
+  // in the track to set the value; drag past either edge and the track
+  // itself compresses/stretches toward the pull, then springs back on
+  // release. `container` becomes the pointer target — call this against
+  // an existing `.range-track` element.
+  function mountElasticSlider(container, opts){
+    const min = opts.min, max = opts.max, step = opts.step || 0;
+    let val = opts.value;
+    const onInput = opts.onInput || function(){};
+    const MAX_OVERFLOW = 16; // px, scaled down from the original's 50 to suit a ~110px track
+
+    container.innerHTML = `
+      <div class="range-track-wrap">
+        <div class="range-track-bg"><div class="range-track-fill"></div></div>
+      </div>
+    `;
+    const wrapEl = container.querySelector('.range-track-wrap');
+    const fillEl = container.querySelector('.range-track-fill');
+
+    let overflow = 0;
+    let region = 'middle';
+    const overflowState = { x: 0, v: 0, raf: 0 };
+
+    function decay(value, m){
+      if (m === 0) return 0;
+      const entry = value / m;
+      const sigmoid = 2 * (1 / (1 + Math.exp(-entry)) - 0.5);
+      return sigmoid * m;
+    }
+
+    function springTo(state, target, onUpdate, sopts){
+      sopts = sopts || {};
+      const stiffness = sopts.stiffness || 300, damping = sopts.damping || 22, mass = 1;
+      let velocity = state.v || 0, value = state.x;
+      cancelAnimationFrame(state.raf);
+      function step(){
+        const force = -stiffness * (value - target);
+        const damp = -damping * velocity;
+        velocity += ((force + damp) / mass) / 60;
+        value += velocity / 60;
+        onUpdate(value);
+        if (Math.abs(target - value) < 0.05 && Math.abs(velocity) < 0.05){
+          onUpdate(target); state.x = target; state.v = 0; return;
+        }
+        state.x = value; state.v = velocity;
+        state.raf = requestAnimationFrame(step);
+      }
+      state.raf = requestAnimationFrame(step);
+    }
+
+    function render(){
+      const pct = max === min ? 0 : ((val - min) / (max - min)) * 100;
+      fillEl.style.width = pct + '%';
+      const rect = container.getBoundingClientRect();
+      const width = rect.width || 1;
+      wrapEl.style.transformOrigin = region === 'right' ? 'left' : 'right';
+      wrapEl.style.transform = `scaleX(${1 + overflow / width})`;
+    }
+
+    function handleMove(e){
+      if (e.buttons <= 0) return;
+      const rect = container.getBoundingClientRect();
+      let newVal = min + ((e.clientX - rect.left) / rect.width) * (max - min);
+      if (step) newVal = Math.round(newVal / step) * step;
+      newVal = Math.min(Math.max(newVal, min), max);
+      val = newVal;
+
+      let raw;
+      if (e.clientX < rect.left){ region = 'left'; raw = rect.left - e.clientX; }
+      else if (e.clientX > rect.right){ region = 'right'; raw = e.clientX - rect.right; }
+      else { region = 'middle'; raw = 0; }
+      overflow = decay(raw, MAX_OVERFLOW);
+      cancelAnimationFrame(overflowState.raf);
+      overflowState.x = overflow;
+      render();
+      onInput(val);
+    }
+    function handleDown(e){ handleMove(e); container.setPointerCapture(e.pointerId); }
+    function handleUp(){
+      springTo(overflowState, 0, (v) => { overflow = v; render(); }, { stiffness: 320, damping: 22 });
+    }
+
+    container.addEventListener('pointerdown', handleDown);
+    container.addEventListener('pointermove', handleMove);
+    container.addEventListener('pointerup', handleUp);
+    container.addEventListener('pointercancel', handleUp);
+    container.addEventListener('lostpointercapture', handleUp);
+
+    render();
+    return { getValue: () => val, setValue: (v) => { val = Math.min(Math.max(v, min), max); render(); } };
   }
 
   // maps a passage's 0–200 "fill" value to an actual color, blended
@@ -1613,15 +1708,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       sizeCtrl.className = 'ctrl';
       const sizeLabel = document.createElement('span'); sizeLabel.className='ctrl-label'; sizeLabel.textContent='Size';
       const sizeTrack = document.createElement('div'); sizeTrack.className='range-track';
-      const sizeRange = document.createElement('input');
-      sizeRange.type='range'; sizeRange.min=10; sizeRange.max=200; sizeRange.value=b.size;
       const sizeVal = document.createElement('span'); sizeVal.className='ctrl-value'; sizeVal.textContent = b.size+'px';
-      sizeRange.addEventListener('input', () => {
-        b.size = parseInt(sizeRange.value,10);
-        sizeVal.textContent = b.size+'px';
-        applyStyle(textarea,b); saveDraft();
+      mountElasticSlider(sizeTrack, {
+        min: 10, max: 200, step: 1, value: b.size,
+        onInput: (v) => {
+          b.size = Math.round(v);
+          sizeVal.textContent = b.size+'px';
+          applyStyle(textarea,b); saveDraft();
+        }
       });
-      sizeTrack.appendChild(sizeRange);
       sizeCtrl.append(sizeLabel, sizeTrack, sizeVal);
 
       // letter spacing slider
@@ -1629,13 +1724,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       trackCtrl.className = 'ctrl';
       const trackLabel = document.createElement('span'); trackLabel.className='ctrl-label'; trackLabel.textContent='Letter spacing';
       const trackTrack = document.createElement('div'); trackTrack.className='range-track';
-      const trackRange = document.createElement('input');
-      trackRange.type='range'; trackRange.min=-30; trackRange.max=150; trackRange.value=b.tracking;
-      trackRange.addEventListener('input', () => {
-        b.tracking = parseInt(trackRange.value,10);
-        applyStyle(textarea,b); saveDraft();
+      mountElasticSlider(trackTrack, {
+        min: -30, max: 150, step: 1, value: b.tracking,
+        onInput: (v) => {
+          b.tracking = Math.round(v);
+          applyStyle(textarea,b); saveDraft();
+        }
       });
-      trackTrack.appendChild(trackRange);
       trackCtrl.append(trackLabel, trackTrack);
 
       // line height slider
@@ -1643,13 +1738,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       leadCtrl.className = 'ctrl';
       const leadLabel = document.createElement('span'); leadLabel.className='ctrl-label'; leadLabel.textContent='Line height';
       const leadTrack = document.createElement('div'); leadTrack.className='range-track';
-      const leadRange = document.createElement('input');
-      leadRange.type='range'; leadRange.min=95; leadRange.max=190; leadRange.value=b.leading;
-      leadRange.addEventListener('input', () => {
-        b.leading = parseInt(leadRange.value,10);
-        applyStyle(textarea,b); saveDraft();
+      mountElasticSlider(leadTrack, {
+        min: 95, max: 190, step: 1, value: b.leading,
+        onInput: (v) => {
+          b.leading = Math.round(v);
+          applyStyle(textarea,b); saveDraft();
+        }
       });
-      leadTrack.appendChild(leadRange);
       leadCtrl.append(leadLabel, leadTrack);
 
       // fill (monochrome grayscale — black through gray)
@@ -1658,16 +1753,16 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       const fillLabel = document.createElement('span'); fillLabel.className='ctrl-label'; fillLabel.textContent='Fill';
       const fillSwatch = document.createElement('span'); fillSwatch.className='fill-swatch';
       const fillTrack = document.createElement('div'); fillTrack.className='range-track';
-      const fillRange = document.createElement('input');
-      fillRange.type='range'; fillRange.min=0; fillRange.max=200; fillRange.value=b.fill;
       function paintSwatch(v){ fillSwatch.style.background = fillColor(v); }
       paintSwatch(b.fill);
-      fillRange.addEventListener('input', () => {
-        b.fill = parseInt(fillRange.value,10);
-        paintSwatch(b.fill);
-        applyStyle(textarea,b); saveDraft();
+      mountElasticSlider(fillTrack, {
+        min: 0, max: 200, step: 1, value: b.fill,
+        onInput: (v) => {
+          b.fill = Math.round(v);
+          paintSwatch(b.fill);
+          applyStyle(textarea,b); saveDraft();
+        }
       });
-      fillTrack.appendChild(fillRange);
       fillCtrl.append(fillLabel, fillTrack, fillSwatch);
 
       // list type — bullet / numbered. Toggling reformats whatever text
