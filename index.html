@@ -362,11 +362,25 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   #printTarget .block-editable[data-layout="col3"]{ column-count:2; column-gap:1.8em; }
   #printTarget .block-editable a{ color:#000 !important; }
   .print-media-page{
-    display:flex !important;flex-direction:column;align-items:center;justify-content:center;
-    gap:.35in;height:9in;box-sizing:border-box;text-align:center;break-inside:avoid;
+    display:block !important;height:9in;box-sizing:border-box;text-align:center;
+    break-inside:avoid;page-break-inside:avoid;
   }
-  .print-media-page:not(:first-child){ break-before:page; }
-  .print-media-page:not(:last-child){ break-after:page; }
+  /* the break-before/after live on the plain block box above, not on
+     the flex box below — Chromium's print engine has a long-standing
+     bug where forced page breaks are unreliable on flex/grid
+     containers specifically, which was letting the image get sliced
+     across a page boundary instead of staying confined to its own
+     page. A flex box only for the internal centering sidesteps it. */
+  .print-media-page:not(:first-child){
+    break-before:page;page-break-before:always;
+  }
+  .print-media-page:not(:last-child){
+    break-after:page;page-break-after:always;
+  }
+  .print-media-inner{
+    display:flex !important;flex-direction:column;align-items:center;justify-content:center;
+    gap:.35in;height:100%;
+  }
   .print-media-page img{ max-width:100%;max-height:6in;object-fit:contain; }
   .print-media-caption{ color:#000 !important;max-width:6.5in; }
   .print-media-link{ font-family:var(--mono);font-size:11px;color:#000 !important;word-break:break-all; }
@@ -718,6 +732,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 <div class="hud" id="composeHud" aria-label="Writing actions">
   <span class="chrome-status" id="saveStatus"></span>
   <button class="chrome-link" id="btnPrint">Print</button>
+  <button class="chrome-link" id="btnExportLetter" title="Download this letter — text and every size/spacing/fill setting — as a JSON file">Export</button>
   <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
   <button class="chrome-link primary" id="btnSeal" disabled><span id="btnSealMain">Seal</span><span class="hud-suffix"> &amp; file</span></button>
 </div>
@@ -927,6 +942,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const blockStack   = document.getElementById('blockStack');
   const printPhantom = document.getElementById('printPhantom');
   const btnPrint     = document.getElementById('btnPrint');
+  const btnExportLetter = document.getElementById('btnExportLetter');
   const btnDelete    = document.getElementById('btnDelete');
   const addBlockBtn  = document.getElementById('addBlockBtn');
   const btnSeal      = document.getElementById('btnSeal');
@@ -1302,6 +1318,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   function updateSealEnabled(){
     const hasContent = blocks.some(b => b.text.trim().length > 0);
     btnSeal.disabled = !hasContent;
+    btnExportLetter.disabled = !hasContent;
     // the instructional tagline recedes once real writing is underway —
     // it's onboarding, not a persistent piece of chrome
     composeTagline.classList.toggle('settled', hasContent);
@@ -1423,6 +1440,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       if (b.link && isImageLink(b.link)){
         const page = document.createElement('div');
         page.className = 'print-media-page';
+        const inner = document.createElement('div');
+        inner.className = 'print-media-inner';
 
         const img = document.createElement('img');
         img.src = b.link;
@@ -1439,7 +1458,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         linkLine.href = b.link;
         linkLine.textContent = b.link;
 
-        page.append(img, caption, linkLine);
+        inner.append(img, caption, linkLine);
+        page.appendChild(inner);
         printTarget.appendChild(page);
         return;
       }
@@ -2550,6 +2570,31 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   // all lose it. Export writes every filed letter out as plain JSON;
   // Import reads that same file back in, skipping anything already
   // present by id so re-importing is always safe to repeat.
+  // per-letter export — this is deliberately a different shape from
+  // exportArchive()'s {exportedAt, entries:[...]} below: a single
+  // letter travels as its own small, self-contained file (content +
+  // every size/spacing/leading/fill/layout setting per passage),
+  // built off whatever's live in `blocks` right now — a fresh
+  // never-sealed draft exports exactly as well as an already-archived
+  // letter mid-edit. importFileInput's handler recognizes this shape
+  // and always files it as a brand-new archive entry.
+  function exportCurrentLetter(){
+    const first = blocks.find(b => b.text && b.text.trim().length) || blocks[0];
+    const slugSource = (first && first.text || 'untitled').trim().slice(0, 40);
+    const slug = slugSource.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'letter';
+    const payload = { app:'frankly', kind:'letter', exportedAt: new Date().toISOString(), blocks: JSON.parse(JSON.stringify(blocks)) };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = slug + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  btnExportLetter.addEventListener('click', exportCurrentLetter);
+
   function exportArchive(){
     const payload = { exportedAt: new Date().toISOString(), entries: entriesCache };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
@@ -2572,7 +2617,14 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     try{
       const text = await file.text();
       const parsed = JSON.parse(text);
-      const incoming = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.entries) ? parsed.entries : null);
+      // a single-letter export (from the compose HUD's Export button)
+      // has no stable archive id of its own and isn't trying to
+      // restore a prior entry — it's always filed as a new letter,
+      // same as writing one from scratch and sealing it.
+      const isSingleLetter = parsed && parsed.kind === 'letter' && Array.isArray(parsed.blocks);
+      const incoming = isSingleLetter
+        ? [{ id: 'entry_imported_' + Date.now() + '_' + Math.random().toString(36).slice(2,8), blocks: parsed.blocks, createdAt: new Date().toISOString() }]
+        : (Array.isArray(parsed) ? parsed : (Array.isArray(parsed.entries) ? parsed.entries : null));
       if (!incoming) throw new Error('unrecognized file shape');
       let added = 0;
       for (const entry of incoming){
