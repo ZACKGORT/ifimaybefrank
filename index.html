@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -65,6 +65,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   background:none;border:none;padding:0;cursor:pointer;
 }
 .brand-mark:hover,.brand-mark:focus-visible{opacity:.7}
+.brand-mark a{color:inherit;text-decoration:underline;text-underline-offset:2px;transition:color .15s ease}
+.brand-mark a:hover,.brand-mark a:focus-visible{color:var(--ink)}
 
 /* ── the "frankly" mark — a tiny kinetic wordmark clamped to the
    opposite corner from Open Letter. Each letter's weight/width/italic
@@ -82,8 +84,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 .pressure-char{display:inline-block}
 
+/* ── unified site header — HUD and the Write/Archive nav used to be
+   two entirely independent position:fixed elements, each guessing its
+   own offset from its own corner; nothing guaranteed they actually
+   shared a baseline, and keeping them in sync (e.g. when the HUD
+   picked up a 4th button) meant hand-tuning two separate formulas.
+   One flex row now positions both together — HUD left, nav right —
+   so they're uniform by construction rather than by coincidence. */
+.site-header{
+  position:fixed;
+  top:clamp(14px, 8.667px + 1.481vw, 22px);
+  left:clamp(16px, 9.333px + 1.852vw, 26px);
+  right:clamp(16px, 9.333px + 1.852vw, 26px);
+  z-index:60;
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:clamp(8px, 4px + 1.111vw, 14px);
+}
 .chrome{
-  position:fixed;top:22px;right:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
+  /* pushes the nav to the right end of the header via an auto
+     margin rather than the container's justify-content — HUD is
+     display:none outside the compose view, and space-between only
+     behaves with exactly two visible children: with just one (the
+     nav, HUD hidden) it collapses to the start of the row instead of
+     staying put on the right. An auto margin holds its position
+     regardless of whether HUD is there. */
+  margin-left:auto;
   display:flex;align-items:center;gap:clamp(11px, 7.667px + 0.926vw, 16px);
   font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
 }
@@ -129,9 +154,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    size and restrained color choices instead of transparency, so it
    never trades away legibility to get there. */
 .hud{
-  position:fixed;top:clamp(14px, 8.667px + 1.481vw, 22px);left:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
   display:flex;align-items:center;flex-wrap:wrap;gap:clamp(8px, 4px + 1.111vw, 14px);
-  max-width:calc(100vw - 32px);
+  max-width:100%;
   font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
   background:rgba(var(--ink-rgb),.16);border:1px solid var(--rule);border-radius:22px;
   padding:clamp(6px, 4.667px + 0.37vw, 8px) clamp(11px, 7.667px + 0.926vw, 16px);transition:background .2s ease;
@@ -156,17 +180,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:760px){
-  /* nav moves below the HUD rather than sharing its row — two fixed,
-     independently-sized elements racing for the same horizontal band
-     will eventually collide no matter how tight the HUD's content is
-     trimmed; stacking them removes the collision by construction.
-     This is a genuine layout-mode switch (stacked vs. inline), not a
-     magnitude, so it stays a hard breakpoint while every size/spacing
-     value around it (above) now scales fluidly with viewport width.
-     Widened from 640 to 760: the HUD picked up a fourth button
-     (Export) since this threshold was set, and needs more headroom
-     before it's safe to share a row with the chrome nav again. */
-  .chrome{top:54px}
+  /* HUD and nav share one row above this width; below it, there's
+     not reliably enough room for a multi-button HUD and the nav on
+     the same line, so the shared header switches to a column instead
+     — HUD on top, nav below — via a real flex-direction change rather
+     than the two independently guessing a fixed pixel offset to avoid
+     colliding. This is a genuine layout-mode switch (stacked vs.
+     inline), not a magnitude, so it stays a hard breakpoint while
+     every size/spacing value around it (above) now scales fluidly
+     with viewport width. */
+  .site-header{flex-direction:column;align-items:flex-start}
+  .chrome{margin-left:0}
   /* "Update & file" / "Seal & file" → just "Update" / "Seal" — the
      worst-case HUD (mid-edit, with Delete showing, saving in
      progress) is otherwise five items fighting for room on a
@@ -793,22 +817,23 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
-<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Open Letter — home">Open Letter</div>
+<div class="brand-mark" id="brandHome" role="button" tabindex="0" aria-label="Home">by <a href="https://zack.cx" id="brandZackLink" target="_blank" rel="noopener noreferrer">zack.cx</a></div>
 <div class="frankly-mark" id="franklyMark"></div>
-<nav class="chrome" aria-label="Navigation">
-  <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
-  <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
-  <button class="chrome-link" data-view="archive">Archive</button>
-  <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Toggle dark theme" title="Toggle dark theme"></button>
-</nav>
-
-<div class="hud" id="composeHud" aria-label="Writing actions">
-  <span class="chrome-status" id="saveStatus"></span>
-  <button class="chrome-link" id="btnPrint">Print</button>
-  <button class="chrome-link" id="btnExportLetter" title="Download this letter — text and every size/spacing/fill setting — as a JSON file">Export</button>
-  <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
-  <button class="chrome-link primary" id="btnSeal" disabled><span id="btnSealMain">Seal</span><span class="hud-suffix"> &amp; file</span></button>
-</div>
+<header class="site-header">
+  <div class="hud" id="composeHud" aria-label="Writing actions">
+    <span class="chrome-status" id="saveStatus"></span>
+    <button class="chrome-link" id="btnPrint">Print</button>
+    <button class="chrome-link" id="btnExportLetter" title="Download this letter — text and every size/spacing/fill setting — as a JSON file">Export</button>
+    <button class="chrome-link" id="btnDelete" style="display:none">Delete</button>
+    <button class="chrome-link primary" id="btnSeal" disabled><span id="btnSealMain">Seal</span><span class="hud-suffix"> &amp; file</span></button>
+  </div>
+  <nav class="chrome" aria-label="Navigation">
+    <button class="chrome-link" data-view="compose" id="navWrite">Write</button>
+    <a class="chrome-sep chrome-emdash" href="https://emdash.click" target="_blank" rel="noopener" title="emdash.click">—</a>
+    <button class="chrome-link" data-view="archive">Archive</button>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Toggle dark theme" title="Toggle dark theme"></button>
+  </nav>
+</header>
 
 <div class="save-toast" id="saveToast" role="status" aria-live="polite"></div>
 
@@ -2196,6 +2221,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   brandHome.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); showView('home'); }
   });
+  // the zack.cx credit is its own real link nested inside the go-home
+  // button — stop its click from bubbling up and *also* firing the
+  // parent's "go home" handler on the same interaction
+  const brandZackLink = document.getElementById('brandZackLink');
+  if (brandZackLink) brandZackLink.addEventListener('click', (e) => e.stopPropagation());
   function showView(name){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.view === name));
     viewHome.classList.toggle('active', name === 'home');
