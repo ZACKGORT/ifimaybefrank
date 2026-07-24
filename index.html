@@ -130,7 +130,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
    never trades away legibility to get there. */
 .hud{
   position:fixed;top:clamp(14px, 8.667px + 1.481vw, 22px);left:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
-  display:flex;align-items:center;gap:clamp(8px, 4px + 1.111vw, 14px);
+  display:flex;align-items:center;flex-wrap:wrap;gap:clamp(8px, 4px + 1.111vw, 14px);
+  max-width:calc(100vw - 32px);
   font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
   background:rgba(var(--ink-rgb),.16);border:1px solid var(--rule);border-radius:22px;
   padding:clamp(6px, 4.667px + 0.37vw, 8px) clamp(11px, 7.667px + 0.926vw, 16px);transition:background .2s ease;
@@ -154,14 +155,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-@media(max-width:640px){
+@media(max-width:760px){
   /* nav moves below the HUD rather than sharing its row — two fixed,
      independently-sized elements racing for the same horizontal band
      will eventually collide no matter how tight the HUD's content is
      trimmed; stacking them removes the collision by construction.
      This is a genuine layout-mode switch (stacked vs. inline), not a
      magnitude, so it stays a hard breakpoint while every size/spacing
-     value around it (above) now scales fluidly with viewport width. */
+     value around it (above) now scales fluidly with viewport width.
+     Widened from 640 to 760: the HUD picked up a fourth button
+     (Export) since this threshold was set, and needs more headroom
+     before it's safe to share a row with the chrome nav again. */
   .chrome{top:54px}
   /* "Update & file" / "Seal & file" → just "Update" / "Seal" — the
      worst-case HUD (mid-edit, with Delete showing, saving in
@@ -270,7 +274,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 ══════════════════════════════════════════ */
 /* top clearance uses max() so a short/narrow window never lets the
    giant headline scroll up under the fixed chrome */
-.compose-wrap{max-width:1680px;margin:0 auto;min-height:100vh;padding:max(clamp(90px, 70px + 5.556vw, 120px), clamp(12vh, 9.333vh + 0.741vw, 16vh)) clamp(16px, 5vw, 84px) min(clamp(200px, -66.667px + 74.074vw, 600px), 40vh)}
+.compose-wrap{
+  --wrap-pad-x: clamp(16px, 5vw, 84px);
+  max-width:1680px;margin:0 auto;min-height:100vh;
+  padding:max(clamp(90px, 70px + 5.556vw, 120px), clamp(12vh, 9.333vh + 0.741vw, 16vh)) var(--wrap-pad-x) min(clamp(200px, -66.667px + 74.074vw, 600px), 40vh);
+}
 .compose-tagline{
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
   margin-bottom:40px;max-width:52ch;
@@ -369,11 +377,20 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   .write-cursor-dot, .write-cursor-ellipse, .write-cursor-pill{ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
+  /* belt-and-suspenders: force the break from *both* sides of the
+     boundary rather than trusting break-before on the media page
+     alone. In practice, relying on a single side was still letting
+     print engines start the media page mid-page (whatever room was
+     left after the preceding passage) and slice it across the
+     boundary instead of giving it a fresh page. */
+  #printTarget .block:has(+ .print-media-page){
+    break-after:page;page-break-after:always;
+  }
   #printTarget .block-editable, #printTarget .block-editable *{ color:#000 !important; }
   #printTarget .block-editable[data-layout="col3"]{ column-count:2; column-gap:1.8em; }
   #printTarget .block-editable a{ color:#000 !important; }
   .print-media-page{
-    display:block !important;height:9in;box-sizing:border-box;text-align:center;
+    display:block !important;height:8.9in;box-sizing:border-box;text-align:center;
     break-inside:avoid;page-break-inside:avoid;
   }
   /* the break-before/after live on the plain block box above, not on
@@ -381,8 +398,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
      bug where forced page breaks are unreliable on flex/grid
      containers specifically, which was letting the image get sliced
      across a page boundary instead of staying confined to its own
-     page. A flex box only for the internal centering sidesteps it. */
-  .print-media-page:not(:first-child){
+     page. A flex box only for the internal centering sidesteps it.
+     break-before applies unconditionally (not just :not(:first-child))
+     since forcing a break directly before the very first element on
+     a page is a harmless no-op in every renderer — there's no reason
+     to make a pseudo-class's correctness load-bearing here too. */
+  .print-media-page{
     break-before:page;page-break-before:always;
   }
   .print-media-page:not(:last-child){
@@ -392,8 +413,19 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     display:flex !important;flex-direction:column;align-items:center;justify-content:center;
     gap:.35in;height:100%;
   }
-  .print-media-page img{ max-width:100%;max-height:6in;object-fit:contain; }
-  .print-media-caption{ color:#000 !important;max-width:6.5in; }
+  .print-media-page img{ max-width:100%;max-height:5in;object-fit:contain; }
+  /* the caption's on-screen editing size can be dialed up well past
+     what a photo caption needs (passages go up to 200px), and at
+     real 6.5in print width a long caption at a large chosen size can
+     wrap to enough lines to overflow the page even with the
+     break-before/after fixes above in place — this was the other
+     half of the original bleed, not just the break mechanics. Capped
+     downward only (min()), so anything already reasonably sized is
+     untouched. */
+  .print-media-caption{
+    color:#000 !important;max-width:6.5in;line-height:1.3 !important;
+    font-size:min(calc(var(--bsize, 24) * 1px), 28px) !important;
+  }
   .print-media-link{ font-family:var(--mono);font-size:11px;color:#000 !important;word-break:break-all; }
 }
 .print-media-page{ display:none; }
@@ -414,7 +446,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
              transform .3s cubic-bezier(.22,1,.36,1), margin-bottom .3s ease, padding-bottom .3s ease;
 }
 .block.active .block-controls{
-  margin-bottom:22px;padding-bottom:14px;max-height:120px;opacity:1;
+  margin-bottom:22px;padding-bottom:14px;max-height:640px;opacity:1;
   transform:translateY(0) scaleY(1);pointer-events:auto;overflow:visible;
   position:sticky;top:60px;z-index:30;
   background:var(--bg);border-bottom:1px solid var(--rule);
@@ -423,6 +455,18 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .block.active{border-color:var(--surface-border)}
 .ctrl{display:flex;align-items:center;gap:8px}
 .ctrl-label{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+/* mobile: read/write over fine-tuning — letter-spacing, line-height,
+   and fill are fine-tuning dials, not choices, and cramming all of
+   them plus font/weight/size/list/layout into a narrow toolbar is
+   what produced the overlapping mess this replaces. Size becomes the
+   sole "scale" slider on small screens; tracking (stored in em) and
+   leading (a unitless multiplier) already ride along proportionally
+   with font-size for free, no extra math required — hiding their
+   controls doesn't remove their effect, just their fine-tuning. */
+@media(max-width:640px){
+  .ctrl-tracking, .ctrl-leading, .ctrl-fill{display:none}
+}
 
 .select-wrap{position:relative;display:inline-flex;align-items:center}
 .select-wrap::after{
@@ -607,17 +651,29 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .layout-icon span{flex:1}
 .layout-icon span:not(:last-child){border-right:1.4px solid currentColor}
 
-.block-insert{
-  font-family:var(--chrome-font);font-size:16px;color:var(--muted);background:transparent;border:none;
-  cursor:pointer;line-height:1;padding:2px 4px;margin-left:10px;
+/* insert & remove both live in the block's left margin — their own
+   quiet "spine," stacked vertically, rather than competing for room
+   in the formatting toolbar. Reachable on hover (or once the block is
+   active/focused) rather than needing the whole control row open
+   first. Offset is 70% of the page's own live left padding
+   (--wrap-pad-x, set on .compose-wrap) rather than a separately
+   hand-tuned value — guaranteed to always fit within whatever that
+   padding currently computes to, at any viewport width, without
+   needing to duplicate and keep its formula in sync by hand. */
+.block-spine{
+  position:absolute;top:2px;left:calc(var(--wrap-pad-x, 24px) * -0.7);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  opacity:0;transition:opacity .15s ease;
 }
-.block-insert:hover{color:var(--ink)}
-
-.block-remove{
+.block:hover .block-spine,
+.block.active .block-spine,
+.block-spine:focus-within{opacity:1}
+.block-spine-btn{
   font-family:var(--chrome-font);font-size:16px;color:var(--muted);background:transparent;border:none;
-  cursor:pointer;line-height:1;padding:2px 4px;margin-left:6px;
+  cursor:pointer;line-height:1;padding:4px;transition:color .15s ease;
 }
-.block-remove:hover{color:var(--ink)}
+.block-spine-btn:hover{color:var(--ink)}
+.block-spine-remove{font-size:15px}
 
 .add-block-row{margin-top:8px}
 .add-block-btn{
@@ -1839,7 +1895,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
       // size slider
       const sizeCtrl = document.createElement('div');
-      sizeCtrl.className = 'ctrl';
+      sizeCtrl.className = 'ctrl ctrl-size';
       const sizeLabel = document.createElement('span'); sizeLabel.className='ctrl-label'; sizeLabel.textContent='Size';
       const sizeTrack = document.createElement('div'); sizeTrack.className='range-track';
       const sizeVal = document.createElement('span'); sizeVal.className='ctrl-value'; sizeVal.textContent = b.size+'px';
@@ -1855,7 +1911,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
       // letter spacing slider
       const trackCtrl = document.createElement('div');
-      trackCtrl.className = 'ctrl';
+      trackCtrl.className = 'ctrl ctrl-tracking';
       const trackLabel = document.createElement('span'); trackLabel.className='ctrl-label'; trackLabel.textContent='Letter spacing';
       const trackTrack = document.createElement('div'); trackTrack.className='range-track';
       const trackVal = document.createElement('span'); trackVal.className='ctrl-value'; trackVal.textContent = b.tracking;
@@ -1871,7 +1927,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
       // line height slider
       const leadCtrl = document.createElement('div');
-      leadCtrl.className = 'ctrl';
+      leadCtrl.className = 'ctrl ctrl-leading';
       const leadLabel = document.createElement('span'); leadLabel.className='ctrl-label'; leadLabel.textContent='Line height';
       const leadTrack = document.createElement('div'); leadTrack.className='range-track';
       const leadVal = document.createElement('span'); leadVal.className='ctrl-value'; leadVal.textContent = b.leading+'%';
@@ -1887,7 +1943,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
       // fill (monochrome grayscale — black through gray)
       const fillCtrl = document.createElement('div');
-      fillCtrl.className = 'ctrl';
+      fillCtrl.className = 'ctrl ctrl-fill';
       const fillLabel = document.createElement('span'); fillLabel.className='ctrl-label'; fillLabel.textContent='Fill';
       const fillSwatch = document.createElement('span'); fillSwatch.className='fill-swatch';
       const fillTrack = document.createElement('div'); fillTrack.className='range-track';
@@ -1988,13 +2044,18 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
       updateLayoutLock();
 
-      // insert — always a new passage directly below this one, never
-      // above; that's what keeps the first passage anchored as the
-      // first passage regardless of which block's control you use,
-      // rather than needing a separate "insert above" that could
+      // insert & remove — both live in the left margin as their own
+      // quiet "spine," separate from the formatting toolbar entirely,
+      // reachable just by hovering the passage (or focusing into it)
+      // rather than needing the whole control row open first.
+      //
+      // insert always adds a new passage directly below this one,
+      // never above — that's what keeps the first passage anchored as
+      // the first passage regardless of which block's control you
+      // use, rather than needing a separate "insert above" that could
       // displace it.
       const insertBtn = document.createElement('button');
-      insertBtn.type='button'; insertBtn.className='block-insert'; insertBtn.title='Insert a new passage below this one';
+      insertBtn.type='button'; insertBtn.className='block-spine-btn'; insertBtn.title='Insert a new passage below this one';
       insertBtn.textContent = '+';
       insertBtn.addEventListener('click', () => {
         blocks.splice(i + 1, 0, defaultBlock());
@@ -2006,9 +2067,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         saveDraft();
       });
 
-      // remove
       const removeBtn = document.createElement('button');
-      removeBtn.type='button'; removeBtn.className='block-remove'; removeBtn.title='Remove this passage';
+      removeBtn.type='button'; removeBtn.className='block-spine-btn block-spine-remove'; removeBtn.title='Remove this passage';
       removeBtn.textContent = '×';
       removeBtn.addEventListener('click', () => {
         if (blocks.length <= 1) return;
@@ -2018,8 +2078,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         saveDraft();
       });
 
-      controls.append(fontWrap, weightWrap, italicBtn, linkWrap, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, insertBtn, removeBtn);
-      block.append(controls, textarea);
+      const spine = document.createElement('div');
+      spine.className = 'block-spine';
+      spine.append(insertBtn, removeBtn);
+
+      controls.append(fontWrap, weightWrap, italicBtn, linkWrap, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup);
+      block.append(controls, textarea, spine);
       blockStack.appendChild(block);
       renderLinkChip(block, b);
 
