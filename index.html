@@ -535,7 +535,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
    snapping straight to the pointer */
 .link-thumb{
   position:fixed;top:0;left:0;z-index:200;
-  width:220px;max-height:220px;
+  width:clamp(200px, 40px + 44.444vw, 440px);max-height:clamp(200px, 40px + 44.444vw, 440px);
   background:var(--surface);border:1px solid var(--rule);border-radius:10px;
   box-shadow:0 20px 48px var(--shadow);
   padding:6px;pointer-events:none;
@@ -544,7 +544,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   will-change:transform;
 }
 .link-thumb.visible{opacity:1;transform-origin:top left}
-.link-thumb img{display:block;width:100%;max-height:200px;object-fit:contain;border-radius:5px}
+.link-thumb img{display:block;width:100%;max-height:clamp(190px, 36.667px + 42.593vw, 420px);object-fit:contain;border-radius:5px}
 
 /* ── elastic range track — a compact port of the react-bits "Elastic
    Slider": no thumb, just a filled bar that lets you drag anywhere,
@@ -1183,7 +1183,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   function stopThumbLoop(){ if (thumbRAF){ cancelAnimationFrame(thumbRAF); thumbRAF = null; } }
 
   function positionThumbTarget(e){
-    const w = 220, h = 220; // matches .link-thumb sizing
+    // read the live size rather than a fixed constant, since it now
+    // scales fluidly with viewport width instead of always being 220px
+    const w = linkThumb.offsetWidth || 220, h = linkThumb.offsetHeight || 220;
     let x = e.clientX + THUMB_OFFSET_X;
     let y = e.clientY + THUMB_OFFSET_Y;
     if (x + w > window.innerWidth - 8) x = e.clientX - w - THUMB_OFFSET_X;
