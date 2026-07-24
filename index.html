@@ -248,7 +248,18 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   font-family:'Fraunces',serif;font-style:italic;font-weight:600;
   font-size:clamp(34px,6vw,76px);line-height:1.08;
   max-width:14ch;color:var(--ink);margin-bottom:32px;
+  transition:font-family .05s;
 }
+/* scroll-to-cycle-fonts feedback — sits in the gap "Frankly," already
+   leaves via margin-bottom rather than pushing the doctrine down, and
+   only appears while actively cycling (see the JS timer that clears
+   its "visible" class after a pause) */
+.home-font-label{
+  display:block;margin-top:-24px;margin-bottom:24px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);opacity:0;transition:opacity .25s ease;
+}
+.home-font-label.visible{opacity:1}
 .home-doctrine{
   font-family:var(--mono);font-size:12px;letter-spacing:.06em;
   text-transform:uppercase;color:var(--muted);max-width:48ch;line-height:1.7;
@@ -596,6 +607,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 .layout-icon span{flex:1}
 .layout-icon span:not(:last-child){border-right:1.4px solid currentColor}
 
+.block-insert{
+  font-family:var(--chrome-font);font-size:16px;color:var(--muted);background:transparent;border:none;
+  cursor:pointer;line-height:1;padding:2px 4px;margin-left:10px;
+}
+.block-insert:hover{color:var(--ink)}
+
 .block-remove{
   font-family:var(--chrome-font);font-size:16px;color:var(--muted);background:transparent;border:none;
   cursor:pointer;line-height:1;padding:2px 4px;margin-left:6px;
@@ -751,7 +768,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 <!-- ══════════════════ HOME ══════════════════ -->
 <main class="view active" id="view-home">
   <div class="home-wrap">
-    <p class="home-statement">Frankly,</p>
+    <p class="home-statement" id="homeStatement">Frankly,</p>
+    <span class="home-font-label" id="homeFontLabel" aria-hidden="true"></span>
     <p class="home-doctrine">Shape influences input and output; <br>what is written &amp; how it is read,</p>
   </div>
 </main>
@@ -906,19 +924,21 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   function odysseyDemoBlocks(){
     // an actual piece written in the tool during testing — kept as a
     // real example of the weight controls doing rhetorical work rather
-    // than just demonstrating themselves
+    // than just demonstrating themselves. Synced from the canonical
+    // exported copy rather than hand-edited in place, so this stays a
+    // straight mirror of whatever's actually been written and filed.
     return [
-      { text:"I have an opinion on Nolan's 'The Odyssey'.", font:'jakarta', weight:800, italic:false, size:86, tracking:-12, leading:100, fill:0, layout:'single', list:'none' },
-      { text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:40, tracking:-6, leading:108, fill:0, layout:'single', list:'none' },
-      { text:"humbly, I offer just one change from Homer's original poem that would improve upon what Nolan was already setting the audience up for.", font:'fraunces', weight:600, italic:true, size:26, tracking:0, leading:145, fill:20, layout:'single', list:'none' },
-      { text:"Instead of 11 ships getting destroyed at the beginning, let most of the ships survive before they meet Polyphemus.   Cut time given to final fight and give that to Polyphemus / Cerci /  / Laestrygonians (the cannibal giants)", font:'mono', weight:500, italic:false, size:13, tracking:0, leading:155, fill:90, layout:'single', list:'none' },
-      { text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none' },
-      { text:'The encounter with Polyphemus could adapt Homer\'s original layout to show something visually more impressive.  More men.  More ships. More stakes. Adapt the encounter with Polyphemus such that logically, it stands to reason that discovering a trove of food from a giant would be sufficient to feed the 1000 soldiers.  Give screentime to creative liberty in how the protagonist and his men cleverly enjoy success before a critical failure causes the giant to become a threat (same logistical workings as the horse out of sand introduction). Perhaps here, we lose a just one or two boats.', font:'jakarta', weight:400, italic:false, size:36, tracking:0, leading:158, fill:75, layout:'single', list:'none' },
-      { text:"Or, imagine your are Cerci, and you adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths to feed.", font:'newsreader', weight:500, italic:false, size:22, tracking:0, leading:145, fill:55, layout:'single', list:'none' },
-      { text:'Or Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:22, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
-      { text:'Or, since the Laestrygonians decided to show up in their Sunday best (you know, the cannibal giants Homer wrote about; with Nolan\'s shiny new armor), well we can now have an actual battle, with real loss through terror and trajedy, rather than just Monthy Pythoning it "run away!"', font:'newsreader', weight:700, italic:false, size:44, tracking:0, leading:140, fill:0, layout:'single', list:'none' },
-      { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' },
-      { text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' }
+      { text:"I have an opinion on Nolan's 'The Odyssey'.", font:'bricolage', weight:800, italic:false, size:116, tracking:-12, leading:100, fill:0, layout:'single', list:'none', link:'' },
+      { text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:36, tracking:-6, leading:108, fill:0, layout:'col2', list:'none', link:'' },
+      { text:"Humbly, I offer just one change from Homer's original poem that would improve upon what Nolan was already setting the audience up for.", font:'fraunces', weight:400, italic:true, size:25, tracking:0, leading:115, fill:20, layout:'single', list:'none', link:'' },
+      { text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:28, tracking:-30, leading:155, fill:90, layout:'single', list:'none', link:'' },
+      { text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Now, our first encounter with Polyphemus adapts Homer\'s original layout to show something visually scaled for the modern era.  More people. More ships. More stakes at greater scale (this is optimized for IMAX, afterall).Let\'s say we lost two ships prior to our arrival at this island. With roughly 150 men per boat, we assume as many as one-thousand mouths to feed — so, it stands to reason that discovering the equivalant of a Costco could setup for some creative cinematic storytelling. Now, as like the original poem, Odysseus and his entourage continue as expected, trapped in the cave with their eye-poking and sheep shenanigans … but perhaps we bring in the "nobody" hook in an imaginative way — Picture the soldiers steathily attempting a rescue, and whenever the cyclops nearly detects them, he yells "who\'s there?!", wherein the soldiers whisper en masse "nobody"  —  eventually building up the sense that Polyphemus has lost his mind.Then, as they escape safely to their ships, a captain quips to Odysseus about their clever "nobody" ploy, to which Odysseus steals the credit and exclaims "but it wasn\'t nobody who blinded that beast, it was I, Odysseus, king of Ithaca" (or something like that)& although quite some distance a way, Polyphemus hears this and rages out, successfully sinking a few ships in a blind fit of fury. ', font:'newsreader', weight:400, italic:false, size:27, tracking:-30, leading:134, fill:75, layout:'single', list:'none', link:'' },
+      { text:"Now, imagine we are Cerci, and we adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths we have to feed.Also, we are evil & vindictive, and we made a few ships-worth of stew.", font:'newsreader', weight:500, italic:false, size:44, tracking:0, leading:145, fill:55, layout:'single', list:'none', link:'' },
+      { text:'Eight ships. Well, the whirlpool of death "ate" one of them, so now we are left with seven; when suddenly, a six-something Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:62, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Two boats left. That\'s three-hundred men, give or take.  And since the Laestrygonians decided to show up in their Sunday best(you know, the cannibal giants Homer wrote about, now outfitted with Nolan\'s shiny new armor), Well, we let us enjoy a battle worthy of epic proportion, with real loss through terror, turmoil, and trajedy — rather than an expensive Monty Python "run away!" skit.', font:'newsreader', weight:400, italic:false, size:47, tracking:0, leading:140, fill:0, layout:'single', list:'none', link:'' },
+      { text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' },
+      { text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none', link:'' }
     ];
   }
 
@@ -1968,6 +1988,24 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
       updateLayoutLock();
 
+      // insert — always a new passage directly below this one, never
+      // above; that's what keeps the first passage anchored as the
+      // first passage regardless of which block's control you use,
+      // rather than needing a separate "insert above" that could
+      // displace it.
+      const insertBtn = document.createElement('button');
+      insertBtn.type='button'; insertBtn.className='block-insert'; insertBtn.title='Insert a new passage below this one';
+      insertBtn.textContent = '+';
+      insertBtn.addEventListener('click', () => {
+        blocks.splice(i + 1, 0, defaultBlock());
+        renderStack();
+        const inserted = blockStack.querySelectorAll('.block')[i + 1];
+        const editable = inserted && inserted.querySelector('.block-editable');
+        if (editable) editable.focus();
+        updateSealEnabled();
+        saveDraft();
+      });
+
       // remove
       const removeBtn = document.createElement('button');
       removeBtn.type='button'; removeBtn.className='block-remove'; removeBtn.title='Remove this passage';
@@ -1980,7 +2018,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         saveDraft();
       });
 
-      controls.append(fontWrap, weightWrap, italicBtn, linkWrap, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, removeBtn);
+      controls.append(fontWrap, weightWrap, italicBtn, linkWrap, sizeCtrl, trackCtrl, leadCtrl, fillCtrl, listGroup, layoutGroup, insertBtn, removeBtn);
       block.append(controls, textarea);
       blockStack.appendChild(block);
       renderLinkChip(block, b);
@@ -2849,6 +2887,67 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     initPressureText(document.querySelector('.archive-title'), { wght:[350,850], opsz:[9,60] });
 
     requestAnimationFrame(pressureAnimate);
+  })();
+
+  // ── scroll-to-cycle-fonts ── the homepage doesn't otherwise scroll,
+  // so a wheel/swipe gesture there is free to mean something else:
+  // step "Frankly," through every font in the app's own palette (the
+  // same FONTS list every passage picks from), rather than a curated
+  // one-off list that could drift out of sync with what the editor
+  // actually offers. A small mono label names whatever's currently
+  // showing, fading in on each step and back out after a pause.
+  (function initHomeFontCycle(){
+    const homeStatement = document.getElementById('homeStatement');
+    const homeFontLabel = document.getElementById('homeFontLabel');
+    if (!homeStatement || !homeFontLabel) return;
+
+    let idx = Math.max(0, FONTS.findIndex(f => f.id === 'fraunces'));
+    let accum = 0;
+    let labelTimer = null;
+    const STEP_PX = 70;
+
+    function step(dir){
+      idx = (idx + dir + FONTS.length) % FONTS.length;
+      const f = FONTS[idx];
+      homeStatement.style.fontFamily = f.family;
+      homeFontLabel.textContent = f.label;
+      homeFontLabel.classList.add('visible');
+      clearTimeout(labelTimer);
+      labelTimer = setTimeout(() => homeFontLabel.classList.remove('visible'), 1100);
+    }
+
+    // consumes a raw scroll/swipe delta, stepping once per STEP_PX
+    // crossed (and carrying the remainder), so a fast flick advances
+    // several fonts at once while a light nudge advances exactly one
+    function consume(deltaY){
+      accum += deltaY;
+      while (Math.abs(accum) >= STEP_PX){
+        step(accum > 0 ? 1 : -1);
+        accum -= Math.sign(accum) * STEP_PX;
+      }
+    }
+
+    viewHome.addEventListener('wheel', (e) => {
+      if (!viewHome.classList.contains('active')) return;
+      e.preventDefault();
+      consume(e.deltaY);
+    }, { passive:false });
+
+    // touch devices have no wheel event, so a single-finger vertical
+    // swipe drives the same accumulator via frame-to-frame movement
+    let touchY = null;
+    viewHome.addEventListener('touchstart', (e) => {
+      if (!viewHome.classList.contains('active') || e.touches.length !== 1) return;
+      touchY = e.touches[0].clientY;
+    }, { passive:true });
+    viewHome.addEventListener('touchmove', (e) => {
+      if (!viewHome.classList.contains('active') || e.touches.length !== 1 || touchY === null) return;
+      const y = e.touches[0].clientY;
+      e.preventDefault();
+      consume(touchY - y);
+      touchY = y;
+    }, { passive:false });
+    viewHome.addEventListener('touchend', () => { touchY = null; });
   })();
 
 
