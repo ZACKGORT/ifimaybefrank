@@ -145,24 +145,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 
 /* ── HUD — a separate floating cluster from the nav above, opposite
    corner, for the compose actions themselves (New/Print/Save/Delete)
-   rather than view navigation. The bordered pill gives it a distinct
-   "instrument panel" feel instead of reading as more nav links.
-   Both this and the nav render at full opacity — a low-opacity resting
-   state (as this used to have) blends even pure black text down to
-   roughly mid-gray against white, well under WCAG AA's 4.5:1 minimum
-   for normal-sized text. "Quiet until needed" now comes from small
-   size and restrained color choices instead of transparency, so it
-   never trades away legibility to get there. */
+   rather than view navigation. A stark solid ink-fill pill (not
+   frosted glass) gives it a distinct "instrument panel" feel instead
+   of reading as more nav links — --ink/--on-ink already flip per
+   theme (black-on-white in light, white-on-black in dark), so filling
+   the HUD with --ink and setting its text to --on-ink automatically
+   gives black-fill/white-text in light mode and white-fill/black-text
+   in dark mode, with no separate dark-theme override needed. */
 .hud{
   display:flex;align-items:center;flex-wrap:wrap;gap:clamp(8px, 4px + 1.111vw, 14px);
   max-width:100%;
   font-family:var(--mono);font-size:clamp(10px, 9.333px + 0.185vw, 11px);letter-spacing:.07em;text-transform:uppercase;
-  background:rgba(var(--ink-rgb),.16);border:1px solid var(--rule);border-radius:22px;
-  padding:clamp(6px, 4.667px + 0.37vw, 8px) clamp(11px, 7.667px + 0.926vw, 16px);transition:background .2s ease;
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  background:var(--ink);color:var(--on-ink);border-radius:22px;
+  box-shadow:0 4px 16px var(--shadow);
+  padding:clamp(6px, 4.667px + 0.37vw, 8px) clamp(11px, 7.667px + 0.926vw, 16px);
+  transition:box-shadow .2s ease;
 }
-.hud:hover,.hud:focus-within{background:rgba(var(--ink-rgb),.24)}
+.hud:hover,.hud:focus-within{box-shadow:0 6px 22px var(--shadow)}
+.hud .chrome-link{color:var(--on-ink)}
+.hud .chrome-link.active{border-bottom-color:var(--on-ink)}
+.hud .chrome-status{color:color-mix(in srgb, var(--on-ink) 65%, transparent)}
 
 /* ── save toast — "Saved" is a one-time confirmation, not an ongoing
    state, so it gets a brief top-center toast rather than sitting in
@@ -180,17 +182,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 @media(max-width:760px){
-  /* HUD and nav share one row above this width; below it, there's
-     not reliably enough room for a multi-button HUD and the nav on
-     the same line, so the shared header switches to a column instead
-     — HUD on top, nav below — via a real flex-direction change rather
-     than the two independently guessing a fixed pixel offset to avoid
-     colliding. This is a genuine layout-mode switch (stacked vs.
-     inline), not a magnitude, so it stays a hard breakpoint while
-     every size/spacing value around it (above) now scales fluidly
-     with viewport width. */
-  .site-header{flex-direction:column;align-items:flex-start}
-  .chrome{margin-left:0}
+  /* HUD and nav share one row above this width; below it, HUD drops
+     to a bottom-clamped bar instead of stacking under the nav — a
+     thumb-reachable action bar along the bottom edge (like a native
+     mobile toolbar) rather than more chrome crowding the top, where
+     it'd also sit closest to whatever passage you're actively editing.
+     It's repositioned above the on-screen keyboard via JS
+     (visualViewport) when one opens, rather than getting hidden
+     underneath it — see initHudKeyboardAvoidance below. This is a
+     genuine layout-mode switch (stacked vs. inline, top vs. bottom),
+     not a magnitude, so it stays a hard breakpoint while every
+     size/spacing value around it (above) now scales fluidly with
+     viewport width. */
+  .chrome{margin-left:0;width:100%;justify-content:center}
+  .hud{
+    position:fixed;top:auto;z-index:60;
+    bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+    left:50%;transform:translateX(-50%);
+    max-width:calc(100vw - 32px);
+    justify-content:center;
+  }
   /* "Update & file" / "Seal & file" → just "Update" / "Seal" — the
      worst-case HUD (mid-edit, with Delete showing, saving in
      progress) is otherwise five items fighting for room on a
@@ -2296,7 +2307,42 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     });
   })();
 
-  // ── custom cursor ──
+  // ── HUD keyboard avoidance (mobile) ──
+  // On mobile the HUD clamps to the bottom of the screen (see the
+  // ≤760px media query above) rather than sharing the top row with
+  // nav — but a plain position:fixed;bottom isn't reliably enough on
+  // its own: depending on the mobile browser, a fixed element can end
+  // up hidden underneath the on-screen keyboard once one of the
+  // passage fields is focused, since "bottom:0" is measured against
+  // the full layout viewport rather than the shorter visible area the
+  // keyboard leaves behind. The VisualViewport API reports that
+  // actual visible area directly, so this nudges the HUD up by
+  // whatever height the keyboard is currently covering, and drops it
+  // back down once the keyboard closes. A no-op on desktop (and in
+  // any browser without visualViewport support, where it just falls
+  // back to the CSS position alone).
+  (function initHudKeyboardAvoidance(){
+    const hud = document.getElementById('composeHud');
+    if (!hud || !window.visualViewport) return;
+    const mq = window.matchMedia('(max-width:760px)');
+    const vv = window.visualViewport;
+
+    function update(){
+      if (!mq.matches){ hud.style.transform = ''; return; }
+      const keyboardInset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      hud.style.transform = keyboardInset > 0
+        ? `translate(-50%, -${keyboardInset}px)`
+        : 'translateX(-50%)';
+    }
+
+    vv.addEventListener('resize', update);
+    vv.addEventListener('scroll', update);
+    if (mq.addEventListener) mq.addEventListener('change', update);
+    else if (mq.addListener) mq.addListener(update); // older Safari
+    update();
+  })();
+
+
   // Three independent layers stand in for the system pointer across
   // the whole app now (home, compose, and archive alike): a dot locked
   // exactly to the real pointer position, a halo ellipse around it
