@@ -221,22 +221,12 @@ body.focus-mode .letters-track{
 .category-pill{
   font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
   padding:7px 14px;border-radius:20px;border:1px solid var(--rule);background:transparent;color:var(--muted);
-  cursor:pointer;transition:color .15s,background .15s,border-color .15s;
+  cursor:grab;transition:color .15s,background .15s,border-color .15s;
 }
 .category-pill:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 .category-pill.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
-.category-pill-wrap{position:relative;display:inline-flex;cursor:grab}
-.category-pill-wrap.dragging{opacity:.4}
-.category-pill-wrap.drag-over .category-pill{border-color:var(--ink)}
-.category-pill-x{
-  position:absolute;top:-6px;right:-6px;z-index:1;
-  width:16px;height:16px;border-radius:50%;padding:0;box-sizing:border-box;
-  display:flex;align-items:center;justify-content:center;
-  background:var(--ink);color:var(--on-ink);border:1px solid var(--surface);
-  cursor:pointer;opacity:0;pointer-events:none;transition:opacity .15s,background .15s;
-}
-.category-pill-wrap:hover .category-pill-x{opacity:1;pointer-events:auto}
-.category-pill-x:hover{background:var(--danger)}
+.category-pill.dragging{opacity:.4}
+.category-pill.drag-over{border-color:var(--ink)}
 .category-pill-add{cursor:pointer;border-style:dashed}
 .category-pill-unsorted{cursor:pointer;font-style:italic}
 #categoryTitleEl[contenteditable="false"],
@@ -686,6 +676,13 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
   border-top:1px solid var(--rule);border-right:1px solid var(--rule);
 }
 .shelf .letter-card:nth-last-child(-n+3){border-bottom:1px solid var(--rule)}
+.shelf .letter-card.letter-card-add{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  border:1px dashed var(--rule);color:var(--muted);
+  font-family:var(--chrome-font);font-weight:600;font-size:14px;
+  cursor:pointer;transition:color .15s,border-color .15s;
+}
+.shelf .letter-card.letter-card-add:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 .shelf .lc-num{margin-bottom:12px}
 .shelf .lc-arrow{position:absolute;top:16px;right:16px}
 .shelf .lc-body{display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
@@ -714,6 +711,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 .shelf.list-mode .lc-desc{-webkit-line-clamp:2;margin-top:0;padding-top:0}
 .shelf.list-mode .lc-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-top:0;padding-top:0;border-top:none;order:3}
 .shelf.list-mode .lc-arrow{position:static;margin-left:4px;order:4}
+.shelf.list-mode .letter-card.letter-card-add{display:flex;justify-content:center;padding:16px}
 
 @media(max-width:640px){
   .shelf.list-mode .letter-card{grid-template-columns:28px 1fr auto}
@@ -813,7 +811,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 <div class="corner-mark" id="cornerMark"></div>
 
 <nav class="site-nav-bar" aria-label="Site navigation">
-  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">zack.cx</button>
+  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">Frankly</button>
   <div class="site-nav-tabs" role="group" aria-label="Journal view">
     <button class="site-nav-tab active" id="tabLetters" type="button">Write</button>
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
@@ -830,7 +828,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
 <main class="view-home" id="viewHome">
   <div class="home-wrap">
-    <p class="home-statement" id="homeStatement">Journal,</p>
+    <p class="home-statement" id="homeStatement">Frankly,</p>
     <span class="home-font-label" id="homeFontLabel" aria-hidden="true"></span>
     <p class="home-doctrine">Shape influences input and output; <br>what is written &amp; how it is read,</p>
   </div>
@@ -868,6 +866,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
           </button>
         </div>
       </div>
+    </div>
+    <div id="toolbarOverviewActions" class="toolbar-group" style="display:none">
+      <button class="chrome-link" id="btnDeleteCategory" type="button" title="Delete this category">Delete category</button>
     </div>
   </div>
   <div class="mode-toolbar-right">
@@ -1078,29 +1079,6 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         B({ text:'Clients: BNY Mellon \u00b7 TikTok \u00b7 GNC \u00b7 Merck \u00b7 Comcast \u00b7 Kent State \u00b7 Philadelphia Eagles\nIndustries: Financial Services \u00b7 Social/Advertising \u00b7 Retail \u00b7 Pharma \u00b7 Higher Ed \u00b7 Sports/Entertainment', font:'mono', weight:500, size:14, leading:170, fill:45, list:'bullet' })
       ];
 
-      case 'letter_odyssey': return [
-        B({ text:"I have an opinion on Nolan's 'The Odyssey'.", font:'bricolage', weight:800, italic:false, size:116, tracking:-12, leading:100, fill:0, layout:'single', list:'none' }),
-        B({ text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:36, tracking:-6, leading:108, fill:0, layout:'col2', list:'none' }),
-        B({ text:"Humbly, I offer just one change from Homer's original poem that would improve upon what Nolan was already setting the audience up for.", font:'fraunces', weight:400, italic:true, size:25, tracking:0, leading:115, fill:20, layout:'single', list:'none' }),
-        B({ text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:28, tracking:-30, leading:155, fill:90, layout:'single', list:'none' }),
-        B({ text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none' }),
-        B({ text:'Now, our first encounter with Polyphemus adapts Homer\u2019s original layout to show something visually scaled for the modern era.  More people. More ships. More stakes at greater scale (this is optimized for IMAX, afterall).Let\u2019s say we lost two ships prior to our arrival at this island. With roughly 150 men per boat, we assume as many as one-thousand mouths to feed \u2014 so, it stands to reason that discovering the equivalant of a Costco could setup for some creative cinematic storytelling. Now, as like the original poem, Odysseus and his entourage continue as expected, trapped in the cave with their eye-poking and sheep shenanigans \u2026 but perhaps we bring in the "nobody" hook in an imaginative way \u2014 Picture the soldiers steathily attempting a rescue, and whenever the cyclops nearly detects them, he yells "who\'s there?!", wherein the soldiers whisper en masse "nobody"  \u2014  eventually building up the sense that Polyphemus has lost his mind.Then, as they escape safely to their ships, a captain quips to Odysseus about their clever "nobody" ploy, to which Odysseus steals the credit and exclaims "but it wasn\u2019t nobody who blinded that beast, it was I, Odysseus, king of Ithaca" (or something like that)& although quite some distance a way, Polyphemus hears this and rages out, successfully sinking a few ships in a blind fit of fury. ', font:'newsreader', weight:400, italic:false, size:27, tracking:-30, leading:134, fill:75, layout:'single', list:'none' }),
-        B({ text:"Now, imagine we are Cerci, and we adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths we have to feed.Also, we are evil & vindictive, and we made a few ships-worth of stew.", font:'newsreader', weight:500, italic:false, size:44, tracking:0, leading:145, fill:55, layout:'single', list:'none' }),
-        B({ text:'Eight ships. Well, the whirlpool of death "ate" one of them, so now we are left with seven; when suddenly, a six-something Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:62, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
-        B({ text:'Two boats left. That\u2019s three-hundred men, give or take.  And since the Laestrygonians decided to show up in their Sunday best(you know, the cannibal giants Homer wrote about, now outfitted with Nolan\u2019s shiny new armor), Well, we let us enjoy a battle worthy of epic proportion, with real loss through terror, turmoil, and trajedy \u2014 rather than an expensive Monty Python "run away!" skit.', font:'newsreader', weight:400, italic:false, size:47, tracking:0, leading:140, fill:0, layout:'single', list:'none' }),
-        B({ text:'Then, Matt Damon yells "Let\u2019s go!" as the camera pans with him, but revealing that he\u2019s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
-        B({ text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' })
-      ];
-
-      case 'letter_stated': return [
-        B({ text:'Stated \u2014 as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' }),
-        B({ text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:45, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' }),
-        B({ text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words \u2014 btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:23, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' }),
-        B({ text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' }),
-        B({ text:'\u2022 They say a \'photo is worth a thousand words\' \u2026 frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }),
-        B({ text:'"write more by writing less." \u2014 zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' })
-      ];
-
       default: return null;
     }
   }
@@ -1186,6 +1164,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const toolbarHistoryActions = document.getElementById('toolbarHistoryActions');
   const toolbarLettersNav = document.getElementById('toolbarLettersNav');
   const toolbarOverviewToggle = document.getElementById('toolbarOverviewToggle');
+  const toolbarOverviewActions = document.getElementById('toolbarOverviewActions');
+  const btnDeleteCategory = document.getElementById('btnDeleteCategory');
   const composeTagline = document.getElementById('composeTagline');
   const btnListView  = document.getElementById('btnListView');
   const btnGridView  = document.getElementById('btnGridView');
@@ -2363,7 +2343,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   (function initPressureTargets(){
     if (cornerMark){
       const h1 = document.createElement('h1');
-      h1.textContent = 'journal';
+      h1.textContent = 'ifimaybefrank.com';
       cornerMark.appendChild(h1);
       initPressureText(h1, { wght:[100,700], wdth:[70,130], ital:[0,1] });
     }
@@ -2372,6 +2352,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     // so the "pressure" reads as the letterforms getting heavier and
     // more display-cut up close, rather than stretching wide.
     initPressureText(homeStatement, { wght:[350,850], opsz:[20,144] });
+    initPressureText(logoHomeBtn, { wght:[400,800], opsz:[9,60] });
 
     requestAnimationFrame(pressureAnimate);
   })();
@@ -2835,6 +2816,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       renderCategorySwitcher();
       updateCategoryHeading();
       renderOverview();
+      updateDeleteCategoryButton();
     }
   }
 
@@ -2869,6 +2851,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       renderCategorySwitcher();
       updateCategoryHeading();
       renderOverview();
+      updateDeleteCategoryButton();
     }
     showSaveToast('Deleted ' + name + ' \u2014 letters moved to Unsorted');
   }
@@ -3123,45 +3106,32 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     categorySwitcher.appendChild(unsortedPill);
 
     categories.forEach((cat, i) => {
-      const wrap = document.createElement('div');
-      wrap.className = 'category-pill-wrap';
-      wrap.draggable = true;
-
       const pill = document.createElement('button');
       pill.type = 'button';
       pill.className = 'category-pill' + (cat.id === activeCategoryId ? ' active' : '');
       pill.textContent = cat.title || 'Untitled category';
+      pill.draggable = true;
       pill.addEventListener('click', () => switchCategory(cat.id));
 
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'category-pill-x';
-      delBtn.setAttribute('aria-label', 'Delete ' + (cat.title || 'this category'));
-      delBtn.title = 'Delete category';
-      delBtn.innerHTML = '<svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
-      delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteCategory(cat.id); });
-
-      wrap.append(pill, delBtn);
-
       // drag-to-reorder — categories only, per how this is meant to scale
-      wrap.addEventListener('dragstart', (e) => {
+      pill.addEventListener('dragstart', (e) => {
         categoryDragSrcIndex = i;
-        wrap.classList.add('dragging');
+        pill.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
       });
-      wrap.addEventListener('dragend', () => {
+      pill.addEventListener('dragend', () => {
         categoryDragSrcIndex = null;
-        categorySwitcher.querySelectorAll('.category-pill-wrap').forEach(w => w.classList.remove('dragging','drag-over'));
+        categorySwitcher.querySelectorAll('.category-pill').forEach(p => p.classList.remove('dragging','drag-over'));
       });
-      wrap.addEventListener('dragover', (e) => {
+      pill.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        if (categoryDragSrcIndex !== null && categoryDragSrcIndex !== i) wrap.classList.add('drag-over');
+        if (categoryDragSrcIndex !== null && categoryDragSrcIndex !== i) pill.classList.add('drag-over');
       });
-      wrap.addEventListener('dragleave', () => wrap.classList.remove('drag-over'));
-      wrap.addEventListener('drop', (e) => {
+      pill.addEventListener('dragleave', () => pill.classList.remove('drag-over'));
+      pill.addEventListener('drop', (e) => {
         e.preventDefault();
-        wrap.classList.remove('drag-over');
+        pill.classList.remove('drag-over');
         if (categoryDragSrcIndex === null || categoryDragSrcIndex === i) return;
         const moved = categories.splice(categoryDragSrcIndex, 1)[0];
         categories.splice(i, 0, moved);
@@ -3169,7 +3139,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         renderCategorySwitcher();
       });
 
-      categorySwitcher.appendChild(wrap);
+      categorySwitcher.appendChild(pill);
     });
 
     const addPill = document.createElement('button');
@@ -3236,6 +3206,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     letterActionsEl.style.display = mode === 'letters' ? '' : 'none';
     toolbarLettersNav.style.display = mode === 'letters' ? '' : 'none';
     toolbarOverviewToggle.style.display = mode === 'overview' ? '' : 'none';
+    toolbarOverviewActions.style.display = mode === 'overview' ? '' : 'none';
     modeToolbar.style.display = mode === 'home' ? 'none' : '';
 
     if (mode !== 'letters' && focusMode) setFocusMode(false);
@@ -3246,10 +3217,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       renderCategorySwitcher();
       updateCategoryHeading();
       renderOverview();
+      updateDeleteCategoryButton();
     } else {
       renderLetterChrome();
     }
   }
+  function updateDeleteCategoryButton(){
+    btnDeleteCategory.style.display = activeCategoryId === UNSORTED_ID ? 'none' : '';
+  }
+  btnDeleteCategory.addEventListener('click', () => deleteCategory(activeCategoryId));
   logoHomeBtn.addEventListener('click', () => showPageMode('home'));
   tabLetters.addEventListener('click', async () => {
     if (activeCategoryId !== UNSORTED_ID) await switchCategory(UNSORTED_ID);
@@ -3338,6 +3314,16 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       });
       overviewShelf.appendChild(card);
     }
+
+    const addCard = document.createElement('button');
+    addCard.type = 'button';
+    addCard.className = 'letter-card letter-card-add';
+    addCard.textContent = '+ New letter';
+    addCard.addEventListener('click', async () => {
+      await addLetter();
+      showPageMode('letters');
+    });
+    overviewShelf.appendChild(addCard);
   }
 
   // ── the static (read-only) preview shown for every letter that
