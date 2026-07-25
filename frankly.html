@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Journal</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -64,7 +65,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   display:flex;align-items:center;
   font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:15px;color:var(--ink);
   flex:none;text-decoration:none;
+  background:none;border:none;padding:0;cursor:pointer;
 }
+.site-nav-brand:hover{color:var(--muted)}
 .site-nav-tabs{display:flex;align-items:center;gap:4px;flex:none}
 .site-nav-tab{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;
@@ -359,7 +362,7 @@ body.focus-mode .letters-track{
 @page{ size: letter; margin: 1in; }
 @media print{
   body{background:#fff}
-  .site-nav-bar, .mode-toolbar, .brand-mark, .save-toast, #liveFrame, .overview-wrap, .context-menu, .modal-overlay, .journal-wrap>*:not(#printTarget){ display:none !important; }
+  .site-nav-bar, .mode-toolbar, .brand-mark, .save-toast, #liveFrame, .overview-wrap, .context-menu, .modal-overlay, .view-home, .corner-mark, .write-cursor-dot, .write-cursor-ellipse, .write-cursor-pill, .journal-wrap>*:not(#printTarget){ display:none !important; }
   #printTarget{ display:block !important; }
   #printTarget .block{ border-bottom:none; break-inside:avoid; }
   #printTarget .block:has(+ .print-media-page){
@@ -696,6 +699,81 @@ body.focus-mode .letters-track{
   .shelf.list-mode .lc-meta{display:none}
 }
 
+/* ══════════════════════════════════════════
+   HOME — the front door, restored. Custom
+   cursor + kinetic corner mark + scroll-to-
+   cycle-fonts, same as the original writing
+   tool this all grew out of.
+══════════════════════════════════════════ */
+body.custom-cursor-active{cursor:none}
+.write-cursor-dot,
+.write-cursor-ellipse,
+.write-cursor-pill{
+  position:fixed;top:0;left:0;z-index:200;pointer-events:none;
+  transform:translate(-9999px,-9999px);
+  opacity:0;transition:opacity .18s ease;will-change:transform;
+}
+.write-cursor-dot.visible,
+.write-cursor-ellipse.visible,
+.write-cursor-pill.visible{opacity:1}
+.write-cursor-dot{
+  width:6px;height:6px;margin:-3px 0 0 -3px;
+  border-radius:50%;background:var(--ink);
+}
+.write-cursor-ellipse{
+  width:34px;height:34px;margin:-17px 0 0 -17px;
+  border:1.5px solid var(--ink);border-radius:50%;opacity:0;
+}
+.write-cursor-ellipse.visible{opacity:.32}
+.write-cursor-pill{
+  display:flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--on-ink);background:var(--ink);
+  padding:8px 15px 8px 12px;border-radius:999px;white-space:nowrap;
+}
+.write-cursor-pill .write-cursor-pill-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--on-ink);flex:none;
+}
+body.custom-cursor-active.write-native-cursor{cursor:auto}
+.write-native-cursor .write-cursor-dot,
+.write-native-cursor .write-cursor-ellipse,
+.write-native-cursor .write-cursor-pill{opacity:0 !important}
+
+.corner-mark{
+  position:fixed;bottom:clamp(14px, 10px + 1.111vw, 20px);right:clamp(16px, 9.333px + 1.852vw, 26px);z-index:60;
+  pointer-events:none;line-height:1;
+}
+.corner-mark h1{
+  margin:0;font-family:'Roboto Flex',sans-serif;text-transform:lowercase;
+  font-weight:100;font-size:clamp(12px, 9.333px + 0.741vw, 16px);color:var(--muted);
+  white-space:nowrap;letter-spacing:0;
+}
+.pressure-char{display:inline-block}
+
+.view-home{display:none}
+.view-home.active{display:block}
+.home-wrap{
+  max-width:1000px;margin:0 auto;min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:16vh 6vw;
+}
+.home-statement{
+  font-family:'Fraunces',serif;font-style:italic;font-weight:600;
+  font-size:clamp(34px,6vw,76px);line-height:1.08;
+  max-width:14ch;color:var(--ink);margin-bottom:32px;
+  transition:font-family .05s;
+}
+.home-font-label{
+  display:block;margin-top:-24px;margin-bottom:24px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);opacity:0;transition:opacity .25s ease;
+}
+.home-font-label.visible{opacity:1}
+.home-doctrine{
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);max-width:48ch;line-height:1.7;
+}
+
 .skip-link{position:fixed;top:-100px;left:12px;z-index:999;background:var(--ink);color:var(--on-ink);padding:10px 16px;font-size:13px;text-decoration:none;transition:top .15s}
 .skip-link:focus-visible{top:12px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
@@ -706,8 +784,15 @@ body.focus-mode .letters-track{
 
 <a class="skip-link" href="#blockStack">Skip to writing surface</a>
 
+<div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
+<div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
+<div class="write-cursor-pill" id="writeCursorPill" aria-hidden="true">
+  <span class="write-cursor-pill-dot"></span>Write
+</div>
+<div class="corner-mark" id="cornerMark"></div>
+
 <nav class="site-nav-bar" aria-label="Site navigation">
-  <a class="site-nav-brand" href="https://zack.cx" target="_blank" rel="noopener noreferrer">zack.cx</a>
+  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">zack.cx</button>
   <div class="site-nav-tabs" role="group" aria-label="Journal view">
     <button class="site-nav-tab active" id="tabLetters" type="button">Write</button>
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
@@ -715,12 +800,20 @@ body.focus-mode .letters-track{
   <div class="site-nav-crumb" id="navCrumb">Zack Gort <span aria-hidden="true">/</span> Journal</div>
   <div class="site-nav-right">
     <a class="chrome-link site-nav-linkedin" href="https://linkedin.com/in/zackgort" target="_blank" rel="noopener noreferrer">in/zackgort</a>
-    <button class="chrome-link" id="btnExportJournal" title="Download every category, letter, and history as one JSON file">Export journal</button>
-    <button class="chrome-link" id="btnImportJournal" title="Restore categories and letters from an exported journal file">Import journal</button>
+    <button class="chrome-link" id="btnImportJournal" title="Restore categories and letters from an exported journal file">Import</button>
+    <button class="chrome-link" id="btnExportJournal" title="Download every category, letter, and history as one JSON file">Export</button>
     <input type="file" id="importJournalInput" accept="application/json" style="display:none">
     <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Toggle dark theme" title="Toggle dark theme"></button>
   </div>
 </nav>
+
+<main class="view-home" id="viewHome">
+  <div class="home-wrap">
+    <p class="home-statement" id="homeStatement">Journal,</p>
+    <span class="home-font-label" id="homeFontLabel" aria-hidden="true"></span>
+    <p class="home-doctrine">Shape influences input and output; <br>what is written &amp; how it is read,</p>
+  </div>
+</main>
 
 <div class="mode-toolbar" id="modeToolbar">
   <div class="mode-toolbar-left">
@@ -1084,6 +1177,14 @@ body.focus-mode .letters-track{
   const categorySwitcher = document.getElementById('categorySwitcher');
   const categoryTitleEl = document.getElementById('categoryTitleEl');
   const categoryDeckEl = document.getElementById('categoryDeckEl');
+  const logoHomeBtn = document.getElementById('logoHomeBtn');
+  const viewHome = document.getElementById('viewHome');
+  const homeStatement = document.getElementById('homeStatement');
+  const homeFontLabel = document.getElementById('homeFontLabel');
+  const cornerMark = document.getElementById('cornerMark');
+  const writeCursorDot = document.getElementById('writeCursorDot');
+  const writeCursorEllipse = document.getElementById('writeCursorEllipse');
+  const writeCursorPill = document.getElementById('writeCursorPill');
 
   function escapeHtml(s){
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2049,6 +2150,240 @@ body.focus-mode .letters-track{
     });
   })();
 
+  // ── custom write-cursor — dot + inertia ellipse + a "Write" pill
+  // that only makes sense on Home. Suppressed over real text/controls
+  // via body.write-native-cursor so typing, selection, and ordinary
+  // button/link affordances are never fought with.
+  (function initWriteCursor(){
+    if (!writeCursorDot || !writeCursorEllipse || !writeCursorPill) return;
+
+    function isHomeActive(){
+      return viewHome.classList.contains('active');
+    }
+
+    const NATIVE_SELECTOR = [
+      'button', 'a', 'input', 'textarea', 'select', 'label',
+      '[contenteditable="true"]', '[role="button"]',
+      '.home-statement', '.home-doctrine', '.archive-title', '.archive-sub', '.compose-tagline'
+    ].join(', ');
+
+    const LEASH_MAX = 777;
+    const LEASH_LERP = 0.16;
+    const ELLIPSE_LERP = 0.22;
+    const SPEED_SATURATE = 34;
+    const MAX_STRETCH = 0.6;
+
+    let ptrX = 0, ptrY = 0;
+    let prevFrameX = 0, prevFrameY = 0, frameInit = false;
+    let ellAngle = 0, ellScaleX = 1, ellScaleY = 1;
+    let pillX = 0, pillY = 0, pillInited = false;
+    let rafId = null;
+
+    function shortAngleLerp(current, target, factor){
+      const diff = ((target - current + 540) % 360) - 180;
+      return current + diff * factor;
+    }
+
+    function step(){
+      if (!frameInit){ prevFrameX = ptrX; prevFrameY = ptrY; frameInit = true; }
+      const dx = ptrX - prevFrameX;
+      const dy = ptrY - prevFrameY;
+      prevFrameX = ptrX; prevFrameY = ptrY;
+
+      const speed = Math.hypot(dx, dy);
+      const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
+      const stretch = Math.min(speed / SPEED_SATURATE, 1) * MAX_STRETCH;
+
+      ellAngle = shortAngleLerp(ellAngle, angleTarget, ELLIPSE_LERP);
+      ellScaleX += ((1 + stretch) - ellScaleX) * ELLIPSE_LERP;
+      ellScaleY += ((1 - stretch * 0.45) - ellScaleY) * ELLIPSE_LERP;
+
+      writeCursorEllipse.style.transform =
+        'translate(' + ptrX + 'px,' + ptrY + 'px) rotate(' + ellAngle + 'deg) scale(' + ellScaleX + ',' + ellScaleY + ')';
+
+      pillX += (ptrX - pillX) * LEASH_LERP;
+      pillY += (ptrY - pillY) * LEASH_LERP;
+      let ldx = pillX - ptrX, ldy = pillY - ptrY;
+      const ldist = Math.hypot(ldx, ldy);
+      if (ldist > LEASH_MAX){
+        const k = LEASH_MAX / ldist;
+        pillX = ptrX + ldx * k;
+        pillY = ptrY + ldy * k;
+      }
+      writeCursorPill.style.transform = 'translate(' + pillX + 'px,' + pillY + 'px)';
+
+      rafId = requestAnimationFrame(step);
+    }
+    function startLoop(){ if (!rafId) rafId = requestAnimationFrame(step); }
+    function stopLoop(){ if (rafId){ cancelAnimationFrame(rafId); rafId = null; } }
+
+    function hideAll(){
+      writeCursorDot.classList.remove('visible');
+      writeCursorEllipse.classList.remove('visible');
+      writeCursorPill.classList.remove('visible');
+      document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
+      stopLoop();
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      const overNative = !!e.target.closest(NATIVE_SELECTOR);
+      document.body.classList.add('custom-cursor-active');
+      document.body.classList.toggle('write-native-cursor', overNative);
+
+      ptrX = e.clientX; ptrY = e.clientY;
+
+      writeCursorDot.style.transform = 'translate(' + ptrX + 'px,' + ptrY + 'px)';
+      writeCursorDot.classList.add('visible');
+      writeCursorEllipse.classList.add('visible');
+      writeCursorPill.classList.toggle('visible', isHomeActive());
+
+      if (!pillInited){
+        pillX = ptrX; pillY = ptrY; pillInited = true;
+      }
+
+      startLoop();
+    });
+    document.addEventListener('mouseleave', hideAll);
+
+    viewHome.addEventListener('click', (e) => {
+      if (e.target.closest(NATIVE_SELECTOR)) return;
+      tabLetters.click();
+    });
+  })();
+
+  // ── "text pressure" system — each opted-in headline's variable-font
+  // axes ease toward a value driven by distance from the cursor. One
+  // shared eased cursor + rAF loop drives every registered instance.
+  const pressureCursorTarget = { x: -9999, y: -9999 };
+  const pressureCursor = { x: -9999, y: -9999 };
+  const pressureInstances = [];
+
+  window.addEventListener('mousemove', (e) => { pressureCursorTarget.x = e.clientX; pressureCursorTarget.y = e.clientY; });
+  window.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    if (t){ pressureCursorTarget.x = t.clientX; pressureCursorTarget.y = t.clientY; }
+  }, { passive:true });
+
+  function pressureDist(a, b){
+    const dx = b.x - a.x, dy = b.y - a.y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  function pressureAttr(distance, maxDist, minVal, maxVal){
+    const val = maxVal - Math.abs((maxVal * distance) / maxDist);
+    return Math.max(minVal, val + minVal);
+  }
+
+  function initPressureText(el, axes){
+    if (!el) return;
+    const text = el.textContent;
+    el.textContent = '';
+    const spans = [];
+    [...text].forEach(ch => {
+      if (ch === ' '){ el.appendChild(document.createTextNode(' ')); return; }
+      const span = document.createElement('span');
+      span.className = 'pressure-char';
+      span.dataset.char = ch;
+      span.textContent = ch;
+      el.appendChild(span);
+      spans.push(span);
+    });
+    pressureInstances.push({ el, spans, axes });
+  }
+
+  function pressureAnimate(){
+    pressureCursor.x += (pressureCursorTarget.x - pressureCursor.x) / 15;
+    pressureCursor.y += (pressureCursorTarget.y - pressureCursor.y) / 15;
+
+    pressureInstances.forEach(({ el, spans, axes }) => {
+      const rect = el.getBoundingClientRect();
+      const maxDist = Math.max(rect.width / 2, 40);
+      spans.forEach(span => {
+        const r = span.getBoundingClientRect();
+        const center = { x: r.x + r.width/2, y: r.y + r.height/2 };
+        const d = pressureDist(pressureCursor, center);
+        const settings = Object.keys(axes).map(tag => {
+          const [minV, maxV] = axes[tag];
+          const raw = pressureAttr(d, maxDist, minV, maxV);
+          const v = tag === 'ital' ? raw.toFixed(2) : Math.floor(raw);
+          return "'" + tag + "' " + v;
+        }).join(', ');
+        if (span.style.fontVariationSettings !== settings){
+          span.style.fontVariationSettings = settings;
+        }
+      });
+    });
+
+    requestAnimationFrame(pressureAnimate);
+  }
+
+  (function initPressureTargets(){
+    if (cornerMark){
+      const h1 = document.createElement('h1');
+      h1.textContent = 'journal';
+      cornerMark.appendChild(h1);
+      initPressureText(h1, { wght:[100,700], wdth:[70,130], ital:[0,1] });
+    }
+    // Fraunces stands in for Roboto Flex's wght/wdth/ital here — it
+    // only exposes wght and opsz (optical size) as continuous axes,
+    // so the "pressure" reads as the letterforms getting heavier and
+    // more display-cut up close, rather than stretching wide.
+    initPressureText(homeStatement, { wght:[350,850], opsz:[20,144] });
+
+    requestAnimationFrame(pressureAnimate);
+  })();
+
+  // ── scroll-to-cycle-fonts — the homepage doesn't otherwise scroll,
+  // so a wheel/swipe gesture there is free to step "Journal," through
+  // every font in the app's own palette (the same FONTS list every
+  // passage picks from).
+  (function initHomeFontCycle(){
+    if (!homeStatement || !homeFontLabel) return;
+
+    let idx = Math.max(0, FONTS.findIndex(f => f.id === 'fraunces'));
+    let accum = 0;
+    let labelTimer = null;
+    const STEP_PX = 70;
+
+    function step(dir){
+      idx = (idx + dir + FONTS.length) % FONTS.length;
+      const f = FONTS[idx];
+      homeStatement.style.fontFamily = f.family;
+      homeFontLabel.textContent = f.label;
+      homeFontLabel.classList.add('visible');
+      clearTimeout(labelTimer);
+      labelTimer = setTimeout(() => homeFontLabel.classList.remove('visible'), 1100);
+    }
+
+    function consume(deltaY){
+      accum += deltaY;
+      while (Math.abs(accum) >= STEP_PX){
+        step(accum > 0 ? 1 : -1);
+        accum -= Math.sign(accum) * STEP_PX;
+      }
+    }
+
+    viewHome.addEventListener('wheel', (e) => {
+      if (!viewHome.classList.contains('active')) return;
+      e.preventDefault();
+      consume(e.deltaY);
+    }, { passive:false });
+
+    let touchY = null;
+    viewHome.addEventListener('touchstart', (e) => {
+      if (!viewHome.classList.contains('active') || e.touches.length !== 1) return;
+      touchY = e.touches[0].clientY;
+    }, { passive:true });
+    viewHome.addEventListener('touchmove', (e) => {
+      if (!viewHome.classList.contains('active') || e.touches.length !== 1 || touchY === null) return;
+      const y = e.touches[0].clientY;
+      e.preventDefault();
+      consume(touchY - y);
+      touchY = y;
+    }, { passive:false });
+    viewHome.addEventListener('touchend', () => { touchY = null; });
+  })();
+
+
   // ── RESILIENT STORAGE (real localStorage, namespaced) ──
   const STORAGE_PREFIX = 'openletter-journal:';
   const persist = {
@@ -2800,6 +3135,8 @@ body.focus-mode .letters-track{
     tabLetters.classList.toggle('active', mode === 'letters');
     tabOverview.classList.toggle('active', mode === 'overview');
 
+    viewHome.classList.toggle('active', mode === 'home');
+    viewHome.style.display = mode === 'home' ? '' : 'none';
     lettersViewport.style.display = mode === 'letters' ? '' : 'none';
     journalWrap.style.display = mode === 'letters' ? '' : 'none';
     overviewWrap.style.display = mode === 'overview' ? '' : 'none';
@@ -2807,10 +3144,13 @@ body.focus-mode .letters-track{
     letterActionsEl.style.display = mode === 'letters' ? '' : 'none';
     toolbarLettersNav.style.display = mode === 'letters' ? '' : 'none';
     toolbarOverviewToggle.style.display = mode === 'overview' ? '' : 'none';
+    modeToolbar.style.display = mode === 'home' ? 'none' : '';
 
     if (mode !== 'letters' && focusMode) setFocusMode(false);
 
-    if (mode === 'overview'){
+    if (mode === 'home'){
+      navCrumb.innerHTML = 'Zack Gort <span aria-hidden="true">/</span> <b>Home</b>';
+    } else if (mode === 'overview'){
       renderCategorySwitcher();
       updateCategoryHeading();
       renderOverview();
@@ -2818,6 +3158,7 @@ body.focus-mode .letters-track{
       renderLetterChrome();
     }
   }
+  logoHomeBtn.addEventListener('click', () => showPageMode('home'));
   tabLetters.addEventListener('click', async () => {
     if (activeCategoryId !== UNSORTED_ID) await switchCategory(UNSORTED_ID);
     showPageMode('letters');
@@ -3251,7 +3592,7 @@ body.focus-mode .letters-track{
     activeIndex = -1;
     await renderTrack();
     await activatePanel(0);
-    showPageMode('letters');
+    showPageMode('home');
   }
   initApp();
 })();
