@@ -607,26 +607,32 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
 /* the little pill that marks a passage as linked, once the popover
    closes — sits clear of the text itself rather than inline with it,
-   since a passage stays plain text underneath */
+   since a passage stays plain text underneath. Same stark ink-fill
+   motif as the HUD (--ink/--on-ink flip automatically per theme)
+   rather than the old low-contrast surface/border pill, so it reads
+   clearly against whatever passage text or image it's sitting near. */
 .link-chip{
   position:absolute;top:6px;right:0;z-index:20;
   display:inline-flex;align-items:center;gap:5px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:var(--muted);
-  background:var(--surface);border:1px solid var(--rule);border-radius:20px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.04em;
+  background:var(--ink);color:var(--on-ink);
+  border-radius:20px;box-shadow:0 4px 16px var(--shadow);
   padding:4px 10px 4px 8px;cursor:pointer;text-decoration:none;max-width:220px;
-  opacity:.55;transition:opacity .15s ease,border-color .15s ease,color .15s ease;
+  transition:box-shadow .15s ease;
 }
-.link-chip:hover,.link-chip:focus-visible{opacity:1;border-color:var(--surface-border-soft);color:var(--ink)}
+.link-chip:hover,.link-chip:focus-visible{box-shadow:0 6px 22px var(--shadow)}
 .link-chip-glyph{flex:none;font-size:11px}
 .link-chip-host{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* floating cursor-follow thumbnail — one shared element, reused by
    every image link on the page, repositioned via rAF lerp rather than
-   snapping straight to the pointer */
+   snapping straight to the pointer. Same stark ink-fill frame as the
+   link chip and HUD, instead of the old near-invisible pale surface
+   border around the preview image. */
 .link-thumb{
   position:fixed;top:0;left:0;z-index:200;
   width:clamp(200px, 40px + 44.444vw, 440px);max-height:clamp(200px, 40px + 44.444vw, 440px);
-  background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+  background:var(--ink);border-radius:10px;
   box-shadow:0 20px 48px var(--shadow);
   padding:6px;pointer-events:none;
   opacity:0;transform:translate3d(-9999px,-9999px,0) scale(.96);
