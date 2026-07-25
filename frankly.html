@@ -221,12 +221,22 @@ body.focus-mode .letters-track{
 .category-pill{
   font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
   padding:7px 14px;border-radius:20px;border:1px solid var(--rule);background:transparent;color:var(--muted);
-  cursor:grab;transition:color .15s,background .15s,border-color .15s;
+  cursor:pointer;transition:color .15s,background .15s,border-color .15s;
 }
 .category-pill:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 .category-pill.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
-.category-pill.dragging{opacity:.4}
-.category-pill.drag-over{border-color:var(--ink)}
+.category-pill-wrap{position:relative;display:inline-flex;cursor:grab}
+.category-pill-wrap.dragging{opacity:.4}
+.category-pill-wrap.drag-over .category-pill{border-color:var(--ink)}
+.category-pill-x{
+  position:absolute;top:-6px;right:-6px;z-index:1;
+  width:16px;height:16px;border-radius:50%;padding:0;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--ink);color:var(--on-ink);border:1px solid var(--surface);
+  cursor:pointer;opacity:0;pointer-events:none;transition:opacity .15s,background .15s;
+}
+.category-pill-wrap:hover .category-pill-x{opacity:1;pointer-events:auto}
+.category-pill-x:hover{background:var(--danger)}
 .category-pill-add{cursor:pointer;border-style:dashed}
 .category-pill-unsorted{cursor:pointer;font-style:italic}
 #categoryTitleEl[contenteditable="false"],
@@ -290,6 +300,17 @@ body.focus-mode .letters-track{
   border-radius:4px;
   padding:32px clamp(24px,4vw,40px) 56px;
   min-height:calc(100vh - 220px);
+  transition:box-shadow .25s ease, transform .25s ease;
+}
+/* elevation only in light mode — on a dark surface a drop shadow reads
+   as a smudge rather than a lift, and the card frame's own border
+   already carries enough contrast there */
+html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame{
+  box-shadow:0 20px 48px -16px rgba(17,17,17,.16), 0 4px 14px rgba(17,17,17,.05);
+}
+html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
+  box-shadow:0 28px 64px -16px rgba(17,17,17,.22), 0 8px 22px rgba(17,17,17,.07);
+  transform:translateY(-2px);
 }
 .letter-card-num{
   position:absolute;top:24px;left:24px;
@@ -1055,6 +1076,29 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'GNC \u2014 Elva Design Group, 2021. Senior UX Designer owning discovery through delivery on a mobile-first, component-based Shopify redesign \u2014 shipped in twelve weeks.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'Clients: BNY Mellon \u00b7 TikTok \u00b7 GNC \u00b7 Merck \u00b7 Comcast \u00b7 Kent State \u00b7 Philadelphia Eagles\nIndustries: Financial Services \u00b7 Social/Advertising \u00b7 Retail \u00b7 Pharma \u00b7 Higher Ed \u00b7 Sports/Entertainment', font:'mono', weight:500, size:14, leading:170, fill:45, list:'bullet' })
+      ];
+
+      case 'letter_odyssey': return [
+        B({ text:"I have an opinion on Nolan's 'The Odyssey'.", font:'bricolage', weight:800, italic:false, size:116, tracking:-12, leading:100, fill:0, layout:'single', list:'none' }),
+        B({ text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:36, tracking:-6, leading:108, fill:0, layout:'col2', list:'none' }),
+        B({ text:"Humbly, I offer just one change from Homer's original poem that would improve upon what Nolan was already setting the audience up for.", font:'fraunces', weight:400, italic:true, size:25, tracking:0, leading:115, fill:20, layout:'single', list:'none' }),
+        B({ text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:28, tracking:-30, leading:155, fill:90, layout:'single', list:'none' }),
+        B({ text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none' }),
+        B({ text:'Now, our first encounter with Polyphemus adapts Homer\u2019s original layout to show something visually scaled for the modern era.  More people. More ships. More stakes at greater scale (this is optimized for IMAX, afterall).Let\u2019s say we lost two ships prior to our arrival at this island. With roughly 150 men per boat, we assume as many as one-thousand mouths to feed \u2014 so, it stands to reason that discovering the equivalant of a Costco could setup for some creative cinematic storytelling. Now, as like the original poem, Odysseus and his entourage continue as expected, trapped in the cave with their eye-poking and sheep shenanigans \u2026 but perhaps we bring in the "nobody" hook in an imaginative way \u2014 Picture the soldiers steathily attempting a rescue, and whenever the cyclops nearly detects them, he yells "who\'s there?!", wherein the soldiers whisper en masse "nobody"  \u2014  eventually building up the sense that Polyphemus has lost his mind.Then, as they escape safely to their ships, a captain quips to Odysseus about their clever "nobody" ploy, to which Odysseus steals the credit and exclaims "but it wasn\u2019t nobody who blinded that beast, it was I, Odysseus, king of Ithaca" (or something like that)& although quite some distance a way, Polyphemus hears this and rages out, successfully sinking a few ships in a blind fit of fury. ', font:'newsreader', weight:400, italic:false, size:27, tracking:-30, leading:134, fill:75, layout:'single', list:'none' }),
+        B({ text:"Now, imagine we are Cerci, and we adjust the story so that Odysseus' nine remaining boats are nine boats-worth of mouths we have to feed.Also, we are evil & vindictive, and we made a few ships-worth of stew.", font:'newsreader', weight:500, italic:false, size:44, tracking:0, leading:145, fill:55, layout:'single', list:'none' }),
+        B({ text:'Eight ships. Well, the whirlpool of death "ate" one of them, so now we are left with seven; when suddenly, a six-something Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:62, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
+        B({ text:'Two boats left. That\u2019s three-hundred men, give or take.  And since the Laestrygonians decided to show up in their Sunday best(you know, the cannibal giants Homer wrote about, now outfitted with Nolan\u2019s shiny new armor), Well, we let us enjoy a battle worthy of epic proportion, with real loss through terror, turmoil, and trajedy \u2014 rather than an expensive Monty Python "run away!" skit.', font:'newsreader', weight:400, italic:false, size:47, tracking:0, leading:140, fill:0, layout:'single', list:'none' }),
+        B({ text:'Then, Matt Damon yells "Let\u2019s go!" as the camera pans with him, but revealing that he\u2019s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
+        B({ text:"Also, the audience get's some better rewatch material.", font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' })
+      ];
+
+      case 'letter_stated': return [
+        B({ text:'Stated \u2014 as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' }),
+        B({ text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:45, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' }),
+        B({ text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words \u2014 btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:23, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' }),
+        B({ text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' }),
+        B({ text:'\u2022 They say a \'photo is worth a thousand words\' \u2026 frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }),
+        B({ text:'"write more by writing less." \u2014 zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' })
       ];
 
       default: return null;
@@ -2794,6 +2838,41 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     }
   }
 
+  // ── delete a category. Never destructive to the writing itself:
+  // its letters (and their full history) move to Unsorted first, then
+  // the category record itself is removed. Unsorted can't be deleted —
+  // there's nowhere left for its letters to go.
+  async function deleteCategory(catId){
+    if (catId === UNSORTED_ID) return;
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const name = cat.title || 'Untitled category';
+    const ok = window.confirm('Delete "' + name + '"? Its letters will move to Unsorted — nothing is erased.');
+    if (!ok) return;
+
+    const catRoster = (catId === activeCategoryId) ? roster : await loadRosterFor(catId);
+    if (catRoster.length){
+      const unsortedRoster = await loadRosterFor(UNSORTED_ID);
+      unsortedRoster.push(...catRoster);
+      await saveRosterFor(UNSORTED_ID, unsortedRoster);
+    }
+    persist.tryDelete('category:' + catId + ':roster');
+
+    categories = categories.filter(c => c.id !== catId);
+    saveCategories();
+    if (lastCategoryId === catId) lastCategoryId = (categories[0] && categories[0].id) || null;
+
+    if (activeCategoryId === catId){
+      await switchCategory(categories[0] ? categories[0].id : UNSORTED_ID);
+    }
+    if (pageMode === 'overview'){
+      renderCategorySwitcher();
+      updateCategoryHeading();
+      renderOverview();
+    }
+    showSaveToast('Deleted ' + name + ' \u2014 letters moved to Unsorted');
+  }
+
   // ── FILE — move the current letter into a category (or back to
   // Unsorted). Works from anywhere in Write, not just Unsorted itself,
   // so re-filing an already-sorted letter is just as easy.
@@ -3044,32 +3123,45 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     categorySwitcher.appendChild(unsortedPill);
 
     categories.forEach((cat, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'category-pill-wrap';
+      wrap.draggable = true;
+
       const pill = document.createElement('button');
       pill.type = 'button';
       pill.className = 'category-pill' + (cat.id === activeCategoryId ? ' active' : '');
       pill.textContent = cat.title || 'Untitled category';
-      pill.draggable = true;
       pill.addEventListener('click', () => switchCategory(cat.id));
 
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'category-pill-x';
+      delBtn.setAttribute('aria-label', 'Delete ' + (cat.title || 'this category'));
+      delBtn.title = 'Delete category';
+      delBtn.innerHTML = '<svg viewBox="0 0 10 10" width="8" height="8" aria-hidden="true"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+      delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteCategory(cat.id); });
+
+      wrap.append(pill, delBtn);
+
       // drag-to-reorder — categories only, per how this is meant to scale
-      pill.addEventListener('dragstart', (e) => {
+      wrap.addEventListener('dragstart', (e) => {
         categoryDragSrcIndex = i;
-        pill.classList.add('dragging');
+        wrap.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
       });
-      pill.addEventListener('dragend', () => {
+      wrap.addEventListener('dragend', () => {
         categoryDragSrcIndex = null;
-        categorySwitcher.querySelectorAll('.category-pill').forEach(p => p.classList.remove('dragging','drag-over'));
+        categorySwitcher.querySelectorAll('.category-pill-wrap').forEach(w => w.classList.remove('dragging','drag-over'));
       });
-      pill.addEventListener('dragover', (e) => {
+      wrap.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        if (categoryDragSrcIndex !== null && categoryDragSrcIndex !== i) pill.classList.add('drag-over');
+        if (categoryDragSrcIndex !== null && categoryDragSrcIndex !== i) wrap.classList.add('drag-over');
       });
-      pill.addEventListener('dragleave', () => pill.classList.remove('drag-over'));
-      pill.addEventListener('drop', (e) => {
+      wrap.addEventListener('dragleave', () => wrap.classList.remove('drag-over'));
+      wrap.addEventListener('drop', (e) => {
         e.preventDefault();
-        pill.classList.remove('drag-over');
+        wrap.classList.remove('drag-over');
         if (categoryDragSrcIndex === null || categoryDragSrcIndex === i) return;
         const moved = categories.splice(categoryDragSrcIndex, 1)[0];
         categories.splice(i, 0, moved);
@@ -3077,7 +3169,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         renderCategorySwitcher();
       });
 
-      categorySwitcher.appendChild(pill);
+      categorySwitcher.appendChild(wrap);
     });
 
     const addPill = document.createElement('button');
@@ -3580,8 +3672,62 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   });
 
   // ── INIT ──
+
+  // ── one-time seed: a new 'Ventilation' category with two real pieces
+  // the user exported from an earlier version of this tool. Runs at
+  // most once, guarded by a flag, regardless of whether this browser
+  // already has other categories from earlier sessions.
+  async function seedVentilationOnce(){
+    const already = await persist.tryGet('ventilationSeeded');
+    if (already) return;
+
+    const B = defaultBlock;
+  const ODYSSEY_BLOCKS = [
+    B({ text:'I have an opinion on Nolan\'s \'The Odyssey\'.', font:'bricolage', weight:800, italic:false, size:116, tracking:-12, leading:100, fill:0, layout:'single', list:'none' }),
+    B({ text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:36, tracking:-6, leading:108, fill:0, layout:'col2', list:'none' }),
+    B({ text:'Humbly, I offer just one change from Homer\'s original poem that would improve upon what Nolan was already setting the audience up for.', font:'fraunces', weight:400, italic:true, size:25, tracking:0, leading:115, fill:20, layout:'single', list:'none' }),
+    B({ text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:28, tracking:-30, leading:155, fill:90, layout:'single', list:'none' }),
+    B({ text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none' }),
+    B({ text:'Now, our first encounter with Polyphemus adapts Homer\'s original layout to show something visually scaled for the modern era.  More people. More ships. More stakes at greater scale (this is optimized for IMAX, afterall).Let\'s say we lost two ships prior to our arrival at this island. With roughly 150 men per boat, we assume as many as one-thousand mouths to feed — so, it stands to reason that discovering the equivalant of a Costco could setup for some creative cinematic storytelling. Now, as like the original poem, Odysseus and his entourage continue as expected, trapped in the cave with their eye-poking and sheep shenanigans … but perhaps we bring in the "nobody" hook in an imaginative way — Picture the soldiers steathily attempting a rescue, and whenever the cyclops nearly detects them, he yells "who\'s there?!", wherein the soldiers whisper en masse "nobody"  —  eventually building up the sense that Polyphemus has lost his mind.Then, as they escape safely to their ships, a captain quips to Odysseus about their clever "nobody" ploy, to which Odysseus steals the credit and exclaims "but it wasn\'t nobody who blinded that beast, it was I, Odysseus, king of Ithaca" (or something like that)& although quite some distance a way, Polyphemus hears this and rages out, successfully sinking a few ships in a blind fit of fury. ', font:'newsreader', weight:400, italic:false, size:27, tracking:-30, leading:134, fill:75, layout:'single', list:'none' }),
+    B({ text:'Now, imagine we are Cerci, and we adjust the story so that Odysseus\' nine remaining boats are nine boats-worth of mouths we have to feed.Also, we are evil & vindictive, and we made a few ships-worth of stew.', font:'newsreader', weight:500, italic:false, size:44, tracking:0, leading:145, fill:55, layout:'single', list:'none' }),
+    B({ text:'Eight ships. Well, the whirlpool of death "ate" one of them, so now we are left with seven; when suddenly, a six-something Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:62, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
+    B({ text:'Two boats left. That\'s three-hundred men, give or take.  And since the Laestrygonians decided to show up in their Sunday best(you know, the cannibal giants Homer wrote about, now outfitted with Nolan\'s shiny new armor), Well, we let us enjoy a battle worthy of epic proportion, with real loss through terror, turmoil, and trajedy — rather than an expensive Monty Python "run away!" skit.', font:'newsreader', weight:400, italic:false, size:47, tracking:0, leading:140, fill:0, layout:'single', list:'none' }),
+    B({ text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:24, tracking:0, leading:130, fill:0, layout:'single', list:'none' }),
+    B({ text:'Also, the audience get\'s some better rewatch material.', font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none' }),
+  ];
+  const STATED_BLOCKS = [
+    B({ text:'Stated — as expressed.', font:'bricolage', weight:800, italic:true, size:200, tracking:-10, leading:96, fill:0, layout:'single', list:'none' }),
+    B({ text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:45, tracking:-6, leading:104, fill:0, layout:'single', list:'none' }),
+    B({ text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words — btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:23, tracking:0, leading:150, fill:70, layout:'col2', list:'none' }),
+    B({ text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' }),
+    B({ text:'• They say a \'photo is worth a thousand words\' … frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:50, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }),
+    B({ text:'"write more by writing less." — zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' }),
+  ];
+
+    const catId = 'category_ventilation';
+    if (!categories.some(c => c.id === catId)){
+      categories.push({ id: catId, title: 'Ventilation', deck: 'Where the professional filter comes off.' });
+      saveCategories();
+    }
+
+    const existingRoster = await loadRosterFor(catId);
+    if (existingRoster.length === 0){
+      const odysseyId = 'letter_odyssey_seed';
+      const statedId = 'letter_stated_seed';
+      await saveRosterFor(catId, [
+        { id: odysseyId, title: 'I have an opinion on Nolan\'s The Odyssey', deck: '' },
+        { id: statedId, title: 'Stated — as expressed', deck: '' }
+      ]);
+      await persist.trySet('letter:' + odysseyId + ':draft', JSON.stringify({ blocks: ODYSSEY_BLOCKS, editingEntryId: null }), true);
+      await persist.trySet('letter:' + statedId + ':draft', JSON.stringify({ blocks: STATED_BLOCKS, editingEntryId: null }), true);
+    }
+
+    await persist.trySet('ventilationSeeded', '1', true);
+  }
+
   async function initApp(){
     categories = await loadCategories();
+    await seedVentilationOnce();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
     roster = await loadRosterFor(UNSORTED_ID);
