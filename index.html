@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frankly,</title>
+<title>Journal</title>
 <link rel="icon" type="image/png" href="https://ifimaybefrank.com/favicon-96x96-dark.png" sizes="96x96">
 <link rel="icon" type="image/svg+xml" href="https://ifimaybefrank.com/favicon-dark.svg">
 <link rel="shortcut icon" href="https://ifimaybefrank.com/favicon-dark.ico">
@@ -383,6 +383,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
   display:block;width:100%;outline:none;
   background:transparent;color:var(--ink);
   min-height:1.2em;text-align:left;
+  white-space:pre-wrap;
 }
 #blockStack .block-editable, .stack-static .block-editable{
   font-size: clamp(
@@ -435,6 +436,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
   .print-media-caption{
     color:#000 !important;max-width:6.5in;line-height:1.3 !important;
     font-size:min(calc(var(--bsize, 24) * 1px), 28px) !important;
+    white-space:pre-wrap;
   }
   .print-media-link{ font-family:var(--mono);font-size:11px;color:#000 !important;word-break:break-all; }
 }
@@ -873,7 +875,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 </div>
 
 <nav class="site-nav-bar" aria-label="Site navigation">
-  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">Frankly,</button>
+  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">If I May Be Frank</button>
   <div class="site-nav-tabs" role="group" aria-label="Journal view">
     <button class="site-nav-tab active" id="tabLetters" type="button">Write</button>
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
@@ -3905,9 +3907,31 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     await persist.trySet('ventilationSeeded', '1', true);
   }
 
+  async function seedUnsortedOnce(){
+    const already = await persist.tryGet('unsortedSeeded');
+    if (already) return;
+
+    const B = defaultBlock;
+    const MISADVENTURE_BLOCKS = [
+      B({ text:'Christopher Nolan\'s The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn\'t a dialogue-driven chamber piece. It\'s a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It\'s a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon\'t tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread\u2014rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we\'re gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus\' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer\'s epic isn\'t memorable because Odysseus visits remarkable places. It\'s memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world \u2014 like, I literally exclaimed "hey, that\'s Charlize!" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ', font:'newsreader', weight:300, italic:false, size:28, tracking:0, leading:146, fill:0, layout:'single', list:'none', link:'' })
+    ];
+
+    const existingRoster = await loadRosterFor(UNSORTED_ID);
+    if (existingRoster.length === 0){
+      const letterId = 'letter_misadventure_seed';
+      await saveRosterFor(UNSORTED_ID, [
+        { id: letterId, title: 'Nolan lost his way.', deck: 'Reportedly, he\u2019s now stuck in a self-perpetuating time loop edited asynchronously against any logical narrative.' }
+      ]);
+      await persist.trySet('letter:' + letterId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
+    }
+
+    await persist.trySet('unsortedSeeded', '1', true);
+  }
+
   async function initApp(){
     categories = await loadCategories();
     await seedVentilationOnce();
+    await seedUnsortedOnce();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
     roster = await loadRosterFor(UNSORTED_ID);
