@@ -167,7 +167,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .journal-wrap{min-height:0}
 .letters-viewport{position:relative;overflow:hidden}
 .letters-track{
-  display:flex;align-items:flex-start;gap:20px;
+  display:flex;align-items:flex-start;gap:clamp(48px, 20px + 5vw, 96px);
   padding:calc(var(--nav-h) + var(--toolbar-h) + clamp(56px,10vh,90px)) 12vw 150px;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
@@ -189,7 +189,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .letter-panel:not(.active) .letter-card-frame{pointer-events:none}
 .letter-panel-inner{width:100%}
 @media(max-width:900px){
-  .letters-track{padding:calc(var(--nav-h) + var(--toolbar-h) + clamp(56px,10vh,90px)) 6vw 150px;gap:14px}
+  .letters-track{padding:calc(var(--nav-h) + var(--toolbar-h) + clamp(56px,10vh,90px)) 6vw 150px;gap:32px}
   .letter-panel{flex:0 0 90%;width:90%}
 }
 
@@ -1030,7 +1030,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     switch(id){
 
       case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0 }),
+        B({ text:'No B.S.', font:'jakarta', weight:800, size:52, tracking:-8, leading:98, fill:0 }),
         B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
         B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:22, leading:150, fill:40 }),
         B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.\n*psst \u2014 I wrote this, not Chat.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
@@ -1041,7 +1041,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0 }),
+        B({ text:'Off the record.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
         B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
@@ -1050,7 +1050,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_outlook': return [
-        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0 }),
+        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
         B({ text:'AI didn\u2019t kill the design job \u2014 it killed the version of the job that was already just production. What\u2019s left is what was always the actual work: deciding what to build, for whom, and why, then proving it with a system instead of a screenshot.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
         B({ text:'I use Claude and prompt engineering the way I used to lean on a junior designer \u2014 to move fast on the parts that don\u2019t need my judgment, so more of my time goes to the parts that do.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'What\u2019s actually worth worrying about isn\u2019t the tools. It\u2019s teams that let the tool make the decision instead of just the draft.', font:'jakarta', weight:700, italic:true, size:26, leading:140, fill:5 }),
@@ -1058,20 +1058,20 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_manifesto': return [
-        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0 }),
+        B({ text:'Five rules.', font:'jakarta', weight:800, size:52, tracking:-8, leading:96, fill:0 }),
         B({ text:'1. Ship the modular version, not the impressive one.\n2. Accessibility isn\u2019t a phase \u2014 it\u2019s a requirement from wireframe one.\n3. Own discovery through delivery, or don\u2019t call it ownership.\n4. Make the system explain itself, so I\u2019m not the single point of failure.\n5. Say what you mean, and be choice with your words.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
         B({ text:'None of these are aspirational. They\u2019re just what I\u2019ve had to keep re-learning on client-facing work, under a deadline, more than once.', font:'mono', weight:500, size:15, leading:160, fill:55 })
       ];
 
       case 'letter_confessions': return [
-        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0 }),
+        B({ text:'A few admissions.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
         B({ text:'My BFA is incomplete. Two stints at Pratt Institute, 2002 to 2005, studying 3D animation and motion graphics \u2014 and I left before finishing. I don\u2019t put it on a wall, but I don\u2019t hide it either.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
         B({ text:'I\u2019ve taken a role I knew would only last a few months, on purpose. Not every engagement needs to be a career.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'I still open a fresh file for something I already know isn\u2019t going to make it, just to see it exist for a minute.', font:'jakarta', weight:500, italic:true, size:22, leading:150, fill:35 })
       ];
 
       case 'letter_impact': return [
-        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0 }),
+        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:52, tracking:-4, leading:102, fill:0 }),
         B({ text:'15+ years \u00b7 Manager UX \u00b7 Senior UX/Interaction Designer \u00b7 Interim Product Owner', font:'mono', weight:600, size:15, leading:150, fill:45 }),
         B({ text:'BNY Mellon \u2014 Publicis Sapient, 2022\u20132023. Interim Product Owner on the Direct Indexing workstream; architected user data models and flows across three Agile tracks and centralized a sprawling product ecosystem into one modular, scalable design system.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
@@ -1095,7 +1095,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       case 'letter_about': return [{
         createdAt: '2023-06-01T00:00:00.000Z',
         blocks: [
-          B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0 }),
+          B({ text:'No B.S.', font:'jakarta', weight:800, size:52, tracking:-8, leading:98, fill:0 }),
           B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
           B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:22, leading:150, fill:40 }),
           B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
@@ -1108,7 +1108,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       case 'letter_impact': return [{
         createdAt: '2022-07-15T00:00:00.000Z',
         blocks: [
-          B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0 }),
+          B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:52, tracking:-4, leading:102, fill:0 }),
           B({ text:'GNC \u00b7 TikTok For Business', font:'mono', weight:600, size:15, leading:150, fill:45 }),
           B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
           B({ text:'GNC \u2014 Elva Design Group, 2021. Senior UX Designer owning discovery through delivery on a mobile-first, component-based Shopify redesign \u2014 shipped in twelve weeks.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
@@ -3692,7 +3692,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
     const B = defaultBlock;
   const ODYSSEY_BLOCKS = [
-    B({ text:'I have an opinion on Nolan\'s \'The Odyssey\'.', font:'bricolage', weight:800, italic:false, size:58, tracking:-12, leading:100, fill:0, layout:'single', list:'none', link:'' }),
+    B({ text:'I have an opinion on Nolan\'s \'The Odyssey\'.', font:'bricolage', weight:800, italic:false, size:52, tracking:-12, leading:100, fill:0, layout:'single', list:'none', link:'' }),
     B({ text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:21, tracking:-6, leading:108, fill:0, layout:'col2', list:'none', link:'' }),
     B({ text:'Humbly, I offer just one change from Homer\'s original poem that would improve upon what Nolan was already setting the audience up for.', font:'fraunces', weight:400, italic:true, size:30, tracking:0, leading:115, fill:20, layout:'single', list:'none', link:'' }),
     B({ text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:17, tracking:-30, leading:155, fill:90, layout:'single', list:'none', link:'' }),
@@ -3706,7 +3706,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     B({ text:'DISCLAIMER: I am writing all of this simply for the sake of writing, and to create content for an idea that I am developing. The main idea is that I write better when in a particular headspace; so in writing, how can I position myself to achieve that? Visually, I was chasing "sympathetic cognition through typographic cues" (I wrote that on the fly, btw), which is to say writing this disclaimer using this font, with this weight, is giving me a unique ability to control the literal shape of my words. ', font:'shoulders', weight:200, italic:false, size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' }),
   ];
   const STATED_BLOCKS = [
-    B({ text:'Stated — as expressed.', font:'bricolage', weight:800, italic:true, size:61, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' }),
+    B({ text:'Stated — as expressed.', font:'bricolage', weight:800, italic:true, size:52, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' }),
     B({ text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:25, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' }),
     B({ text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words — btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:18, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' }),
     B({ text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' }),
