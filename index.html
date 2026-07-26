@@ -247,7 +247,14 @@ body.focus-mode .letters-track{
   max-width:1280px;margin:0 auto;
   padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 32px 100px;
 }
-.category-switcher{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
+.category-switcher{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;transition:gap .2s ease}
+.category-switcher.list-mode{flex-direction:column;align-items:flex-start;gap:2px}
+.category-switcher.list-mode .category-pill,
+.category-switcher.list-mode .category-pill-add{
+  width:100%;text-align:left;border-radius:0;border:none;border-bottom:1px solid var(--rule);
+  padding:10px 4px;background:transparent;
+}
+.category-switcher.list-mode .category-pill.active{background:transparent;color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
 .category-pill{
   font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;
   padding:7px 14px;border-radius:20px;border:1px solid var(--rule);background:transparent;color:var(--muted);
@@ -866,7 +873,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 </div>
 
 <nav class="site-nav-bar" aria-label="Site navigation">
-  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">If I May Be Frank</button>
+  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">Frankly,</button>
   <div class="site-nav-tabs" role="group" aria-label="Journal view">
     <button class="site-nav-tab active" id="tabLetters" type="button">Write</button>
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
@@ -3374,6 +3381,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   function setOverviewViewMode(mode){
     overviewShelf.classList.toggle('list-mode', mode === 'list');
+    categorySwitcher.classList.toggle('list-mode', mode === 'list');
     ovGridView.classList.toggle('active', mode === 'grid');
     ovListView.classList.toggle('active', mode === 'list');
   }
