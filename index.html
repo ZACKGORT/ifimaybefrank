@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Journal</title>
+<link rel="icon" type="image/png" href="https://ifimaybefrank.com/favicon-96x96-dark.png" sizes="96x96">
+<link rel="icon" type="image/svg+xml" href="https://ifimaybefrank.com/favicon-dark.svg">
+<link rel="shortcut icon" href="https://ifimaybefrank.com/favicon-dark.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="https://ifimaybefrank.com/apple-touch-icon-dark.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Mono:ital,wght@0,200;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600;700&family=Bricolage+Grotesque:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Big+Shoulders+Display:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
 <style>
@@ -862,7 +866,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 </div>
 
 <nav class="site-nav-bar" aria-label="Site navigation">
-  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">Frankly,</button>
+  <button class="site-nav-brand" id="logoHomeBtn" type="button" aria-label="Home">If I May Be Frank</button>
   <div class="site-nav-tabs" role="group" aria-label="Journal view">
     <button class="site-nav-tab active" id="tabLetters" type="button">Write</button>
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
@@ -1703,7 +1707,27 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         if (e.key === 'Enter'){
           e.preventDefault();
           const marker = nextListMarker(textarea.textContent, b.list);
-          document.execCommand('insertText', false, '\n' + marker);
+          // NOTE: execCommand('insertText', false, '\n' + marker) is not used here —
+          // several browsers substitute a <br> element for embedded newlines instead
+          // of a literal text-node character. A <br> contributes zero characters to
+          // .textContent, so the break silently vanishes the next time b.text is read
+          // back from the DOM (exactly the "flattens on save" symptom). Inserting a
+          // real text node via the Range API guarantees the '\n' actually persists.
+          const sel = window.getSelection();
+          if (sel && sel.rangeCount > 0){
+            const range = sel.getRangeAt(0);
+            range.deleteContents();
+            const textNode = document.createTextNode('\n' + marker);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+          b.text = textarea.textContent;
+          updateSealEnabled();
+          saveDraft();
         } else if (e.key === 'Escape'){
           textarea.blur();
           e.stopPropagation();
