@@ -340,6 +340,8 @@ body.focus-mode .letters-track{
 .context-menu-item.current:hover{background:transparent}
 .context-menu-divider{height:1px;background:var(--rule);margin:4px 0}
 .context-menu-new{font-weight:600}
+.context-menu-danger{color:var(--danger)}
+.context-menu-danger:hover{background:color-mix(in srgb, var(--danger) 12%, transparent)}
 
 /* ── new-category modal ── */
 .modal-overlay{
@@ -3061,6 +3063,27 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     showSaveToast('Filed under ' + categoryDisplayNameFor(targetCatId));
   }
 
+  // ── delete an arbitrary letter from whichever roster is currently
+  // shown in Overview — used by the right-click context menu, so you
+  // don't have to open a letter just to remove it.
+  async function deleteLetterFromOverview(letterId){
+    const idx = roster.findIndex(l => l.id === letterId);
+    if (idx === -1) return;
+    persist.tryDelete('letter:' + letterId + ':draft');
+    const entryKeys = await persist.tryList('letter:' + letterId + ':entries:');
+    entryKeys.forEach(k => persist.tryDelete(k));
+
+    roster.splice(idx, 1);
+    if (roster.length === 0){
+      roster.push({ id: 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' });
+    }
+    saveRoster();
+
+    if (activeIndex >= roster.length) activeIndex = Math.max(0, roster.length - 1);
+    renderOverview();
+    showSaveToast('Letter deleted');
+  }
+
   // ── right-click context menu — same "move to" options as the File
   // popover, but for any card in the Overview grid, not just the
   // currently-open letter ──
@@ -3099,6 +3122,28 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       closeLetterContextMenu();
       openNewCategoryDialog(letterId);
     }, { strong:true }));
+
+    letterContextMenuList.appendChild(makeMenuDivider());
+    const deleteItem = document.createElement('button');
+    deleteItem.type = 'button';
+    deleteItem.className = 'context-menu-item context-menu-danger';
+    deleteItem.textContent = 'Delete letter';
+    let contextDeleteConfirming = false;
+    deleteItem.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!contextDeleteConfirming){
+        contextDeleteConfirming = true;
+        deleteItem.textContent = 'Confirm delete?';
+        setTimeout(() => {
+          if (contextDeleteConfirming){ contextDeleteConfirming = false; deleteItem.textContent = 'Delete letter'; }
+        }, 3000);
+        return;
+      }
+      contextDeleteConfirming = false;
+      closeLetterContextMenu();
+      deleteLetterFromOverview(letterId);
+    });
+    letterContextMenuList.appendChild(deleteItem);
 
     letterContextMenu.style.left = x + 'px';
     letterContextMenu.style.top = y + 'px';
