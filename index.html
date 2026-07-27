@@ -138,6 +138,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   transition:opacity .25s ease,transform .25s ease;
 }
 .save-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.save-toast.scale-toast{
+  font-size:28px;font-weight:700;letter-spacing:0;text-transform:none;
+  padding:10px 26px;font-variant-numeric:tabular-nums;
+}
 
 /* ══════════════════════════════════════════
    MODE TOOLBAR — one docked row, directly under
@@ -461,8 +465,27 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 }
 .block{transition:border-color .25s ease}
 .block.active{border-color:var(--surface-border)}
-.ctrl{display:flex;align-items:center;gap:8px}
+.ctrl{display:flex;align-items:center;gap:8px;position:relative}
 .ctrl-label{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.ctrl-label-btn{
+  background:none;border:none;padding:0;font-family:inherit;cursor:pointer;
+  border-bottom:1px dashed transparent;transition:color .15s,border-color .15s;
+}
+.ctrl-label-btn:hover{color:var(--ink);border-bottom-color:var(--surface-border-soft)}
+.title-style-ctrl{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  margin:0;padding-bottom:0;max-height:0;opacity:0;overflow:hidden;
+  transform:translateY(-6px) scaleY(.94);transform-origin:top left;
+  pointer-events:none;
+  transition:max-height .38s cubic-bezier(.22,1,.36,1), opacity .22s ease,
+             transform .3s cubic-bezier(.22,1,.36,1), margin .3s ease, padding-bottom .3s ease;
+}
+.letter-cover.active .title-style-ctrl{
+  margin:10px 0 14px;padding-bottom:0;max-height:160px;opacity:1;
+  transform:translateY(0) scaleY(1);pointer-events:auto;overflow:visible;
+  position:relative;z-index:100;
+}
+.title-style-ctrl .ctrl-size{width:150px}
 @media(max-width:640px){
   .ctrl-tracking, .ctrl-leading, .ctrl-fill{display:none}
 }
@@ -482,7 +505,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 .font-picker-label{font-family:var(--chrome-font);font-size:13px;font-weight:600;color:var(--ink)}
 .font-picker-trigger .dd-chevron{font-size:11px;color:var(--muted)}
 .font-picker-panel{
-  position:absolute;top:calc(100% + 10px);left:0;z-index:70;
+  position:absolute;top:calc(100% + 10px);left:0;z-index:500;
   width:min(420px, calc(100vw - 60px));max-height:60vh;overflow-y:auto;
   background:var(--surface);border:1px solid var(--rule);border-radius:12px;
   box-shadow:0 16px 40px var(--shadow);
@@ -519,7 +542,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 }
 .link-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .link-popover{
-  position:absolute;top:calc(100% + 10px);left:0;z-index:70;
+  position:absolute;top:calc(100% + 10px);left:0;z-index:500;
   width:min(320px, calc(100vw - 60px));
   background:var(--surface);border:1px solid var(--rule);border-radius:12px;
   box-shadow:0 16px 40px var(--shadow);
@@ -616,7 +639,30 @@ body.focus-mode .block-inline-image{display:block}
 .range-track input[type=range]::-moz-range-thumb{
   width:18px;height:18px;border-radius:50%;background:var(--surface);border:1.5px solid var(--ink);
 }
-.ctrl-value{font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px}
+.ctrl-value{
+  font-family:var(--mono);font-size:11px;color:var(--muted);min-width:34px;
+  background:none;border:none;padding:0;text-align:left;cursor:text;
+  border-bottom:1px dashed transparent;transition:color .15s,border-color .15s;
+}
+.ctrl-value:hover{color:var(--ink);border-bottom-color:var(--surface-border-soft)}
+.ctrl-value-input{
+  font-family:var(--mono);font-size:11px;color:var(--ink);min-width:44px;width:50px;
+  background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:1px 4px;
+}
+.slider-preset-menu{
+  position:absolute;top:calc(100% + 8px);left:0;z-index:500;
+  background:var(--surface);border:1px solid var(--rule);border-radius:10px;
+  box-shadow:0 16px 40px var(--shadow);
+  padding:6px;display:flex;flex-direction:column;gap:1px;
+  min-width:110px;
+}
+.slider-preset-item{
+  display:block;width:100%;text-align:left;background:transparent;border:none;
+  font-family:var(--mono);font-size:12px;color:var(--ink);
+  padding:7px 10px;border-radius:6px;cursor:pointer;transition:background .12s;
+}
+.slider-preset-item:hover{background:var(--rule-soft)}
+.slider-preset-item.selected{background:var(--ink);color:var(--on-ink)}
 .fill-swatch{width:11px;height:11px;border-radius:50%;border:1px solid var(--rule);flex:none;display:inline-block}
 
 .list-group{display:flex;gap:3px;margin-left:auto}
@@ -977,9 +1023,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   <span class="letter-card-num" id="letterNum">01</span>
   <button class="letter-card-focus-toggle" id="btnFocus" type="button">Focus</button>
 
-  <div class="letter-cover">
+  <div class="letter-cover" id="letterCover">
     <span class="letter-cover-kicker" id="letterKicker">LETTER 01</span>
     <h2 class="letter-cover-name" id="letterTitle" contenteditable="true" data-placeholder="Untitled letter"></h2>
+    <div class="title-style-ctrl" id="titleStyleCtrl">
+      <div class="ctrl font-picker" id="titleFontWrap"></div>
+      <div id="titleSizeCtrl"></div>
+    </div>
     <p class="letter-cover-deck" id="letterDeck" contenteditable="true" data-placeholder="A one-line description of this letter&hellip;"></p>
   </div>
 
@@ -1233,6 +1283,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const letterNumEl    = document.getElementById('letterNum');
   const letterKickerEl = document.getElementById('letterKicker');
   const letterTitleEl  = document.getElementById('letterTitle');
+  const letterCoverEl = document.getElementById('letterCover');
+  const titleFontWrap = document.getElementById('titleFontWrap');
+  const titleSizeCtrl = document.getElementById('titleSizeCtrl');
   const letterDeckEl   = document.getElementById('letterDeck');
   const liveFrame = document.getElementById('liveFrame');
   const lettersViewport = document.getElementById('lettersViewport');
@@ -1288,6 +1341,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       if (opts.step) input.step = opts.step;
       input.value = opts.value;
       input.addEventListener('input', () => opts.onInput(parseFloat(input.value)));
+      if (opts.onDragStart) input.addEventListener('pointerdown', opts.onDragStart);
+      if (opts.onDragEnd){
+        input.addEventListener('pointerup', opts.onDragEnd);
+        input.addEventListener('blur', opts.onDragEnd);
+      }
       container.appendChild(input);
       return { getValue: () => parseFloat(input.value), setValue: (v) => { input.value = v; } };
     }
@@ -1362,9 +1420,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       render();
       onInput(val);
     }
-    function handleDown(e){ handleMove(e); container.setPointerCapture(e.pointerId); }
+    function handleDown(e){
+      if (opts.onDragStart) opts.onDragStart();
+      handleMove(e); container.setPointerCapture(e.pointerId);
+    }
     function handleUp(){
       springTo(overflowState, 0, (v) => { overflow = v; render(); }, { stiffness: 320, damping: 22 });
+      if (opts.onDragEnd) opts.onDragEnd();
     }
 
     container.addEventListener('pointerdown', handleDown);
@@ -1380,6 +1442,114 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   function fillColor(v){
     const bgPct = Math.max(0, Math.min(100, (v/200)*100));
     return 'color-mix(in srgb, var(--ink) ' + (100 - bgPct) + '%, var(--bg) ' + bgPct + '%)';
+  }
+
+  // ── shared oversized value readout — reuses the existing top toast
+  // (rather than inventing a new overlay), just switched into a larger
+  // "scale" mode so the number stays legible while the small inline
+  // label is under your cursor mid-drag
+  function showSliderOverlay(text){
+    showSaveToast(text, { scale: true });
+  }
+  function hideSliderOverlay(){ /* toast auto-hides on its own timer */ }
+
+  // ── a full slider control: draggable track, a value readout that
+  // becomes a type-in field on click, and a label that surfaces a
+  // quick-pick preset menu on click. Used for every Size/Letter
+  // spacing/Line height/Fill control in the app, block-level or not.
+  function buildSliderControl(opts){
+    const fmt = opts.formatValue || (v => v + (opts.unit || ''));
+
+    const ctrl = document.createElement('div');
+    ctrl.className = 'ctrl ' + (opts.ctrlClass || '');
+
+    const label = document.createElement('button');
+    label.type = 'button';
+    label.className = 'ctrl-label ctrl-label-btn';
+    label.textContent = opts.label;
+
+    const track = document.createElement('div');
+    track.className = 'range-track';
+
+    const valBtn = document.createElement('button');
+    valBtn.type = 'button';
+    valBtn.className = 'ctrl-value';
+    valBtn.textContent = fmt(opts.getValue());
+
+    const slider = mountSlider(track, {
+      min: opts.min, max: opts.max, step: opts.step, value: opts.getValue(),
+      onInput: (v) => {
+        const rounded = (opts.step && opts.step >= 1) ? Math.round(v) : Math.round(v * 100) / 100;
+        opts.setValue(rounded);
+        valBtn.textContent = fmt(rounded);
+        showSliderOverlay(fmt(rounded));
+      },
+      onDragStart: () => showSliderOverlay(fmt(opts.getValue())),
+      onDragEnd: hideSliderOverlay
+    });
+
+    // click the number — type an exact value
+    valBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'ctrl-value-input';
+      input.value = opts.getValue();
+      input.min = opts.min; input.max = opts.max;
+      if (opts.step) input.step = opts.step;
+      valBtn.replaceWith(input);
+      input.focus(); input.select();
+      let done = false;
+      function commit(){
+        if (done) return; done = true;
+        let v = parseFloat(input.value);
+        if (isNaN(v)) v = opts.getValue();
+        v = Math.min(opts.max, Math.max(opts.min, v));
+        opts.setValue(v);
+        valBtn.textContent = fmt(v);
+        slider.setValue(v);
+        input.replaceWith(valBtn);
+      }
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter'){ ev.preventDefault(); commit(); }
+        else if (ev.key === 'Escape'){ done = true; input.replaceWith(valBtn); }
+      });
+      input.addEventListener('blur', commit);
+    });
+
+    // click the label — quick-pick preset menu
+    let presetMenu = null;
+    function closePresetMenu(){ if (presetMenu){ presetMenu.remove(); presetMenu = null; } }
+    if (opts.presets && opts.presets.length){
+      label.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (presetMenu){ closePresetMenu(); return; }
+        document.querySelectorAll('.slider-preset-menu').forEach(m => m.remove());
+        presetMenu = document.createElement('div');
+        presetMenu.className = 'slider-preset-menu';
+        opts.presets.forEach(p => {
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'slider-preset-item' + (p === opts.getValue() ? ' selected' : '');
+          item.textContent = fmt(p);
+          item.addEventListener('click', () => {
+            opts.setValue(p);
+            valBtn.textContent = fmt(p);
+            slider.setValue(p);
+            closePresetMenu();
+          });
+          presetMenu.appendChild(item);
+        });
+        ctrl.appendChild(presetMenu);
+      });
+    }
+    document.addEventListener('click', (e) => {
+      if (presetMenu && !ctrl.contains(e.target)) closePresetMenu();
+    });
+
+    ctrl.append(label, track, valBtn);
+    ctrl.refreshValue = () => { valBtn.textContent = fmt(opts.getValue()); slider.setValue(opts.getValue()); };
+    return ctrl;
   }
 
   // ── LINKS ──
@@ -1991,54 +2161,44 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       linkWrap.append(linkBtn, linkPopover);
 
       // size
-      const sizeCtrl = document.createElement('div');
-      sizeCtrl.className = 'ctrl ctrl-size';
-      const sizeLabel = document.createElement('span'); sizeLabel.className='ctrl-label'; sizeLabel.textContent='Size';
-      const sizeTrack = document.createElement('div'); sizeTrack.className='range-track';
-      const sizeVal = document.createElement('span'); sizeVal.className='ctrl-value'; sizeVal.textContent = b.size+'px';
-      mountSlider(sizeTrack, {
-        min: 10, max: 200, step: 1, value: b.size,
-        onInput: (v) => { b.size = Math.round(v); sizeVal.textContent = b.size+'px'; applyStyle(textarea,b); saveDraft(); }
+      const sizeCtrl = buildSliderControl({
+        label: 'Size', min: 10, max: 200, step: 1, unit: 'px',
+        presets: [16,24,32,40,48,56,64,72,80,96],
+        ctrlClass: 'ctrl-size',
+        getValue: () => b.size,
+        setValue: (v) => { b.size = v; applyStyle(textarea,b); saveDraft(); }
       });
-      sizeCtrl.append(sizeLabel, sizeTrack, sizeVal);
 
       // tracking
-      const trackCtrl = document.createElement('div');
-      trackCtrl.className = 'ctrl ctrl-tracking';
-      const trackLabel = document.createElement('span'); trackLabel.className='ctrl-label'; trackLabel.textContent='Letter spacing';
-      const trackTrack = document.createElement('div'); trackTrack.className='range-track';
-      const trackVal = document.createElement('span'); trackVal.className='ctrl-value'; trackVal.textContent = b.tracking;
-      mountSlider(trackTrack, {
-        min: -30, max: 150, step: 1, value: b.tracking,
-        onInput: (v) => { b.tracking = Math.round(v); trackVal.textContent = b.tracking; applyStyle(textarea,b); saveDraft(); }
+      const trackCtrl = buildSliderControl({
+        label: 'Letter spacing', min: -30, max: 150, step: 1, unit: '',
+        presets: [-30,-15,0,10,20,40,60,90,120,150],
+        ctrlClass: 'ctrl-tracking',
+        getValue: () => b.tracking,
+        setValue: (v) => { b.tracking = v; applyStyle(textarea,b); saveDraft(); }
       });
-      trackCtrl.append(trackLabel, trackTrack, trackVal);
 
       // leading
-      const leadCtrl = document.createElement('div');
-      leadCtrl.className = 'ctrl ctrl-leading';
-      const leadLabel = document.createElement('span'); leadLabel.className='ctrl-label'; leadLabel.textContent='Line height';
-      const leadTrack = document.createElement('div'); leadTrack.className='range-track';
-      const leadVal = document.createElement('span'); leadVal.className='ctrl-value'; leadVal.textContent = b.leading+'%';
-      mountSlider(leadTrack, {
-        min: 95, max: 190, step: 1, value: b.leading,
-        onInput: (v) => { b.leading = Math.round(v); leadVal.textContent = b.leading+'%'; applyStyle(textarea,b); saveDraft(); }
+      const leadCtrl = buildSliderControl({
+        label: 'Line height', min: 95, max: 190, step: 1, unit: '%',
+        presets: [100,110,120,130,140,150,160,170,180,190],
+        ctrlClass: 'ctrl-leading',
+        getValue: () => b.leading,
+        setValue: (v) => { b.leading = v; applyStyle(textarea,b); saveDraft(); }
       });
-      leadCtrl.append(leadLabel, leadTrack, leadVal);
 
       // fill
-      const fillCtrl = document.createElement('div');
-      fillCtrl.className = 'ctrl ctrl-fill';
-      const fillLabel = document.createElement('span'); fillLabel.className='ctrl-label'; fillLabel.textContent='Fill';
       const fillSwatch = document.createElement('span'); fillSwatch.className='fill-swatch';
-      const fillTrack = document.createElement('div'); fillTrack.className='range-track';
       function paintSwatch(v){ fillSwatch.style.background = fillColor(v); }
       paintSwatch(b.fill);
-      mountSlider(fillTrack, {
-        min: 0, max: 200, step: 1, value: b.fill,
-        onInput: (v) => { b.fill = Math.round(v); paintSwatch(b.fill); applyStyle(textarea,b); saveDraft(); }
+      const fillCtrl = buildSliderControl({
+        label: 'Fill', min: 0, max: 200, step: 1, unit: '',
+        presets: [0,25,50,75,100,125,150,175,200],
+        ctrlClass: 'ctrl-fill',
+        getValue: () => b.fill,
+        setValue: (v) => { b.fill = v; paintSwatch(b.fill); applyStyle(textarea,b); saveDraft(); }
       });
-      fillCtrl.append(fillLabel, fillTrack, fillSwatch);
+      fillCtrl.appendChild(fillSwatch);
 
       // list
       const listGroup = document.createElement('div');
@@ -2529,8 +2689,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   const saveToastEl = document.getElementById('saveToast');
   let saveToastTimer = null;
-  function showSaveToast(message){
+  function showSaveToast(message, opts){
     saveToastEl.textContent = message;
+    saveToastEl.classList.toggle('scale-toast', !!(opts && opts.scale));
     saveToastEl.classList.add('show');
     clearTimeout(saveToastTimer);
     saveToastTimer = setTimeout(() => saveToastEl.classList.remove('show'), 1800);
@@ -3364,6 +3525,96 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   function saveRosterFor(catId, list){ persist.trySet('category:' + catId + ':roster', JSON.stringify(list)); }
   function saveRoster(){ saveRosterFor(activeCategoryId, roster); }
 
+  letterCoverEl.addEventListener('focusin', () => letterCoverEl.classList.add('active'));
+  letterCoverEl.addEventListener('focusout', () => {
+    requestAnimationFrame(() => {
+      if (!letterCoverEl.contains(document.activeElement)) letterCoverEl.classList.remove('active');
+    });
+  });
+
+  function applyTitleStyle(letter){
+    letterTitleEl.style.fontFamily = letter.titleFont ? fontFamilyFor(letter.titleFont) : '';
+    letterTitleEl.style.fontSize = letter.titleSize ? (letter.titleSize + 'px') : '';
+  }
+
+  function renderTitleStyleControls(){
+    const letter = currentLetter();
+    const fontId = letter.titleFont || 'fraunces';
+
+    titleFontWrap.innerHTML = '';
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'font-picker-trigger';
+    trigger.title = 'Change typeface';
+    const swatch = document.createElement('span');
+    swatch.className = 'font-swatch';
+    swatch.textContent = 'Aa';
+    swatch.style.fontFamily = fontFamilyFor(fontId);
+    swatch.style.fontWeight = 700;
+    const label = document.createElement('span');
+    label.className = 'font-picker-label';
+    label.textContent = FONTS.find(f => f.id === fontId).label;
+    const chevron = document.createElement('span');
+    chevron.className = 'dd-chevron';
+    chevron.textContent = '\u2304';
+    trigger.append(swatch, label, chevron);
+
+    const panel = document.createElement('div');
+    panel.className = 'font-picker-panel';
+    FONTS.forEach(f => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'font-picker-card' + (f.id === fontId ? ' selected' : '');
+
+      const name = document.createElement('div');
+      name.className = 'fp-name';
+      name.textContent = f.label;
+
+      const sampleRegular = document.createElement('div');
+      sampleRegular.className = 'fp-sample';
+      sampleRegular.style.fontFamily = f.family;
+      sampleRegular.style.fontWeight = 400;
+      sampleRegular.textContent = letter.title || 'Untitled letter';
+
+      const sampleBlack = document.createElement('div');
+      sampleBlack.className = 'fp-sample';
+      sampleBlack.style.fontFamily = f.family;
+      sampleBlack.style.fontWeight = 800;
+      sampleBlack.textContent = letter.title || 'Untitled letter';
+
+      card.append(name, sampleRegular, sampleBlack);
+      card.addEventListener('click', () => {
+        letter.titleFont = f.id;
+        applyTitleStyle(letter);
+        saveRoster();
+        closePanel();
+        renderTitleStyleControls();
+      });
+      panel.appendChild(card);
+    });
+    function closePanel(){ panel.classList.remove('open'); }
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.font-picker-panel.open').forEach(p => { if (p !== panel) p.classList.remove('open'); });
+      panel.classList.toggle('open');
+    });
+    titleFontWrap.append(trigger, panel);
+
+    const defaultSize = Math.round(parseFloat(getComputedStyle(letterTitleEl).fontSize)) || 32;
+    titleSizeCtrl.innerHTML = '';
+    titleSizeCtrl.appendChild(buildSliderControl({
+      label: 'Size', min: 16, max: 120, step: 1, unit: 'px',
+      presets: [16,24,32,40,48,56,64,72,80,96],
+      ctrlClass: 'ctrl-size',
+      getValue: () => letter.titleSize || defaultSize,
+      setValue: (v) => {
+        letter.titleSize = v;
+        applyTitleStyle(letter);
+        saveRoster();
+      }
+    }));
+  }
+
   function renderLetterChrome(){
     const letter = currentLetter();
     const num = String(activeIndex + 1).padStart(2, '0');
@@ -3371,6 +3622,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     letterKickerEl.textContent = 'LETTER ' + num;
     letterTitleEl.textContent = letter.title || '';
     letterDeckEl.textContent = letter.deck || '';
+    applyTitleStyle(letter);
+    renderTitleStyleControls();
     pagerLabel.textContent = letter.title || 'Untitled';
     pagerCount.textContent = (activeIndex + 1) + ' / ' + roster.length;
     if (pageMode === 'letters'){
