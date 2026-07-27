@@ -3695,6 +3695,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     activeIndex = -1;
     await renderTrack();
     await activatePanel(blankIdx);
+    setFocusMode(true);
   }
 
   tabLetters.addEventListener('click', async () => {
@@ -4042,6 +4043,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     activeIndex = -1;
     await renderTrack();
     await activatePanel(roster.length - 1);
+    setFocusMode(true);
     requestAnimationFrame(() => { letterTitleEl.focus(); });
   }
 
