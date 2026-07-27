@@ -171,14 +171,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .hud .chrome-link.active{border-bottom-color:var(--on-ink)}
 .hud .chrome-status{color:color-mix(in srgb, var(--on-ink) 65%, transparent)}
 .toolbar-group{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.toolbar-pager{display:inline-flex;align-items:baseline;gap:7px;color:var(--ink);font-weight:800}
-.toolbar-pager #pagerLabel{font-size:13px;letter-spacing:.05em}
-.toolbar-pager-count{color:var(--muted);font-weight:600}
+.toolbar-pager{display:inline-flex;align-items:baseline;gap:7px;color:var(--ink);font-weight:800;min-width:0}
+.toolbar-pager #pagerLabel{
+  font-size:13px;letter-spacing:.05em;
+  max-width:min(50vw, 480px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.toolbar-pager-count{color:var(--muted);font-weight:600;flex:none}
 .floating-pager{
-  position:fixed;bottom:calc(24px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);z-index:74;
-  display:flex;align-items:center;gap:12px;
-  background:var(--surface);border:1px solid var(--rule);border-radius:999px;
-  padding:8px 18px;box-shadow:0 8px 24px var(--shadow);
+  position:fixed;bottom:0;left:0;right:0;z-index:74;height:44px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:0 clamp(16px, 9.333px + 1.852vw, 26px);
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+  background:var(--surface);border-top:1px solid var(--rule);
   font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
 }
 @media(max-width:760px){
@@ -760,7 +764,7 @@ body.focus-mode .block-inline-image{display:block}
 .lc-arrow{font-size:14px;color:var(--muted);transition:color .15s,transform .15s}
 .letter-card:hover .lc-arrow{color:var(--ink);transform:translateX(3px)}
 .lc-head{
-  color:var(--ink);line-height:1.08;word-break:break-word;
+  color:var(--ink);line-height:1.18;word-break:break-word;
   overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;
 }
 .lc-desc{font-size:13px;font-weight:400;line-height:1.5;color:var(--muted);overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical}
