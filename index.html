@@ -244,8 +244,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .journal-wrap{min-height:0}
 .letters-viewport{position:relative;overflow:hidden}
 .letters-track{
-  display:flex;align-items:flex-start;gap:clamp(72px, 40px + 8vw, 160px);
-  padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 12vw 150px;
+  display:flex;align-items:flex-start;gap:22px;
+  padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 6vw 150px;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   scroll-behavior:smooth;
@@ -255,7 +255,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 .letters-track.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
 .letter-panel{
-  flex:0 0 76%;width:76%;max-width:1100px;
+  flex:0 0 auto;width:min(88vw, 1100px);max-width:1100px;
   scroll-snap-align:center;
   box-sizing:border-box;
   opacity:.38;
@@ -266,8 +266,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .letter-panel:not(.active) .letter-card-frame{pointer-events:none}
 .letter-panel-inner{width:100%}
 @media(max-width:900px){
-  .letters-track{padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 6vw 150px;gap:32px}
-  .letter-panel{flex:0 0 90%;width:90%}
+  .letters-track{padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 4vw 150px;gap:16px}
+  .letter-panel{flex:0 0 auto;width:min(92vw, 900px)}
 }
 
 /* ── FOCUS MODE — one letter, full viewport, no peeking neighbors ── */
@@ -1136,18 +1136,17 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     switch(id){
 
       case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:52, tracking:-8, leading:98, fill:0 }),
+        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0 }),
         B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
-        B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:22, leading:150, fill:40 }),
-        B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.\n*psst \u2014 I wrote this, not Chat.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
-        B({ text:'\u2022 Enterprise UX \u00b7 Navigation Systems\n\u2022 Design Systems \u00b7 Component-Based Design\n\u2022 AI-Fluent \u00b7 Code-Native (Claude, Prompt Engineering)\n\u2022 Accessible Design (ADA) \u00b7 Modular UI', font:'jakarta', weight:600, size:19, leading:155, fill:15, list:'bullet' }),
-        B({ text:'Currently \u2014 Founder, Wolfgang & Co. Content strategy, product roadmap, and third-party integrations, end-to-end; live event infrastructure built across previously unmapped, siloed teams.', font:'jakarta', weight:500, size:21, leading:150, fill:20 }),
-        B({ text:'1. 2025 \u00b7 Phenom \u2014 UX Strategist\n2. 2022\u20132023 \u00b7 Publicis Sapient \u2014 Senior UX Designer, BNY Mellon\n3. 2021\u20132022 \u00b7 Code & Theory \u2014 Senior Interaction Designer, TikTok For Business\n4. 2021 \u00b7 Elva Design Group \u2014 Senior UX Designer, GNC\n5. 2021 \u00b7 HUGE Inc. \u2014 Senior UX Designer, Sentral Lifestyle Apartments\n6. 2020\u20132021 \u00b7 PFSweb LiveArea \u2014 Manager, UX\n7. 2018\u20132020 \u00b7 FlightPath \u2014 Senior UX Designer, Merck / Goya / Charter\n8. 2017\u20132018 \u00b7 Workarea \u2014 Senior UX Designer\n9. 2016\u20132017 \u00b7 O3 World \u2014 UX Designer\n10. 2014\u20132016 \u00b7 One Sixty Over Ninety \u2014 Interaction Designer, Comcast / Kent State / Philadelphia Eagles', font:'mono', weight:500, size:14, leading:165, fill:35, list:'number' }),
+        B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
+        B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
+        B({ text:'Recently \u2014 Senior UX Designer, Publicis Sapient. Interim Product Owner on BNY Mellon\u2019s Direct Indexing platform; centralized a sprawling product ecosystem into one modular, scalable design system.', font:'jakarta', weight:500, size:21, leading:150, fill:20 }),
+        B({ text:'1. 2022\u20132023 \u00b7 Publicis Sapient \u2014 Senior UX Designer, BNY Mellon\n2. 2021\u20132022 \u00b7 Code & Theory \u2014 Senior Interaction Designer, TikTok For Business\n3. 2021 \u00b7 Elva Design Group \u2014 Senior UX Designer, GNC\n4. 2021 \u00b7 HUGE Inc. \u2014 Senior UX Designer, Sentral Lifestyle Apartments\n5. 2020\u20132021 \u00b7 PFSweb LiveArea \u2014 Manager, UX\n6. 2018\u20132020 \u00b7 FlightPath \u2014 Senior UX Designer, Merck / Goya / Charter', font:'mono', weight:500, size:14, leading:165, fill:35, list:'number' }),
         B({ text:'linkedin.com/in/zackgort \u00b7 zack.cx', font:'mono', weight:500, size:16, leading:150, fill:45, link:'https://zack.cx' })
       ];
 
       case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
+        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0 }),
         B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
@@ -1156,7 +1155,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_outlook': return [
-        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
+        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0 }),
         B({ text:'AI didn\u2019t kill the design job \u2014 it killed the version of the job that was already just production. What\u2019s left is what was always the actual work: deciding what to build, for whom, and why, then proving it with a system instead of a screenshot.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
         B({ text:'I use Claude and prompt engineering the way I used to lean on a junior designer \u2014 to move fast on the parts that don\u2019t need my judgment, so more of my time goes to the parts that do.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'What\u2019s actually worth worrying about isn\u2019t the tools. It\u2019s teams that let the tool make the decision instead of just the draft.', font:'jakarta', weight:700, italic:true, size:26, leading:140, fill:5 }),
@@ -1164,20 +1163,20 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_manifesto': return [
-        B({ text:'Five rules.', font:'jakarta', weight:800, size:52, tracking:-8, leading:96, fill:0 }),
+        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0 }),
         B({ text:'1. Ship the modular version, not the impressive one.\n2. Accessibility isn\u2019t a phase \u2014 it\u2019s a requirement from wireframe one.\n3. Own discovery through delivery, or don\u2019t call it ownership.\n4. Make the system explain itself, so I\u2019m not the single point of failure.\n5. Say what you mean, and be choice with your words.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
         B({ text:'None of these are aspirational. They\u2019re just what I\u2019ve had to keep re-learning on client-facing work, under a deadline, more than once.', font:'mono', weight:500, size:15, leading:160, fill:55 })
       ];
 
       case 'letter_confessions': return [
-        B({ text:'A few admissions.', font:'jakarta', weight:800, size:52, tracking:-6, leading:100, fill:0 }),
+        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0 }),
         B({ text:'My BFA is incomplete. Two stints at Pratt Institute, 2002 to 2005, studying 3D animation and motion graphics \u2014 and I left before finishing. I don\u2019t put it on a wall, but I don\u2019t hide it either.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
         B({ text:'I\u2019ve taken a role I knew would only last a few months, on purpose. Not every engagement needs to be a career.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'I still open a fresh file for something I already know isn\u2019t going to make it, just to see it exist for a minute.', font:'jakarta', weight:500, italic:true, size:22, leading:150, fill:35 })
       ];
 
       case 'letter_impact': return [
-        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:52, tracking:-4, leading:102, fill:0 }),
+        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0 }),
         B({ text:'15+ years \u00b7 Manager UX \u00b7 Senior UX/Interaction Designer \u00b7 Interim Product Owner', font:'mono', weight:600, size:15, leading:150, fill:45 }),
         B({ text:'BNY Mellon \u2014 Publicis Sapient, 2022\u20132023. Interim Product Owner on the Direct Indexing workstream; architected user data models and flows across three Agile tracks and centralized a sprawling product ecosystem into one modular, scalable design system.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
@@ -2915,7 +2914,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // ── CATEGORIES (the top-level grid) ──
   function defaultCategories(){
-    return [ { id:'category_journal', title:'Journal', deck:'Resume, in your own words.' } ];
+    return [ { id:'category_journal', title:'Work', deck:'Resume, in your own words.' } ];
   }
   async function loadCategories(){
     const res = await persist.tryGet('categories');
@@ -4025,10 +4024,92 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     await persist.trySet('unsortedSeeded', '1', true);
   }
 
+  async function seedLifeAndBalanceOnce(){
+    const already = await persist.tryGet('lifeBalanceSeeded');
+    if (already) return;
+
+    const B = defaultBlock;
+    const catLifeId = 'category_life';
+    const catBalanceId = 'category_balance';
+
+    // ── Life ──
+    const phillyId = 'letter_philly_special';
+    const nycId = 'letter_nyc_experience';
+    const earlyId = 'letter_life_early_days';
+    const academiaId = 'letter_academia';
+
+    const PHILLY_BLOCKS = [
+      B({ text:'From Greater Philadelphia to the epicenter of Center City', font:'newsreader', weight:300, size:33, leading:100 }),
+      B({ text:'Actually quite a thrilling journey.  There\u2019s the impetus of many design paradigms that I was independently learning, building & solutioning [sic] for (Twitter Bootstrap/Responsive Design, Sketch rather than Photoshop, and some exciting CSS/JS updates) that completely changed how websites were built.', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'Notice how I said "built", and not "designed"', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'My point is, knowing how something is built, can be built, what breaks it, and what is broken, is essential in understanding how to shape business intent toward logically, systematically, and defensibly achieve desired outcomes.', font:'jakarta', weight:400, size:38, leading:130 }),
+      B({ text:'for what it\u2019s worth, I wrote that in a pure flow state; not sure if it is entirely coherent, but it was not written  by chat.  \n\nFor what it\u2019s worth, I am primarily just testing my own platform by writing off the top of my head rather than default to lorem ipsum, or worse, waste water using robots. ', font:'mono', weight:400, size:10, leading:130 }),
+      B({ font:'jakarta', weight:700, size:20, leading:130 })
+    ];
+
+    // three pieces the user sealed — their live draft is blank (sealing
+    // always clears the surface), but the actual writing lives in the
+    // one history entry each already has
+    const NYC_ENTRY_BLOCKS = [
+      B({ text:'this will be a long letter.  lots of pics though, some mp4s too.  quality content, i wager.', font:'newsreader', weight:300, size:33, leading:100 })
+    ];
+    const EARLY_ENTRY_BLOCKS = [
+      B({ text:'The early days...', font:'newsreader', weight:300, size:33, leading:100 })
+    ];
+    const ACADEMIA_ENTRY_BLOCKS = [
+      B({ text:'3.8 unweighted, with honors. \n', font:'newsreader', weight:700, size:33, leading:100 }),
+      B({ text:'I applied to only two schools: Carnegie Melon University and Pratt Institute of Art.', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'I was accepted to both, but CMU offered zero scholarship, whereas Pratt offered $8K/year off of my $40,000 tuition bill.', font:'jakarta', weight:400, size:20, leading:130 }),
+      B({ text:'Since mom & dad were footing the bill (arguable), they heavily pressured me to choose Pratt, as it would save them on time and money spent for travel and check-ins/upkeep, and were thrilled that not only was Pratt cheaper, but offering $8K/y in scholarship.\n', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'I cannot express to you how embarrassed I was when my art history professor  learned of my decision.  He had been my number one supporter and had written an incredible recommendation letter that I am sure is the reason I was ultimately accepted).', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'I mean, I was also fucking talented, smart as heck, and full of promise.', font:'jakarta', weight:700, size:20, leading:130 }),
+      B({ text:'...more to come, this was just an exercise in catharis.', font:'jakarta', weight:700, size:20, leading:130 })
+    ];
+
+    const existingLifeRoster = await loadRosterFor(catLifeId);
+    if (existingLifeRoster.length === 0){
+      await saveRosterFor(catLifeId, [
+        { id: phillyId, title: 'The Philly Special', deck: 'Start-ups to jump-starting my career from the Philly \u2018burbs, to commuting into the center city hustle & bustle, to top-floor views over Independence Hall.' },
+        { id: nycId, title: 'New York City Experience', deck: '' },
+        { id: earlyId, title: 'The Early Days', deck: 'Construction / Retail / Pirated Software' },
+        { id: academiaId, title: 'Academia', deck: '' }
+      ]);
+      await persist.trySet('letter:' + phillyId + ':draft', JSON.stringify({ blocks: PHILLY_BLOCKS, editingEntryId: null }), true);
+      await persist.trySet('letter:' + phillyId + ':entries:entry_philly_seed', JSON.stringify({ id:'entry_philly_seed', blocks: PHILLY_BLOCKS, createdAt:'2026-07-26T23:30:11.261Z' }), true);
+
+      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
+      await persist.trySet('letter:' + nycId + ':entries:entry_nyc_seed', JSON.stringify({ id:'entry_nyc_seed', blocks: NYC_ENTRY_BLOCKS, createdAt:'2026-07-26T23:32:36.358Z' }), true);
+
+      await persist.trySet('letter:' + earlyId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
+      await persist.trySet('letter:' + earlyId + ':entries:entry_early_seed', JSON.stringify({ id:'entry_early_seed', blocks: EARLY_ENTRY_BLOCKS, createdAt:'2026-07-26T23:34:42.089Z' }), true);
+
+      await persist.trySet('letter:' + academiaId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
+      await persist.trySet('letter:' + academiaId + ':entries:entry_academia_seed', JSON.stringify({ id:'entry_academia_seed', blocks: ACADEMIA_ENTRY_BLOCKS, createdAt:'2026-07-26T23:42:29.248Z' }), true);
+    }
+
+    // ── Balance — nothing written yet, just the category itself ──
+    const existingBalanceRoster = await loadRosterFor(catBalanceId);
+    if (existingBalanceRoster.length === 0){
+      const blankId = 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+      await saveRosterFor(catBalanceId, [{ id: blankId, title:'', deck:'' }]);
+    }
+
+    if (!categories.find(c => c.id === catLifeId)){
+      categories.push({ id: catLifeId, title:'Life', deck:'' });
+    }
+    if (!categories.find(c => c.id === catBalanceId)){
+      categories.push({ id: catBalanceId, title:'Balance', deck:'' });
+    }
+    saveCategories();
+
+    await persist.trySet('lifeBalanceSeeded', '1', true);
+  }
+
   async function initApp(){
     categories = await loadCategories();
     await seedVentilationOnce();
     await seedUnsortedOnce();
+    await seedLifeAndBalanceOnce();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
     roster = await loadRosterFor(UNSORTED_ID);
