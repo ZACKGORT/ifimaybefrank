@@ -4332,6 +4332,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     B({ text:'• They say a \'photo is worth a thousand words\' … frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:33, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }),
     B({ text:'"write more by writing less." — zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' }),
   ];
+  const MISADVENTURE_BLOCKS = [
+    B({ text:'Christopher Nolan\'s The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn\'t a dialogue-driven chamber piece. It\'s a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It\'s a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon\'t tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread\u2014rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we\'re gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus\' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer\'s epic isn\'t memorable because Odysseus visits remarkable places. It\'s memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world \u2014 like, I literally exclaimed "hey, that\'s Charlize!" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ', font:'newsreader', weight:300, italic:false, size:33, tracking:0, leading:135, fill:0, layout:'single', list:'none', link:'' })
+  ];
 
     const catId = 'category_ventilation';
     if (!categories.some(c => c.id === catId)){
@@ -4343,12 +4346,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (existingRoster.length === 0){
       const odysseyId = 'letter_odyssey_seed';
       const statedId = 'letter_stated_seed';
+      const misadventureId = 'letter_misadventure_seed';
       await saveRosterFor(catId, [
         { id: odysseyId, title: 'I have an opinion on Nolan\'s The Odyssey', deck: '' },
-        { id: statedId, title: 'Stated — as expressed', deck: '' }
+        { id: statedId, title: 'Stated — as expressed', deck: '' },
+        { id: misadventureId, title: 'Nolan lost his way.', deck: 'An actual critique.' }
       ]);
       await persist.trySet('letter:' + odysseyId + ':draft', JSON.stringify({ blocks: ODYSSEY_BLOCKS, editingEntryId: null }), true);
       await persist.trySet('letter:' + statedId + ':draft', JSON.stringify({ blocks: STATED_BLOCKS, editingEntryId: null }), true);
+      await persist.trySet('letter:' + misadventureId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
     }
 
     await persist.trySet('ventilationSeeded', '1', true);
@@ -4358,20 +4364,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const already = await persist.tryGet('unsortedSeeded');
     if (already) return;
 
-    const B = defaultBlock;
-    const MISADVENTURE_BLOCKS = [
-      B({ text:'Christopher Nolan\'s The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn\'t a dialogue-driven chamber piece. It\'s a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It\'s a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon\'t tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread\u2014rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we\'re gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus\' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer\'s epic isn\'t memorable because Odysseus visits remarkable places. It\'s memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world \u2014 like, I literally exclaimed "hey, that\'s Charlize!" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ', font:'newsreader', weight:300, italic:false, size:28, tracking:0, leading:146, fill:0, layout:'single', list:'none', link:'' })
-    ];
-
     const existingRoster = await loadRosterFor(UNSORTED_ID);
     if (existingRoster.length === 0){
       const blankId = 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-      const misadventureId = 'letter_misadventure_seed';
-      await saveRosterFor(UNSORTED_ID, [
-        { id: blankId, title: '', deck: '' },
-        { id: misadventureId, title: 'Nolan lost his way.', deck: 'Reportedly, he\u2019s now stuck in a self-perpetuating time loop edited asynchronously against any logical narrative.' }
-      ]);
-      await persist.trySet('letter:' + misadventureId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
+      await saveRosterFor(UNSORTED_ID, [{ id: blankId, title: '', deck: '' }]);
     }
 
     await persist.trySet('unsortedSeeded', '1', true);
