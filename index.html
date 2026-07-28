@@ -3088,12 +3088,32 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // ── switch which category's roster is loaded, without leaving
   // whatever page (Letters/Overview) is currently showing ──
+  // ── self-healing: Unsorted should never show a letter that's already
+  // properly filed elsewhere. Whatever the original cause, if a filing
+  // operation's "remove from source" half didn't stick while the "add
+  // to target" half did, the letter ends up live in two places at
+  // once. Strip any such leftovers out of Unsorted every time it loads.
+  async function dedupeUnsortedRoster(unsortedRoster){
+    const claimedIds = new Set();
+    for (const cat of categories){
+      const catRoster = await loadRosterFor(cat.id);
+      for (const l of catRoster) claimedIds.add(l.id);
+    }
+    const before = unsortedRoster.length;
+    const cleaned = unsortedRoster.filter(l => !claimedIds.has(l.id));
+    if (cleaned.length === before) return unsortedRoster;
+    const finalRoster = cleaned.length ? cleaned : [{ id: 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' }];
+    await saveRosterFor(UNSORTED_ID, finalRoster);
+    return finalRoster;
+  }
+
   async function switchCategory(catId){
     if (catId === activeCategoryId) return;
     flushDraftNow();
     activeCategoryId = catId;
     if (catId !== UNSORTED_ID) lastCategoryId = catId;
     roster = await loadRosterFor(catId);
+    if (catId === UNSORTED_ID) roster = await dedupeUnsortedRoster(roster);
     if (roster.length === 0){
       // a category never has zero letters to land on; Unsorted can
       // legitimately empty out once everything's been filed, but still
@@ -3703,7 +3723,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   async function goToFreshWrite(){
     flushDraftNow();
     activeCategoryId = UNSORTED_ID;
-    let unsortedRoster = await loadRosterFor(UNSORTED_ID);
+    let unsortedRoster = await dedupeUnsortedRoster(await loadRosterFor(UNSORTED_ID));
 
     let blankIdx = -1;
     for (let i = 0; i < unsortedRoster.length; i++){
@@ -4461,7 +4481,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     await seedVentilationOnce();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
-    roster = await loadRosterFor(UNSORTED_ID);
+    roster = await dedupeUnsortedRoster(await loadRosterFor(UNSORTED_ID));
     if (roster.length === 0){
       roster = [{ id: 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' }];
       saveRosterFor(UNSORTED_ID, roster);
