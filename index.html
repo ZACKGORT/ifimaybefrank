@@ -2742,8 +2742,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     }
     setSaveStatus('saving');
     hasPendingSave = true;
+    const blocksSnapshot = blocks;
+    const editingEntryIdSnapshot = editingEntryId;
     draftTimer = setTimeout(() => {
-      persist.trySet('letter:' + letter.id + ':draft', JSON.stringify({ blocks, editingEntryId }));
+      persist.trySet('letter:' + letter.id + ':draft', JSON.stringify({ blocks: blocksSnapshot, editingEntryId: editingEntryIdSnapshot }));
       hasPendingSave = false;
     }, 900);
   }
@@ -4093,7 +4095,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // letter title / deck editing
   let metaTimer = null;
-  function scheduleMetaSave(){ clearTimeout(metaTimer); metaTimer = setTimeout(saveRoster, 500); }
+  function scheduleMetaSave(){
+    clearTimeout(metaTimer);
+    const catSnapshot = activeCategoryId;
+    const rosterSnapshot = roster;
+    metaTimer = setTimeout(() => saveRosterFor(catSnapshot, rosterSnapshot), 500);
+  }
   letterTitleEl.addEventListener('input', () => {
     if (letterTitleEl.textContent.trim() === '' && letterTitleEl.childNodes.length > 0) letterTitleEl.textContent = '';
     currentLetter().title = letterTitleEl.textContent;
