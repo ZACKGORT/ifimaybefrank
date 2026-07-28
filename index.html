@@ -4456,9 +4456,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   async function initApp(){
     categories = await loadCategories();
-    await seedVentilationOnce();
-    await seedUnsortedOnce();
     await seedLifeAndBalanceOnce();
+    await seedUnsortedOnce();
+    await seedVentilationOnce();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
     roster = await loadRosterFor(UNSORTED_ID);
