@@ -142,6 +142,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   font-size:28px;font-weight:700;letter-spacing:0;text-transform:none;
   padding:10px 26px;font-variant-numeric:tabular-nums;
 }
+.refresh-guard{
+  position:fixed;top:22px;left:50%;z-index:250;
+  transform:translateX(-50%) translateY(-10px);
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;max-width:calc(100vw - 40px);
+  font-family:var(--chrome-font);font-size:13px;
+  background:var(--ink);color:var(--on-ink);padding:12px 20px;border-radius:14px;
+  box-shadow:0 16px 48px var(--shadow);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.refresh-guard.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.refresh-guard .chrome-link{color:var(--on-ink);white-space:nowrap}
+#refreshGuardExport{font-weight:700;border-bottom-color:var(--on-ink)}
 
 /* ══════════════════════════════════════════
    MODE TOOLBAR — one docked row, directly under
@@ -995,6 +1008,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 </div>
 
 <div class="save-toast" id="saveToast" role="status" aria-live="polite"></div>
+
+<div class="refresh-guard" id="refreshGuard" role="alertdialog" aria-label="Export before refreshing?">
+  <span>Refreshing? Your writing stays put, but it never hurts to have a copy.</span>
+  <button type="button" class="chrome-link" id="refreshGuardExport">Export journal</button>
+  <button type="button" class="chrome-link" id="refreshGuardDismiss">Refresh anyway</button>
+</div>
 
 <main class="journal-wrap" id="journalWrap">
   <div class="letters-viewport" id="lettersViewport">
@@ -2709,6 +2728,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // ── PER-LETTER DRAFT / SEAL / ARCHIVE ──
   let draftTimer = null;
+  let hasPendingSave = false;
   function saveDraft(){
     schedulePageBreakUpdate();
     clearTimeout(draftTimer);
@@ -2721,12 +2741,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       return;
     }
     setSaveStatus('saving');
+    hasPendingSave = true;
     draftTimer = setTimeout(() => {
       persist.trySet('letter:' + letter.id + ':draft', JSON.stringify({ blocks, editingEntryId }));
+      hasPendingSave = false;
     }, 900);
   }
   function flushDraftNow(){
     clearTimeout(draftTimer);
+    hasPendingSave = false;
     const letter = currentLetter();
     if (!letter) return;
     const hasContent = blocks.some(b => b.text.trim().length > 0);
@@ -4115,6 +4138,49 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     else if (e.key === 'ArrowRight') activatePanel(activeIndex + 1);
   });
 
+  // ── offer an export before a refresh. The data itself isn't at risk —
+  // everything autosaves to localStorage — but a portable JSON copy is
+  // a nice thing to have, and a refresh is a natural moment to nudge it.
+  const refreshGuardEl = document.getElementById('refreshGuard');
+  const refreshGuardExport = document.getElementById('refreshGuardExport');
+  const refreshGuardDismiss = document.getElementById('refreshGuardDismiss');
+  let refreshGuardTimer = null;
+  function showRefreshGuard(){
+    refreshGuardEl.classList.add('show');
+    clearTimeout(refreshGuardTimer);
+    refreshGuardTimer = setTimeout(() => refreshGuardEl.classList.remove('show'), 8000);
+  }
+  function hideRefreshGuard(){
+    refreshGuardEl.classList.remove('show');
+    clearTimeout(refreshGuardTimer);
+  }
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && refreshGuardEl.classList.contains('show')){
+      hideRefreshGuard();
+      return;
+    }
+    const isRefreshCombo = e.key === 'F5' || ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'r' || e.key === 'R'));
+    if (!isRefreshCombo) return;
+    e.preventDefault();
+    showRefreshGuard();
+  }, true);
+  refreshGuardExport.addEventListener('click', async () => {
+    await exportWholeJournal();
+    hideRefreshGuard();
+  });
+  refreshGuardDismiss.addEventListener('click', () => {
+    hideRefreshGuard();
+    location.reload();
+  });
+  // fallback for the browser's own refresh/close controls, which a
+  // scripted keydown listener can't intercept — only warns if there's
+  // an actual unsaved debounce in flight, not on every routine refresh
+  window.addEventListener('beforeunload', (e) => {
+    if (!hasPendingSave) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
+
   // ── whole-journal export / import (backup everything at once) ──
   const btnImportExport = document.getElementById('btnImportExport');
   const importExportPopover = document.getElementById('importExportPopover');
@@ -4135,8 +4201,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (importExportPopover.classList.contains('open') && !e.target.closest('.file-ctrl')) closeImportExportPopover();
   });
 
-  menuExportJournal.addEventListener('click', async () => {
-    closeImportExportPopover();
+  async function exportWholeJournal(){
     flushDraftNow();
     const payload = { app:'journal', kind:'journal-full', exportedAt: new Date().toISOString(), categories: JSON.parse(JSON.stringify(categories)), data:{} };
     for (const cat of categories){
@@ -4150,6 +4215,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       payload.data[cat.id] = { roster: catRoster, letters: lettersOut };
     }
     downloadJSON(payload, 'journal-' + fileTimestamp() + '.json');
+  }
+
+  menuExportJournal.addEventListener('click', async () => {
+    closeImportExportPopover();
+    await exportWholeJournal();
   });
 
   menuImportJournal.addEventListener('click', () => { closeImportExportPopover(); importJournalInput.click(); });
@@ -4294,6 +4364,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const NYC_ENTRY_BLOCKS = [
       B({ text:'this will be a long letter.  lots of pics though, some mp4s too.  quality content, i wager.', font:'newsreader', weight:300, size:33, leading:100 })
     ];
+    const NYC_DRAFT_BLOCKS = [
+      B({ text:'Wake up at 5:00 am. Shit, shower, shave; feed cat and dish out two-dozen face smooches . Buck out the door by 5:45; get buckled-up and on i95 by 5:55. \n\n55mph speed limit? Nah, 75 minimum, is necessary (everyone else is pushing 80). I mog through morning rush hour traffic in my rear-real drive coupe en route to Hamilton, NJ. \n\nAim to arrive at the station by 6:30am, leaving time to grab some Dunkin\', so long as there is no line; the express train comes at 6:45am with the local following at 7:15am  \u2014 fuck that; I\'m making the express train.\n\nTrain arrives. The usual suspects emerge to the front. These are the fighting folk, whose entire day is determinate upon them claiming their favorite seat.\n\nNGL, I preferred the single seat with luggage rack that only two of such seats existed per car. Many, many others also preferred this seat.\n\nDoesn\'t matter.  So long as I got a window. Nothing better than soaking in the rising sun in silence. I wouldn\'t think about work on the train. Once I got to Penn Station, I would start thinking about work, but before that, I would visit my favorite food cart stationed next to the Flatiron building.', font:'newsreader', weight:300, size:33, leading:100 })
+    ];
     const EARLY_ENTRY_BLOCKS = [
       B({ text:'The early days...', font:'newsreader', weight:300, size:33, leading:100 })
     ];
@@ -4311,14 +4384,14 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (existingLifeRoster.length === 0){
       await saveRosterFor(catLifeId, [
         { id: phillyId, title: 'The Philly Special', deck: 'Start-ups to jump-starting my career from the Philly \u2018burbs, to commuting into the center city hustle & bustle, to top-floor views over Independence Hall.' },
-        { id: nycId, title: 'New York City Experience', deck: '' },
+        { id: nycId, title: 'From Streets to Skyscapers in New York City.', deck: '' },
         { id: earlyId, title: 'The Early Days', deck: 'Construction / Retail / Pirated Software' },
         { id: academiaId, title: 'Academia', deck: '' }
       ]);
       await persist.trySet('letter:' + phillyId + ':draft', JSON.stringify({ blocks: PHILLY_BLOCKS, editingEntryId: null }), true);
       await persist.trySet('letter:' + phillyId + ':entries:entry_philly_seed', JSON.stringify({ id:'entry_philly_seed', blocks: PHILLY_BLOCKS, createdAt:'2026-07-26T23:30:11.261Z' }), true);
 
-      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
+      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks: NYC_DRAFT_BLOCKS, editingEntryId: null }), true);
       await persist.trySet('letter:' + nycId + ':entries:entry_nyc_seed', JSON.stringify({ id:'entry_nyc_seed', blocks: NYC_ENTRY_BLOCKS, createdAt:'2026-07-26T23:32:36.358Z' }), true);
 
       await persist.trySet('letter:' + earlyId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
@@ -4335,10 +4408,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       await saveRosterFor(catBalanceId, [{ id: blankId, title:'', deck:'' }]);
     }
 
-    if (!categories.find(c => c.id === catLifeId)){
+    if (!categories.find(c => c.id === catLifeId || (c.title || '').trim().toLowerCase() === 'life')){
       categories.push({ id: catLifeId, title:'Life', deck:'' });
     }
-    if (!categories.find(c => c.id === catBalanceId)){
+    if (!categories.find(c => c.id === catBalanceId || (c.title || '').trim().toLowerCase() === 'balance')){
       categories.push({ id: catBalanceId, title:'Balance', deck:'' });
     }
     saveCategories();
