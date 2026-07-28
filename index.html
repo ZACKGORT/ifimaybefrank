@@ -4221,6 +4221,19 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
       payload.data[cat.id] = { roster: catRoster, letters: lettersOut };
     }
+    // Unsorted is deliberately never a named category, but its letters
+    // still deserve to survive a backup/round-trip — include them under
+    // a fixed key rather than leaving them out of the export entirely.
+    {
+      const unsortedRoster = (activeCategoryId === UNSORTED_ID) ? roster : await loadRosterFor(UNSORTED_ID);
+      const lettersOut = {};
+      for (const l of unsortedRoster){
+        const draft = await loadLetterDraft(l.id);
+        const entries = await loadLetterEntries(l.id);
+        lettersOut[l.id] = { draft, entries };
+      }
+      payload.data[UNSORTED_ID] = { roster: unsortedRoster, letters: lettersOut };
+    }
     downloadJSON(payload, 'journal-' + fileTimestamp() + '.json');
   }
 
@@ -4257,7 +4270,29 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         addedCats++;
       }
       saveCategories();
-      showSaveToast(addedCats ? (addedCats + (addedCats === 1 ? ' category restored' : ' categories restored')) : 'Nothing new to restore');
+
+      let addedUnsorted = 0;
+      const unsortedBundle = parsed.data && parsed.data[UNSORTED_ID];
+      if (unsortedBundle && Array.isArray(unsortedBundle.roster) && unsortedBundle.roster.length){
+        const currentUnsorted = (activeCategoryId === UNSORTED_ID) ? roster : await loadRosterFor(UNSORTED_ID);
+        for (const l of unsortedBundle.roster){
+          const newLetterId = 'letter_import_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+          currentUnsorted.push({ id:newLetterId, title: l.title || '', deck: l.deck || '' });
+          const lb = (unsortedBundle.letters && unsortedBundle.letters[l.id]) || { draft:{ blocks:[openingBlock()], editingEntryId:null }, entries:[] };
+          await persist.trySet('letter:' + newLetterId + ':draft', JSON.stringify(lb.draft || { blocks:[openingBlock()], editingEntryId:null }));
+          for (const entry of (lb.entries || [])){
+            await persist.trySet('letter:' + newLetterId + ':entries:' + entry.id, JSON.stringify(entry));
+          }
+          addedUnsorted++;
+        }
+        await saveRosterFor(UNSORTED_ID, currentUnsorted);
+        if (activeCategoryId === UNSORTED_ID) roster = currentUnsorted;
+      }
+
+      const parts = [];
+      if (addedCats) parts.push(addedCats + (addedCats === 1 ? ' category' : ' categories'));
+      if (addedUnsorted) parts.push(addedUnsorted + (addedUnsorted === 1 ? ' unsorted letter' : ' unsorted letters'));
+      showSaveToast(parts.length ? (parts.join(' + ') + ' restored') : 'Nothing new to restore');
       showPageMode('overview');
     }catch(err){
       showSaveToast('Could not read that file');
@@ -4331,12 +4366,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const existingRoster = await loadRosterFor(UNSORTED_ID);
     if (existingRoster.length === 0){
       const blankId = 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-      const letterId = 'letter_misadventure_seed';
+      const misadventureId = 'letter_misadventure_seed';
       await saveRosterFor(UNSORTED_ID, [
         { id: blankId, title: '', deck: '' },
-        { id: letterId, title: 'Nolan lost his way.', deck: 'Reportedly, he\u2019s now stuck in a self-perpetuating time loop edited asynchronously against any logical narrative.' }
+        { id: misadventureId, title: 'Nolan lost his way.', deck: 'Reportedly, he\u2019s now stuck in a self-perpetuating time loop edited asynchronously against any logical narrative.' }
       ]);
-      await persist.trySet('letter:' + letterId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
+      await persist.trySet('letter:' + misadventureId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
     }
 
     await persist.trySet('unsortedSeeded', '1', true);
@@ -4371,9 +4406,6 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const NYC_ENTRY_BLOCKS = [
       B({ text:'this will be a long letter.  lots of pics though, some mp4s too.  quality content, i wager.', font:'newsreader', weight:300, size:33, leading:100 })
     ];
-    const NYC_DRAFT_BLOCKS = [
-      B({ text:'Wake up at 5:00 am. Shit, shower, shave; feed cat and dish out two-dozen face smooches . Buck out the door by 5:45; get buckled-up and on i95 by 5:55. \n\n55mph speed limit? Nah, 75 minimum, is necessary (everyone else is pushing 80). I mog through morning rush hour traffic in my rear-real drive coupe en route to Hamilton, NJ. \n\nAim to arrive at the station by 6:30am, leaving time to grab some Dunkin\', so long as there is no line; the express train comes at 6:45am with the local following at 7:15am  \u2014 fuck that; I\'m making the express train.\n\nTrain arrives. The usual suspects emerge to the front. These are the fighting folk, whose entire day is determinate upon them claiming their favorite seat.\n\nNGL, I preferred the single seat with luggage rack that only two of such seats existed per car. Many, many others also preferred this seat.\n\nDoesn\'t matter.  So long as I got a window. Nothing better than soaking in the rising sun in silence. I wouldn\'t think about work on the train. Once I got to Penn Station, I would start thinking about work, but before that, I would visit my favorite food cart stationed next to the Flatiron building.', font:'newsreader', weight:300, size:33, leading:100 })
-    ];
     const EARLY_ENTRY_BLOCKS = [
       B({ text:'The early days...', font:'newsreader', weight:300, size:33, leading:100 })
     ];
@@ -4391,14 +4423,14 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (existingLifeRoster.length === 0){
       await saveRosterFor(catLifeId, [
         { id: phillyId, title: 'The Philly Special', deck: 'Start-ups to jump-starting my career from the Philly \u2018burbs, to commuting into the center city hustle & bustle, to top-floor views over Independence Hall.' },
-        { id: nycId, title: 'From Streets to Skyscapers in New York City.', deck: '' },
+        { id: nycId, title: 'New York City Experience', deck: '' },
         { id: earlyId, title: 'The Early Days', deck: 'Construction / Retail / Pirated Software' },
         { id: academiaId, title: 'Academia', deck: '' }
       ]);
       await persist.trySet('letter:' + phillyId + ':draft', JSON.stringify({ blocks: PHILLY_BLOCKS, editingEntryId: null }), true);
       await persist.trySet('letter:' + phillyId + ':entries:entry_philly_seed', JSON.stringify({ id:'entry_philly_seed', blocks: PHILLY_BLOCKS, createdAt:'2026-07-26T23:30:11.261Z' }), true);
 
-      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks: NYC_DRAFT_BLOCKS, editingEntryId: null }), true);
+      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
       await persist.trySet('letter:' + nycId + ':entries:entry_nyc_seed', JSON.stringify({ id:'entry_nyc_seed', blocks: NYC_ENTRY_BLOCKS, createdAt:'2026-07-26T23:32:36.358Z' }), true);
 
       await persist.trySet('letter:' + earlyId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
