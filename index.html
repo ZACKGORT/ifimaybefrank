@@ -408,11 +408,16 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 }
 .letter-cover-deck:empty:before{content:attr(data-placeholder);color:var(--muted);opacity:.5}
 .letter-card-focus-toggle{
-  position:absolute;top:20px;right:24px;
+  position:absolute;top:20px;right:24px;z-index:5;
   font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
-  background:transparent;border:1px solid var(--rule);border-radius:20px;color:var(--muted);
+  background:color-mix(in srgb, var(--surface) 78%, transparent);
+  border:1px solid var(--rule);border-radius:20px;color:var(--muted);
   padding:6px 14px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;
+  backdrop-filter:blur(6px) saturate(1.2);-webkit-backdrop-filter:blur(6px) saturate(1.2);
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
 }
+.letter-card-focus-toggle:hover{color:var(--ink);border-color:var(--surface-border-soft)}
+.letter-card-focus-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 .letter-card-focus-toggle:hover{color:var(--ink);border-color:var(--surface-border-soft)}
 .letter-card-focus-toggle.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
 
@@ -1185,7 +1190,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     switch(id){
 
       case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/gM4dRT1v/mask-Uw-Dg-Mvg-Yh-Dco-WEJTuwuk-GLQFj-SVw.webp' }),
+        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg' }),
         B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
         B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
         B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
@@ -1195,7 +1200,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg' }),
+        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg' }),
         B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
@@ -1204,7 +1209,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_outlook': return [
-        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0, link:'https://picsum.photos/id/1043/1600/900' }),
+        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/hqCtdrS/ZAX02263.jpg' }),
         B({ text:'AI didn\u2019t kill the design job \u2014 it killed the version of the job that was already just production. What\u2019s left is what was always the actual work: deciding what to build, for whom, and why, then proving it with a system instead of a screenshot.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
         B({ text:'I use Claude and prompt engineering the way I used to lean on a junior designer \u2014 to move fast on the parts that don\u2019t need my judgment, so more of my time goes to the parts that do.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'What\u2019s actually worth worrying about isn\u2019t the tools. It\u2019s teams that let the tool make the decision instead of just the draft.', font:'jakarta', weight:700, italic:true, size:26, leading:140, fill:5 }),
@@ -1212,20 +1217,20 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_manifesto': return [
-        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/F4cQHTFF/DSC09310.jpg' }),
+        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/0jHKxpPZ/vermont-91.jpg' }),
         B({ text:'1. Ship the modular version, not the impressive one.\n2. Accessibility isn\u2019t a phase \u2014 it\u2019s a requirement from wireframe one.\n3. Own discovery through delivery, or don\u2019t call it ownership.\n4. Make the system explain itself, so I\u2019m not the single point of failure.\n5. Say what you mean, and be choice with your words.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
         B({ text:'None of these are aspirational. They\u2019re just what I\u2019ve had to keep re-learning on client-facing work, under a deadline, more than once.', font:'mono', weight:500, size:15, leading:160, fill:55 })
       ];
 
       case 'letter_confessions': return [
-        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/DDFpj6Dm/ZAX03810.jpg' }),
+        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/gMDT38J5/IMG-20200527-221611-475.jpg' }),
         B({ text:'My BFA is incomplete. Two stints at Pratt Institute, 2002 to 2005, studying 3D animation and motion graphics \u2014 and I left before finishing. I don\u2019t put it on a wall, but I don\u2019t hide it either.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
         B({ text:'I\u2019ve taken a role I knew would only last a few months, on purpose. Not every engagement needs to be a career.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'I still open a fresh file for something I already know isn\u2019t going to make it, just to see it exist for a minute.', font:'jakarta', weight:500, italic:true, size:22, leading:150, fill:35 })
       ];
 
       case 'letter_impact': return [
-        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0, link:'https://i.ibb.co/0jHKxpPZ/vermont-91.jpg' }),
+        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0, link:'https://i.ibb.co/gbn5tBf5/ZAX01304.jpg' }),
         B({ text:'15+ years \u00b7 Manager UX \u00b7 Senior UX/Interaction Designer \u00b7 Interim Product Owner', font:'mono', weight:600, size:15, leading:150, fill:45 }),
         B({ text:'BNY Mellon \u2014 Publicis Sapient, 2022\u20132023. Interim Product Owner on the Direct Indexing workstream; architected user data models and flows across three Agile tracks and centralized a sprawling product ecosystem into one modular, scalable design system.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
@@ -1604,7 +1609,6 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   }
 
   // ── LINKS ──
-  const imageLinkCache = new Map();
 
   function looksLikeImageUrl(url){
     let pathname = url;
@@ -1642,17 +1646,33 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
     });
   }
+  const imageLinkCache = new Map();
+  const imageLinkWaiters = new Map();
   function testImageLink(url, onResolved){
     if (!url) return;
     if (imageLinkCache.has(url)){
       const v = imageLinkCache.get(url);
-      if (v !== undefined && onResolved) onResolved(v);
+      if (v !== undefined){ if (onResolved) onResolved(v); return; }
+      // a probe for this url is already in flight — queue this caller
+      // too, rather than silently dropping it (the old bug: only the
+      // very first caller ever found out how the probe resolved)
+      if (onResolved){
+        if (!imageLinkWaiters.has(url)) imageLinkWaiters.set(url, []);
+        imageLinkWaiters.get(url).push(onResolved);
+      }
       return;
     }
     imageLinkCache.set(url, undefined);
+    if (onResolved) imageLinkWaiters.set(url, [onResolved]);
     const probe = new Image();
-    probe.onload = () => { imageLinkCache.set(url, true); if (onResolved) onResolved(true); };
-    probe.onerror = () => { imageLinkCache.set(url, false); if (onResolved) onResolved(false); };
+    function settle(result){
+      imageLinkCache.set(url, result);
+      const waiters = imageLinkWaiters.get(url) || [];
+      imageLinkWaiters.delete(url);
+      waiters.forEach(cb => cb(result));
+    }
+    probe.onload = () => settle(true);
+    probe.onerror = () => settle(false);
     probe.src = url;
   }
   function hostnameFor(url){
