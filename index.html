@@ -350,8 +350,29 @@ body.focus-mode .letters-track{
   border-radius:4px;
   padding:32px clamp(24px,4vw,40px) 56px;
   min-height:calc(100vh - 220px);
+  overflow:hidden;
   transition:box-shadow .25s ease, transform .25s ease;
 }
+.letter-hero{
+  position:relative;
+  margin:-32px clamp(-40px,-4vw,-24px) 28px;
+  height:38vh;min-height:200px;max-height:420px;
+  overflow:hidden;
+  background:var(--rule-soft);
+}
+.letter-hero img{
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  display:block;filter:saturate(.92) contrast(1.02);
+}
+.letter-hero img[data-focus="1"]{object-position:top}
+.letter-hero img[data-focus="2"]{object-position:center}
+.letter-hero img[data-focus="3"]{object-position:bottom}
+.letter-hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 55%, var(--bg) 100%);
+}
+@media(min-width:1024px){ .letter-hero{height:44vh;max-height:520px} }
+@media(max-width:640px){ .letter-hero{height:28vh;min-height:160px;margin-bottom:20px} }
 /* elevation only in light mode — on a dark surface a drop shadow reads
    as a smudge rather than a lift, and the card frame's own border
    already carries enough contrast there */
@@ -1047,6 +1068,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   <span class="letter-card-num" id="letterNum">01</span>
   <button class="letter-card-focus-toggle" id="btnFocus" type="button">Focus</button>
 
+  <div class="letter-hero" id="letterHero" style="display:none">
+    <img id="letterHeroImg" src="" alt="" data-focus="2">
+  </div>
+
   <div class="letter-cover" id="letterCover">
     <span class="letter-cover-kicker" id="letterKicker">LETTER 01</span>
     <h2 class="letter-cover-name" id="letterTitle" contenteditable="true" data-placeholder="Untitled letter"></h2>
@@ -1160,7 +1185,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     switch(id){
 
       case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0 }),
+        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/gM4dRT1v/mask-Uw-Dg-Mvg-Yh-Dco-WEJTuwuk-GLQFj-SVw.webp' }),
         B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
         B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
         B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
@@ -1170,7 +1195,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0 }),
+        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg' }),
         B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
@@ -1179,7 +1204,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_outlook': return [
-        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0 }),
+        B({ text:'Where this is headed.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0, link:'https://picsum.photos/id/1043/1600/900' }),
         B({ text:'AI didn\u2019t kill the design job \u2014 it killed the version of the job that was already just production. What\u2019s left is what was always the actual work: deciding what to build, for whom, and why, then proving it with a system instead of a screenshot.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
         B({ text:'I use Claude and prompt engineering the way I used to lean on a junior designer \u2014 to move fast on the parts that don\u2019t need my judgment, so more of my time goes to the parts that do.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'What\u2019s actually worth worrying about isn\u2019t the tools. It\u2019s teams that let the tool make the decision instead of just the draft.', font:'jakarta', weight:700, italic:true, size:26, leading:140, fill:5 }),
@@ -1187,20 +1212,20 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_manifesto': return [
-        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0 }),
+        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/F4cQHTFF/DSC09310.jpg' }),
         B({ text:'1. Ship the modular version, not the impressive one.\n2. Accessibility isn\u2019t a phase \u2014 it\u2019s a requirement from wireframe one.\n3. Own discovery through delivery, or don\u2019t call it ownership.\n4. Make the system explain itself, so I\u2019m not the single point of failure.\n5. Say what you mean, and be choice with your words.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
         B({ text:'None of these are aspirational. They\u2019re just what I\u2019ve had to keep re-learning on client-facing work, under a deadline, more than once.', font:'mono', weight:500, size:15, leading:160, fill:55 })
       ];
 
       case 'letter_confessions': return [
-        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0 }),
+        B({ text:'A few admissions.', font:'jakarta', weight:800, size:70, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/DDFpj6Dm/ZAX03810.jpg' }),
         B({ text:'My BFA is incomplete. Two stints at Pratt Institute, 2002 to 2005, studying 3D animation and motion graphics \u2014 and I left before finishing. I don\u2019t put it on a wall, but I don\u2019t hide it either.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
         B({ text:'I\u2019ve taken a role I knew would only last a few months, on purpose. Not every engagement needs to be a career.', font:'jakarta', weight:500, size:22, leading:150, fill:25 }),
         B({ text:'I still open a fresh file for something I already know isn\u2019t going to make it, just to see it exist for a minute.', font:'jakarta', weight:500, italic:true, size:22, leading:150, fill:35 })
       ];
 
       case 'letter_impact': return [
-        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0 }),
+        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0, link:'https://i.ibb.co/0jHKxpPZ/vermont-91.jpg' }),
         B({ text:'15+ years \u00b7 Manager UX \u00b7 Senior UX/Interaction Designer \u00b7 Interim Product Owner', font:'mono', weight:600, size:15, leading:150, fill:45 }),
         B({ text:'BNY Mellon \u2014 Publicis Sapient, 2022\u20132023. Interim Product Owner on the Direct Indexing workstream; architected user data models and flows across three Agile tracks and centralized a sprawling product ecosystem into one modular, scalable design system.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
         B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
@@ -1308,6 +1333,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const letterKickerEl = document.getElementById('letterKicker');
   const letterTitleEl  = document.getElementById('letterTitle');
   const letterCoverEl = document.getElementById('letterCover');
+  const letterHeroEl = document.getElementById('letterHero');
+  const letterHeroImgEl = document.getElementById('letterHeroImg');
   const titleFontWrap = document.getElementById('titleFontWrap');
   const titleSizeCtrl = document.getElementById('titleSizeCtrl');
   const letterDeckEl   = document.getElementById('letterDeck');
@@ -1591,6 +1618,29 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (cached === false) return false;
     if (cached === true) return true;
     return looksLikeImageUrl(url);
+  }
+
+  // ── standing rule: whenever a letter's FIRST passage links an image,
+  // show that image as a full-bleed hero above the cover, rather than
+  // just an inline preview. Re-evaluated on every render since the
+  // first block's link can change as someone writes.
+  function updateLetterHero(){
+    const first = blocks[0];
+    const link = first && first.link;
+    if (!link){ letterHeroEl.style.display = 'none'; return; }
+    if (isImageLink(link)){
+      letterHeroImgEl.src = link;
+      letterHeroEl.style.display = '';
+      return;
+    }
+    letterHeroEl.style.display = 'none';
+    testImageLink(link, (ok) => {
+      // only act if this is still the first block's link by the time it resolves
+      if (blocks[0] && blocks[0].link === link && ok){
+        letterHeroImgEl.src = link;
+        letterHeroEl.style.display = '';
+      }
+    });
   }
   function testImageLink(url, onResolved){
     if (!url) return;
@@ -1887,6 +1937,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   // switch just swaps out what `blocks` points at before calling this)
   function renderStack(){
     blockStack.innerHTML = '';
+    updateLetterHero();
     blocks.forEach((b, i) => {
       const block = document.createElement('div');
       block.className = 'block';
@@ -2153,6 +2204,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         linkBtn.setAttribute('aria-pressed', b.link ? 'true' : 'false');
         linkRemove.style.display = b.link ? '' : 'none';
         renderLinkChip(block, b);
+        if (b === blocks[0]) updateLetterHero();
         saveDraft();
       }
       linkApply.addEventListener('click', () => {
@@ -3905,6 +3957,18 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     deck.textContent = letter.deck || '';
     cover.append(kicker, title, deck);
 
+    const firstBlock = (blocksArr || [])[0];
+    let heroEl = null;
+    if (firstBlock && firstBlock.link && isImageLink(firstBlock.link)){
+      heroEl = document.createElement('div');
+      heroEl.className = 'letter-hero';
+      const heroImg = document.createElement('img');
+      heroImg.src = firstBlock.link;
+      heroImg.alt = '';
+      heroImg.dataset.focus = '2';
+      heroEl.appendChild(heroImg);
+    }
+
     const stack = document.createElement('div');
     stack.className = 'stack stack-static';
     (blocksArr || []).forEach(b => {
@@ -3921,7 +3985,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       renderLinkChip(block, b);
     });
 
-    frame.append(numEl, cover, stack);
+    if (heroEl) frame.append(numEl, heroEl, cover, stack);
+    else frame.append(numEl, cover, stack);
     return frame;
   }
 
