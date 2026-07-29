@@ -360,13 +360,17 @@ body.focus-mode .letters-track{
   overflow:hidden;
   background:var(--rule-soft);
 }
-.letter-hero img{
+.letter-hero img,
+.letter-hero video{
   width:100%;height:100%;object-fit:cover;object-position:center;
   display:block;filter:saturate(.92) contrast(1.02);
 }
-.letter-hero img[data-focus="1"]{object-position:top}
-.letter-hero img[data-focus="2"]{object-position:center}
-.letter-hero img[data-focus="3"]{object-position:bottom}
+.letter-hero img[data-focus="1"],
+.letter-hero video[data-focus="1"]{object-position:top}
+.letter-hero img[data-focus="2"],
+.letter-hero video[data-focus="2"]{object-position:center}
+.letter-hero img[data-focus="3"],
+.letter-hero video[data-focus="3"]{object-position:bottom}
 .letter-hero::after{
   content:'';position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg, rgba(0,0,0,0) 55%, var(--bg) 100%);
@@ -1075,6 +1079,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   <div class="letter-hero" id="letterHero" style="display:none">
     <img id="letterHeroImg" src="" alt="" data-focus="2">
+    <video id="letterHeroVideo" autoplay muted loop playsinline data-focus="2" style="display:none"></video>
   </div>
 
   <div class="letter-cover" id="letterCover">
@@ -1190,7 +1195,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     switch(id){
 
       case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/FbxpWLhV/DSC08352-1.jpg' }),
+        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/3xrYxxR/ZAX09787.jpg' }),
         B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
         B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
         B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
@@ -1200,7 +1205,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg' }),
+        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/j9vwMpg1/IMG-20200515-231729-042.jpg' }),
         B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
         B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
@@ -1217,7 +1222,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       ];
 
       case 'letter_manifesto': return [
-        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/0jHKxpPZ/vermont-91.jpg' }),
+        B({ text:'Five rules.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/DDFpj6Dm/ZAX03810.jpg' }),
         B({ text:'1. Ship the modular version, not the impressive one.\n2. Accessibility isn\u2019t a phase \u2014 it\u2019s a requirement from wireframe one.\n3. Own discovery through delivery, or don\u2019t call it ownership.\n4. Make the system explain itself, so I\u2019m not the single point of failure.\n5. Say what you mean, and be choice with your words.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
         B({ text:'None of these are aspirational. They\u2019re just what I\u2019ve had to keep re-learning on client-facing work, under a deadline, more than once.', font:'mono', weight:500, size:15, leading:160, fill:55 })
       ];
@@ -1340,6 +1345,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const letterCoverEl = document.getElementById('letterCover');
   const letterHeroEl = document.getElementById('letterHero');
   const letterHeroImgEl = document.getElementById('letterHeroImg');
+  const letterHeroVideoEl = document.getElementById('letterHeroVideo');
   const titleFontWrap = document.getElementById('titleFontWrap');
   const titleSizeCtrl = document.getElementById('titleSizeCtrl');
   const letterDeckEl   = document.getElementById('letterDeck');
@@ -1616,6 +1622,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     catch(e){ pathname = url.split('?')[0].split('#')[0]; }
     return /\.(png|jpe?g|gif|webp|avif|svg|bmp)$/i.test(pathname);
   }
+  function isVideoLink(url){
+    if (!url) return false;
+    let pathname = url;
+    try{ pathname = new URL(url, window.location.href).pathname; }
+    catch(e){ pathname = url.split('?')[0].split('#')[0]; }
+    return /\.(mp4|webm|mov|m4v)$/i.test(pathname);
+  }
   function isImageLink(url){
     if (!url) return false;
     const cached = imageLinkCache.get(url);
@@ -1628,22 +1641,38 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   // show that image as a full-bleed hero above the cover, rather than
   // just an inline preview. Re-evaluated on every render since the
   // first block's link can change as someone writes.
+  function setLetterHero(kind, link){
+    if (kind === 'video'){
+      letterHeroImgEl.style.display = 'none';
+      if (letterHeroVideoEl.dataset.src !== link){
+        letterHeroVideoEl.src = link;
+        letterHeroVideoEl.dataset.src = link;
+      }
+      letterHeroVideoEl.style.display = '';
+      letterHeroVideoEl.play().catch(() => {});
+      letterHeroEl.style.display = '';
+    } else if (kind === 'image'){
+      letterHeroVideoEl.pause();
+      letterHeroVideoEl.style.display = 'none';
+      letterHeroImgEl.src = link;
+      letterHeroImgEl.style.display = '';
+      letterHeroEl.style.display = '';
+    } else {
+      letterHeroVideoEl.pause();
+      letterHeroEl.style.display = 'none';
+    }
+  }
+
   function updateLetterHero(){
     const first = blocks[0];
     const link = first && first.link;
-    if (!link){ letterHeroEl.style.display = 'none'; return; }
-    if (isImageLink(link)){
-      letterHeroImgEl.src = link;
-      letterHeroEl.style.display = '';
-      return;
-    }
-    letterHeroEl.style.display = 'none';
+    if (!link){ setLetterHero(null); return; }
+    if (isVideoLink(link)){ setLetterHero('video', link); return; }
+    if (isImageLink(link)){ setLetterHero('image', link); return; }
+    setLetterHero(null);
     testImageLink(link, (ok) => {
       // only act if this is still the first block's link by the time it resolves
-      if (blocks[0] && blocks[0].link === link && ok){
-        letterHeroImgEl.src = link;
-        letterHeroEl.style.display = '';
-      }
+      if (blocks[0] && blocks[0].link === link && ok) setLetterHero('image', link);
     });
   }
   const imageLinkCache = new Map();
@@ -2400,7 +2429,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       blockStack.appendChild(block);
       renderLinkChip(block, b);
 
-      if (b.link && isImageLink(b.link)){
+      if (b.link && isVideoLink(b.link)){
+        const inlineVideo = document.createElement('video');
+        inlineVideo.className = 'block-inline-image';
+        inlineVideo.src = b.link;
+        inlineVideo.autoplay = true; inlineVideo.muted = true; inlineVideo.loop = true; inlineVideo.playsInline = true;
+        block.appendChild(inlineVideo);
+      } else if (b.link && isImageLink(b.link)){
         const inlineImg = document.createElement('img');
         inlineImg.className = 'block-inline-image';
         inlineImg.src = b.link;
@@ -3979,7 +4014,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
     const firstBlock = (blocksArr || [])[0];
     let heroEl = null;
-    if (firstBlock && firstBlock.link && isImageLink(firstBlock.link)){
+    if (firstBlock && firstBlock.link && isVideoLink(firstBlock.link)){
+      heroEl = document.createElement('div');
+      heroEl.className = 'letter-hero';
+      const heroVideo = document.createElement('video');
+      heroVideo.src = firstBlock.link;
+      heroVideo.autoplay = true; heroVideo.muted = true; heroVideo.loop = true; heroVideo.playsInline = true;
+      heroVideo.dataset.focus = '2';
+      heroEl.appendChild(heroVideo);
+    } else if (firstBlock && firstBlock.link && isImageLink(firstBlock.link)){
       heroEl = document.createElement('div');
       heroEl.className = 'letter-hero';
       const heroImg = document.createElement('img');
