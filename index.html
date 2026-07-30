@@ -378,6 +378,21 @@ body.focus-mode .letters-track{
 }
 @media(min-width:1024px){ .letter-hero{height:44vh;max-height:520px} }
 @media(max-width:640px){ .letter-hero{height:28vh;min-height:160px;margin-bottom:20px} }
+.hero-controls{
+  position:absolute;bottom:14px;right:14px;z-index:20;
+  display:flex;gap:7px;
+}
+.hero-ctrl-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;padding:0;
+  background:rgba(var(--ink-rgb),.55);color:var(--on-ink);
+  border:none;border-radius:50%;cursor:pointer;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:background .15s ease,transform .15s ease;
+}
+.hero-ctrl-btn:hover,.hero-ctrl-btn:focus-visible{background:rgba(var(--ink-rgb),.85)}
+.hero-ctrl-btn:active{transform:scale(.92)}
+.hero-ctrl-btn svg{display:block;pointer-events:none}
 /* elevation only in light mode — on a dark surface a drop shadow reads
    as a smudge rather than a lift, and the card frame's own border
    already carries enough contrast there */
@@ -1081,6 +1096,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   <div class="letter-hero" id="letterHero" style="display:none">
     <img id="letterHeroImg" src="" alt="" data-focus="2">
     <video id="letterHeroVideo" autoplay muted loop playsinline data-focus="2" style="display:none"></video>
+    <div class="hero-controls" id="heroControls" style="display:none">
+      <button type="button" class="hero-ctrl-btn" id="heroPlayToggle" aria-label="Pause video" title="Pause"></button>
+      <button type="button" class="hero-ctrl-btn" id="heroMuteToggle" aria-label="Unmute video" title="Unmute"></button>
+    </div>
   </div>
 
   <div class="letter-cover" id="letterCover">
@@ -1403,6 +1422,9 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const letterHeroEl = document.getElementById('letterHero');
   const letterHeroImgEl = document.getElementById('letterHeroImg');
   const letterHeroVideoEl = document.getElementById('letterHeroVideo');
+  const heroControlsEl = document.getElementById('heroControls');
+  const heroPlayBtn = document.getElementById('heroPlayToggle');
+  const heroMuteBtn = document.getElementById('heroMuteToggle');
   const titleFontWrap = document.getElementById('titleFontWrap');
   const titleSizeCtrl = document.getElementById('titleSizeCtrl');
   const letterDeckEl   = document.getElementById('letterDeck');
@@ -1704,21 +1726,53 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       if (letterHeroVideoEl.dataset.src !== link){
         letterHeroVideoEl.src = link;
         letterHeroVideoEl.dataset.src = link;
+        letterHeroVideoEl.muted = true; // fresh clip: start muted so autoplay is allowed
       }
       letterHeroVideoEl.style.display = '';
       letterHeroVideoEl.play().catch(() => {});
       letterHeroEl.style.display = '';
+      heroControlsEl.style.display = '';
+      syncHeroControls();
     } else if (kind === 'image'){
       letterHeroVideoEl.pause();
       letterHeroVideoEl.style.display = 'none';
+      heroControlsEl.style.display = 'none';
       letterHeroImgEl.src = link;
       letterHeroImgEl.style.display = '';
       letterHeroEl.style.display = '';
     } else {
       letterHeroVideoEl.pause();
+      heroControlsEl.style.display = 'none';
       letterHeroEl.style.display = 'none';
     }
   }
+
+  // ── hero video controls: play/pause + mute/unmute ──
+  const PLAY_ICON = '<svg viewBox="0 0 10 12" width="10" height="12" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
+  const PAUSE_ICON = '<svg viewBox="0 0 10 12" width="10" height="12" fill="currentColor"><rect x="0" y="0" width="3" height="12"/><rect x="7" y="0" width="3" height="12"/></svg>';
+  const SOUND_ICON = '<svg viewBox="0 0 15 12" width="15" height="12" fill="none" stroke="currentColor"><polygon points="0.5,4 3.5,4 7,1 7,11 3.5,8 0.5,8" fill="currentColor" stroke="none"/><path d="M9.3 3.2c1.3 1.1 1.3 4.5 0 5.6" stroke-width="1.3" stroke-linecap="round"/><path d="M11 1.7c2.4 2 2.4 6.6 0 8.6" stroke-width="1.3" stroke-linecap="round"/></svg>';
+  const MUTE_ICON = '<svg viewBox="0 0 15 12" width="15" height="12" fill="none" stroke="currentColor"><polygon points="0.5,4 3.5,4 7,1 7,11 3.5,8 0.5,8" fill="currentColor" stroke="none"/><line x1="9.5" y1="2.5" x2="14.5" y2="9.5" stroke-width="1.3" stroke-linecap="round"/><line x1="14.5" y1="2.5" x2="9.5" y2="9.5" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
+  function syncHeroControls(){
+    const v = letterHeroVideoEl;
+    heroPlayBtn.innerHTML = v.paused ? PLAY_ICON : PAUSE_ICON;
+    heroPlayBtn.setAttribute('aria-label', v.paused ? 'Play video' : 'Pause video');
+    heroPlayBtn.title = v.paused ? 'Play' : 'Pause';
+    heroMuteBtn.innerHTML = v.muted ? MUTE_ICON : SOUND_ICON;
+    heroMuteBtn.setAttribute('aria-label', v.muted ? 'Unmute video' : 'Mute video');
+    heroMuteBtn.title = v.muted ? 'Unmute' : 'Mute';
+  }
+  heroPlayBtn.addEventListener('click', () => {
+    if (letterHeroVideoEl.paused) letterHeroVideoEl.play().catch(() => {});
+    else letterHeroVideoEl.pause();
+  });
+  heroMuteBtn.addEventListener('click', () => {
+    letterHeroVideoEl.muted = !letterHeroVideoEl.muted;
+    syncHeroControls();
+  });
+  letterHeroVideoEl.addEventListener('play', syncHeroControls);
+  letterHeroVideoEl.addEventListener('pause', syncHeroControls);
+  letterHeroVideoEl.addEventListener('volumechange', syncHeroControls);
 
   function updateLetterHero(){
     const first = blocks[0];
