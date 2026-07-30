@@ -4659,7 +4659,64 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     await persist.trySet('lifeBalanceSeeded', '1', true);
   }
 
+  // ── DEV: reset one or more letters back to their shipped defaults ──
+  // The seed in letterSeedBlocks() only ever fills a letter the FIRST
+  // time it has no saved draft — after that, whatever's in localStorage
+  // wins forever, on purpose, so normal use never clobbers real writing.
+  // That also means editing the seed content in this file does nothing
+  // for a browser that already has a draft saved. This is the escape
+  // hatch: it deletes the saved draft/history/entries for the given
+  // letter(s) so the next load falls through to the current seed again.
+  //
+  // From the browser console:
+  //   resetLetterSeed('work')                         // the six Work letters
+  //   resetLetterSeed('all')                           // every letter this browser has saved
+  //   resetLetterSeed('letter_about')                  // one letter
+  //   resetLetterSeed(['letter_about','letter_impact']) // a specific few
+  //
+  // Or via URL, once: yourfile.html?reset-seed=work
+  // (the param strips itself from the address bar so it only fires once).
+  const WORK_LETTER_IDS = ['letter_about','letter_insight','letter_outlook','letter_manifesto','letter_confessions','letter_impact'];
+
+  async function resetLetterSeed(target){
+    let ids;
+    if (target === 'work') ids = WORK_LETTER_IDS;
+    else if (target === 'all'){
+      const keys = await persist.tryList('letter:');
+      const seen = new Set();
+      keys.forEach(k => { const m = k.match(/^letter:([^:]+):/); if (m) seen.add(m[1]); });
+      ids = Array.from(seen);
+    }
+    else if (Array.isArray(target)) ids = target;
+    else if (typeof target === 'string') ids = target.split(',').map(s => s.trim()).filter(Boolean);
+    else { console.warn('resetLetterSeed: pass \'work\', \'all\', a letter id, or an array of letter ids'); return; }
+
+    for (const id of ids){
+      persist.tryDelete('letter:' + id + ':draft');
+      persist.tryDelete('letter:' + id + ':historySeeded');
+      const entryKeys = await persist.tryList('letter:' + id + ':entries:');
+      entryKeys.forEach(k => persist.tryDelete(k));
+    }
+    console.log('Reset to shipped defaults:', ids);
+    location.reload();
+  }
+  window.resetLetterSeed = resetLetterSeed;
+
+  // Returns true if a reset+reload was kicked off (caller should bail
+  // out of the rest of init, since the page is about to reload anyway).
+  async function maybeHandleResetSeedParam(){
+    const params = new URLSearchParams(location.search);
+    const val = params.get('reset-seed');
+    if (!val) return false;
+    params.delete('reset-seed');
+    const rest = params.toString();
+    history.replaceState(null, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
+    await resetLetterSeed(val);
+    return true;
+  }
+
   async function initApp(){
+    if (await maybeHandleResetSeedParam()) return;
     categories = await loadCategories();
     await seedLifeAndBalanceOnce();
     await seedUnsortedOnce();
