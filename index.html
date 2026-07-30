@@ -130,8 +130,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .theme-toggle[aria-pressed="true"]{background:var(--ink)}
 
 .save-toast{
-  position:fixed;top:22px;left:50%;z-index:90;
-  transform:translateX(-50%) translateY(-10px);
+  position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 60px);left:50%;z-index:90;
+  transform:translateX(-50%) translateY(10px);
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   background:var(--ink);color:var(--on-ink);padding:8px 18px;border-radius:20px;
   opacity:0;pointer-events:none;
@@ -200,6 +200,30 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 @media(max-width:760px){
   .hud-suffix{display:none}
+}
+/* ── mobile HUD: on a narrow phone, the write-mode toolbar (File / Print
+   / Export / Delete / Save) has more items than fit on one line at a
+   comfortable size. Left to wrap, that produces a lopsided second row —
+   a handful of buttons on top, "Update" stranded alone underneath with
+   the rest of the pill's width sitting empty. Instead, on small screens
+   the row stays single-line and scrolls horizontally within the pill,
+   the same pattern iOS/most mobile toolbars use for overflow actions —
+   so the pill stays one tidy line at its intended height regardless of
+   how many actions are in it. ──*/
+@media(max-width:640px){
+  .hud{
+    max-width:calc(100vw - 24px);
+    gap:8px;
+    padding:7px 10px;
+  }
+  .hud .toolbar-group{
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .hud .toolbar-group::-webkit-scrollbar{display:none}
+  .hud .chrome-link, .hud .chrome-status{flex:none}
 }
 
 /* ══════════════════════════════════════════
@@ -639,7 +663,14 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 /* ── File popover — move a letter into a category (or Unsorted) ── */
 .file-ctrl{position:relative;display:inline-flex}
 .file-popover{width:min(260px, calc(100vw - 60px))}
-.file-popover-list{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow-y:auto}
+/* min-height:0 is load-bearing here: .file-popover-list is a flex item
+   inside .link-popover's column flex layout, and flex items default to
+   min-height:auto, which silently overrides max-height/overflow and lets
+   the list grow to fit every category instead of scrolling — the actual
+   cause of the menu clipping past the bottom of the viewport as more
+   categories are added. max-height is also capped to the viewport now,
+   not just a fixed 260px, so it can't overflow a short window either. */
+.file-popover-list{display:flex;flex-direction:column;gap:2px;min-height:0;max-height:min(260px, 45vh);overflow-y:auto}
 .file-popover-item{
   font-family:var(--chrome-font);font-size:13px;color:var(--ink);
   background:transparent;border:none;text-align:left;padding:8px 10px;border-radius:6px;cursor:pointer;
@@ -5801,6 +5832,12 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     pageMode = mode;
     tabLetters.classList.toggle('active', mode === 'letters');
     tabOverview.classList.toggle('active', mode === 'overview');
+
+    // hiding journalWrap with CSS doesn't stop a <video> inside it from
+    // playing — without this, a letter's mp4 hero (and its audio, if
+    // unmuted) would keep running in the background after navigating
+    // away to Overview or Home
+    if (mode !== 'letters') letterHeroVideoEl.pause();
 
     viewHome.classList.toggle('active', mode === 'home');
     viewHome.style.display = mode === 'home' ? '' : 'none';
