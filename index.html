@@ -130,8 +130,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .theme-toggle[aria-pressed="true"]{background:var(--ink)}
 
 .save-toast{
-  position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 60px);left:50%;z-index:90;
-  transform:translateX(-50%) translateY(10px);
+  position:fixed;top:22px;left:50%;z-index:90;
+  transform:translateX(-50%) translateY(-10px);
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   background:var(--ink);color:var(--on-ink);padding:8px 18px;border-radius:20px;
   opacity:0;pointer-events:none;
@@ -200,30 +200,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 @media(max-width:760px){
   .hud-suffix{display:none}
-}
-/* ── mobile HUD: on a narrow phone, the write-mode toolbar (File / Print
-   / Export / Delete / Save) has more items than fit on one line at a
-   comfortable size. Left to wrap, that produces a lopsided second row —
-   a handful of buttons on top, "Update" stranded alone underneath with
-   the rest of the pill's width sitting empty. Instead, on small screens
-   the row stays single-line and scrolls horizontally within the pill,
-   the same pattern iOS/most mobile toolbars use for overflow actions —
-   so the pill stays one tidy line at its intended height regardless of
-   how many actions are in it. ──*/
-@media(max-width:640px){
-  .hud{
-    max-width:calc(100vw - 24px);
-    gap:8px;
-    padding:7px 10px;
-  }
-  .hud .toolbar-group{
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  .hud .toolbar-group::-webkit-scrollbar{display:none}
-  .hud .chrome-link, .hud .chrome-status{flex:none}
 }
 
 /* ══════════════════════════════════════════
@@ -663,14 +639,7 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 /* ── File popover — move a letter into a category (or Unsorted) ── */
 .file-ctrl{position:relative;display:inline-flex}
 .file-popover{width:min(260px, calc(100vw - 60px))}
-/* min-height:0 is load-bearing here: .file-popover-list is a flex item
-   inside .link-popover's column flex layout, and flex items default to
-   min-height:auto, which silently overrides max-height/overflow and lets
-   the list grow to fit every category instead of scrolling — the actual
-   cause of the menu clipping past the bottom of the viewport as more
-   categories are added. max-height is also capped to the viewport now,
-   not just a fixed 260px, so it can't overflow a short window either. */
-.file-popover-list{display:flex;flex-direction:column;gap:2px;min-height:0;max-height:min(260px, 45vh);overflow-y:auto}
+.file-popover-list{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow-y:auto}
 .file-popover-item{
   font-family:var(--chrome-font);font-size:13px;color:var(--ink);
   background:transparent;border:none;text-align:left;padding:8px 10px;border-radius:6px;cursor:pointer;
@@ -1189,11 +1158,43 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   </div>
 </div>
 
-<script type="application/json" id="latest-export-data">
-{
+<script>
+(function(){
+  'use strict';
+
+  const FONTS = [
+    { id:'jakarta',    label:'Jakarta Sans',   family:"'Plus Jakarta Sans', sans-serif" },
+    { id:'fraunces',   label:'Fraunces',       family:"'Fraunces', serif" },
+    { id:'grotesk',    label:'Space Grotesk',  family:"'Space Grotesk', sans-serif" },
+    { id:'bricolage',  label:'Bricolage',      family:"'Bricolage Grotesque', sans-serif" },
+    { id:'newsreader', label:'Newsreader',     family:"'Newsreader', serif" },
+    { id:'shoulders',  label:'Big Shoulders',  family:"'Big Shoulders Display', sans-serif" },
+    { id:'mono',       label:'Plex Mono',      family:"'IBM Plex Mono', monospace" }
+  ];
+  const WEIGHTS = [
+    { v:200, label:'Thin' },
+    { v:300, label:'Light' },
+    { v:400, label:'Regular' },
+    { v:500, label:'Medium' },
+    { v:600, label:'Semibold' },
+    { v:700, label:'Bold' },
+    { v:800, label:'Black' }
+  ];
+
+  function defaultBlock(overrides){
+    return Object.assign({
+      text:'', font:'jakarta', weight:700, italic:false,
+      size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:''
+    }, overrides || {});
+  }
+  function openingBlock(){
+    return defaultBlock({ font:'newsreader', weight:300, size:33, leading:100 });
+  }
+
+  const SEED_JOURNAL = {
   "app": "journal",
   "kind": "journal-full",
-  "exportedAt": "2026-07-31T00:03:46.207Z",
+  "exportedAt": "2026-07-31T00:25:40.688Z",
   "categories": [
     {
       "id": "category_journal",
@@ -2761,6 +2762,11 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
           "id": "letter_1785456066877_time",
           "title": "time",
           "deck": ""
+        },
+        {
+          "id": "letter_nothing_else_matters",
+          "title": "Nothing Else Matters",
+          "deck": ""
         }
       ],
       "letters": {
@@ -2841,6 +2847,27 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
                 "layout": "single",
                 "list": "none",
                 "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/pinkfloyd-parkbenchjam_comp_v1%20(540p).mp4"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        },
+        "letter_nothing_else_matters": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
               }
             ],
             "editingEntryId": null
@@ -3073,7 +3100,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
                 "fill": 0,
                 "layout": "single",
                 "list": "none",
-                "link": ""
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
               }
             ],
             "editingEntryId": "entry_1785451801293"
@@ -3093,7 +3120,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
                   "fill": 0,
                   "layout": "single",
                   "list": "none",
-                  "link": ""
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
                 }
               ],
               "createdAt": "2026-07-30T22:50:01.293Z"
@@ -3135,209 +3162,47 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
     }
   }
-}
-</script>
+};
 
-<script>
-(function(){
-  'use strict';
-
-  const FONTS = [
-    { id:'jakarta',    label:'Jakarta Sans',   family:"'Plus Jakarta Sans', sans-serif" },
-    { id:'fraunces',   label:'Fraunces',       family:"'Fraunces', serif" },
-    { id:'grotesk',    label:'Space Grotesk',  family:"'Space Grotesk', sans-serif" },
-    { id:'bricolage',  label:'Bricolage',      family:"'Bricolage Grotesque', sans-serif" },
-    { id:'newsreader', label:'Newsreader',     family:"'Newsreader', serif" },
-    { id:'shoulders',  label:'Big Shoulders',  family:"'Big Shoulders Display', sans-serif" },
-    { id:'mono',       label:'Plex Mono',      family:"'IBM Plex Mono', monospace" }
-  ];
-  const WEIGHTS = [
-    { v:200, label:'Thin' },
-    { v:300, label:'Light' },
-    { v:400, label:'Regular' },
-    { v:500, label:'Medium' },
-    { v:600, label:'Semibold' },
-    { v:700, label:'Bold' },
-    { v:800, label:'Black' }
-  ];
-
-  function defaultBlock(overrides){
-    return Object.assign({
-      text:'', font:'jakarta', weight:700, italic:false,
-      size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:''
-    }, overrides || {});
-  }
-  function openingBlock(){
-    return defaultBlock({ font:'newsreader', weight:300, size:33, leading:100 });
-  }
 
   // ── the six letters this journal starts with. Purely a starting
   // point — every field here is editable, and whole letters can be
   // added or removed from here on.
   function defaultRoster(){
-    return [
-      { id:'letter_about',       title:'About',       deck:'Who I am, what I actually do, and why the r\u00e9sum\u00e9 undersells it.' },
-      { id:'letter_insight',     title:'Insight',     deck:'The moments that actually taught me something \u2014 none of which ever made it into a case study.' },
-      { id:'letter_outlook',     title:'Outlook',     deck:'Where this job is headed, and what\u2019s actually worth worrying about.' },
-      { id:'letter_manifesto',   title:'Manifesto',   deck:'Five rules I keep even when nobody\u2019s checking.' },
-      { id:'letter_confessions', title:'Confessions', deck:'A few admissions, format optional.' },
-      { id:'letter_impact',      title:'Impact',      deck:'Four engagements, six balance sheets, one UX practice \u2014 audited against the public record.' }
-    ];
+    const bundle = SEED_JOURNAL.data['category_journal'];
+    const src = (bundle && Array.isArray(bundle.roster)) ? bundle.roster : [];
+    return src.map(l => ({ id: l.id, title: l.title || '', deck: l.deck || '' }));
   }
 
-  // ── first-run content for the six default letters, drafted from the
-  // resume the person uploaded. This is a starting draft, not a final
-  // copy — every word of it is a normal passage, editable the same way
-  // as anything typed by hand. Only used the first time a letter has
-  // no saved draft yet; never overwrites anything already written.
+  // ── first-run content, sourced from SEED_JOURNAL (the journal
+  // export baked into this file as the shipped default). Only used
+  // the first time a letter has no saved draft/entries yet; never
+  // overwrites anything already written.
+  function findSeedLetterBundle(id){
+    const data = SEED_JOURNAL.data;
+    for (const catId in data){
+      const bundle = data[catId];
+      if (bundle && bundle.letters && bundle.letters[id]) return bundle.letters[id];
+    }
+    return null;
+  }
   function letterSeedBlocks(id){
-    const B = defaultBlock;
-    switch(id){
-
-      case 'letter_about': return [
-        B({ text:'No B.S.', font:'jakarta', weight:800, size:80, tracking:-8, leading:98, fill:0, link:'https://i.ibb.co/F4cQHTFF/DSC09310.jpg' }),
-        B({ text:'Staff UX & Product Designer \u00b7 Wolfgang & Co. \u00b7 PHI/NYC', font:'mono', weight:600, size:15, leading:150, fill:45 }),
-        B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who enjoys converting complex concepts into codified behavioural heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
-        B({ text:'In plain terms, craft & taste applied to E-commerce and SaaS stuff. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
-        B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
-        B({ text:'*psst \u2014 I wrote this, not Chat.', font:'mono', weight:500, italic:true, size:14, leading:150, fill:60 }),
-        B({ text:'Expertise', font:'mono', weight:700, size:11, tracking:16, leading:150, fill:45 }),
-        B({ text:'Enterprise UX \u00b7 Navigation Systems\nDesign Systems \u00b7 E-Commerce\nAI-Fluent \u00b7 Code-Native\nAccessible Design \u00b7 Video \u00b7 Photography', font:'mono', weight:500, size:14, leading:165, fill:35, list:'bullet' }),
-        B({ text:'Contact', font:'mono', weight:700, size:11, tracking:16, leading:150, fill:45 }),
-        B({ text:'linkedin.com/in/zackgort \u00b7 zack.cx', font:'mono', weight:500, size:16, leading:150, fill:45, link:'https://zack.cx' }),
-        B({ text:'Career Timeline', font:'mono', weight:700, size:11, tracking:16, leading:150, fill:45 }),
-        B({ text:'1. 2022\u20132023 \u00b7 Publicis Sapient \u2014 BNY Mellon / Pershing X \u2014 Principal UX Lead on the Direct Indexing workstream at Pershing X. De facto Team Lead and Product Owner. Led research, discovery, client workshops, cross-track collaboration, and junior designer mentorship. Contract extension secured. Product shipped and is live.\n2. 2021 \u00b7 Elva Design Group \u2014 GNC, Shopify Plus \u2014 Principal UX Designer owning discovery and research on a Shopify Plus redesign under extreme timeline pressure with exceptional expectations \u2014 and total creative freedom. GNC went from bankruptcy to $500M/year in revenue within five years of launch.\n3. 2021 \u00b7 Code & Theory \u2014 TikTok For Business \u2014 Senior UX Designer / Acting ACD serving content strategy and headless CMS platform architecture to a newly formed business initiative from ByteDance.\n4. 2021 \u00b7 Huge \u2014 UX Designer (Contract) \u2014 Contributing information architecture and user flow prototypes and studies.\n5. 2020\u20132021 \u00b7 PFSweb, LiveArea \u2014 UX Manager \u2014 UX Manager across enterprise retail accounts: Hardinge, Simpson Strong-Tie, Aquasana, Yeti, West Marine.\n6. 2018\u20132020 \u00b7 FlightPath {PHI~NYC} \u2014 Pharma & Philanthropy \u2014 Merck, Vetsulin, pharma and philanthropic: Dana Foundation.\n7. 2017\u201318 \u00b7 WebLinc / Workarea \u2014 SaaS E-Commerce \u2014 Agile/scrum dev-shop. SaaS e-commerce platform. UX writer and designer embedded in product development.\n8. 2016\u201317 \u00b7 O3 World \u2014 WOVN iOS \u2014 Agile/scrum dev-shop. iOS product design for WOVN.\n9. 2014\u201316 \u00b7 160over90 \u2014 .EDU & Brand \u2014 Embedded interactive designer and creative conduit across all agency branches. .EDU-focused: Kent State, UW-Madison, Comcast.\n10. 2011\u201314 \u00b7 Leadnomics \u2014 Design by Data \u2014 Lead generation, finance, health. Design-by-data culture at an early-stage startup.\n11. 2007\u201311 \u00b7 Turn5 / Bootstrap Startup: E-commerce \u2014 Email and display ad marketing, UI and UX for multi-vertical e-commerce, product photography, catalog, packaging, print.', font:'mono', weight:500, size:13, leading:170, fill:35, list:'number' })
-      ];
-
-      case 'letter_insight': return [
-        B({ text:'Off the record.', font:'jakarta', weight:800, size:70, tracking:26, leading:100, fill:0, link:'https://i.ibb.co/Vc4F4vfT/ZAX09994.jpg' }),
-        B({ text:'01 \u2014 \u2026going off the rails on a crazy train', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'\u2026going off the rails on a crazy train \u2014 four months at Phenom, watching a platform\u2019s marketing, sales, and product data live in three unmapped silos, and realizing the redesign was the easy part.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
-        B({ text:'02 \u2014 From Phenom to Phugazi', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'From Phenom to Phugazi \u2014 the gap between what a role is pitched as and what it turns out to be, and how fast you can tell the difference once you\u2019re actually inside the data.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
-        B({ text:'03 \u2014 Heartrate: 160/90', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'Heartrate: 160/90 \u2014 running full-spectrum Salesforce Commerce Cloud builds across a project lifecycle while also owning the strategy conversation. Something in that math was always going to run hot.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
-        B({ text:'04 \u2014 Bootstrap Startup', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'Bootstrap Startup \u2014 five years inside Turn5, doing whatever the day needed: product photography one morning, an email campaign that afternoon, packaging by the end of the week. Nobody called it UX. It was the job anyway.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
-        B({ text:'05 \u2014 The Early Days', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'The Early Days \u2014 Comcast, Kent State, the Philadelphia Eagles: full-service interaction design before anyone on the team called it that, learning IA and ADA compliance the hard way, client by client.', font:'newsreader', weight:500, size:23, leading:155, fill:15 }),
-        B({ text:'(the rest of this one\u2019s still being written.)', font:'mono', weight:500, italic:true, size:14, leading:150, fill:60 })
-      ];
-
-      case 'letter_outlook': return [
-        B({ text:'Still Shipping.', font:'jakarta', weight:800, size:64, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/hqCtdrS/ZAX02263.jpg' }),
-        B({ text:'01 \u2014 What AI Actually Took', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'AI didn\u2019t replace my job. It replaced the parts of my job I was quietly resentful of anyway \u2014 the fifteenth spacing audit, the eleventh naming debate.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
-        B({ text:'02 \u2014 What\u2019s Left', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'What\u2019s left is the part machines are bad at: reading a room, protecting a relationship, knowing when \u201cno\u201d actually means \u201cnot yet.\u201d', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
-        B({ text:'03 \u2014 The Bet', font:'jakarta', weight:700, italic:true, size:17, leading:150, fill:10 }),
-        B({ text:'My bet for the next few years: designers who can direct systems win. Designers who can only operate them don\u2019t.', font:'newsreader', weight:500, size:24, leading:155, fill:15 }),
-        B({ text:'*psst \u2014 I already automated the boring half of this bio.', font:'mono', weight:500, italic:true, size:14, leading:150, fill:60 })
-      ];
-
-      case 'letter_manifesto': return [
-        B({ text:'The Doctrine.', font:'jakarta', weight:800, size:84, tracking:-8, leading:96, fill:0, link:'https://i.ibb.co/0jHKxpPZ/vermont-91.jpg' }),
-        B({ text:'1. Don\u2019t be an asshole.\n2. Defend the user.\n3. Design for intent, not outcomes.\n4. Only offer three anecdotes in a single serving.\n5. Stand in. Step up. Step forward.', font:'jakarta', weight:700, size:30, leading:145, fill:0, list:'number' }),
-        B({ text:'*psst \u2014 rule six is \u201cdon\u2019t publish a manifesto,\u201d and yet.', font:'mono', weight:500, italic:true, size:14, leading:150, fill:60 })
-      ];
-
-      case 'letter_confessions': return [
-        B({ text:'Never Have I Ever.', font:'jakarta', weight:900, size:70, tracking:-6, leading:100, fill:0, link:'https://i.ibb.co/gMDT38J5/IMG-20200527-221611-475.jpg' }),
-        B({ text:'Never have I ever missed a deadline.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
-        B({ text:'Like, ever.', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
-        B({ text:'Never have I ever gotten a speeding ticket.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
-        B({ text:'In fact, two of the three times I\u2019ve ever been pulled over, I pulled myself over.', font:'jakarta', weight:500, size:18, leading:150, fill:40 }),
-        B({ text:'Never have I ever taken a full 30 minutes for lunch.', font:'fraunces', weight:500, italic:true, size:24, leading:150, fill:15 }),
-        B({ text:'Except at Whole Foods, working the produce department, where I ate my microwaveable standing next to the clock-in machine.', font:'jakarta', weight:500, size:18, leading:150, fill:40 })
-      ];
-
-      case 'letter_impact': return [
-        B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:56, tracking:-4, leading:102, fill:0, link:'https://i.ibb.co/gbn5tBf5/ZAX01304.jpg' }),
-        B({ text:'FORM UX-10 \u00b7 GENERAL DISTRIBUTION \u00b7 NDA-SAFE CONTENT ONLY', font:'mono', weight:700, size:11, tracking:10, leading:150, fill:45 }),
-        B({ text:'Four engagements, six balance sheets, one UX practice \u2014 audited against the public record. What the business was doing while the work was shipping.', font:'fraunces', weight:500, italic:true, size:21, leading:150, fill:20 }),
-        B({ text:'Subject \u2014 Zack Gort\nPeriod covered \u2014 2020\u20132023\nFiled \u2014 July 18, 2026\nStatus \u2014 Compiled from public filings, press releases & industry estimates', font:'mono', weight:500, size:13, leading:180, fill:45, list:'bullet' }),
-        B({ text:'A note on the numbers. Every figure below traces back to a 10-K, an earnings release, a court filing, or a named industry estimate \u2014 not a portfolio brag sheet. Where a brand doesn\u2019t report standalone financials (a subsidiary, a private company, a division of a much bigger private parent), that\u2019s stated plainly instead of papered over. Estimates are labeled as estimates.', font:'jakarta', weight:500, size:18, leading:160, fill:30 }),
-
-        B({ text:'Exhibit A \u2014 Enterprise Retail Portfolio', font:'jakarta', weight:800, size:26, tracking:-4, leading:120, fill:5 }),
-        B({ text:'UX Manager \u00b7 PFSweb / LiveArea \u00b7 Filed 2020\u20132021', font:'mono', weight:600, size:12, leading:150, fill:45 }),
-        B({ text:'One role, three accounts running in parallel \u2014 a ground-up B2B commerce rebuild for Hardinge, anchoring a book that also carried Simpson Strong-Tie and Aquasana.', font:'fraunces', weight:500, size:21, leading:155, fill:20 }),
-        B({ text:'HDNG \u00b7 Hardinge Inc. \u2014 \u25bc Liquidated 2024', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'\u201cHardly / broke a sweat.\u201d', font:'fraunces', weight:500, italic:true, size:20, leading:150, fill:10 }),
-        B({ text:'A zero-to-one Salesforce Commerce Cloud build for a 130-year-old precision machine tool maker, delivered under board-level scrutiny. Weeks after this engagement closed, Hardinge acquired the German manufacturer J.G. Weisser S\u00f6hne \u2014 the growth chapter this platform was built to support.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'Reported ~$330M in annual revenue at the time of its July 2024 Chapter 11 filing, triggered when Chinese regulators blocked the planned sale of Hardinge\u2019s China unit. Sold to Centre Lane Partners in September 2024; the original entity was liquidated effective Dec 31, 2024. The platform shipped during Hardinge\u2019s expansion phase \u2014 the collapse came three years later, for reasons entirely outside the work itself.', font:'mono', weight:500, size:13, leading:170, fill:45 }),
-        B({ text:'SSD \u00b7 Simpson Strong-Tie \u2014 \u25b2 +42% net sales since \u201921', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'Structural-connector manufacturer, parent Simpson Manufacturing (NYSE: SSD). Net sales climbed from roughly $1.6B in 2021 to $2.2B+ every year since, closing 2025 with 4.5% growth and a 19.6% operating margin \u2014 in a housing market the CEO himself called challenging.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'AOS \u00b7 Aquasana \u2014 Folded into parent', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'Aquasana hasn\u2019t reported standalone numbers since A.O. Smith (NYSE: AOS) acquired it in 2016. What\u2019s verifiable: the parent kept doubling down on the category this work sat in \u2014 acquiring Impact Water Products in 2024 and Pureit from Unilever for roughly $125M later that year.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'Certified role of record for this exhibit, per engagement filing.', font:'mono', weight:500, italic:true, size:12, leading:150, fill:55 }),
-
-        B({ text:'Exhibit B \u2014 GNC, Shopify Plus Redesign', font:'jakarta', weight:800, size:26, tracking:-4, leading:120, fill:5 }),
-        B({ text:'Lead UX Designer \u00b7 Elva Design Group \u00b7 Filed 2021', font:'mono', weight:600, size:12, leading:150, fill:45 }),
-        B({ text:'GNC \u00b7 General Nutrition Centers \u2014 Private since 2020', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'\u201cthis is / the whey\u201d', font:'fraunces', weight:500, italic:true, size:20, leading:150, fill:10 }),
-        B({ text:'One year removed from a Chapter 11 filing and a $770M sale to Harbin Pharmaceutical, GNC needed a storefront that read like a fresh start, not a survivor. A mobile-first navigation rebuild, designed bold enough to feel like a genuine rebrand \u2014 every decision here was carrying real weight, because there wasn\u2019t much room left to get it wrong.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'GNC has filed no public financials since the 2020 bankruptcy sale, so there\u2019s no independently verifiable post-2021 revenue figure to cite here \u2014 treat any specific number you\u2019ve seen elsewhere as unconfirmed until GNC or Harbin discloses one. What is on the record: the pre-bankruptcy slide this redesign was reacting against (2018 revenue of $2.35B falling to $2.07B in 2019), and a company that, by the time this work shipped, had every incentive to prove the fall was over.', font:'mono', weight:500, size:13, leading:170, fill:45 }),
-
-        B({ text:'Exhibit C \u2014 TikTok For Business', font:'jakarta', weight:800, size:26, tracking:-4, leading:120, fill:5 }),
-        B({ text:'Senior UX Designer / Acting ACD \u00b7 Code & Theory \u00b7 Filed 2021', font:'mono', weight:600, size:12, leading:150, fill:45 }),
-        B({ text:'BDNCE \u00b7 ByteDance (parent) \u2014 \u25b2 Private \u00b7 ~$186B rev. est. \u201925', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'Content strategy and headless CMS architecture for a brand-new ByteDance initiative \u2014 building the infrastructure for a business unit before the platform\u2019s advertiser base had scaled into the number it would become.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'ByteDance doesn\u2019t publish audited financials, so every figure here is an industry estimate. What\u2019s directionally consistent across sources: TikTok\u2019s global ad revenue roughly tripled to over $11B the year after this initiative launched, then kept compounding toward a projected $33\u2013$35B by 2025 \u2014 with ByteDance overall closing in on an estimated $186B in total 2025 revenue, within striking distance of Meta.', font:'mono', weight:500, size:13, leading:170, fill:45 }),
-
-        B({ text:'Exhibit D \u2014 BNY Mellon, Pershing X \u2192 Wove', font:'jakarta', weight:800, size:26, tracking:-4, leading:120, fill:5 }),
-        B({ text:'Principal UX Lead \u00b7 Publicis Sapient \u00b7 Filed 2022\u20132023', font:'mono', weight:600, size:12, leading:150, fill:45 }),
-        B({ text:'BK \u00b7 BNY (parent) \u2014 \u25b2 $20.08B total rev. FY\u201925', font:'mono', weight:700, size:14, leading:150, fill:10 }),
-        B({ text:'The zero-to-one work behind Wove', font:'fraunces', weight:500, italic:true, size:20, leading:150, fill:10 }),
-        B({ text:'Joined as the zero-to-one thinker on the Direct Indexing workstream for what became Wove \u2014 BNY\u2019s integrated wealth-management platform for financial advisors. De facto team lead and product owner; the contract was extended, and the product shipped and is live today.', font:'fraunces', weight:500, size:20, leading:155, fill:20 }),
-        B({ text:'Timing matters here: Pershing X, the unit behind Wove, was only stood up in late 2021 \u2014 meaning this engagement sat at the platform\u2019s literal founding, not a mature, already-proven product. Wove itself didn\u2019t publicly launch until June 2023. For scale, BNY\u2019s Investment & Wealth Management segment alone posted $854M in Q4 2025 revenue, inside a firm that closed all of 2025 with $20.08B in total revenue and $5.58B in net income.', font:'mono', weight:500, size:13, leading:170, fill:45 }),
-        B({ text:'Shipped & live. Contract extension secured mid-engagement.', font:'mono', weight:500, italic:true, size:12, leading:150, fill:55 }),
-
-        B({ text:'Item 15 \u2014 Sources & Exhibits Referenced', font:'jakarta', weight:800, size:22, tracking:-2, leading:120, fill:5 }),
-        B({ text:'1. Simpson Manufacturing Co., Inc. \u2014 Q4 & FY2025 earnings release; FY2021\u20132024 earnings releases (ir.simpsonmfg.com)\n2. A. O. Smith Corp. \u2014 FY2025 Form 10-K & 10-Q (sec.gov); Aquasana acquisition release, 2016 (prnewswire.com)\n3. Hardinge Inc. \u2014 Chapter 11 filing summary & disclosure statement, 2024 (Kroll Restructuring); Wikipedia entry; Metalworking News, Sept. 2024\n4. GNC Holdings, Inc. \u2014 2018\u20132020 Form 10-K / 8-K filings (sec.gov); Harbin Pharmaceutical acquisition coverage, 2020 (Franchise Times, BeautyMatter)\n5. ByteDance / TikTok \u2014 Bloomberg, \u201cTikTok Owner ByteDance on Track for $50 Billion Profit in 2025,\u201d Dec. 2025; eMarketer, June 2025; eMarketer/Statista ad revenue estimates, 2025\n6. The Bank of New York Mellon Corp. (BNY) \u2014 Q3 & Q4 2025 earnings releases and FY2025 Annual Report (bny.com); Pershing X / Wove launch releases, 2023\u20132024', font:'mono', weight:500, size:12, leading:175, fill:40, list:'number' }),
-        B({ text:'\u2014 compiled against the public record, not the press release \u2014', font:'mono', weight:500, italic:true, size:12, leading:150, fill:55 }),
-
-        B({ text:'Clients: BNY Mellon \u00b7 TikTok \u00b7 GNC \u00b7 Merck \u00b7 Comcast \u00b7 Kent State \u00b7 Philadelphia Eagles\nIndustries: Financial Services \u00b7 Social/Advertising \u00b7 Retail \u00b7 Pharma \u00b7 Higher Ed \u00b7 Sports/Entertainment', font:'mono', weight:500, size:14, leading:170, fill:45, list:'bullet' })
-      ];
-
-      default: return null;
+    const lb = findSeedLetterBundle(id);
+    if (lb && lb.draft && Array.isArray(lb.draft.blocks) && lb.draft.blocks.length){
+      return lb.draft.blocks.map(b => defaultBlock(b));
     }
+    return null;
   }
 
-  // ── one seeded History entry for a couple of letters, so that layer
-  // of the app has real content too — a genuine earlier snapshot (fewer
-  // roles on the timeline, because those later roles hadn't happened
-  // yet), not a fabricated one. Only applied the first time a letter
-  // has zero saved entries; deleting it afterward is permanent.
+  // ── seeded History entries, likewise sourced from SEED_JOURNAL. Only
+  // applied the first time a letter has zero saved entries; deleting
+  // it afterward is permanent.
   function letterHistorySeed(id){
-    const B = defaultBlock;
-    switch(id){
-
-      case 'letter_about': return [{
-        createdAt: '2023-06-01T00:00:00.000Z',
-        blocks: [
-          B({ text:'No B.S.', font:'jakarta', weight:800, size:52, tracking:-8, leading:98, fill:0 }),
-          B({ text:'Art-school \u201cstop-out\u201d (not drop-out) who converts complex concepts into codified behavioral heuristics \u2014 vis-\u00e0-vis design & data.', font:'fraunces', weight:500, size:26, leading:145, fill:20 }),
-          B({ text:'In plain terms: craft and taste applied to e-commerce and SaaS. #fintech #salesforce #shopify #saas #b2b #b2c #consumer', font:'jakarta', weight:500, size:22, leading:150, fill:40 }),
-          B({ text:'If you think that\u2019s vague, welcome to my world as a UX designer.', font:'jakarta', weight:600, italic:true, size:22, leading:150, fill:10 }),
-          B({ text:'Recently \u2014 Senior UX Designer, Publicis Sapient. Interim Product Owner on BNY Mellon\u2019s Direct Indexing platform; centralized a sprawling product ecosystem into one modular, scalable design system.', font:'jakarta', weight:500, size:21, leading:150, fill:20 }),
-          B({ text:'1. 2022\u20132023 \u00b7 Publicis Sapient \u2014 Senior UX Designer, BNY Mellon\n2. 2021\u20132022 \u00b7 Code & Theory \u2014 Senior Interaction Designer, TikTok For Business\n3. 2021 \u00b7 Elva Design Group \u2014 Senior UX Designer, GNC\n4. 2021 \u00b7 HUGE Inc. \u2014 Senior UX Designer, Sentral Lifestyle Apartments\n5. 2020\u20132021 \u00b7 PFSweb LiveArea \u2014 Manager, UX\n6. 2018\u20132020 \u00b7 FlightPath \u2014 Senior UX Designer, Merck / Goya / Charter', font:'mono', weight:500, size:14, leading:165, fill:35, list:'number' }),
-          B({ text:'linkedin.com/in/zackgort \u00b7 zack.cx', font:'mono', weight:500, size:16, leading:150, fill:45, link:'https://zack.cx' })
-        ]
-      }];
-
-      case 'letter_impact': return [{
-        createdAt: '2022-07-15T00:00:00.000Z',
-        blocks: [
-          B({ text:'Audited against the public record.', font:'jakarta', weight:800, size:52, tracking:-4, leading:102, fill:0 }),
-          B({ text:'GNC \u00b7 TikTok For Business', font:'mono', weight:600, size:15, leading:150, fill:45 }),
-          B({ text:'TikTok For Business \u2014 Code & Theory, 2021\u20132022. Senior Interaction Designer running IA and headless-CMS workshops for a brand-new ByteDance initiative; progressed Senior Designer \u2192 ACD \u2192 Directly Responsible Individual on a fast-growing platform.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
-          B({ text:'GNC \u2014 Elva Design Group, 2021. Senior UX Designer owning discovery through delivery on a mobile-first, component-based Shopify redesign \u2014 shipped in twelve weeks.', font:'fraunces', weight:500, size:23, leading:150, fill:15 }),
-          B({ text:'Clients: TikTok \u00b7 GNC\nIndustries: Social/Advertising \u00b7 Retail', font:'mono', weight:500, size:14, leading:170, fill:45, list:'bullet' })
-        ]
-      }];
-
-      default: return [];
+    const lb = findSeedLetterBundle(id);
+    if (lb && Array.isArray(lb.entries)){
+      return lb.entries.map(e => ({ createdAt: e.createdAt, blocks: (e.blocks || []).map(b => defaultBlock(b)) }));
     }
+    return [];
   }
 
   let blocks = [ openingBlock() ];       // the ACTIVE letter's live passages
@@ -5253,7 +5118,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // ── CATEGORIES (the top-level grid) ──
   function defaultCategories(){
-    return [ { id:'category_journal', title:'Work', deck:'Resume, in your own words.' } ];
+    const cat = SEED_JOURNAL.categories.find(c => c.id === 'category_journal') || SEED_JOURNAL.categories[0];
+    return [ { id: cat.id, title: cat.title, deck: cat.deck } ];
   }
   async function loadCategories(){
     const res = await persist.tryGet('categories');
@@ -5884,12 +5750,6 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     pageMode = mode;
     tabLetters.classList.toggle('active', mode === 'letters');
     tabOverview.classList.toggle('active', mode === 'overview');
-
-    // hiding journalWrap with CSS doesn't stop a <video> inside it from
-    // playing — without this, a letter's mp4 hero (and its audio, if
-    // unmuted) would keep running in the background after navigating
-    // away to Overview or Home
-    if (mode !== 'letters') letterHeroVideoEl.pause();
 
     viewHome.classList.toggle('active', mode === 'home');
     viewHome.style.display = mode === 'home' ? '' : 'none';
@@ -6546,158 +6406,41 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   // ── INIT ──
 
-  // ── one-time seed: a new 'Ventilation' category with two real pieces
-  // the user exported from an earlier version of this tool. Runs at
-  // most once, guarded by a flag, regardless of whether this browser
-  // already has other categories from earlier sessions.
-  async function seedVentilationOnce(){
-    const already = await persist.tryGet('ventilationSeeded');
+  // ── one-time seed: populate every category/letter/entry from
+  // SEED_JOURNAL (the journal export baked into this file as the
+  // shipped default). Runs at most once, guarded by a flag, and only
+  // ever fills in categories/rosters that don't already exist ──
+  // per-letter draft/entry content is filled in lazily elsewhere, via
+  // letterSeedBlocks()/letterHistorySeed(), the first time each letter
+  // is actually opened.
+  async function seedAllFromJournal(){
+    const already = await persist.tryGet('journalDataSeeded');
     if (already) return;
 
-    const B = defaultBlock;
-  const ODYSSEY_BLOCKS = [
-    B({ text:'I have an opinion on Nolan\'s \'The Odyssey\'.', font:'bricolage', weight:800, italic:false, size:52, tracking:-12, leading:100, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'& to preface this: I have no comment regarding the casting, the set pieces, the dialogue, or the overwhelming underutilization of bespoke imax technology in capturing the essence of the mediterranean.', font:'jakarta', weight:800, italic:false, size:21, tracking:-6, leading:108, fill:0, layout:'col2', list:'none', link:'' }),
-    B({ text:'Humbly, I offer just one change from Homer\'s original poem that would improve upon what Nolan was already setting the audience up for.', font:'fraunces', weight:400, italic:true, size:30, tracking:0, leading:115, fill:20, layout:'single', list:'none', link:'' }),
-    B({ text:'Instead of 11 ships getting destroyed at the beginning by happenstance, adapt the narrative such that most of the ships survive before encountering Polyphemus. Now, edit the final fight to just a few minutes, and enjoy the time gifted to the epic itself; granting more screentime to Polyphemus / Cerci / Laestrygonians (the cannibal giants)', font:'grotesk', weight:200, italic:false, size:17, tracking:-30, leading:155, fill:90, layout:'single', list:'none', link:'' }),
-    B({ text:'Imagine, you as Odysseus now have ~1000 men to guide home. Real responsibility, real stakes at scale.', font:'newsreader', weight:500, italic:false, size:54, tracking:0, leading:112, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'Now, our first encounter with Polyphemus adapts Homer\'s original layout to show something visually scaled for the modern era.  More people. More ships. More stakes at greater scale (this is optimized for IMAX, afterall).Let\'s say we lost two ships prior to our arrival at this island. With roughly 150 men per boat, we assume as many as one-thousand mouths to feed — so, it stands to reason that discovering the equivalant of a Costco could setup for some creative cinematic storytelling. Now, as like the original poem, Odysseus and his entourage continue as expected, trapped in the cave with their eye-poking and sheep shenanigans … but perhaps we bring in the "nobody" hook in an imaginative way — Picture the soldiers steathily attempting a rescue, and whenever the cyclops nearly detects them, he yells "who\'s there?!", wherein the soldiers whisper en masse "nobody"  —  eventually building up the sense that Polyphemus has lost his mind.Then, as they escape safely to their ships, a captain quips to Odysseus about their clever "nobody" ploy, to which Odysseus steals the credit and exclaims "but it wasn\'t nobody who blinded that beast, it was I, Odysseus, king of Ithaca" (or something like that)& although quite some distance a way, Polyphemus hears this and rages out, successfully sinking a few ships in a blind fit of fury. ', font:'newsreader', weight:400, italic:false, size:27, tracking:-30, leading:134, fill:75, layout:'single', list:'none', link:'' }),
-    B({ text:'Now, imagine we are Cerci, and we adjust the story so that Odysseus\' nine remaining boats are nine boats-worth of mouths we have to feed.Also, we are evil & vindictive, and we made a few ships-worth of stew.', font:'newsreader', weight:500, italic:false, size:32, tracking:0, leading:145, fill:55, layout:'single', list:'none', link:'' }),
-    B({ text:'Eight ships. Well, the whirlpool of death "ate" one of them, so now we are left with seven; when suddenly, a six-something Scylia takes out six ships, not just six men.', font:'jakarta', weight:800, italic:false, size:34, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'Two boats left. That\'s three-hundred men, give or take.  And since the Laestrygonians decided to show up in their Sunday best(you know, the cannibal giants Homer wrote about, now outfitted with Nolan\'s shiny new armor), Well, we let us enjoy a battle worthy of epic proportion, with real loss through terror, turmoil, and trajedy — rather than an expensive Monty Python "run away!" skit.', font:'newsreader', weight:400, italic:false, size:30, tracking:0, leading:140, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'Then, Matt Damon yells "Let\'s go!" as the camera pans with him, but revealing that he\'s now running alone in an super high resolution foggy field shot exclusively on IMAX.', font:'jakarta', weight:800, italic:false, size:34, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'None of this is my actual opinion; I assumed my own creative liberties, same as Nolan (the academy award-winning s-tier professional). It was a solid movie created under incredible constraints. I personally was hoping for more visual spectacle in terms of scale. ', font:'mono', weight:600, italic:false, size:15, tracking:0, leading:140, fill:40, layout:'single', list:'none', link:'' }),
-    B({ text:'DISCLAIMER: I am writing all of this simply for the sake of writing, and to create content for an idea that I am developing. The main idea is that I write better when in a particular headspace; so in writing, how can I position myself to achieve that? Visually, I was chasing "sympathetic cognition through typographic cues" (I wrote that on the fly, btw), which is to say writing this disclaimer using this font, with this weight, is giving me a unique ability to control the literal shape of my words. ', font:'shoulders', weight:200, italic:false, size:20, tracking:0, leading:130, fill:0, layout:'single', list:'none', link:'' }),
-  ];
-  const STATED_BLOCKS = [
-    B({ text:'Stated — as expressed.', font:'bricolage', weight:800, italic:true, size:52, tracking:-10, leading:96, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'Not just in prose, but in presentation.', font:'mono', weight:200, italic:false, size:25, tracking:-6, leading:104, fill:0, layout:'single', list:'none', link:'' }),
-    B({ text:'Let this interface serve as an exploration into human intent, where prose takes precedence over  pixel perfection. Where the shape of your thoughts is decided by the presence of your written words — btw, I am hand-writing all of this copy just to stress-test the system I am building. This entire thing is an exercise in restraint under constraint, creating a hueristic system while allowing content to typographically convey emotional or intellectual register.', font:'grotesk', weight:400, italic:false, size:18, tracking:0, leading:150, fill:70, layout:'col2', list:'none', link:'' }),
-    B({ text:'1. Where form is a result of function.\n2. Where shape influences thought.', font:'newsreader', weight:600, italic:false, size:52, tracking:0, leading:135, fill:0, layout:'single', list:'number', link:'https://zack.cx' }),
-    B({ text:'• They say a \'photo is worth a thousand words\' … frankly, we say "f*ck that". Say what you mean, and be choice with your f*cking words. {pardon my french, btw}', font:'shoulders', weight:700, italic:false, size:33, tracking:0, leading:120, fill:0, layout:'single', list:'bullet', link:'https://i.ibb.co/MDw7nWfZ/greenpoint.webp' }),
-    B({ text:'"write more by writing less." — zack.cx', font:'mono', weight:600, italic:true, size:29, tracking:0, leading:130, fill:35, layout:'single', list:'none', link:'https://zack.cx' }),
-  ];
-  const MISADVENTURE_BLOCKS = [
-    B({ text:'Christopher Nolan\'s The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn\'t a dialogue-driven chamber piece. It\'s a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It\'s a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon\'t tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread\u2014rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we\'re gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus\' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer\'s epic isn\'t memorable because Odysseus visits remarkable places. It\'s memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world \u2014 like, I literally exclaimed "hey, that\'s Charlize!" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ', font:'newsreader', weight:300, italic:false, size:33, tracking:0, leading:135, fill:0, layout:'single', list:'none', link:'' })
-  ];
-
-    const catId = 'category_ventilation';
-    if (!categories.some(c => c.id === catId)){
-      categories.push({ id: catId, title: 'Ventilation', deck: 'Where the professional filter comes off.' });
-      saveCategories();
-    }
-
-    const existingRoster = await loadRosterFor(catId);
-    if (existingRoster.length === 0){
-      const odysseyId = 'letter_odyssey_seed';
-      const statedId = 'letter_stated_seed';
-      const misadventureId = 'letter_misadventure_seed';
-      await saveRosterFor(catId, [
-        { id: odysseyId, title: 'I have an opinion on Nolan\'s The Odyssey', deck: '' },
-        { id: statedId, title: 'Stated — as expressed', deck: '' },
-        { id: misadventureId, title: 'Nolan lost his way.', deck: 'An actual critique.' }
-      ]);
-      await persist.trySet('letter:' + odysseyId + ':draft', JSON.stringify({ blocks: ODYSSEY_BLOCKS, editingEntryId: null }), true);
-      await persist.trySet('letter:' + statedId + ':draft', JSON.stringify({ blocks: STATED_BLOCKS, editingEntryId: null }), true);
-      await persist.trySet('letter:' + misadventureId + ':draft', JSON.stringify({ blocks: MISADVENTURE_BLOCKS, editingEntryId: null }), true);
-    }
-
-    await persist.trySet('ventilationSeeded', '1', true);
-  }
-
-  async function seedUnsortedOnce(){
-    const already = await persist.tryGet('unsortedSeeded');
-    if (already) return;
-
-    const existingRoster = await loadRosterFor(UNSORTED_ID);
-    if (existingRoster.length === 0){
-      const blankId = 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-      await saveRosterFor(UNSORTED_ID, [{ id: blankId, title: '', deck: '' }]);
-    }
-
-    await persist.trySet('unsortedSeeded', '1', true);
-  }
-
-  async function seedLifeAndBalanceOnce(){
-    const already = await persist.tryGet('lifeBalanceSeeded');
-    if (already) return;
-
-    const B = defaultBlock;
-    const catLifeId = 'category_life';
-    const catBalanceId = 'category_balance';
-
-    // ── Life ──
-    const phillyId = 'letter_philly_special';
-    const nycId = 'letter_nyc_experience';
-    const earlyId = 'letter_life_early_days';
-    const academiaId = 'letter_academia';
-
-    const PHILLY_BLOCKS = [
-      B({ text:'From Greater Philadelphia to the epicenter of Center City', font:'newsreader', weight:300, size:33, leading:100 }),
-      B({ text:'Actually quite a thrilling journey.  There\u2019s the impetus of many design paradigms that I was independently learning, building & solutioning [sic] for (Twitter Bootstrap/Responsive Design, Sketch rather than Photoshop, and some exciting CSS/JS updates) that completely changed how websites were built.', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'Notice how I said "built", and not "designed"', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'My point is, knowing how something is built, can be built, what breaks it, and what is broken, is essential in understanding how to shape business intent toward logically, systematically, and defensibly achieve desired outcomes.', font:'jakarta', weight:400, size:38, leading:130 }),
-      B({ text:'for what it\u2019s worth, I wrote that in a pure flow state; not sure if it is entirely coherent, but it was not written  by chat.  \n\nFor what it\u2019s worth, I am primarily just testing my own platform by writing off the top of my head rather than default to lorem ipsum, or worse, waste water using robots. ', font:'mono', weight:400, size:10, leading:130 }),
-      B({ font:'jakarta', weight:700, size:20, leading:130 })
-    ];
-
-    // three pieces the user sealed — their live draft is blank (sealing
-    // always clears the surface), but the actual writing lives in the
-    // one history entry each already has
-    const NYC_ENTRY_BLOCKS = [
-      B({ text:'this will be a long letter.  lots of pics though, some mp4s too.  quality content, i wager.', font:'newsreader', weight:300, size:33, leading:100 })
-    ];
-    const EARLY_ENTRY_BLOCKS = [
-      B({ text:'The early days...', font:'newsreader', weight:300, size:33, leading:100 })
-    ];
-    const ACADEMIA_ENTRY_BLOCKS = [
-      B({ text:'3.8 unweighted, with honors. \n', font:'newsreader', weight:700, size:33, leading:100 }),
-      B({ text:'I applied to only two schools: Carnegie Melon University and Pratt Institute of Art.', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'I was accepted to both, but CMU offered zero scholarship, whereas Pratt offered $8K/year off of my $40,000 tuition bill.', font:'jakarta', weight:400, size:20, leading:130 }),
-      B({ text:'Since mom & dad were footing the bill (arguable), they heavily pressured me to choose Pratt, as it would save them on time and money spent for travel and check-ins/upkeep, and were thrilled that not only was Pratt cheaper, but offering $8K/y in scholarship.\n', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'I cannot express to you how embarrassed I was when my art history professor  learned of my decision.  He had been my number one supporter and had written an incredible recommendation letter that I am sure is the reason I was ultimately accepted).', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'I mean, I was also fucking talented, smart as heck, and full of promise.', font:'jakarta', weight:700, size:20, leading:130 }),
-      B({ text:'...more to come, this was just an exercise in catharis.', font:'jakarta', weight:700, size:20, leading:130 })
-    ];
-
-    const existingLifeRoster = await loadRosterFor(catLifeId);
-    if (existingLifeRoster.length === 0){
-      await saveRosterFor(catLifeId, [
-        { id: phillyId, title: 'The Philly Special', deck: 'Start-ups to jump-starting my career from the Philly \u2018burbs, to commuting into the center city hustle & bustle, to top-floor views over Independence Hall.' },
-        { id: nycId, title: 'New York City Experience', deck: '' },
-        { id: earlyId, title: 'The Early Days', deck: 'Construction / Retail / Pirated Software' },
-        { id: academiaId, title: 'Academia', deck: '' }
-      ]);
-      await persist.trySet('letter:' + phillyId + ':draft', JSON.stringify({ blocks: PHILLY_BLOCKS, editingEntryId: null }), true);
-      await persist.trySet('letter:' + phillyId + ':entries:entry_philly_seed', JSON.stringify({ id:'entry_philly_seed', blocks: PHILLY_BLOCKS, createdAt:'2026-07-26T23:30:11.261Z' }), true);
-
-      await persist.trySet('letter:' + nycId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
-      await persist.trySet('letter:' + nycId + ':entries:entry_nyc_seed', JSON.stringify({ id:'entry_nyc_seed', blocks: NYC_ENTRY_BLOCKS, createdAt:'2026-07-26T23:32:36.358Z' }), true);
-
-      await persist.trySet('letter:' + earlyId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
-      await persist.trySet('letter:' + earlyId + ':entries:entry_early_seed', JSON.stringify({ id:'entry_early_seed', blocks: EARLY_ENTRY_BLOCKS, createdAt:'2026-07-26T23:34:42.089Z' }), true);
-
-      await persist.trySet('letter:' + academiaId + ':draft', JSON.stringify({ blocks:[ B({ font:'newsreader', weight:300, size:33, leading:100 }) ], editingEntryId: null }), true);
-      await persist.trySet('letter:' + academiaId + ':entries:entry_academia_seed', JSON.stringify({ id:'entry_academia_seed', blocks: ACADEMIA_ENTRY_BLOCKS, createdAt:'2026-07-26T23:42:29.248Z' }), true);
-    }
-
-    // ── Balance — nothing written yet, just the category itself ──
-    const existingBalanceRoster = await loadRosterFor(catBalanceId);
-    if (existingBalanceRoster.length === 0){
-      const blankId = 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-      await saveRosterFor(catBalanceId, [{ id: blankId, title:'', deck:'' }]);
-    }
-
-    if (!categories.find(c => c.id === catLifeId || (c.title || '').trim().toLowerCase() === 'life')){
-      categories.push({ id: catLifeId, title:'Life', deck:'' });
-    }
-    if (!categories.find(c => c.id === catBalanceId || (c.title || '').trim().toLowerCase() === 'balance')){
-      categories.push({ id: catBalanceId, title:'Balance', deck:'' });
+    for (const cat of SEED_JOURNAL.categories){
+      if (!categories.find(c => c.id === cat.id)){
+        categories.push({ id: cat.id, title: cat.title || '', deck: cat.deck || '' });
+      }
+      const bundle = SEED_JOURNAL.data[cat.id];
+      if (!bundle || !Array.isArray(bundle.roster) || !bundle.roster.length) continue;
+      const existingRoster = await loadRosterFor(cat.id);
+      if (existingRoster.length === 0){
+        await saveRosterFor(cat.id, bundle.roster.map(l => ({ id: l.id, title: l.title || '', deck: l.deck || '' })));
+      }
     }
     saveCategories();
 
-    await persist.trySet('lifeBalanceSeeded', '1', true);
+    const unsortedBundle = SEED_JOURNAL.data[UNSORTED_ID];
+    if (unsortedBundle && Array.isArray(unsortedBundle.roster) && unsortedBundle.roster.length){
+      const existingUnsorted = await loadRosterFor(UNSORTED_ID);
+      if (existingUnsorted.length === 0){
+        await saveRosterFor(UNSORTED_ID, unsortedBundle.roster.map(l => ({ id: l.id, title: l.title || '', deck: l.deck || '' })));
+      }
+    }
+
+    await persist.trySet('journalDataSeeded', '1', true);
   }
+
 
   // ── DEV: reset one or more letters back to their shipped defaults ──
   // The seed in letterSeedBlocks() only ever fills a letter the FIRST
@@ -6755,75 +6498,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     return true;
   }
 
-  // ── LATEST EXPORT SWAP-IN ──
-  // Whenever this file was regenerated from a fresh journal-full export,
-  // the raw export JSON is embedded in the page (see the
-  // #latest-export-data <script type="application/json"> tag above). On
-  // first load with that particular export, every bit of storage this
-  // page reads from — categories, rosters, letter drafts, letter
-  // entries — is wiped and rewritten to match that export exactly. This
-  // is a genuine full swap: nothing from an older snapshot survives
-  // alongside it, unlike the Import menu action, which only ever adds
-  // new categories/letters next to what's already there.
-  // Gated by the export's own `exportedAt` timestamp, so this only
-  // fires once per distinct export: normal edits made afterward, in the
-  // browser, are left alone on subsequent loads of the same file/export.
-  async function applyLatestExportIfNew(){
-    const el = document.getElementById('latest-export-data');
-    if (!el) return;
-    let payload;
-    try{ payload = JSON.parse(el.textContent); }catch(e){ return; }
-    if (!payload || payload.kind !== 'journal-full' || !Array.isArray(payload.categories)) return;
-
-    const versionKey = 'latestExportApplied';
-    const version = payload.exportedAt || 'unknown';
-    const already = await persist.tryGet(versionKey);
-    if (already && already.value === version) return;
-
-    // full wipe of everything this app has ever written, so nothing
-    // from a prior snapshot (or the old hardcoded first-run seeds)
-    // lingers alongside the swapped-in data
-    const allKeys = await persist.tryList('');
-    for (const k of allKeys) persist.tryDelete(k);
-
-    await persist.trySet('categories', JSON.stringify(payload.categories), true);
-
-    for (const catId of Object.keys(payload.data || {})){
-      const bundle = payload.data[catId] || { roster:[], letters:{} };
-      const roster_ = Array.isArray(bundle.roster) ? bundle.roster : [];
-      await persist.trySet('category:' + catId + ':roster', JSON.stringify(roster_), true);
-      for (const l of roster_){
-        const lb = (bundle.letters && bundle.letters[l.id]) || { draft:{ blocks:[openingBlock()], editingEntryId:null }, entries:[] };
-        const draft = lb.draft && Array.isArray(lb.draft.blocks) && lb.draft.blocks.length
-          ? lb.draft
-          : { blocks:[openingBlock()], editingEntryId:null };
-        await persist.trySet('letter:' + l.id + ':draft', JSON.stringify(draft), true);
-        for (const entry of (lb.entries || [])){
-          await persist.trySet('letter:' + l.id + ':entries:' + entry.id, JSON.stringify(entry), true);
-        }
-        // prevents the old hardcoded default-history fallback from
-        // backfilling a letter that's genuinely meant to have zero
-        // sealed entries in this export
-        await persist.trySet('letter:' + l.id + ':historySeeded', '1', true);
-      }
-    }
-
-    // this export's data already covers everything the old first-run
-    // seed helpers exist to provide — mark them all done so they no-op
-    await persist.trySet('ventilationSeeded', '1', true);
-    await persist.trySet('unsortedSeeded', '1', true);
-    await persist.trySet('lifeBalanceSeeded', '1', true);
-
-    await persist.trySet(versionKey, version, true);
-  }
-
   async function initApp(){
     if (await maybeHandleResetSeedParam()) return;
-    await applyLatestExportIfNew();
     categories = await loadCategories();
-    await seedLifeAndBalanceOnce();
-    await seedUnsortedOnce();
-    await seedVentilationOnce();
+    await seedAllFromJournal();
     lastCategoryId = categories[0].id;
     activeCategoryId = UNSORTED_ID;
     roster = await dedupeUnsortedRoster(await loadRosterFor(UNSORTED_ID));
