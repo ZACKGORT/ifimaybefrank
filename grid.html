@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bento,</title>
+<link rel="icon" type="image/png" href="https://ifimaybefrank.com/favicon-96x96-dark.png" sizes="96x96">
+<link rel="icon" type="image/svg+xml" href="https://ifimaybefrank.com/favicon-dark.svg">
+<link rel="shortcut icon" href="https://ifimaybefrank.com/favicon-dark.ico">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  scrollbar-width:thin;
+  scrollbar-color:var(--surface-border-soft) transparent;
+  --bar-h:52px;
+  --bg:#ffffff;
+  --ink:#111111;
+  --rule:#e6e6e4;
+  --muted:#8a8a86;
+  --on-ink:#ffffff;
+  --surface:#ffffff;
+  --surface-border:#d5d5d1;
+  --surface-border-soft:#c7c7c3;
+  --shadow:rgba(0,0,0,.13);
+  --accent:#7A3324;
+  --chrome-font:'Plus Jakarta Sans',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+html[data-theme="dark"]{
+  --bg:#121212;
+  --ink:#f1f0ea;
+  --rule:#2c2c29;
+  --muted:#93938d;
+  --on-ink:#111111;
+  --surface:#1a1a18;
+  --surface-border:#3a3a36;
+  --surface-border-soft:#4a4a45;
+  --shadow:rgba(0,0,0,.5);
+  --accent:#c96a4c;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webkit-font-smoothing:antialiased}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background-color:var(--surface-border-soft);border-radius:999px}
+
+/* ── top bar ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:40;height:var(--bar-h);
+  display:flex;align-items:center;gap:18px;
+  padding:0 clamp(14px,9px+1.2vw,22px);
+  background:var(--surface);border-bottom:1px solid var(--rule);
+}
+.brand{
+  font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:16px;color:var(--ink);
+  flex:none;letter-spacing:-0.01em;
+}
+.brand em{color:var(--muted);font-style:italic}
+.focus-tabs{display:flex;align-items:center;gap:4px;flex:none}
+.focus-tab{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 11px;border-radius:20px;background:none;border:1px solid var(--rule);color:var(--muted);
+  cursor:pointer;transition:color .15s,background .15s,border-color .15s;white-space:nowrap;
+}
+.focus-tab:hover{color:var(--ink);border-color:var(--surface-border-soft)}
+.focus-tab.active{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px;flex:none}
+.chrome-link{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  background:none;border:none;color:var(--ink);cursor:pointer;padding:2px 0;
+  border-bottom:1px solid transparent;transition:border-color .15s,opacity .15s;
+}
+.chrome-link:hover{border-bottom-color:var(--ink)}
+.theme-toggle{
+  width:14px;height:14px;border-radius:50%;flex:none;
+  border:1.5px solid var(--ink);background:transparent;padding:0;cursor:pointer;
+  transition:background .2s ease;
+}
+.theme-toggle[aria-pressed="true"]{background:var(--ink)}
+@media(max-width:640px){
+  .focus-tab span{display:none}
+  .topbar{gap:10px;padding:0 12px}
+}
+
+/* ── grid wrap ── */
+.grid-wrap{
+  position:fixed;top:var(--bar-h);left:0;right:0;bottom:0;
+  display:grid;
+  grid-template-areas:"a b" "c d";
+  gap:1px;background:var(--rule);
+}
+.grid-wrap.animate{transition:grid-template-columns .55s cubic-bezier(.16,1,.3,1),grid-template-rows .55s cubic-bezier(.16,1,.3,1)}
+.pane{
+  background:var(--bg);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;position:relative;
+}
+.pane[data-id="a"]{grid-area:a}
+.pane[data-id="b"]{grid-area:b}
+.pane[data-id="c"]{grid-area:c}
+.pane[data-id="d"]{grid-area:d}
+.pane-head{
+  flex:none;height:30px;display:flex;align-items:center;gap:8px;
+  padding:0 12px;border-bottom:1px solid var(--rule);
+}
+.pane-dot{width:6px;height:6px;border-radius:50%;background:var(--surface-border-soft);flex:none}
+.pane-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.pane-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
+.pane-btn{
+  background:none;border:none;color:var(--muted);cursor:pointer;padding:2px;line-height:0;
+  transition:color .15s;
+}
+.pane-btn:hover{color:var(--ink)}
+.pane-frame-wrap{flex:1;min-height:0;position:relative}
+.pane iframe{width:100%;height:100%;border:none;display:block;background:var(--surface)}
+.pane-fallback{
+  position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:var(--surface);text-align:center;padding:20px;
+}
+.pane-fallback.show{display:flex}
+.pane-fallback p{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.03em;max-width:220px}
+.pane-fallback a{font-family:var(--mono);font-size:10.5px;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+/* ── splitters ── */
+.split{position:absolute;z-index:20;background:transparent}
+.split-v{top:0;bottom:0;width:9px;cursor:col-resize;transform:translateX(-50%)}
+.split-h{left:0;right:0;height:9px;cursor:row-resize;transform:translateY(-50%)}
+.split-x{width:22px;height:22px;cursor:move;transform:translate(-50%,-50%);z-index:21;border-radius:50%}
+.split::after{content:"";position:absolute;background:var(--rule);transition:background .15s}
+.split-v::after{top:0;bottom:0;left:50%;width:1px;transform:translateX(-50%)}
+.split-h::after{left:0;right:0;top:50%;height:1px;transform:translateY(-50%)}
+.split-x::after{inset:0;border-radius:50%;background:var(--surface);border:1px solid var(--surface-border-soft)}
+.split:hover::after,.split.dragging::after{background:var(--ink)}
+.split-x:hover::after,.split-x.dragging::after{background:var(--ink);border-color:var(--ink)}
+
+.brand-mark{
+  position:fixed;bottom:14px;left:16px;z-index:50;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:12px;
+  color:var(--muted);opacity:.32;transition:opacity .2s ease;pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">bento<em>,</em></div>
+  <div class="focus-tabs" id="focusTabs">
+    <button class="focus-tab" data-target="a">a · <span>zack.cx</span></button>
+    <button class="focus-tab" data-target="b">b · <span>ifimaybefrank</span></button>
+    <button class="focus-tab" data-target="c">c · <span>emdash.click</span></button>
+    <button class="focus-tab" data-target="d">d · <span>neverever.land</span></button>
+  </div>
+  <div class="topbar-right">
+    <button class="chrome-link" id="resetBtn">Reset</button>
+    <button class="theme-toggle" id="themeToggle" aria-pressed="true" title="Toggle theme"></button>
+  </div>
+</div>
+
+<div class="grid-wrap" id="gridWrap">
+
+  <div class="pane" data-id="a">
+    <div class="pane-head">
+      <span class="pane-dot"></span>
+      <span class="pane-label">zack.cx</span>
+      <div class="pane-actions">
+        <button class="pane-btn" data-focus="a" title="Focus this pane">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 4V1h3M10 4V1H7M1 7v3h3M10 7v3H7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="pane-btn" href="https://zack.cx" target="_blank" rel="noopener" title="Open in new tab">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M4.5 1.5H1.5V9.5H9.5V6.5M6.5 1.5H9.5V4.5M9.5 1.5L4.75 6.25" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="pane-frame-wrap">
+      <iframe src="https://zack.cx" loading="lazy" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
+      <div class="pane-fallback"><p>This may not allow embedding.</p><a href="https://zack.cx" target="_blank" rel="noopener">open zack.cx ↗</a></div>
+    </div>
+  </div>
+
+  <div class="pane" data-id="b">
+    <div class="pane-head">
+      <span class="pane-dot"></span>
+      <span class="pane-label">ifimaybefrank.com</span>
+      <div class="pane-actions">
+        <button class="pane-btn" data-focus="b" title="Focus this pane">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 4V1h3M10 4V1H7M1 7v3h3M10 7v3H7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="pane-btn" href="https://ifimaybefrank.com" target="_blank" rel="noopener" title="Open in new tab">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M4.5 1.5H1.5V9.5H9.5V6.5M6.5 1.5H9.5V4.5M9.5 1.5L4.75 6.25" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="pane-frame-wrap">
+      <iframe src="https://ifimaybefrank.com" loading="lazy" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
+      <div class="pane-fallback"><p>This may not allow embedding.</p><a href="https://ifimaybefrank.com" target="_blank" rel="noopener">open ifimaybefrank.com ↗</a></div>
+    </div>
+  </div>
+
+  <div class="pane" data-id="c">
+    <div class="pane-head">
+      <span class="pane-dot"></span>
+      <span class="pane-label">emdash.click</span>
+      <div class="pane-actions">
+        <button class="pane-btn" data-focus="c" title="Focus this pane">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 4V1h3M10 4V1H7M1 7v3h3M10 7v3H7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="pane-btn" href="https://emdash.click" target="_blank" rel="noopener" title="Open in new tab">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M4.5 1.5H1.5V9.5H9.5V6.5M6.5 1.5H9.5V4.5M9.5 1.5L4.75 6.25" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="pane-frame-wrap">
+      <iframe src="https://emdash.click" loading="lazy" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
+      <div class="pane-fallback"><p>This may not allow embedding.</p><a href="https://emdash.click" target="_blank" rel="noopener">open emdash.click ↗</a></div>
+    </div>
+  </div>
+
+  <div class="pane" data-id="d">
+    <div class="pane-head">
+      <span class="pane-dot"></span>
+      <span class="pane-label">neverever.land</span>
+      <div class="pane-actions">
+        <button class="pane-btn" data-focus="d" title="Focus this pane">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M1 4V1h3M10 4V1H7M1 7v3h3M10 7v3H7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="pane-btn" href="https://neverever.land" target="_blank" rel="noopener" title="Open in new tab">
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M4.5 1.5H1.5V9.5H9.5V6.5M6.5 1.5H9.5V4.5M9.5 1.5L4.75 6.25" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="pane-frame-wrap">
+      <iframe src="https://neverever.land" loading="lazy" referrerpolicy="no-referrer-when-downgrade" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
+      <div class="pane-fallback"><p>This may not allow embedding.</p><a href="https://neverever.land" target="_blank" rel="noopener">open neverever.land ↗</a></div>
+    </div>
+  </div>
+
+  <div class="split split-v" id="splitV"></div>
+  <div class="split split-h" id="splitH"></div>
+  <div class="split split-x" id="splitX"></div>
+</div>
+
+<div class="brand-mark">bento<em>,</em> — a wolfgang &amp; co. thing</div>
+
+<script>
+(function(){
+  const wrap = document.getElementById('gridWrap');
+  const splitV = document.getElementById('splitV');
+  const splitH = document.getElementById('splitH');
+  const splitX = document.getElementById('splitX');
+  const MIN = 14, MAX = 86;
+
+  let col = 50, row = 50; // percentages
+
+  function apply(){
+    wrap.style.gridTemplateColumns = col + '% ' + (100 - col) + '%';
+    wrap.style.gridTemplateRows = row + '% ' + (100 - row) + '%';
+    splitV.style.left = col + '%';
+    splitH.style.top = row + '%';
+    splitX.style.left = col + '%';
+    splitX.style.top = row + '%';
+  }
+
+  function clamp(v){ return Math.min(MAX, Math.max(MIN, v)); }
+
+  function withAnimation(fn){
+    wrap.classList.add('animate');
+    fn();
+    window.setTimeout(() => wrap.classList.remove('animate'), 600);
+  }
+
+  function focusPane(id){
+    const big = 76, small = 24;
+    withAnimation(() => {
+      if (id === 'a'){ col = big; row = big; }
+      else if (id === 'b'){ col = small; row = big; }
+      else if (id === 'c'){ col = big; row = small; }
+      else if (id === 'd'){ col = small; row = small; }
+      apply();
+    });
+    document.querySelectorAll('.focus-tab').forEach(t => t.classList.toggle('active', t.dataset.target === id));
+  }
+
+  document.querySelectorAll('[data-focus]').forEach(btn => {
+    btn.addEventListener('click', () => focusPane(btn.dataset.focus));
+  });
+  document.querySelectorAll('.focus-tab').forEach(tab => {
+    tab.addEventListener('click', () => focusPane(tab.dataset.target));
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    withAnimation(() => { col = 50; row = 50; apply(); });
+    document.querySelectorAll('.focus-tab').forEach(t => t.classList.remove('active'));
+  });
+
+  // ── drag handling ──
+  function startDrag(mode, handleEl){
+    return function(e){
+      e.preventDefault();
+      handleEl.classList.add('dragging');
+      document.body.style.userSelect = 'none';
+      const overlays = document.querySelectorAll('.pane-frame-wrap');
+      overlays.forEach(o => o.style.pointerEvents = 'none');
+
+      function move(ev){
+        const pt = ev.touches ? ev.touches[0] : ev;
+        const rect = wrap.getBoundingClientRect();
+        if (mode === 'v' || mode === 'x'){
+          col = clamp(((pt.clientX - rect.left) / rect.width) * 100);
+        }
+        if (mode === 'h' || mode === 'x'){
+          row = clamp(((pt.clientY - rect.top) / rect.height) * 100);
+        }
+        apply();
+      }
+      function up(){
+        handleEl.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        overlays.forEach(o => o.style.pointerEvents = '');
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+      }
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+    };
+  }
+  splitV.addEventListener('pointerdown', startDrag('v', splitV));
+  splitH.addEventListener('pointerdown', startDrag('h', splitH));
+  splitX.addEventListener('pointerdown', startDrag('x', splitX));
+
+  apply();
+
+  // ── blocked-frame fallback detection ──
+  document.querySelectorAll('.pane-frame-wrap').forEach(w => {
+    const iframe = w.querySelector('iframe');
+    const fallback = w.querySelector('.pane-fallback');
+    let loaded = false;
+    iframe.addEventListener('load', () => { loaded = true; });
+    window.setTimeout(() => {
+      // heuristic: if load hasn't fired after 4.5s, the frame is likely blocked
+      if (!loaded) fallback.classList.add('show');
+    }, 4500);
+  });
+
+  // ── theme toggle ──
+  const themeToggle = document.getElementById('themeToggle');
+  function setTheme(dark){
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    themeToggle.setAttribute('aria-pressed', dark ? 'true' : 'false');
+    localStorage.setItem('bento-theme', dark ? 'dark' : 'light');
+  }
+  const saved = localStorage.getItem('bento-theme');
+  setTheme(saved ? saved === 'dark' : true);
+  themeToggle.addEventListener('click', () => {
+    setTheme(document.documentElement.getAttribute('data-theme') !== 'dark');
+  });
+})();
+</script>
+</body>
+</html>
