@@ -680,8 +680,11 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 }
 body.focus-mode .block-inline-image{display:block}
 
+.link-chip-row{
+  display:flex;justify-content:flex-end;
+  margin-bottom:14px;
+}
 .link-chip{
-  position:absolute;top:6px;right:0;z-index:20;
   display:inline-flex;align-items:center;gap:5px;
   font-family:var(--mono);font-size:10px;letter-spacing:.04em;
   background:var(--ink);color:var(--on-ink);
@@ -3739,12 +3742,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   }
 
   function renderLinkChip(blockEl, b){
-    let chip = blockEl.querySelector(':scope > .link-chip');
+    let row = blockEl.querySelector(':scope > .link-chip-row');
+    let chip = row ? row.querySelector(':scope > .link-chip') : null;
     if (!b.link){
-      if (chip) chip.remove();
+      if (row) row.remove();
       return;
     }
-    if (!chip){
+    if (!row){
+      row = document.createElement('div');
+      row.className = 'link-chip-row';
       chip = document.createElement('a');
       chip.className = 'link-chip';
       chip.target = '_blank';
@@ -3755,7 +3761,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       const host = document.createElement('span');
       host.className = 'link-chip-host';
       chip.append(glyph, host);
-      blockEl.appendChild(chip);
+      row.appendChild(chip);
+      blockEl.insertBefore(row, blockEl.firstChild);
     }
     chip.href = b.link;
     chip.querySelector('.link-chip-host').textContent = hostnameFor(b.link);
