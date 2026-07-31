@@ -103,6 +103,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   .site-nav-bar{gap:12px;padding:0 14px}
   .site-nav-crumb{display:none}
   .sub-masthead{height:0;padding:0;overflow:hidden}
+  :root{--crumb-h:0px}
 }
 @media(max-width:520px){
   .site-nav-right .chrome-link:not(.site-nav-linkedin){display:none}
@@ -130,8 +131,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .theme-toggle[aria-pressed="true"]{background:var(--ink)}
 
 .save-toast{
-  position:fixed;top:22px;left:50%;z-index:90;
-  transform:translateX(-50%) translateY(-10px);
+  position:fixed;bottom:22px;left:50%;z-index:90;
+  transform:translateX(-50%) translateY(10px);
   font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   background:var(--ink);color:var(--on-ink);padding:8px 18px;border-radius:20px;
   opacity:0;pointer-events:none;
@@ -200,6 +201,21 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 }
 @media(max-width:760px){
   .hud-suffix{display:none}
+}
+@media(max-width:640px){
+  .hud{
+    left:0;right:0;top:calc(var(--nav-h) + var(--crumb-h));transform:none;
+    width:100%;max-width:100%;
+    border-radius:0;
+    justify-content:stretch;
+    box-sizing:border-box;
+  }
+  body.focus-mode .hud{top:0}
+  .hud #letterActions,
+  .hud .toolbar-group{
+    width:100%;
+    justify-content:space-between;
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -607,14 +623,18 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
 .link-popover{
   position:absolute;top:calc(100% + 10px);left:0;z-index:500;
   width:min(320px, calc(100vw - 60px));
+  max-height:min(70vh, calc(100vh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
+  overflow-y:auto;
   background:var(--surface);border:1px solid var(--rule);border-radius:12px;
   box-shadow:0 16px 40px var(--shadow);
   padding:14px;display:none;flex-direction:column;gap:10px;
+  box-sizing:border-box;
 }
 #importExportPopover{left:auto;right:0}
 .link-popover.open{display:flex}
 .link-popover-label{
   font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  position:sticky;top:0;background:var(--surface);z-index:1;
 }
 .link-popover input[type="url"]{
   width:100%;font-family:var(--chrome-font);font-size:13px;color:var(--ink);
