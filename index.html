@@ -106,7 +106,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
   :root{--crumb-h:0px}
 }
 @media(max-width:520px){
-  .site-nav-right .chrome-link:not(.site-nav-linkedin){display:none}
+  .site-nav-right .chrome-link:not(.site-nav-linkedin):not(.site-nav-support){display:none}
 }
 
 /* ── chrome primitives, shared by the nav bar and the toolbar ── */
@@ -631,6 +631,13 @@ html:not([data-theme="dark"]) .letter-panel.active .letter-card-frame:hover{
   box-sizing:border-box;
 }
 #importExportPopover{left:auto;right:0}
+#supportPopover{left:auto;right:0;width:min(360px, calc(100vw - 60px));padding:12px}
+#supportPopover .link-popover-hint{margin-top:-2px}
+.gfm-embed-wrap{width:100%;min-height:120px;display:flex;align-items:center;justify-content:center}
+.gfm-embed-wrap:empty::before{
+  content:'Loading…';font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--muted);
+}
 .link-popover.open{display:flex}
 .link-popover-label{
   font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
@@ -1016,6 +1023,15 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     <button class="site-nav-tab" id="tabOverview" type="button">Overview</button>
   </div>
   <div class="site-nav-right">
+    <div class="file-ctrl">
+      <button class="chrome-link site-nav-support" id="btnSupport" type="button">Support</button>
+      <div class="link-popover" id="supportPopover">
+        <div class="link-popover-label">Help for Zack</div>
+        <div class="gfm-embed-wrap" id="gfmEmbedWrap">
+          <div class="gfm-embed" data-url="https://www.gofundme.com/f/help-for-zack-g-broke-not-broken-builder-rebuilding/widget/large?attribution_id=sl%3A52989da0-f722-479c-9b28-1819da57eac5"></div>
+        </div>
+      </div>
+    </div>
     <a class="chrome-link site-nav-linkedin" href="https://linkedin.com/in/zackgort" target="_blank" rel="noopener noreferrer">in/zackgort</a>
     <div class="file-ctrl">
       <button class="chrome-link" id="btnImportExport" type="button">Import/Export</button>
@@ -6399,6 +6415,23 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (importExportPopover.classList.contains('open') && !e.target.closest('.file-ctrl')) closeImportExportPopover();
   });
 
+  // ── Support panel — GoFundMe embed ──
+  const btnSupport = document.getElementById('btnSupport');
+  const supportPopover = document.getElementById('supportPopover');
+
+  function closeSupportPopover(){ supportPopover.classList.remove('open'); }
+  function openSupportPopover(){
+    document.querySelectorAll('.link-popover.open, .font-picker-panel.open').forEach(p => { if (p !== supportPopover) p.classList.remove('open'); });
+    supportPopover.classList.add('open');
+  }
+  btnSupport.addEventListener('click', (e) => {
+    e.stopPropagation();
+    supportPopover.classList.contains('open') ? closeSupportPopover() : openSupportPopover();
+  });
+  document.addEventListener('click', (e) => {
+    if (supportPopover.classList.contains('open') && !e.target.closest('.file-ctrl')) closeSupportPopover();
+  });
+
   async function exportWholeJournal(){
     flushDraftNow();
     const payload = { app:'journal', kind:'journal-full', exportedAt: new Date().toISOString(), categories: JSON.parse(JSON.stringify(categories)), data:{} };
@@ -6603,5 +6636,6 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   initApp();
 })();
 </script>
+<script defer src="https://www.gofundme.com/static/js/embed.js"></script>
 </body>
 </html>
