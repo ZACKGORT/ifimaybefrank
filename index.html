@@ -3676,6 +3676,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroEl.style.display = '';
       heroControlsEl.style.display = '';
       syncHeroControls();
+      if (letterHeroVideoEl.readyState >= 1) sizeHeroForMedia();
     } else if (kind === 'image'){
       letterHeroVideoEl.pause();
       letterHeroVideoEl.style.display = 'none';
@@ -3683,12 +3684,39 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroImgEl.src = link;
       letterHeroImgEl.style.display = '';
       letterHeroEl.style.display = '';
+      if (letterHeroImgEl.complete && letterHeroImgEl.naturalWidth) sizeHeroForMedia();
     } else {
       letterHeroVideoEl.pause();
       heroControlsEl.style.display = 'none';
       letterHeroEl.style.display = 'none';
+      letterHeroEl.style.height = '';
     }
   }
+
+  // ── portrait media shouldn't be cropped down to the same short,
+  // landscape-shaped band as everything else — grow the hero to fit
+  // the image/video's own aspect ratio (capped so a very tall shot
+  // still can't swallow the whole viewport). Landscape/square media
+  // is untouched and keeps the fixed CSS heights. ──
+  function sizeHeroForMedia(){
+    if (letterHeroEl.style.display === 'none') return;
+    const isVideoVisible = letterHeroVideoEl.style.display !== 'none';
+    const media = isVideoVisible ? letterHeroVideoEl : letterHeroImgEl;
+    const w = isVideoVisible ? media.videoWidth : media.naturalWidth;
+    const h = isVideoVisible ? media.videoHeight : media.naturalHeight;
+    if (!w || !h || h <= w){ letterHeroEl.style.height = ''; return; }
+    const boxW = letterHeroEl.offsetWidth || window.innerWidth;
+    const cap = window.innerHeight * (window.innerWidth <= 640 ? 0.7 : 0.85);
+    const fitH = boxW * (h / w);
+    letterHeroEl.style.height = Math.min(fitH, cap) + 'px';
+  }
+  letterHeroImgEl.addEventListener('load', sizeHeroForMedia);
+  letterHeroVideoEl.addEventListener('loadedmetadata', sizeHeroForMedia);
+  let heroResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(heroResizeTimer);
+    heroResizeTimer = setTimeout(sizeHeroForMedia, 120);
+  });
 
   // ── hero video controls: play/pause + mute/unmute ──
   const PLAY_ICON = '<svg viewBox="0 0 10 12" width="10" height="12" fill="currentColor"><polygon points="0,0 10,6 0,12"/></svg>';
