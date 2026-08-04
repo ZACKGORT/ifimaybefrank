@@ -6479,88 +6479,75 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       const parsed = JSON.parse(text);
       if (parsed.kind !== 'journal-full' || !Array.isArray(parsed.categories)) throw new Error('unrecognized file shape');
 
-      const normTitle = s => (s || '').trim().toLowerCase();
+      const ok = window.confirm('Importing will replace your entire journal — every category, letter, and version history — with the contents of this file. This can\u2019t be undone. Continue?');
+      if (!ok) return;
 
-      // Imports letters from an incoming roster/letters bundle into rosterList
-      // (an array of {id,title,deck} already persisted under catId). Letters
-      // whose title matches an existing letter in rosterList are overwritten
-      // in place (draft + entries fully replaced, not merged); unmatched
-      // letters are appended as new. Mutates and returns rosterList.
-      async function importLettersInto(catId, incomingRoster, incomingLetters, rosterList){
-        const byTitle = new Map();
-        rosterList.forEach(l => { const t = normTitle(l.title); if (t) byTitle.set(t, l); });
-        let added = 0, updated = 0;
+      flushDraftNow();
+
+      // ── full replace, not merge: the export already contains every
+      // aspect needed to reconstruct the journal exactly, original ids
+      // included, so wipe everything currently stored and rebuild from
+      // the file rather than trying to discern which content is "new".
+      // This also makes re-importing the same file idempotent instead
+      // of piling up duplicates on every run. ──
+      const oldLetterKeys = await persist.tryList('letter:');
+      oldLetterKeys.forEach(k => persist.tryDelete(k));
+      const oldCategoryKeys = await persist.tryList('category:');
+      oldCategoryKeys.forEach(k => persist.tryDelete(k));
+      persist.tryDelete('categories');
+      persist.tryDelete('roster');
+
+      async function writeLetters(catId, incomingRoster, incomingLetters){
+        const newRoster = [];
         for (const l of (incomingRoster || [])){
           const lb = (incomingLetters && incomingLetters[l.id]) || { draft:{ blocks:[openingBlock()], editingEntryId:null }, entries:[] };
-          const t = normTitle(l.title);
-          const match = t ? byTitle.get(t) : null;
-          let targetId;
-          if (match){
-            targetId = match.id;
-            match.title = l.title || '';
-            match.deck = l.deck || '';
-            // full overwrite: clear this letter's existing entries before
-            // writing the imported ones, so stale versions don't linger
-            const oldKeys = await persist.tryList('letter:' + targetId + ':entries:');
-            oldKeys.forEach(k => persist.tryDelete(k));
-            updated++;
-          } else {
-            targetId = 'letter_import_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-            const newLetter = { id:targetId, title: l.title || '', deck: l.deck || '' };
-            rosterList.push(newLetter);
-            if (t) byTitle.set(t, newLetter);
-            added++;
-          }
-          await persist.trySet('letter:' + targetId + ':draft', JSON.stringify(lb.draft || { blocks:[openingBlock()], editingEntryId:null }));
+          newRoster.push({ id: l.id, title: l.title || '', deck: l.deck || '' });
+          await persist.trySet('letter:' + l.id + ':draft', JSON.stringify(lb.draft || { blocks:[openingBlock()], editingEntryId:null }));
           for (const entry of (lb.entries || [])){
-            await persist.trySet('letter:' + targetId + ':entries:' + entry.id, JSON.stringify(entry));
+            await persist.trySet('letter:' + l.id + ':entries:' + entry.id, JSON.stringify(entry));
           }
         }
-        return { added, updated };
+        return newRoster;
       }
 
-      let addedCats = 0, updatedCats = 0, addedLetters = 0, updatedLetters = 0;
+      const newCategories = [];
+      let letterCount = 0;
       for (const cat of parsed.categories){
         const bundle = (parsed.data && parsed.data[cat.id]) || { roster:[], letters:{} };
-        const t = normTitle(cat.title);
-        const existingCat = t ? categories.find(c => normTitle(c.title) === t) : null;
-        let catId, rosterList;
-        if (existingCat){
-          catId = existingCat.id;
-          existingCat.deck = cat.deck || '';
-          rosterList = (catId === activeCategoryId) ? roster : await loadRosterFor(catId);
-          updatedCats++;
-        } else {
-          catId = 'category_import_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-          rosterList = [];
-          categories.push({ id:catId, title: cat.title || '', deck: cat.deck || '' });
-          addedCats++;
-        }
-        const res = await importLettersInto(catId, bundle.roster, bundle.letters, rosterList);
-        addedLetters += res.added; updatedLetters += res.updated;
-        if (!rosterList.length) rosterList.push({ id:'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' });
-        await saveRosterFor(catId, rosterList);
-        if (catId === activeCategoryId) roster = rosterList;
+        const newRoster = await writeLetters(cat.id, bundle.roster, bundle.letters);
+        letterCount += newRoster.length;
+        await saveRosterFor(cat.id, newRoster.length ? newRoster : [{ id:'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' }]);
+        newCategories.push({ id: cat.id, title: cat.title || '', deck: cat.deck || '' });
       }
+      categories = newCategories;
       saveCategories();
 
-      let addedUnsorted = 0, updatedUnsorted = 0;
       const unsortedBundle = parsed.data && parsed.data[UNSORTED_ID];
-      if (unsortedBundle && Array.isArray(unsortedBundle.roster) && unsortedBundle.roster.length){
-        const currentUnsorted = (activeCategoryId === UNSORTED_ID) ? roster : await loadRosterFor(UNSORTED_ID);
-        const res = await importLettersInto(UNSORTED_ID, unsortedBundle.roster, unsortedBundle.letters, currentUnsorted);
-        addedUnsorted = res.added; updatedUnsorted = res.updated;
-        await saveRosterFor(UNSORTED_ID, currentUnsorted);
-        if (activeCategoryId === UNSORTED_ID) roster = currentUnsorted;
+      const unsortedRoster = unsortedBundle ? await writeLetters(UNSORTED_ID, unsortedBundle.roster, unsortedBundle.letters) : [];
+      letterCount += unsortedRoster.length;
+      await saveRosterFor(UNSORTED_ID, unsortedRoster);
+
+      if (!categories.length){
+        // an export with no named categories still needs somewhere for
+        // Overview to land — fall back to a single empty default rather
+        // than leaving the app with no categories at all
+        categories = defaultCategories();
+        saveCategories();
+        await saveRosterFor(categories[0].id, [{ id:'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' }]);
       }
 
-      const parts = [];
-      if (addedCats) parts.push(addedCats + (addedCats === 1 ? ' category' : ' categories') + ' added');
-      if (updatedCats) parts.push(updatedCats + (updatedCats === 1 ? ' category' : ' categories') + ' overwritten');
-      const addedL = addedLetters + addedUnsorted, updatedL = updatedLetters + updatedUnsorted;
-      if (addedL) parts.push(addedL + (addedL === 1 ? ' letter' : ' letters') + ' added');
-      if (updatedL) parts.push(updatedL + (updatedL === 1 ? ' letter' : ' letters') + ' overwritten');
-      showSaveToast(parts.length ? parts.join(', ') : 'Nothing new to restore');
+      lastCategoryId = categories[0].id;
+      activeCategoryId = UNSORTED_ID;
+      roster = await dedupeUnsortedRoster(await loadRosterFor(UNSORTED_ID));
+      if (roster.length === 0){
+        roster = [{ id: 'letter_' + Date.now() + '_' + Math.random().toString(36).slice(2,7), title:'', deck:'' }];
+        saveRosterFor(UNSORTED_ID, roster);
+      }
+      activeIndex = -1;
+      await renderTrack();
+      await activatePanel(0);
+
+      showSaveToast(categories.length + (categories.length === 1 ? ' category' : ' categories') + ', ' + letterCount + (letterCount === 1 ? ' letter' : ' letters') + ' restored');
       showPageMode('overview');
     }catch(err){
       showSaveToast('Could not read that file');
