@@ -1670,24 +1670,26 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       heroControlsEl.style.display = 'none';
       letterHeroEl.style.display = 'none';
       letterHeroEl.style.height = '';
+      letterHeroEl.style.maxHeight = '';
     }
   }
 
-  // ── portrait media shouldn't be cropped down to the same short,
-  // landscape-shaped band as everything else — grow the hero to fit
-  // the image/video's own aspect ratio (capped so a very tall shot
-  // still can't swallow the whole viewport). Landscape/square media
-  // is untouched and keeps the fixed CSS heights. ──
+  // ── the hero should always show the image/video at its own aspect
+  // ratio, full width, rather than cropping it down to a fixed
+  // landscape-shaped band — so we size the hero's height to match
+  // (capped so a very tall shot still can't swallow the whole
+  // viewport, floored by the CSS min-height for very wide shots). ──
   function sizeHeroForMedia(){
     if (letterHeroEl.style.display === 'none') return;
     const isVideoVisible = letterHeroVideoEl.style.display !== 'none';
     const media = isVideoVisible ? letterHeroVideoEl : letterHeroImgEl;
     const w = isVideoVisible ? media.videoWidth : media.naturalWidth;
     const h = isVideoVisible ? media.videoHeight : media.naturalHeight;
-    if (!w || !h || h <= w){ letterHeroEl.style.height = ''; return; }
+    if (!w || !h){ letterHeroEl.style.height = ''; letterHeroEl.style.maxHeight = ''; return; }
     const boxW = letterHeroEl.offsetWidth || window.innerWidth;
     const cap = window.innerHeight * (window.innerWidth <= 640 ? 0.7 : 0.85);
     const fitH = boxW * (h / w);
+    letterHeroEl.style.maxHeight = 'none'; // CSS max-height (420px/520px) would otherwise clip tall/portrait heroes
     letterHeroEl.style.height = Math.min(fitH, cap) + 'px';
   }
   letterHeroImgEl.addEventListener('load', sizeHeroForMedia);
