@@ -401,6 +401,11 @@ body.focus-mode .letters-track{
   overflow:hidden;
   background:var(--rule-soft);
 }
+/* the live hero's real height depends on its media's aspect ratio,
+   computed async in sizeHeroForMedia() — stay hidden until that's
+   applied so letter-load never flashes the plain-CSS-height (and
+   therefore over-cropped/zoomed) version first. */
+#letterHero{opacity:0;transition:opacity .16s ease;}
 .letter-hero img,
 .letter-hero video{
   width:100%;height:100%;object-fit:cover;object-position:center;
@@ -1682,6 +1687,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroVideoEl.style.display = '';
       letterHeroVideoEl.play().catch(() => {});
       letterHeroEl.style.display = '';
+      letterHeroEl.style.opacity = '0';
       heroControlsEl.style.display = '';
       syncHeroControls();
       if (letterHeroVideoEl.readyState >= 1) sizeHeroForMedia();
@@ -1692,6 +1698,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroImgEl.src = link;
       letterHeroImgEl.style.display = '';
       letterHeroEl.style.display = '';
+      letterHeroEl.style.opacity = '0';
       if (letterHeroImgEl.complete && letterHeroImgEl.naturalWidth) sizeHeroForMedia();
     } else {
       letterHeroVideoEl.pause();
@@ -1699,6 +1706,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroEl.style.display = 'none';
       letterHeroEl.style.height = '';
       letterHeroEl.style.maxHeight = '';
+      letterHeroEl.style.opacity = '0';
     }
   }
 
@@ -1713,12 +1721,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const media = isVideoVisible ? letterHeroVideoEl : letterHeroImgEl;
     const w = isVideoVisible ? media.videoWidth : media.naturalWidth;
     const h = isVideoVisible ? media.videoHeight : media.naturalHeight;
-    if (!w || !h){ letterHeroEl.style.height = ''; letterHeroEl.style.maxHeight = ''; return; }
+    if (!w || !h){ letterHeroEl.style.height = ''; letterHeroEl.style.maxHeight = ''; letterHeroEl.style.opacity = '1'; return; }
     const boxW = letterHeroEl.offsetWidth || window.innerWidth;
     const cap = window.innerHeight * (window.innerWidth <= 640 ? 0.7 : 0.85);
     const fitH = boxW * (h / w);
     letterHeroEl.style.maxHeight = 'none'; // CSS max-height (420px/520px) would otherwise clip tall/portrait heroes
     letterHeroEl.style.height = Math.min(fitH, cap) + 'px';
+    letterHeroEl.style.opacity = '1';
   }
   letterHeroImgEl.addEventListener('load', sizeHeroForMedia);
   letterHeroVideoEl.addEventListener('loadedmetadata', sizeHeroForMedia);
