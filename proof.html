@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>proofsheet — journal preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:ital,wght@0,400..700;1,400..700&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..800&family=Bricolage+Grotesque:wght@400..800&family=Space+Grotesk:wght@400..700&family=Big+Shoulders+Display:wght@400..800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --panel:#131315;
+    --panel-2:#1a1a1d;
+    --line:#26262a;
+    --fg:#f2f0ec;
+    --muted:#8a8a8f;
+    --accent:#e8623f;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- upload screen ---------- */
+  #drop{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:18px;
+    padding:40px;
+    text-align:center;
+  }
+  #drop.hidden{display:none;}
+  #drop h1{
+    font-family:'Fraunces', serif;
+    font-weight:500; font-style:italic;
+    font-size:clamp(28px,5vw,46px);
+    margin:0;
+    color:var(--fg);
+  }
+  #drop p{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--muted);
+    max-width:420px;
+    line-height:1.6;
+    margin:0;
+  }
+  .dropzone{
+    width:min(560px,86vw);
+    border:1px dashed var(--line);
+    border-radius:4px;
+    padding:48px 24px;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover, .dropzone.drag{
+    border-color:var(--accent);
+    background:rgba(232,98,63,0.04);
+  }
+  .dropzone span.label{
+    display:block;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .dropzone span.sub{
+    display:block;
+    margin-top:8px;
+    font-size:15px;
+    color:var(--fg);
+  }
+  #fileInput{display:none;}
+  #err{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent);
+    min-height:16px;
+  }
+
+  /* ---------- app shell ---------- */
+  #app{
+    display:none;
+    height:100vh;
+    grid-template-columns: 260px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  #app.active{display:grid;}
+
+  header.top{
+    grid-column:1 / -1;
+    display:flex; align-items:center; gap:16px;
+    padding:10px 18px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--muted);
+  }
+  header.top .brand{
+    color:var(--fg);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:11px;
+  }
+  header.top .meta{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  header.top button{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:6px 10px;
+    cursor:pointer;
+    transition:color .15s, border-color .15s;
+  }
+  header.top button:hover{color:var(--fg); border-color:var(--fg);}
+
+  nav.side{
+    border-right:1px solid var(--line);
+    background:var(--panel);
+    overflow-y:auto;
+    padding:14px 0 40px;
+  }
+  .cat{border-bottom:1px solid var(--line);}
+  .cat-head{
+    padding:12px 16px 8px;
+  }
+  .cat-title{
+    font-family:'Bricolage Grotesque', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:0.02em;
+    color:var(--fg);
+  }
+  .cat-deck{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--muted);
+    margin-top:2px;
+    line-height:1.4;
+  }
+  .letter-list{padding:0 0 10px;}
+  .letter-item{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-size:13px;
+    padding:7px 16px 7px 24px;
+    cursor:pointer;
+    border-left:2px solid transparent;
+  }
+  .letter-item:hover{color:var(--fg);}
+  .letter-item.active{
+    color:var(--fg);
+    border-left-color:var(--accent);
+    background:rgba(232,98,63,0.06);
+  }
+  .letter-item .untitled{font-style:italic; color:var(--muted);}
+
+  main.stage{
+    overflow-y:auto;
+    padding:48px 24px 120px;
+  }
+  .letter-toolbar{
+    max-width:760px;
+    margin:0 auto 28px;
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .pill{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.03em;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    border-radius:99px;
+    color:var(--muted);
+    cursor:pointer;
+    background:var(--panel-2);
+  }
+  .pill:hover{color:var(--fg);}
+  .pill.active{color:var(--bg); background:var(--accent); border-color:var(--accent);}
+
+  .canvas{
+    max-width:760px;
+    margin:0 auto;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:56px 48px;
+  }
+  @media (max-width:640px){
+    .canvas{padding:32px 20px;}
+    #app{grid-template-columns:1fr;}
+    nav.side{display:none;}
+  }
+
+  .block{margin:0 0 26px;}
+  .block:last-child{margin-bottom:0;}
+  .block img{max-width:100%; border-radius:4px; display:block; margin-bottom:14px;}
+  .block video{max-width:100%; border-radius:4px; display:block; margin-bottom:14px; background:#000;}
+  .block a.textlink{text-decoration:underline; text-decoration-color:var(--accent); text-underline-offset:3px;}
+  .block.col2{column-count:2; column-gap:32px;}
+  .block ol, .block ul{margin:0; padding-left:1.3em;}
+  .block p.line{margin:0;}
+  .empty-block{opacity:0.3; font-family:var(--mono); font-size:11px;}
+
+  .no-content{
+    max-width:760px; margin:60px auto; text-align:center;
+    font-family:var(--mono); color:var(--muted); font-size:13px;
+  }
+
+  /* raw JSON overlay */
+  #rawOverlay{
+    display:none;
+    position:fixed; inset:0; background:rgba(0,0,0,0.85);
+    z-index:50; padding:40px;
+  }
+  #rawOverlay.active{display:block;}
+  #rawOverlay pre{
+    max-width:900px; margin:0 auto; height:100%;
+    overflow:auto; background:var(--panel); border:1px solid var(--line);
+    border-radius:6px; padding:24px;
+    font-family:var(--mono); font-size:12px; color:var(--fg);
+    white-space:pre-wrap; word-break:break-word;
+  }
+</style>
+</head>
+<body>
+
+<div id="drop">
+  <h1>proofsheet</h1>
+  <p>drop a journal export .json here, or click to browse. nothing leaves your browser.</p>
+  <div class="dropzone" id="dropzone">
+    <span class="label">journal-*.json</span>
+    <span class="sub">click or drag a file to preview</span>
+  </div>
+  <input type="file" id="fileInput" accept="application/json,.json">
+  <div id="err"></div>
+</div>
+
+<div id="app">
+  <header class="top">
+    <span class="brand">proofsheet</span>
+    <span class="meta" id="metaLine">—</span>
+    <button id="rawBtn">raw json</button>
+    <button id="loadNewBtn">load another</button>
+  </header>
+  <nav class="side" id="side"></nav>
+  <main class="stage" id="stage"></main>
+</div>
+
+<div id="rawOverlay"><pre id="rawPre"></pre></div>
+
+<script>
+(function(){
+  const FONT_MAP = {
+    jakarta: "'Plus Jakarta Sans', sans-serif",
+    fraunces: "'Fraunces', serif",
+    mono: "'IBM Plex Mono', monospace",
+    newsreader: "'Newsreader', serif",
+    bricolage: "'Bricolage Grotesque', sans-serif",
+    grotesk: "'Space Grotesk', sans-serif",
+    shoulders: "'Big Shoulders Display', sans-serif"
+  };
+  const IMG_EXT = /\.(png|jpe?g|gif|webp|avif|svg)(\?.*)?$/i;
+  const VID_EXT = /\.(mp4|webm|mov)(\?.*)?$/i;
+
+  let doc = null;
+  let currentCategoryId = null;
+  let currentLetterId = null;
+  let currentVersion = 'draft'; // 'draft' or an entry id
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const dropScreen = document.getElementById('drop');
+  const errEl = document.getElementById('err');
+  const appEl = document.getElementById('app');
+  const sideEl = document.getElementById('side');
+  const stageEl = document.getElementById('stage');
+  const metaLine = document.getElementById('metaLine');
+  const rawOverlay = document.getElementById('rawOverlay');
+  const rawPre = document.getElementById('rawPre');
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  ['dragover','dragenter'].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('drag'); })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.remove('drag'); })
+  );
+  dropzone.addEventListener('drop', e => {
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  fileInput.addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) handleFile(f);
+  });
+
+  document.getElementById('loadNewBtn').addEventListener('click', () => {
+    appEl.classList.remove('active');
+    dropScreen.classList.remove('hidden');
+    errEl.textContent = '';
+    fileInput.value = '';
+  });
+
+  document.getElementById('rawBtn').addEventListener('click', () => {
+    rawPre.textContent = JSON.stringify(doc, null, 2);
+    rawOverlay.classList.add('active');
+  });
+  rawOverlay.addEventListener('click', () => rawOverlay.classList.remove('active'));
+
+  function handleFile(file){
+    errEl.textContent = '';
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try{
+        parsed = JSON.parse(reader.result);
+      }catch(e){
+        errEl.textContent = 'not valid JSON — ' + e.message;
+        return;
+      }
+      const normalized = normalizeDoc(parsed);
+      if (!normalized){
+        errEl.textContent = "doesn't look like a journal or letter export";
+        return;
+      }
+      loadDoc(normalized, file.name);
+    };
+    reader.onerror = () => { errEl.textContent = 'could not read that file'; };
+    reader.readAsText(file);
+  }
+
+  // Accepts either a full journal export ({categories, data:{...}})
+  // or a single-letter export ({kind:'letter', title, deck, category, blocks:[...]}).
+  // Returns a doc normalized to the journal-full shape, or null if unrecognized.
+  function normalizeDoc(parsed){
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    // already a full journal export
+    if (parsed.data && parsed.categories){
+      return parsed;
+    }
+
+    // single-letter export
+    if (Array.isArray(parsed.blocks)){
+      const cat = parsed.category || { id: '__unsorted__', title: 'Unsorted', deck: '' };
+      const letterId = '__single__';
+      return {
+        app: parsed.app || 'journal',
+        kind: parsed.kind || 'letter',
+        exportedAt: parsed.exportedAt,
+        categories: [{ id: cat.id, title: cat.title, deck: cat.deck || '' }],
+        data: {
+          [cat.id]: {
+            roster: [{ id: letterId, title: parsed.title || '', deck: parsed.deck || '' }],
+            letters: {
+              [letterId]: {
+                draft: { blocks: parsed.blocks, editingEntryId: null },
+                entries: []
+              }
+            }
+          }
+        }
+      };
+    }
+
+    return null;
+  }
+
+  function loadDoc(parsed, filename){
+    doc = parsed;
+    dropScreen.classList.add('hidden');
+    appEl.classList.add('active');
+
+    const exported = doc.exportedAt ? new Date(doc.exportedAt).toLocaleString() : 'unknown time';
+    metaLine.textContent = `${filename} · ${doc.app || 'journal'}/${doc.kind || '—'} · exported ${exported}`;
+
+    buildSidebar();
+
+    // select first category/letter that actually has content
+    const cats = doc.categories || [];
+    outer:
+    for (const cat of cats){
+      const roster = (doc.data[cat.id] && doc.data[cat.id].roster) || [];
+      for (const l of roster){
+        selectLetter(cat.id, l.id);
+        break outer;
+      }
+    }
+  }
+
+  function buildSidebar(){
+    sideEl.innerHTML = '';
+    const cats = doc.categories || [];
+    cats.forEach(cat => {
+      const catData = doc.data[cat.id];
+      const roster = (catData && catData.roster) || [];
+      const wrap = document.createElement('div');
+      wrap.className = 'cat';
+
+      const head = document.createElement('div');
+      head.className = 'cat-head';
+      head.innerHTML = `<div class="cat-title">${escapeHtml(cat.title || cat.id)}</div>` +
+        (cat.deck ? `<div class="cat-deck">${escapeHtml(cat.deck)}</div>` : '');
+      wrap.appendChild(head);
+
+      const list = document.createElement('div');
+      list.className = 'letter-list';
+      roster.forEach(letter => {
+        const btn = document.createElement('button');
+        btn.className = 'letter-item';
+        btn.dataset.cat = cat.id;
+        btn.dataset.letter = letter.id;
+        btn.innerHTML = letter.title
+          ? escapeHtml(letter.title)
+          : '<span class="untitled">untitled</span>';
+        btn.addEventListener('click', () => selectLetter(cat.id, letter.id));
+        list.appendChild(btn);
+      });
+      wrap.appendChild(list);
+      sideEl.appendChild(wrap);
+    });
+  }
+
+  function selectLetter(catId, letterId){
+    currentCategoryId = catId;
+    currentLetterId = letterId;
+    currentVersion = 'draft';
+    Array.from(sideEl.querySelectorAll('.letter-item')).forEach(el => {
+      el.classList.toggle('active', el.dataset.cat === catId && el.dataset.letter === letterId);
+    });
+    renderStage();
+  }
+
+  function getLetterObj(){
+    const catData = doc.data[currentCategoryId];
+    if (!catData) return null;
+    return catData.letters[currentLetterId] || null;
+  }
+
+  function renderStage(){
+    stageEl.innerHTML = '';
+    const letterObj = getLetterObj();
+    if (!letterObj){
+      stageEl.innerHTML = '<div class="no-content">nothing here yet</div>';
+      return;
+    }
+
+    const entries = (letterObj.entries || []).slice().sort((a,b) =>
+      new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+    );
+
+    // toolbar: draft + entries as pills
+    const toolbar = document.createElement('div');
+    toolbar.className = 'letter-toolbar';
+
+    const draftPill = makePill('draft', currentVersion === 'draft', () => {
+      currentVersion = 'draft';
+      renderStage();
+    });
+    toolbar.appendChild(draftPill);
+
+    entries.forEach(entry => {
+      const label = entry.createdAt
+        ? new Date(entry.createdAt).toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'})
+        : entry.id;
+      const pill = makePill(label, currentVersion === entry.id, () => {
+        currentVersion = entry.id;
+        renderStage();
+      });
+      toolbar.appendChild(pill);
+    });
+
+    stageEl.appendChild(toolbar);
+
+    // resolve blocks for current version
+    let blocks;
+    if (currentVersion === 'draft'){
+      blocks = (letterObj.draft && letterObj.draft.blocks) || [];
+    } else {
+      const entry = entries.find(e => e.id === currentVersion);
+      blocks = (entry && entry.blocks) || [];
+    }
+
+    const canvas = document.createElement('div');
+    canvas.className = 'canvas';
+
+    const visibleBlocks = blocks.filter(b => (b.text && b.text.trim()) || b.link);
+    if (visibleBlocks.length === 0){
+      canvas.innerHTML = '<div class="empty-block">(empty)</div>';
+    } else {
+      visibleBlocks.forEach(b => canvas.appendChild(renderBlock(b)));
+    }
+
+    stageEl.appendChild(canvas);
+  }
+
+  function makePill(label, active, onClick){
+    const p = document.createElement('button');
+    p.className = 'pill' + (active ? ' active' : '');
+    p.textContent = label;
+    p.addEventListener('click', onClick);
+    return p;
+  }
+
+  function renderBlock(b){
+    const div = document.createElement('div');
+    div.className = 'block' + (b.layout === 'col2' ? ' col2' : '');
+
+    // media from `link`
+    if (b.link){
+      if (IMG_EXT.test(b.link)){
+        const img = document.createElement('img');
+        img.src = b.link;
+        img.loading = 'lazy';
+        img.alt = (b.text || '').slice(0, 120);
+        div.appendChild(img);
+      } else if (VID_EXT.test(b.link)){
+        const vid = document.createElement('video');
+        vid.src = b.link;
+        vid.controls = true;
+        div.appendChild(vid);
+      }
+    }
+
+    const textWrap = document.createElement('div');
+    const fillPct = typeof b.fill === 'number' ? b.fill : 0;
+    const opacity = Math.max(0.28, 1 - (fillPct / 100) * 0.85);
+
+    textWrap.style.fontFamily = FONT_MAP[b.font] || FONT_MAP.jakarta;
+    textWrap.style.fontWeight = b.weight || 400;
+    textWrap.style.fontStyle = b.italic ? 'italic' : 'normal';
+    textWrap.style.fontSize = (b.size || 18) + 'px';
+    textWrap.style.letterSpacing = ((b.tracking || 0) / 1000) + 'em';
+    textWrap.style.lineHeight = ((b.leading || 140) / 100);
+    textWrap.style.color = 'var(--fg)';
+    textWrap.style.opacity = opacity;
+
+    const rawText = b.text || '';
+    const lines = rawText.split('\n').filter(l => l.trim().length > 0);
+
+    if ((b.list === 'number' || b.list === 'bullet') && lines.length > 1){
+      const listTag = b.list === 'number' ? 'ol' : 'ul';
+      const list = document.createElement(listTag);
+      lines.forEach(line => {
+        const li = document.createElement('li');
+        li.textContent = line.replace(/^\s*\d+\.\s*/, '');
+        list.appendChild(li);
+      });
+      textWrap.appendChild(list);
+    } else {
+      rawText.split('\n').forEach((line, i, arr) => {
+        const p = document.createElement('p');
+        p.className = 'line';
+        p.textContent = line;
+        if (line.trim() === '') p.style.height = '0.6em';
+        textWrap.appendChild(p);
+        if (i < arr.length - 1){
+          textWrap.appendChild(document.createElement('br'));
+        }
+      });
+    }
+
+    // if link exists and isn't media, wrap text as hyperlink
+    if (b.link && !IMG_EXT.test(b.link) && !VID_EXT.test(b.link)){
+      const a = document.createElement('a');
+      a.href = b.link;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'textlink';
+      a.style.color = 'inherit';
+      while (textWrap.firstChild) a.appendChild(textWrap.firstChild);
+      textWrap.appendChild(a);
+    }
+
+    div.appendChild(textWrap);
+    return div;
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+  }
+})();
+</script>
+</body>
+</html>
