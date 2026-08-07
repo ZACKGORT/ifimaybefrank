@@ -232,7 +232,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .letters-viewport{position:relative;overflow:hidden}
 .letters-track{
   display:flex;align-items:flex-start;gap:22px;
-  padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 6vw 150px;
+  padding-top:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px));
+  padding-bottom:150px;
+  /* enough side room to scroll the FIRST/LAST panel to true center too —
+     a flat 6vw runs out of room on wide viewports since the panel caps
+     at 1100px (half = 550px), so the scrollable range clamps short and
+     the outermost letters end up shoved toward one edge instead. */
+  padding-left:max(6vw, calc(50% - 550px));
+  padding-right:max(6vw, calc(50% - 550px));
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   scroll-behavior:smooth;
@@ -252,8 +259,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--chrome-font);-webki
 .letter-panel.active{opacity:1;cursor:auto}
 .letter-panel:not(.active) .letter-card-frame{pointer-events:none}
 .letter-panel-inner{width:100%}
+/* ── click hotspots — thin edge zones over the viewport so paging
+   between letters is a single low-effort click near either side,
+   without hunting for the arrow buttons or a peeking neighbor.
+   Sits above the track's panels but below the fixed chrome. ── */
+.letter-hotspot{
+  position:absolute;top:0;bottom:0;
+  width:clamp(56px, 9vw, 180px);
+  z-index:20;
+}
+.letter-hotspot-prev{left:0;cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M26%2012%20L16%2022%20L26%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, w-resize;}
+.letter-hotspot-next{right:0;cursor:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2744%27%20height%3D%2744%27%3E%3Ccircle%20cx%3D%2722%27%20cy%3D%2722%27%20r%3D%2720%27%20fill%3D%27rgba%2820%2C20%2C20%2C0.55%29%27/%3E%3Cpath%20d%3D%27M18%2012%20L28%2022%20L18%2032%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-width%3D%273%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3C/svg%3E") 22 22, e-resize;}
 @media(max-width:900px){
-  .letters-track{padding:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px)) 4vw 150px;gap:16px}
+  .letters-track{
+    padding-top:calc(var(--nav-h) + var(--crumb-h) + clamp(56px,10vh,90px));
+    padding-bottom:150px;
+    padding-left:max(4vw, calc(50% - 450px));
+    padding-right:max(4vw, calc(50% - 450px));
+    gap:16px;
+  }
   .letter-panel{flex:0 0 auto;width:min(92vw, 900px)}
 }
 
@@ -377,6 +401,11 @@ body.focus-mode .letters-track{
   overflow:hidden;
   background:var(--rule-soft);
 }
+/* the live hero's real height depends on its media's aspect ratio,
+   computed async in sizeHeroForMedia() — stay hidden until that's
+   applied so letter-load never flashes the plain-CSS-height (and
+   therefore over-cropped/zoomed) version first. */
+#letterHero{opacity:0;transition:opacity .16s ease;}
 .letter-hero img,
 .letter-hero video{
   width:100%;height:100%;object-fit:cover;object-position:center;
@@ -1103,6 +1132,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 <main class="journal-wrap" id="journalWrap">
   <div class="letters-viewport" id="lettersViewport">
     <div class="letters-track" id="lettersTrack"></div>
+    <div class="letter-hotspot letter-hotspot-prev" id="letterHotspotPrev" aria-hidden="true" tabindex="-1"></div>
+    <div class="letter-hotspot letter-hotspot-next" id="letterHotspotNext" aria-hidden="true" tabindex="-1"></div>
   </div>
 </main>
 
@@ -1233,2134 +1264,2299 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const SEED_JOURNAL = {
   "app": "journal",
   "kind": "journal-full",
-  "exportedAt": "2026-08-04T00:00:00.000Z",
+  "exportedAt": "2026-08-06T21:24:32.780Z",
   "categories": [
-    { "id": "category_journal", "title": "Journal", "deck": "" },
-    { "id": "category_life", "title": "Life", "deck": "" }
-  ],
-  "data": {
-    "category_journal": { "roster": [], "letters": {} },
-    "category_life": {
-  "roster": [
     {
-      "id": "letter_life_01",
-      "title": "Hi, I'm Zack",
+      "id": "category_journal",
+      "title": "Journal",
       "deck": ""
     },
     {
-      "id": "letter_life_02",
-      "title": "The Impetus",
-      "deck": "Circa, 2007–2008"
+      "id": "category_1785876654818_tzqz3",
+      "title": "Work",
+      "deck": "Work to eat. Eat to live. Live to skate. Skate to work."
     },
     {
-      "id": "letter_life_03",
-      "title": "Art School \"Stop Out\"",
-      "deck": "Pratt Institute of Art, Brooklyn | Circa, 2002–03; 2004–05"
+      "id": "category_1785876658816_uerdf",
+      "title": "Life",
+      "deck": "The doings of a Left-handed autodidact"
     },
     {
-      "id": "letter_life_04",
-      "title": "Doings of an Autodidact",
-      "deck": "Pennsylvania suburbia | Circa, 2002–03; 2004–05"
+      "id": "category_1785876662439_bjvwy",
+      "title": "Balance",
+      "deck": "Insights / Outlook / Philosphy / Vibes"
     },
     {
-      "id": "letter_life_05",
-      "title": "Found On Road Designing",
-      "deck": "Omni-channel, Multi-vertical E-commerce Startup | Circa, 2008–11"
+      "id": "category_1785876666609_h9exz",
+      "title": "Ventilation",
+      "deck": "real talk. filter off."
     },
     {
-      "id": "letter_life_06",
-      "title": "Design by Data",
-      "deck": "Lead Generation Startup | Circa, 2011–14"
-    },
-    {
-      "id": "letter_life_07",
-      "title": "Enter #AgencyLife",
-      "deck": "One Sixty Over Ninety, an Advertising & Branding Agency | Circa, 2014–2016"
-    },
-    {
-      "id": "letter_life_08",
-      "title": "Gaining XP in UX",
-      "deck": "O3 World, a digital product shop in Fishtown, Philly | Circa, 2017–18"
-    },
-    {
-      "id": "letter_life_09",
-      "title": "Life at Workarea",
-      "deck": "SaaS E-commerce Platform based in Olde City, PHI | Circa, 2017–18"
-    },
-    {
-      "id": "letter_life_10",
-      "title": "PHI > NYC; Rinse and Repeat",
-      "deck": "Foot-in-the-door to the NYC agency scene | Circa 2018–2019"
-    },
-    {
-      "id": "letter_life_11",
-      "title": "Cards Against Bad UX",
-      "deck": "PFSweb, LiveArea {Pre Merkle Acquisition} | Circa, 2020–21"
-    },
-    {
-      "id": "letter_life_12",
-      "title": "Small cog, HUGE Wheel",
-      "deck": "Freelance with HUGE Inc. | Circa, 2021"
-    },
-    {
-      "id": "letter_life_13",
-      "title": "This is the Whey",
-      "deck": "Boutique West Coast Design Agency specializing in Shopify builds | Circa, 2021"
-    },
-    {
-      "id": "letter_life_14",
-      "title": "Long Way to the Top",
-      "deck": "62nd Floor of the World One Trade Center Tower | Circa, 2021"
-    },
-    {
-      "id": "letter_life_15",
-      "title": "#SeizeTheSpace #BonCourage",
-      "deck": "375 Hudson Street, along \"Agency Row\" | Circa, 2022–2023"
-    },
-    {
-      "id": "letter_life_16",
-      "title": "Do the Twist!",
-      "deck": "\"Independent Contractor\" | Circa, 2023–Present"
-    },
-    {
-      "id": "letter_life_17",
-      "title": "Reason & Resolution",
-      "deck": "Setting up for success today | Changing paradigms tomorrow"
+      "id": "category_1785876927811_uio34",
+      "title": "Chaotic Good",
+      "deck": ""
     }
   ],
-  "letters": {
-    "letter_life_01": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/XLRJ0yL/IMG-20160930-105946.jpg"
+  "data": {
+    "category_journal": {
+      "roster": [
+        {
+          "id": "letter_1785876641429_4yt7d",
+          "title": "What the f*ck is this?",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785876638169_xmwdj",
+          "title": "Value By The Minute",
+          "deck": ""
+        },
+        {
+          "id": "letter_1786047175723_ztl2l",
+          "title": "a \"systems thinker\"",
+          "deck": "& the art of conveyance"
+        }
+      ],
+      "letters": {
+        "letter_1785876641429_4yt7d": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "ifimaybefrank.com is a prose platform.",
+                "font": "bricolage",
+                "weight": 200,
+                "italic": false,
+                "size": 42,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/HTqtChHv/curbyourdog.webp"
+              },
+              {
+                "text": "Most writing tools claim they are built for writing, but are only optimized for editing. You are expected to write completely and uniformly whilst considering form as secondary to your typing experience. Traditional editors may offer rich formatting utility, which is indeed essential for perfectly formatted documentation. While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.",
+                "font": "fraunces",
+                "weight": 300,
+                "italic": false,
+                "size": 22,
+                "tracking": 0,
+                "leading": 163,
+                "fill": 0,
+                "layout": "col2",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "\"While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.\"",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 56,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "zack.cx",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 142,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://zack.cx"
+              },
+              {
+                "text": "fyi, I am handwriting all content herein.  how can you tell?  if there is an abundance of alliterative apropos or a subtle rhyming schema in any of my sentences, that's one tell. another tell is I stack my talking points progressively in increments of 3 (an old animation/storytelling concept I picked up from my college days) — also,  i tend to digress often.",
+                "font": "newsreader",
+                "weight": 200,
+                "italic": false,
+                "size": 16,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              }
+            ],
+            "editingEntryId": "entry_1785882264121"
           },
-          {
-            "text": "This article is not written with any assistance of AI, but rather instead with genuine earnest — daresay, \"from the heart\"[?]",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785882264121",
+              "blocks": [
+                {
+                  "text": "ifimaybefrank.com is a prose platform.",
+                  "font": "bricolage",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 42,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "Most writing tools claim they are built for writing, but are only optimized for editing. You are expected to write completely and uniformly whilst considering form as secondary to your typing experience. Traditional editors may offer rich formatting utility, which is indeed essential for perfectly formatted documentation. While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.",
+                  "font": "fraunces",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 22,
+                  "tracking": 0,
+                  "leading": 163,
+                  "fill": 0,
+                  "layout": "col2",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "\"While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.\"",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 56,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "zack.cx",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 142,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://zack.cx"
+                },
+                {
+                  "text": "fyi, I am handwriting all content herein.  how can you tell?  if there is an abundance of alliterative apropos or a subtle rhyming schema in any of my sentences, that's one tell. another tell is I stack my talking points progressively in increments of 3 (an old animation/storytelling concept I picked up from my college days) — also,  i tend to digress often.",
+                  "font": "newsreader",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 16,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-04T22:24:24.121Z"
+            }
+          ]
+        },
+        "letter_1785876638169_xmwdj": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "I made this a few years ago as means to convey my career trajectory and growth. I know most prioritize money as the main metric, but for me, it's always been about something else.\n\nI think this animation demonstrates that 'something'.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Doller%20per%20minute.mp4"
+              },
+              {
+                "text": "I think what I am chasing is a sense of completeness in what I am capable of and passionate for.",
+                "font": "fraunces",
+                "weight": 200,
+                "italic": false,
+                "size": 18,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/mVgz2Pv1/nothingbutnet.gif"
+              }
+            ],
+            "editingEntryId": "entry_1786041868609"
           },
-          {
-            "text": "\"I think. I make. Will work for work.\"",
-            "font": "newsreader",
-            "weight": 400,
-            "italic": true,
-            "size": 19,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 30,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1786041868609",
+              "blocks": [
+                {
+                  "text": "I made this a few years ago as means to convey my career trajectory and growth. I know most prioritize money as the main metric, but for me, it's always been about something else.\n\nI think this animation demonstrates that 'something'.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Doller%20per%20minute.mp4"
+                }
+              ],
+              "createdAt": "2026-08-06T18:44:28.609Z"
+            }
+          ]
+        },
+        "letter_1786047175723_ztl2l": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "it's not magic.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Not%20Magic.%20Just%20a%20good%20mind%20for%20managing%20systems.mp4"
+              }
+            ],
+            "editingEntryId": "entry_1786047225748"
+          },
+          "entries": [
+            {
+              "id": "entry_1786047225748",
+              "blocks": [
+                {
+                  "text": "it's not magic.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Not%20Magic.%20Just%20a%20good%20mind%20for%20managing%20systems.mp4"
+                }
+              ],
+              "createdAt": "2026-08-06T20:13:45.748Z"
+            }
+          ]
+        }
+      }
     },
-    "letter_life_02": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*sqUSg_c1xGQxZdQS4L7fSw.png"
+    "category_1785876654818_tzqz3": {
+      "roster": [
+        {
+          "id": "letter_1785877646708_gsmct",
+          "title": "Bank of New York — Pershing X",
+          "deck": "Product Lead avec Publicis Sapient at 375 Hudson St"
+        },
+        {
+          "id": "letter_1785877563585_3erm2",
+          "title": "TikTok For Business via Code & Theory",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785877537057_r6jdo",
+          "title": "General Nutrition Centers {GNC}",
+          "deck": "Via Elva, a boutique studio specializing in Shopify Plus e-commerce"
+        },
+        {
+          "id": "letter_1785877389501_681cd",
+          "title": "PFSweb, LiveArea",
+          "deck": "Manager, UX — B2B & B2C Saleforce Commerce for: Aquasana, Simpson Strong-Tie, Hardinge"
+        },
+        {
+          "id": "letter_1785877293644_8fdbz",
+          "title": "Weblinc, Workarea",
+          "deck": "E-commerce Software As A Service based in Olde City, Philadelphia"
+        },
+        {
+          "id": "letter_1785877214352_6ff33",
+          "title": "O3 World",
+          "deck": "An Agile Digital Product Shop from Fishtown, Philadelphia"
+        },
+        {
+          "id": "letter_1785877203881_csde0",
+          "title": "160over90",
+          "deck": "A Philadelphia Full-Service Advertising & Branding Agency"
+        },
+        {
+          "id": "letter_1786030963076_qixjc",
+          "title": "Multi-vertical E-commerce",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785877704618_9ms7y",
+          "title": "Low-Voltage Data Tech",
+          "deck": "Technically, not a technician, but traveling apprentice (even still at four decades of existence)"
+        }
+      ],
+      "letters": {
+        "letter_1785877646708_gsmct": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/mCK7D4Xb/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785896368332"
           },
-          {
-            "text": "How it started.",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785896368332",
+              "blocks": [
+                {
+                  "text": "...",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/mCK7D4Xb/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T02:19:28.332Z"
+            }
+          ]
+        },
+        "letter_1785877563585_3erm2": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "ux?",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://github.com/ZACKGORT/reasonably/blob/main/tiktok-proto-gif.gif?raw=true"
+              },
+              {
+                "text": "",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/Z69xjMQY/tiktok-cat.gif"
+              }
+            ],
+            "editingEntryId": null
           },
-          {
-            "text": "Bootstrap start with a bootstrap startup.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": []
+        },
+        "letter_1785877537057_r6jdo": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/cSQCgNQY/work1.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785896556328"
           },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*6ftVCi9PiL1q47VskwMbWA.png"
+          "entries": [
+            {
+              "id": "entry_1785896556328",
+              "blocks": [
+                {
+                  "text": "...",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/cSQCgNQY/work1.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T02:22:36.328Z"
+            }
+          ]
+        },
+        "letter_1785877389501_681cd": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/4nLTQS02/danaheroa-Zcf-Ia-BQr-Rdkrtxo-THSyhar-T.webp"
+              }
+            ],
+            "editingEntryId": null
           },
-          {
-            "text": "How it's going:",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": []
+        },
+        "letter_1785877293644_8fdbz": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "gidget",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/N2yd0jJV/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785896752313"
           },
-          {
-            "text": "...to working with some well-to-do agencies working with a diverse client array.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1785896752313",
+              "blocks": [
+                {
+                  "text": "gidget",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/N2yd0jJV/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T02:25:52.313Z"
+            }
+          ]
+        },
+        "letter_1785877214352_6ff33": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "fishtown",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/zTKr9Dh9/1-7w-EKA8du-Scc-OZw-Im-A-6j-SQ.webp"
+              },
+              {
+                "text": "Fishtown, Philadelphia",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/Swf714Sd/o3.webp"
+              },
+              {
+                "text": "...",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/jkQc7BbK/phillywork11.webp"
+              },
+              {
+                "text": "98.5% Utilization Rate",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/z1qNxqP/phillywork15.webp"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        },
+        "letter_1785877203881_csde0": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "all night long.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/VcrQ8WkX/powerhomeloopoptimizedw-FIkl-UHPGV.gif"
+              },
+              {
+                "text": "",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/fd8Ycjyv/1-pch6xh-Ep-Fo-Xxli-AGb-Nnr7-Q.webp"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        },
+        "letter_1786030963076_qixjc": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/N27sPZv5/AMwire-GYVHbp-RSo-KUCz-KGe-FVEzj-Lzjmg.webp"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        },
+        "letter_1785877704618_9ms7y": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*Fpw92LFkhtWU0eFuRAKqVg.jpeg"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": [
+            {
+              "id": "entry_1785897751151",
+              "blocks": [
+                {
+                  "text": "road worthy",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/NDk7kcW/drivethruluxurysuite.webp"
+                },
+                {
+                  "text": "",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/NDk7kcW/drivethruluxurysuite.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T02:42:31.151Z"
+            }
+          ]
+        }
+      }
     },
-    "letter_life_03": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4466/format:webp/1*kY6yg0chz7Puu-WgrlYNMA.jpeg"
+    "category_1785876658816_uerdf": {
+      "roster": [
+        {
+          "id": "letter_1785876654819_ntutq",
+          "title": "Academia",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785876977395_a5rx2",
+          "title": "Career Impetus",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785876992914_d5eaf",
+          "title": "That Startup Life",
+          "deck": "getting started in a multivertical omnichannel grassroots startup."
+        },
+        {
+          "id": "letter_1785894676956_6z7bq",
+          "title": "The Philadelphia Experience",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785877150834_0fjtr",
+          "title": "From PHI ↭ to NYC",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785877792112_ycfkf",
+          "title": "Blood, sweat, tears … & hard-earned success ",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785877903918_bthe8",
+          "title": "Making it in Manhattan…",
+          "deck": ""
+        }
+      ],
+      "letters": {
+        "letter_1785876654819_ntutq": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "Art School \"Stop Out\"",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 91,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/DPJM0yfz/1-k-Y6yg0chz7-Puu-Wgrl-YNMA.webp"
+              },
+              {
+                "text": "I didn't graduate from college. I couldn't afford it. Pratt Institute of Art was expensive, and loans or financial aid were simply out of reach {though not as simple as it may seem}. At nineteen years old, there wasn't much that I could afford, so I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station. At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could [\"bull\"-expletive] with my so-called 'talent'.",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 26,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/gbVdcLRq/hands-by-zackgort-dckl0r-375w-2x.jpg"
+              },
+              {
+                "text": "There's the master",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/mVkj6sxm/1-g-Ax-Wr-Bz-Rv-QDdn-TOBp-GHGt-A.webp"
+              },
+              {
+                "text": "...",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/bfLRSyD/1-da251-CSL3-Sypkif-V8-7-Dd-A.webp"
+              },
+              {
+                "text": "...",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/zWddYDKH/1-b7-R1-Bb-D3kn-TIbl-Ly-MZd-Xg.webp"
+              },
+              {
+                "text": "hands",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/sv7DQYwJ/hands-by-zackgort-dckl0r-375w-2x.jpg"
+              },
+              {
+                "text": "don't drink the water",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/SD10N0GR/don-t-drink-the-water-by-zackgort-dckl2j-375w-2x.jpg"
+              }
+            ],
+            "editingEntryId": "entry_1785895057185"
           },
-          {
-            "text": "I didn't graduate from college. I couldn't afford it. Pratt Institute of Art was expensive, and loans or financial aid were simply out of reach {though not as simple as it may seem}. At nineteen years old, there wasn't much that I could afford, so I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station. At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could [\"bull\"-expletive] with my so-called 'talent'.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785895057185",
+              "blocks": [
+                {
+                  "text": "...",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T01:57:37.185Z"
+            }
+          ]
+        },
+        "letter_1785876977395_a5rx2": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "The Doings of an Autodidact",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp"
+              },
+              {
+                "text": "I built my first computer {circa 2005–'06}. I immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at, intensely.",
+                "font": "bricolage",
+                "weight": 300,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/S4vmSJNr/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp"
+              },
+              {
+                "text": "So, without a college degree, or any equivalent experience, I started from absolute scratch. I studied typography {reading books, examining magazines, and generally observing what I saw wherever I were}. I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal {my clandestinely acquired Adobe products}.",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 29,
+                "tracking": 39,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*h9ljVOzzRT-IrakgaDSWvQ.png"
+              },
+              {
+                "text": "I began to create faux website concepts to gain an understanding of designing for that medium — as the screenshot above may suggest, I had lots to learn.",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*puHZ09ELFPd-AaMK0HAxqQ.png"
+              },
+              {
+                "text": "This culminated with an interview and subsequent job offer from Xoxide Incorporated {later turned Turn5 Inc.} which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals {Beauty, Automotive, Tech}. I found their company through a Craigslist post in the web / design category. I can still pull up my original cover letter {which I just looked at and am considering reusing in my current job search endeavors}.",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lm5BUxr0dDq73bWoi3vy4w.png"
+              },
+              {
+                "text": "",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              }
+            ],
+            "editingEntryId": "entry_1785895005940"
           },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*b7R1BbD3knTIbl_LyMZdXg.png"
+          "entries": [
+            {
+              "id": "entry_1785895005940",
+              "blocks": [
+                {
+                  "text": "The Doings of an Autodidact",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp"
+                },
+                {
+                  "text": "I built my first computer {circa 2005–'06}. I immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at, intensely.",
+                  "font": "bricolage",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/S4vmSJNr/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp"
+                },
+                {
+                  "text": "So, without a college degree, or any equivalent experience, I started from absolute scratch. I studied typography {reading books, examining magazines, and generally observing what I saw wherever I were}. I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal {my clandestinely acquired Adobe products}.",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 29,
+                  "tracking": 39,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*h9ljVOzzRT-IrakgaDSWvQ.png"
+                },
+                {
+                  "text": "I began to create faux website concepts to gain an understanding of designing for that medium — as the screenshot above may suggest, I had lots to learn.",
+                  "font": "jakarta",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*puHZ09ELFPd-AaMK0HAxqQ.png"
+                },
+                {
+                  "text": "This culminated with an interview and subsequent job offer from Xoxide Incorporated {later turned Turn5 Inc.} which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals {Beauty, Automotive, Tech}. I found their company through a Craigslist post in the web / design category. I can still pull up my original cover letter {which I just looked at and am considering reusing in my current job search endeavors}.",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lm5BUxr0dDq73bWoi3vy4w.png"
+                },
+                {
+                  "text": "",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-05T01:56:45.940Z"
+            }
+          ]
+        },
+        "letter_1785876992914_d5eaf": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "Multi-vertical Grass-roots E-commerce Startup",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/xyz2BHf/mustangtom-BPa-YSw-BXft-NHQCVEkp-IGb-O.webp"
+              },
+              {
+                "text": "F.O.R.D. — Found On Road Designing",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/YTKt6LcS/IMG-20210515-151006.webp"
+              },
+              {
+                "text": "The company had set up its new HQ at a warehouse office facility in Great Valley, PA {~20 miles outside of Philly}, and was owned and operated by two brothers; one of which wasn't even old enough to drink at the company holiday party. I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens.\n\nI was the sole resource for all print related initiatives including package design, catalogue design, and large-format printing needs.\n\nI also was the product photographer & image manipulation specialist; covering all manner of product photography; specializing in lighting, establishing systematic product photography protocols {for visual uniformity at scale}, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.\n\nin addition to that, I was the designer for all social & advertising channels; including marketing campaigns, banner and display ads, and email marketing.\n\nUsing data from our e-mail segmentation, we brought those audience insights into our flagship website, where I served as the graphic designer turned web designer; responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning [sic].\n\nIn many respects, Turn5 Inc. served as my formal education.\n\nI learned first and foremost how to work within a team environment, where everyone's role was crucial towards the company's success. There, I learned the ins-and-outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs, and in the latter half of my nearly four years there, served as a web designer focused on user experience — by the books — as applied to a {then} forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              }
+            ],
+            "editingEntryId": "entry_1786033759672"
           },
-          {
-            "text": "{Attended Pratt: 2002–03; 2004–2005}",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 14,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 40,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1786033759672",
+              "blocks": [
+                {
+                  "text": "...",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://miro.medium.com/v2/resize:fit:4000/format:webp/1*dtGgrSm7amTRi_5jQMVeIw.png"
+                },
+                {
+                  "text": "F.O.R.D. — Found On Road Designing",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp"
+                },
+                {
+                  "text": "The company had set up its new HQ at a warehouse office facility in Great Valley, PA {~20 miles outside of Philly}, and was owned and operated by two brothers; one of which wasn't even old enough to drink at the company holiday party. I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens.\n\nI was the sole resource for all print related initiatives including package design, catalogue design, and large-format printing needs.\n\nI also was the product photographer & image manipulation specialist; covering all manner of product photography; specializing in lighting, establishing systematic product photography protocols {for visual uniformity at scale}, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.\n\nin addition to that, I was the designer for all social & advertising channels; including marketing campaigns, banner and display ads, and email marketing.\n\nUsing data from our e-mail segmentation, we brought those audience insights into our flagship website, where I served as the graphic designer turned web designer; responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning [sic].\n\nIn many respects, Turn5 Inc. served as my formal education.\n\nI learned first and foremost how to work within a team environment, where everyone's role was crucial towards the company's success. There, I learned the ins-and-outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs, and in the latter half of my nearly four years there, served as a web designer focused on user experience — by the books — as applied to a {then} forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.",
+                  "font": "jakarta",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-06T16:29:19.672Z"
+            }
+          ]
+        },
+        "letter_1785894676956_6z7bq": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/v6fqJ9b9/1-I-n-HQKs7-BIXo-Y0onf-Nxn-Og.webp"
+              },
+              {
+                "text": "",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/chqNfQGJ/skylinephilly.webp"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        },
+        "letter_1785877150834_0fjtr": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "Circa 2018",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/23WVc0PW/tunnel-ANIMATION.gif"
+              },
+              {
+                "text": "...",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/LdDMT8zw/pennstation.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785894662978"
+          },
+          "entries": [
+            {
+              "id": "entry_1785894662978",
+              "blocks": [
+                {
+                  "text": "Circa 2018",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/Ps3PcGJL/IMG-20170913-181223-1-01.jpg"
+                }
+              ],
+              "createdAt": "2026-08-05T01:51:02.978Z"
+            }
+          ]
+        },
+        "letter_1785877792112_ycfkf": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785894898972"
+          },
+          "entries": [
+            {
+              "id": "entry_1785894898972",
+              "blocks": [
+                {
+                  "text": "...",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T01:54:58.973Z"
+            }
+          ]
+        },
+        "letter_1785877903918_bthe8": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/MDw7nWfZ/greenpoint.webp"
+              },
+              {
+                "text": "....",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/C3fQ63NH/vermont-500.jpg"
+              }
+            ],
+            "editingEntryId": null
+          },
+          "entries": []
+        }
+      }
     },
-    "letter_life_04": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4096/format:webp/1*ZpyOMlmzMa0rPlNY--3KXA.png"
+    "category_1785876662439_bjvwy": {
+      "roster": [
+        {
+          "id": "letter_1785876662439_ltquz",
+          "title": "waiting on the world to change",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785878083203_24qxy",
+          "title": "where do we go now?",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785878264315_6yoig",
+          "title": "ticking away",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785884584244_13v2s",
+          "title": "Nothing Else Mattered",
+          "deck": "my sweet Wolfgang "
+        }
+      ],
+      "letters": {
+        "letter_1785876662439_ltquz": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "This is really just meant to convey the value that comes from an alternative approach.\n\nA reimagining of John Mayer's single-string solo — nothing too crazy, but there's care for craft, storytelling, and a pleasantness about it.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ZACKGORT/main/waitingontheworldtochange_zackgort_v1720p.mp4"
+              }
+            ],
+            "editingEntryId": "entry_1785878506185"
           },
-          {
-            "text": "I built my first computer {circa 2005–'06}. I immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at, intensely.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785878506185",
+              "blocks": [
+                {
+                  "text": "This is really just meant to convey the value that comes from an alternative approach.\n\nA reimagining of John Mayer's single-string solo — nothing too crazy, but there's care for craft, storytelling, and a pleasantness about it.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ZACKGORT/main/waitingontheworldtochange_zackgort_v1720p.mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T21:21:46.185Z"
+            },
+            {
+              "id": "entry_1785878203589",
+              "blocks": [
+                {
+                  "text": "what I hope this clip conveys is the value I bring from my approach.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ZACKGORT/main/waitingontheworldtochange_zackgort_v1720p.mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T21:16:43.589Z"
+            }
+          ]
+        },
+        "letter_1785878083203_24qxy": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "oh oh oh oh",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/sweetsolo_v1%20(1080p)%20(1).mp4"
+              }
+            ],
+            "editingEntryId": "entry_1785878317588"
           },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*h9ljVOzzRT-IrakgaDSWvQ.png"
+          "entries": [
+            {
+              "id": "entry_1785878317588",
+              "blocks": [
+                {
+                  "text": "oh oh oh oh",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/sweetsolo_v1%20(1080p)%20(1).mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T21:18:37.588Z"
+            },
+            {
+              "id": "entry_1785878243503",
+              "blocks": [
+                {
+                  "text": "oh oh oh oh.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/sweetsolo_v1%20(1080p)%20(1).mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T21:17:23.503Z"
+            }
+          ]
+        },
+        "letter_1785878264315_6yoig": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "...the moments that make up a dull day",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/pinkfloyd-parkbenchjam_comp_v1%20(540p).mp4"
+              }
+            ],
+            "editingEntryId": "entry_1785878289802"
           },
-          {
-            "text": "So, without a college degree, or any equivalent experience, I started from absolute scratch. I studied typography {reading books, examining magazines, and generally observing what I saw wherever I were}. I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal {my clandestinely acquired Adobe products}.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785878289802",
+              "blocks": [
+                {
+                  "text": "...the moments that make up a dull day",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/pinkfloyd-parkbenchjam_comp_v1%20(540p).mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T21:18:09.802Z"
+            }
+          ]
+        },
+        "letter_1785884584244_13v2s": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "My Wolfgang",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
+              }
+            ],
+            "editingEntryId": "entry_1785884605807"
           },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*puHZ09ELFPd-AaMK0HAxqQ.png"
-          },
-          {
-            "text": "I began to create faux website concepts to gain an understanding of designing for that medium — as the screenshot above may suggest, I had lots to learn.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lm5BUxr0dDq73bWoi3vy4w.png"
-          },
-          {
-            "text": "All this culminated with an interview and subsequent job offer from Xoxide Incorporated {later turned Turn5 Inc.} which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals {Beauty, Automotive, Tech}. I found their company through a Craigslist post in the web / design category. I can still pull up my original cover letter {which I just looked at and am considering reusing in my current job search endeavors}.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1785884605807",
+              "blocks": [
+                {
+                  "text": "My Wolfgang",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
+                }
+              ],
+              "createdAt": "2026-08-04T23:03:25.807Z"
+            }
+          ]
+        }
+      }
     },
-    "letter_life_05": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4000/format:webp/1*dtGgrSm7amTRi_5jQMVeIw.png"
+    "category_1785876666609_h9exz": {
+      "roster": [
+        {
+          "id": "letter_1785876666609_mjkax",
+          "title": "Nolan lost his way",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785885287491_aurpd",
+          "title": "Crazy, but that's how it goes…",
+          "deck": "Millions of people living as foes oh  whoa whoa."
+        }
+      ],
+      "letters": {
+        "letter_1785876666609_mjkax": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "Christopher Nolan's The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn't a dialogue-driven chamber piece. It's a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It's a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon't tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread—rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we're gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer's epic isn't memorable because Odysseus visits remarkable places. It's memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world — like, I literally exclaimed \"hey, that's Charlize!\" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 24,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              }
+            ],
+            "editingEntryId": "entry_1785878550952"
           },
-          {
-            "text": "Alright. Now, where to begin? {circa 2007 through 2011}",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785878550952",
+              "blocks": [
+                {
+                  "text": "Christopher Nolan's The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn't a dialogue-driven chamber piece. It's a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It's a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon't tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread—rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we're gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer's epic isn't memorable because Odysseus visits remarkable places. It's memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world — like, I literally exclaimed \"hey, that's Charlize!\" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 24,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-04T21:22:30.952Z"
+            }
+          ]
+        },
+        "letter_1785885287491_aurpd": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "Crazy things things happen in the corporate world. Mind you, this was an acclaimed NYC studio acquired by a larger distribution group out of Texas, and teams were redistributed into an agency-format \"pod\" org structure. I was a \"Manager, UX (Senior IC II) often partnered with an adjacent Senior Solutions Architect for enterprise-scale migrating into the Salesforce Commerce capability. My clients: Aquasana (what's under your sink), Simpson Strong-tie (holding your house together), Hardinge (what built the materials that built your house).",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 25,
+                "tracking": 0,
+                "leading": 120,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/MkTGC2NX/6feetapart.webp"
+              },
+              {
+                "text": "True story: Your boss calls you asking you to take on a project straight from the board. It's top priority, zero-to-one, & you are 100% resourced to it effective now. \n\nFast forward two weeks; boss texts you \"good luck\" two minutes before the presentation starts (he called you at 11pm the night prior too, just to be sure). \n\nNo worries boss, \"we got this\" (I say we, because what I was presenting was team approved).",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 50,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "Anyway, call is going great, but the client had a question, to which I responded somewhat apologetically {classic humility theater tactic that softens your defense}.",
+                "font": "newsreader",
+                "weight": 200,
+                "italic": false,
+                "size": 38,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "bullet",
+                "link": ""
+              },
+              {
+                "text": "\nThe client, mid-call: \"No, no, no!\"",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 119,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "bullet",
+                "link": ""
+              },
+              {
+                "text": "My boss, texting in real time: \"Careful!\"",
+                "font": "jakarta",
+                "weight": 800,
+                "italic": true,
+                "size": 69,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "The client, thirty seconds later: \n\"No, no no! We love it.\"",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 66,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "They approved the work on the call with warm notes for the thoughtfulness just prepared for them.\n\nYou get a phone call immmediately after the video conference ends. It's your boss. He's upset that you upset the client. Like, really upset. He's never heard a client yell like that on a call in his career.\n",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 28,
+                "tracking": 0,
+                "leading": 150,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "So, how would you go about this?",
+                "font": "fraunces",
+                "weight": 400,
+                "italic": false,
+                "size": 43,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "\nI took that one on the chin, so to speak, but nothing chipped on my shoulder, but perhaps damned the boss' perception of me. I did convey to my mentor my concerns, offering the video call recording for assurance — I assume it was acknkowledged in some sense, since I wasn't immediately fired.",
+                "font": "jakarta",
+                "weight": 200,
+                "italic": false,
+                "size": 26,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              },
+              {
+                "text": "FWIW: This is also at the impetus of COVID, a time where faces were defaulted to lettered thumbnails, with voices tempered by a tap. Spreadsheet over spreadsheets, tasks with no target, especially ones dressed up in powerpoints or .pdf. There came about an apparent frustration in the air. I felt it. So I offered a fresh way to engage the client.\n\nOf particular note with this particular client, one of my strongest innovations was \"Cards Against Bad UX\".\n\nBasically, I gamified client workshopping with a \"Cards Against Bad UX\" format; I humanized requirements gathering resulting in a renewed interest toward truly capturing the client's business req's. & the format enabled me to engage the client with their cameras off and muted mics.\n\nI wish things simply played out better. Regardless, I'm a good sport.",
+                "font": "mono",
+                "weight": 200,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": ""
+              }
+            ],
+            "editingEntryId": "entry_1785885943296"
           },
-          {
-            "text": "Okay, so I've just been brought into the fold with a budding home-grown startup. The company had set up its new HQ at a warehouse office facility in Great Valley, PA {~20 miles outside of Philly}, and was owned and operated by two brothers; one of which wasn't even old enough to drink at the company holiday party. I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens. I think it's easier to list all my roles and functions via bulleted list:",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*FYtVicHKjLDPLW2rcnJ1uA.png"
-          },
-          {
-            "text": "Graphic designer for all print related initiatives; including package design, catalogue design, and large-format printing needs.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*GFvd_ywApPELXmtrFbxVug.png"
-          },
-          {
-            "text": "Product Photographer & Image Manipulation specialist; covering all manner of product photography; specializing in lighting, establishing systematic product photography protocols {for visual uniformity at scale}, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*ktnHKT8ZgIADpbeByv2bqg.png"
-          },
-          {
-            "text": "Graphic designer for all web properties; including 'reskin' efforts, banner and display ads, and email marketing.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*NaZV6rcEwRT55pR12BY0jg.png"
-          },
-          {
-            "text": "Graphic Designer turned Web Designer; responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning [sic].",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*m7HfhuQO4Ugr1VteZf6itA.png"
-          },
-          {
-            "text": "In many respects, Turn5 Inc. served as my formal education.\n\nI learned first and foremost how to work within a team environment, where everyone's role was crucial towards the company's success. There, I learned the ins-and-outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs, and in the latter half of my nearly four years there, served as a web designer focused on user experience — by the books — as applied to a {then} forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1785885943296",
+              "blocks": [
+                {
+                  "text": "The Setup\n\nCrazy things things happen in the corporate world. Mind you, this was an acclaimed NYC studio acquired by a larger distribution group out of Texas, and teams were redistributed into an agency-format \"pod\" org structure. I was a \"Manager, UX (Senior IC II) often partnered with an adjacent Senior Solutions Architect for enterprise-scale migrating into the Salesforce Commerce capability. My clients: Aquasana (what's under your sink), Simpson Strong-tie (holding your house together), Hardinge (what built the materials that built your house).",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 22,
+                  "tracking": 0,
+                  "leading": 120,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/MkTGC2NX/6feetapart.webp"
+                },
+                {
+                  "text": "The Call\n\nTrue story: Your boss calls you asking you to take on a project straight from the board. It's top priority, zero-to-one, & you are 100% resourced to it effective now. \n\nFast forward two weeks; boss texts you \"good luck\" two minutes before the presentation starts (he called you at 11pm the night prior too, just to be sure). \n\nNo worries boss, \"we got this\" (I say we, because what I was presenting was team approved).",
+                  "font": "jakarta",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 50,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "Anyway, call is going great, but the client had a question, to which I responded somewhat apologetically {classic humility theater tactic that softens your defense}.",
+                  "font": "newsreader",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "bullet",
+                  "link": ""
+                },
+                {
+                  "text": "\nThe client, mid-call: \"No, no, no!\"",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 38,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "bullet",
+                  "link": ""
+                },
+                {
+                  "text": "My boss, texting in real time: \"Careful!\"",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 43,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "The client, thirty seconds later: \n\n\"No, no no, you are right. We love it.\"",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 45,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "They approved the work on the call with warm notes for the thoughtfulness just prepared for them.\n\nYou get a phone call immmediately after the video conference ends. It's your boss. He's upset that you upset the client. Like, really upset. He's never heard a client yell like that on a call in his career.\n",
+                  "font": "jakarta",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 150,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "So, how would you go about this?",
+                  "font": "fraunces",
+                  "weight": 400,
+                  "italic": false,
+                  "size": 43,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "\nI took that one on the chin, so to speak, but nothing chipped on my shoulder, but perhaps damned the boss' perception of me. I did convey to my mentor my concerns, offering the video call recording for assurance — I assume it was acknkowledged in some sense, since I wasn't immediately fired.",
+                  "font": "jakarta",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                },
+                {
+                  "text": "FWIW: This is also at the impetus of COVID, a time where faces were defaulted to lettered thumbnails, with voices tempered by a tap. Spreadsheet over spreadsheets, tasks with no target, especially ones dressed up in powerpoints or .pdf. There came about an apparent frustration in the air. I felt it. So I offered a fresh way to engage the client.\n\nOf particular note with this particular client, one of my strongest innovations was \"Cards Against Bad UX\".\n\nBasically, I gamified client workshopping with a \"Cards Against Bad UX\" format; I humanized requirements gathering resulting in a renewed interest toward truly capturing the client's business req's. & the format enabled me to engage the client with their cameras off and muted mics.",
+                  "font": "mono",
+                  "weight": 200,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-04T23:25:43.296Z"
+            }
+          ]
+        }
+      }
     },
-    "letter_life_06": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*6CxwkYwhhn5Z-FHINfdpWA.png"
+    "category_1785876927811_uio34": {
+      "roster": [
+        {
+          "id": "letter_1785876927812_an63k",
+          "title": "I once chased a Zebra through the streets of West Philadelphia.",
+          "deck": ""
+        },
+        {
+          "id": "letter_1785888871921_ize07",
+          "title": "Unparalleled & Unbothered.",
+          "deck": "a parallel paradigm"
+        },
+        {
+          "id": "letter_1785884758486_zjqhv",
+          "title": "Frankly, a manifesto",
+          "deck": "a do or die doctrine."
+        }
+      ],
+      "letters": {
+        "letter_1785876927812_an63k": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "…which is to say that I offer a unique impassioned and informed perspective.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 58,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "bullet",
+                "link": "https://i.ibb.co/ZzdZ0kyx/zebra1.webp"
+              },
+              {
+                "text": "Street.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/d49fwjK2/zebra3.webp"
+              },
+              {
+                "text": "normal neighborhood happenings.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/V0FXtQzf/zebra5.webp"
+              },
+              {
+                "text": "I was a genuine part of its safe capture.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/KxTJNsBB/zebra6.webp"
+              },
+              {
+                "text": "Snap back to reality, ope, there goes gravity",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785898211196"
           },
-          {
-            "text": "Okay, so Leadnomics was shifty. 👀 Paradigm shifty, we'll say.",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785898211196",
+              "blocks": [
+                {
+                  "text": "I once chased a Zebra through the streets of West Philadelphia.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "bullet",
+                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
+                },
+                {
+                  "text": "a scene straight from Jumanji.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/d49fwjK2/zebra3.webp"
+                },
+                {
+                  "text": "normal neighborhood happenings.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/V0FXtQzf/zebra5.webp"
+                },
+                {
+                  "text": "I was a genuine part of its safe capture.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/KxTJNsBB/zebra6.webp"
+                },
+                {
+                  "text": "Snap back to reality, ope, there goes gravity",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T02:50:11.196Z"
+            },
+            {
+              "id": "entry_1785879827033",
+              "blocks": [
+                {
+                  "text": "I once chased a zebra through the streets of West Philly",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/ZzdZ0kyx/zebra1.webp"
+                },
+                {
+                  "text": "I was stopped at an intersection, when a scene straight out of Jumanji galloped past my peripherals.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/d49fwjK2/zebra3.webp"
+                },
+                {
+                  "text": "The chase took us from west Philly, down City Line Ave into the hills of Bala Cynwyd.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/V0FXtQzf/zebra5.webp"
+                },
+                {
+                  "text": "The police won't give me credit, but they lost the zebra a few times. I, on my bicycle, was able to follow the zebra closely and signal to the 'professionals' the zebra's location. One cop tried to grab the reigns and got hocked 15 feet back into oblivian; almost positive he broke some ribs. I was right next to him when that happened and immediately reconsidered grabbing the leash while on my carbon fiber bicycle.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/KxTJNsBB/zebra6.webp"
+                },
+                {
+                  "text": "Which is all to say, that unlikely things occur with me. My approach is unlike what you might expect, and the outcome is better than you would expect.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
+                }
+              ],
+              "createdAt": "2026-08-04T21:43:47.033Z"
+            }
+          ]
+        },
+        "letter_1785888871921_ize07": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "possibility.",
+                "font": "jakarta",
+                "weight": 300,
+                "italic": false,
+                "size": 24,
+                "tracking": 0,
+                "leading": 100,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/5hJTV5sh/philly-laundry-g35.jpg"
+              },
+              {
+                "text": "palpability.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/fdyYsYKy/parallelpark2.webp"
+              },
+              {
+                "text": "precision.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/Hfmt3S8p/parallelpark3.webp"
+              },
+              {
+                "text": "power play.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/tf52zLw/parallelpark4.webp"
+              },
+              {
+                "text": "pas perfunctory.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": true,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/DHJDpkQY/parallelpark5.webp"
+              },
+              {
+                "text": "proponent.",
+                "font": "jakarta",
+                "weight": 700,
+                "italic": false,
+                "size": 20,
+                "tracking": 0,
+                "leading": 130,
+                "fill": 0,
+                "layout": "single",
+                "list": "none",
+                "link": "https://i.ibb.co/cSyb2bfd/parallelpark6.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785890656866"
           },
-          {
-            "text": "It was a great place to work though. I have lasting friendships with folks I worked with there {heck, two of them now work at Google}. But our work fed upon the uneducated and disenfranchised, in some respects. As the name may suggest, our focus was in lead generation. Our cash cow was in facilitating easy access to high-interest short-term loans {otherwise known as payday loans}.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
+          "entries": [
+            {
+              "id": "entry_1785890656866",
+              "blocks": [
+                {
+                  "text": "possibility.",
+                  "font": "jakarta",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 24,
+                  "tracking": 0,
+                  "leading": 100,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/5hJTV5sh/philly-laundry-g35.jpg"
+                },
+                {
+                  "text": "palpability.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/fdyYsYKy/parallelpark2.webp"
+                },
+                {
+                  "text": "precision.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/Hfmt3S8p/parallelpark3.webp"
+                },
+                {
+                  "text": "power play.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/tf52zLw/parallelpark4.webp"
+                },
+                {
+                  "text": "pas perfunctory.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": true,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/DHJDpkQY/parallelpark5.webp"
+                },
+                {
+                  "text": "proponent.",
+                  "font": "jakarta",
+                  "weight": 700,
+                  "italic": false,
+                  "size": 20,
+                  "tracking": 0,
+                  "leading": 130,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "none",
+                  "link": "https://i.ibb.co/cSyb2bfd/parallelpark6.webp"
+                }
+              ],
+              "createdAt": "2026-08-05T00:44:16.866Z"
+            }
+          ]
+        },
+        "letter_1785884758486_zjqhv": {
+          "draft": {
+            "blocks": [
+              {
+                "text": "1. Don't be an asshole.\n2. Don't be other genitalia either.\n3. Own your shit. Own the shit. Own all of it.\n4. Don't expect folks to remember a 4th rule.\n5. Say what you mean, and be choice with your words.",
+                "font": "newsreader",
+                "weight": 300,
+                "italic": false,
+                "size": 33,
+                "tracking": 29,
+                "leading": 136,
+                "fill": 0,
+                "layout": "single",
+                "list": "number",
+                "link": "https://i.ibb.co/BHKQwjNL/life.webp"
+              }
+            ],
+            "editingEntryId": "entry_1785884925940"
           },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*HI1bKbZmFYVgs3My-H3wvg.png"
-          },
-          {
-            "text": "But, we had free lunches, regular bonuses, company outings, free snacks, and solid benefits; each with our own super thin Apple laptops and the ability to WFH occasionally {circa 2011, fyi}.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1200/format:webp/1*BNs_Ch8k1bcljKMu1KN_-g.gif"
-          },
-          {
-            "text": "In short, my job was to make it intuitive and stress free {daresay pleasant} for one {user} to make catastrophic financial decisions {under clandestine duress} at a scale in tens of thousands per month.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
+          "entries": [
+            {
+              "id": "entry_1785884925940",
+              "blocks": [
+                {
+                  "text": "1. Don't be an asshole.\n2. Don't be other genitalia either.\n3. Own your shit. Own the shit. Own all of it.\n4. Don't expect folks to remember a 4th rule.\n5. Say what you mean, and be choice with your words.",
+                  "font": "newsreader",
+                  "weight": 300,
+                  "italic": false,
+                  "size": 33,
+                  "tracking": 29,
+                  "leading": 136,
+                  "fill": 0,
+                  "layout": "single",
+                  "list": "number",
+                  "link": ""
+                }
+              ],
+              "createdAt": "2026-08-04T23:08:45.941Z"
+            }
+          ]
+        }
+      }
     },
-    "letter_life_07": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4096/format:webp/1*mnDJgS7abSiPjlzk2BxkTA.png"
-          },
-          {
-            "text": "One Sixty Over Ninety — my heart rate when I was offered a full-time gig as an \"Interaction Designer\" {circa 2014} working at a leading design agency at the literal epicenter of Center City, Philadelphia.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:750/format:webp/1*aQOvTWfvAwf6m7-oyZyGyA.png"
-          },
-          {
-            "text": "Granted, I accepted the job at approximately $12K less than I was at my previous start-up, but I was one of two interactive designers hired to fulfill the needs of the newly minted Interactive Department at the 160/90 HQ.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:750/format:webp/1*pch6xhEpFoXxliAGbNnr7Q.png"
-          },
-          {
-            "text": "I was there to learn. Day. Night. Lots of nights.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*oP6krDDqPpSgF4AgFrWClw.png"
-          },
-          {
-            "text": "....weekends too.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*CQ_4uTkD6MUBWABKwJIZgA.png"
-          },
-          {
-            "text": "We made high-fidelity wireframes. We completely bypassed any user research, data, or analytics.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*HXIU3nxuZGok-HeOsK0qtrw.png"
-          },
-          {
-            "text": "We were charged with being edgy and innovative {within budget, and within WordPress' capabilities}",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*vkU8lZmqnOHgheOsK0qtrw.png"
-          },
-          {
-            "text": "Responsibly 'Responsive', of course.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_08": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:3962/format:webp/1*TutCePQB0bSCoMfMTWJb-Q.png"
-          },
-          {
-            "text": "An elevating experience with O3 World, a digital product shop based in Fishtown, Philadelphia",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "Wireframes at 160over90 fit the workflow at 160over90. Wireframing at O3 World was a different beast, which required throwing everything I thought I knew out of the window, and reverting to the basics. Here, it was less about impressing our clients. Here, it was all about working with our clients. Without the pizazz of beautiful grayscale renders of your soon-to-be colored in homepage, we focused on asking the right questions and getting the right 'feel' with our clients. We were agile in nature and scrum led; we had daily scrums and weekly sprint schedules. We dealt with client feedback organically, and responsively, as opposed to reactively.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:882/format:webp/1*7wEKA8duSccOZwImA_6jSQ.png"
-          },
-          {
-            "text": "#team vibes",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1120/format:webp/1*I_nHQKs7BIXoY0onfNxnOg.png"
-          },
-          {
-            "text": "In it to win it.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:828/format:webp/1*KE8gFA6w4wud1uDArA4YvQ.png"
-          },
-          {
-            "text": "\"Office-friendly\"",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_09": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:3044/format:webp/1*lEJetjUt85CTbb24dBTFkA.png"
-          },
-          {
-            "text": "I had mentioned Agile and Scrum. Well, say hello to Gidget, our adjunct project manager and scrum master at Workarea {a proprietary SaaS e-commerce platform}.\n\nHere, I served as a Senior Visual and UX Designer. Here, we did wireframes differently. Here, we worked in direct partnership with our ever-ready-to-help developers. Napkin sketches, low-fi mockups, or just a few messages on Slack were all that was needed.\n\nThe work was building out our proprietary SaaS E-commerce Platform which we marketed out in typical agency-style to a number of A-list brands, using all insights and analytics towards optimizing our platform and expanding functionality to meet demand.\n\nI don't have any work to show from here. I didn't save any of my napkins.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_10": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4800/format:webp/1*XT2eaL5pv1yb49r_oJqAoA.png"
-          },
-          {
-            "text": "FlightPath presented an intriguing opportunity. Recently emerging from the brink of bankruptcy, the agency had drastically downsized from a bustling office to a sparse handful of core employees. It wasn't a lucrative endeavor; the pay was passable at best. But for me, the allure lay in the chance to immerse myself in the New York agency scene and gather invaluable experience to propel my career forward.\n\nDespite its tumultuous journey, FlightPath managed to preserve vital relationships with long-standing clients, specifically in the pharmaceutical sector {Merck, Zoetis, Charter, and Goya}. Operating in regulated industries, these clients demanded design solutions that not only adhered to WCAG 2.0 AA {or even AAA} compliance standards but also underwent rigorous scrutiny and approval from legal and regulatory marketing authorities.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*9EZTgvxttDXOacHzI9axeQ.gif"
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/NtWgd7T/dana-mobile-mockup.jpg"
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/p4K0rCJ/baw-mobile-mockup.jpg"
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/FJczkpC/dana-Dana-Mobile-Nav.jpg"
-          },
-          {
-            "text": "This non-profit client only had a $20K budget. Look at what I gave them for $20K. I can't show any of my Merck work due to NDA.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_11": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4466/format:webp/1*mZdgz7yElh7nWKuuS8XZ2g.png"
-          },
-          {
-            "text": "Cards against bad UX? What?",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "What do you do when you're working with a sophisticated client, who has a tremendously complex product line and deep inventory, who are accustomed to B2B and B2E operations and dealings, and whom while fluent with their industry acumen, were completely unfamiliar with \"the design process\"[?]",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*a9toSr99x6NtE5YC7bGnzw.png"
-          },
-          {
-            "text": "What do you do when jargon-laden spreadsheets and single-sided meetings net nothing but frustration with the client to the point where they're considering abandoning the contract?",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*pXU6SpY7MxMKiyfVI-976g.gif"
-          },
-          {
-            "text": "Enter \"Cards Against Bad UX\"",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "All I did was 'simplify what we asked'; to shift the conversation away from technical jargon and towards user-centric thinking. By providing different perspectives such as \"As a shopper\" \"As a content manager\" or \"As a guest user\", and pairing it with a simple visual {a card}, I was able to help our stakeholders empathize with their end-users and focus on their needs and experiences.\n\nThis approach not only catalyzed communication but also encouraged collaboration and problem-solving from both sides of the table. It allowed our client to see the project from various angles and find common ground, ultimately leading to more effective solutions and preventing frustration or contract abandonment.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_12": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/4RksMzw/Browse-Location-List.png"
-          },
-          {
-            "text": "At LiveArea, I was the UX Manager assigned to contracts exceeding $1m in value {$1.2m, actually}. My hourly billable rate to the client was something like $235/hr. Everything I did had a direct impact on the final deliverable.\n\nI managed multiple projects and pitches as well as junior designers while being the primary client-facing resource. I presented findings. I course-corrected when needed. I moved the machine forward.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*UATKEet6VtcLkA8rYspjFQ.png"
-          },
-          {
-            "text": "At Huge, I couldn't tell you what my billable rate was, but I could say this was the first time I had seen a project with at least 20 different people involved {on just the agency side}.\n\nAt Huge, I was responsible for exploring a single user flow. There were other designers responsible for exploring other individual user flows. At no point during my time with Huge did I even know there were other designers on that project. To say we were siloed would be a gross understatement.\n\nBeing completely candid, I get it. This was a mere contract position. Huge hired numerous UX contractors to sign on few weeks or months. It was simply about a little bit of work done without any long-term commitments.\n\nI would be thrilled to take on a more robust contract, but hopefully with a different {and more vested manager this time around}. Or, may I be the manager? ;)",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_13": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2400/format:webp/1*ijfhJkgMsBKeSl3rIzi0XQ.png"
-          },
-          {
-            "text": "Heavy Lift. Big Gains. This is the Whey.",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "Enter, Elva Design Group {now just \"Elva\"}; a boutique design agency based in San Francisco specializing in Shopify e-commerce builds, and I was just resourced to their newest client, General Nutrition Centers {GNC}.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*ExXeZpPzCwC4QKjx3FpJ-Q.png"
-          },
-          {
-            "text": "Notes. Lots of notes.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*HRsgXZNL-WJf4XjJ-O75Bg.png"
-          },
-          {
-            "text": "Hypothesis",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*8mPDVHlSO_dLbJVIi5VkFg.png"
-          },
-          {
-            "text": "Setting up for success",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*7e7U6ZN5HC_zdQzm1tSbGg.png"
-          },
-          {
-            "text": "Roadmap to success",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*LCDrFFlmX0F1RasveRsrvA.png"
-          },
-          {
-            "text": "Iteration",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*5gMvv7027-cm7r0vmIDy1A.png"
-          },
-          {
-            "text": "\"Innovation\"",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*asoTmZ5cV3ZkodrMcuYjig.png"
-          },
-          {
-            "text": "Optimization",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Iy-nWY_5dNzLniq7vHVgIw.png"
-          },
-          {
-            "text": "Refinement",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*fTX_dBN7l7ofM3nfKU7p8g.png"
-          },
-          {
-            "text": "Gains",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/pbchQFh/dash-gnc-screen.png"
-          },
-          {
-            "text": "Reward",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_14": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*RTEI5aCcw31fjFzqjBgFEg.png"
-          },
-          {
-            "text": "It's a long way to the top, if you want to rock and roll",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "In this chapter, I won't delve into the specifics of the project at Code & Theory, but rather focus on the broader context and my experiences during my time there.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:4000/format:webp/1*xQoqrV021PFk0sxts5AWAg.png"
-          },
-          {
-            "text": "I interviewed for an 'ACD, Interactive' position and was immediately hired on a freelance basis as a Senior Designer, with the intention of fulfilling the ACD responsibilities. As part of the team working on a project for a top social media brand, I quickly proved my worth and was transitioned to full-time employment.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1100/format:webp/1*1gjrEffBioJYoEAvMWHfKQ.png"
-          },
-          {
-            "text": "The project was led by a Directly Responsible Individual (DRI), but whom accepted a Director-level position {elsewhere} three months into the project. There were also the departure of several key team members {including senior strategists and technologists}, which placed additional responsibilities on my shoulders, requiring me to provide guidance in UX, Strategy, and Development, while also serving as a people manager myself with a junior-level associate under my purview.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*gC_cmPMoCAMgckq051lwZg.png"
-          },
-          {
-            "text": "Besides resourcing hurdles, there were issues spanning practicality and pragmatism, suffice to say.\n\nDespite offering to improve internal education initiatives and providing proactive feedback {submitting a 'post mortem', as requested}, I was let go from Code & Theory without explanation. It was a challenging experience, but one that taught me valuable lessons about the realities of working in a large agency environment.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_15": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2560/format:webp/1*OenHCQmGa10wpCzR8o9PtA.png"
-          },
-          {
-            "text": "Enter Publicis Sapient, \"a Digital Transformation Company\".",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "I can tell you that I spent a full year here working in the Financial Services sector serving BNY Mellon — Pershing X Advisory Experience Platform.\n\nPublicis Sapient wasn't without its imperfections either. Suffice to say there were some organizational and operational aspects that could be improved upon, dialogue and communication not withstanding.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:428/format:webp/1*bQ-sX24bQkUtx50Q5jMZNg.png"
-          },
-          {
-            "text": "I became the de facto Team Lead and Product Owner. I led research and discovery efforts. I led client workshops; I led design and prototype development and testing; I collaborated across multiple concurrent tracks, while providing mentorship and guidance to junior and associate designers; also serving as team lead amongst peers at the senior level.\n\n{I successfully negotiated on numerous occasion company paid lunches for my in-office workshops}",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*BlRk8mWPsIvsfbZkdzSI1A.png"
-          },
-          {
-            "text": "I set my team up for success daily, conducting exhaustive research and socializing of knowledge.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:750/format:webp/1*PGkVR2sOAfcKk5kkTrnQdw.png"
-          },
-          {
-            "text": "My contract stated I was a full-time remote employee, yet I still opted to be a consistent presence in the office.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*3gnCq0a4KbY8MGJyVKyP-A.png"
-          },
-          {
-            "text": "I listened and learned from leadership.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:2000/format:webp/1*-sJ-pN8tBwwsHq1XcDSLLw.png"
-          },
-          {
-            "text": "Also, lots of design systems work and data refactorization for a suite of Financial Advisor applications.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_16": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*KF8S3mjG-LyygktGkM10Kg.jpeg"
-          },
-          {
-            "text": "\"Come on, baby. Let's do the twist!\"",
-            "font": "jakarta",
-            "weight": 700,
-            "italic": false,
-            "size": 22,
-            "tracking": 0,
-            "leading": 120,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "In case the headline doesn't make sense, in the world of Low Voltage Data Installation, some terminations require a very specific twist parity, lest you run risk of signal impedance/interference. Got it? Good.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*iP-y0X1WqN9WLw_Y-w-evQ.jpeg"
-          },
-          {
-            "text": "Suffice to say, I've been networking {pun intended}. I've taken on sub-contractor gigs and learned new hands-on skills. I can now terminate an RJ45 in 30–45 seconds per. I can run cables and install security systems and setup indoor/outdoor digital displays. No problem.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*fQX6x7lVSHT4XJxpApkBfg.jpeg"
-          },
-          {
-            "text": "My passion for creative output is unrelenting, though I'm using different parts of my brain to make due. I still have my eyes set on elevating my career in a paradigm changing way.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*Fpw92LFkhtWU0eFuRAKqVg.jpeg"
-          },
-          {
-            "text": "Maybe someone out there sees potential.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:720/format:webp/1*O3ydblRDwhoq24nxcOKolw.jpeg"
-          },
-          {
-            "text": "Meanwhile, got mouths to feed.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "As an aside, I've been keeping up with the latest happenings in the world of \"Artificial Intelligence\". I am absolutely unequivocally NOT worried about the 'thinking machines' taking over jobs, or the world for that matter. AI will never have the patience required (nor physical dexterity) to run and terminate physical ethernet cables or fiber optic lines. Never. {If it isn't clear, this is written in jest}",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          }
-        ]
-      },
-      "entries": []
-    },
-    "letter_life_17": {
-      "draft": {
-        "blocks": [
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://i.ibb.co/Ct9DZd9/image-442-min.png"
-          },
-          {
-            "text": "TL;DR:\nI have my reasons. I have my resolution.",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "\"Zack has a deep connection to emotions, imagination, and sensitivity—the quintessential idealist. His greatest strength is his depth of sensitivity and empathy, which allows him to give voice to human connections in a way that works with people on a profound level. Zack brings fresh perspective to things when I felt in a rut—a great person to work with.\"\n\n— Christopher Bayle | ACD UX, Publicis Sapient",
-            "font": "newsreader",
-            "weight": 400,
-            "italic": true,
-            "size": 19,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 30,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "\"Zack is one of the most talented, hard-working, and knowledgeable individuals I have had the pleasure of working with. He fosters communication not only between us but also with the whole team, setting them up for success. He always gives his best and more. I really enjoy working with him, and I feel he should be recognized for his tremendous effort and for being such a great team player.\"\n\n— Andrés Moros, MPS | Sr. UX Designer, Publicis Sapient",
-            "font": "newsreader",
-            "weight": 400,
-            "italic": true,
-            "size": 19,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 30,
-            "layout": "single",
-            "list": "none",
-            "link": ""
-          },
-          {
-            "text": "",
-            "font": "jakarta",
-            "weight": 400,
-            "italic": false,
-            "size": 17,
-            "tracking": 0,
-            "leading": 150,
-            "fill": 0,
-            "layout": "single",
-            "list": "none",
-            "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*R9yBt9fSyEoa56p77NcpqA.png"
-          }
-        ]
-      },
-      "entries": []
+    "__unsorted__": {
+      "roster": [],
+      "letters": {}
     }
-  }
-}
   }
 };
 
@@ -3481,6 +3677,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const pagerCount = document.getElementById('pagerCount');
   const btnPrevLetter = document.getElementById('btnPrevLetter');
   const btnNextLetter = document.getElementById('btnNextLetter');
+  const letterHotspotPrev = document.getElementById('letterHotspotPrev');
+  const letterHotspotNext = document.getElementById('letterHotspotNext');
   const tabLetters = document.getElementById('tabLetters');
   const tabOverview = document.getElementById('tabOverview');
   const navCrumb = document.getElementById('navCrumb');
@@ -3776,6 +3974,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroVideoEl.style.display = '';
       letterHeroVideoEl.play().catch(() => {});
       letterHeroEl.style.display = '';
+      letterHeroEl.style.opacity = '0';
       heroControlsEl.style.display = '';
       syncHeroControls();
       if (letterHeroVideoEl.readyState >= 1) sizeHeroForMedia();
@@ -3786,6 +3985,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroImgEl.src = link;
       letterHeroImgEl.style.display = '';
       letterHeroEl.style.display = '';
+      letterHeroEl.style.opacity = '0';
       if (letterHeroImgEl.complete && letterHeroImgEl.naturalWidth) sizeHeroForMedia();
     } else {
       letterHeroVideoEl.pause();
@@ -3793,6 +3993,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       letterHeroEl.style.display = 'none';
       letterHeroEl.style.height = '';
       letterHeroEl.style.maxHeight = '';
+      letterHeroEl.style.opacity = '0';
     }
   }
 
@@ -3807,12 +4008,13 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     const media = isVideoVisible ? letterHeroVideoEl : letterHeroImgEl;
     const w = isVideoVisible ? media.videoWidth : media.naturalWidth;
     const h = isVideoVisible ? media.videoHeight : media.naturalHeight;
-    if (!w || !h){ letterHeroEl.style.height = ''; letterHeroEl.style.maxHeight = ''; return; }
+    if (!w || !h){ letterHeroEl.style.height = ''; letterHeroEl.style.maxHeight = ''; letterHeroEl.style.opacity = '1'; return; }
     const boxW = letterHeroEl.offsetWidth || window.innerWidth;
     const cap = window.innerHeight * (window.innerWidth <= 640 ? 0.7 : 0.85);
     const fitH = boxW * (h / w);
     letterHeroEl.style.maxHeight = 'none'; // CSS max-height (420px/520px) would otherwise clip tall/portrait heroes
     letterHeroEl.style.height = Math.min(fitH, cap) + 'px';
+    letterHeroEl.style.opacity = '1';
   }
   letterHeroImgEl.addEventListener('load', sizeHeroForMedia);
   letterHeroVideoEl.addEventListener('loadedmetadata', sizeHeroForMedia);
@@ -6406,6 +6608,8 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
 
   btnPrevLetter.addEventListener('click', () => activatePanel(activeIndex - 1));
   btnNextLetter.addEventListener('click', () => activatePanel(activeIndex + 1));
+  letterHotspotPrev.addEventListener('click', () => activatePanel(activeIndex - 1));
+  letterHotspotNext.addEventListener('click', () => activatePanel(activeIndex + 1));
 
   async function addLetter(){
     flushDraftNow();
