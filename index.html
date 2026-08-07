@@ -1069,6 +1069,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
         <div class="file-popover-list">
           <button class="file-popover-item" id="menuImportJournal" type="button" title="Restore categories and letters from an exported journal file">Import&hellip;</button>
           <button class="file-popover-item" id="menuExportJournal" type="button" title="Download every category, letter, and history as one JSON file">Export</button>
+          <button class="file-popover-item" id="menuExportJournalCode" type="button" title="Download every category, letter, and history as a JS file — paste it over the SEED_JOURNAL block in your source file to bake it in as the shipped default">Export as code&hellip;</button>
         </div>
       </div>
     </div>
@@ -1264,7 +1265,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const SEED_JOURNAL = {
   "app": "journal",
   "kind": "journal-full",
-  "exportedAt": "2026-08-07T18:13:00.331Z",
+  "exportedAt": "2026-08-07T18:46:01.549Z",
   "categories": [
     {
       "id": "category_journal",
@@ -1388,79 +1389,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876641429_4yt7d_0",
-              "blocks": [
-                {
-                  "text": "ifimaybefrank.com is a prose platform.",
-                  "font": "bricolage",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 42,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "Most writing tools claim they are built for writing, but are only optimized for editing. You are expected to write completely and uniformly whilst considering form as secondary to your typing experience. Traditional editors may offer rich formatting utility, which is indeed essential for perfectly formatted documentation. While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.",
-                  "font": "fraunces",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 22,
-                  "tracking": 0,
-                  "leading": 163,
-                  "fill": 0,
-                  "layout": "col2",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "\"While traditional platforms advocate for fit and finish, this surface seeks to catalyze the capture of raw output.\"",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 56,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "zack.cx",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 142,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://zack.cx"
-                },
-                {
-                  "text": "fyi, I am handwriting all content herein.  how can you tell?  if there is an abundance of alliterative apropos or a subtle rhyming schema in any of my sentences, that's one tell. another tell is I stack my talking points progressively in increments of 3 (an old animation/storytelling concept I picked up from my college days) — also,  i tend to digress often.",
-                  "font": "newsreader",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 16,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-04T22:24:24.121Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785876638169_xmwdj": {
           "draft": {
@@ -1494,27 +1423,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876638169_xmwdj_0",
-              "blocks": [
-                {
-                  "text": "I made this a few years ago as means to convey my career trajectory and growth. I know most prioritize money as the main metric, but for me, it's always been about something else.\n\nI think this animation demonstrates that 'something'.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Doller%20per%20minute.mp4"
-                }
-              ],
-              "createdAt": "2026-08-06T18:44:28.609Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1786047175723_ztl2l": {
           "draft": {
@@ -1535,27 +1444,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1786047175723_ztl2l_0",
-              "blocks": [
-                {
-                  "text": "it's not magic.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://github.com/ZACKGORT/ifimaybefrank/raw/refs/heads/main/mp4/Not%20Magic.%20Just%20a%20good%20mind%20for%20managing%20systems.mp4"
-                }
-              ],
-              "createdAt": "2026-08-06T20:13:45.748Z"
-            }
-          ]
+          "entries": []
         }
       }
     },
@@ -1627,27 +1516,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877646708_gsmct_0",
-              "blocks": [
-                {
-                  "text": "...",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/mCK7D4Xb/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T02:19:28.332Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785877563585_3erm2": {
           "draft": {
@@ -1702,27 +1571,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877537057_r6jdo_0",
-              "blocks": [
-                {
-                  "text": "...",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/cSQCgNQY/work1.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T02:22:36.328Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785877389501_681cd": {
           "draft": {
@@ -1764,27 +1613,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877293644_8fdbz_0",
-              "blocks": [
-                {
-                  "text": "gidget",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/N2yd0jJV/1-l-EJetj-Ut85-CTbb24d-BTFk-A.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T02:25:52.313Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785877214352_6ff33": {
           "draft": {
@@ -1920,40 +1749,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877704618_9ms7y_0",
-              "blocks": [
-                {
-                  "text": "road worthy",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/NDk7kcW/drivethruluxurysuite.webp"
-                },
-                {
-                  "text": "",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/NDk7kcW/drivethruluxurysuite.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T02:42:31.151Z"
-            }
-          ]
+          "entries": []
         }
       }
     },
@@ -2093,27 +1889,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876654819_ntutq_0",
-              "blocks": [
-                {
-                  "text": "...",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T01:57:37.185Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785876977395_a5rx2": {
           "draft": {
@@ -2199,92 +1975,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876977395_a5rx2_0",
-              "blocks": [
-                {
-                  "text": "The Doings of an Autodidact",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/SwPmvZd8/1-Zpy-OMlmz-Ma0r-Pl-NY-3-KXA.webp"
-                },
-                {
-                  "text": "I built my first computer {circa 2005–'06}. I immediately installed pirated copies of Adobe Photoshop and Illustrator. While I didn't study at university, I studied what I saw. Whatever piqued my interest, I looked at, intensely.",
-                  "font": "bricolage",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/S4vmSJNr/1-d-MG5-YE20sk-Uzo3z7-GIyf1w.webp"
-                },
-                {
-                  "text": "So, without a college degree, or any equivalent experience, I started from absolute scratch. I studied typography {reading books, examining magazines, and generally observing what I saw wherever I were}. I studied color theory and sought online tutorials that taught me how to master the tools I had at my disposal {my clandestinely acquired Adobe products}.",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 29,
-                  "tracking": 39,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*h9ljVOzzRT-IrakgaDSWvQ.png"
-                },
-                {
-                  "text": "I began to create faux website concepts to gain an understanding of designing for that medium — as the screenshot above may suggest, I had lots to learn.",
-                  "font": "jakarta",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*puHZ09ELFPd-AaMK0HAxqQ.png"
-                },
-                {
-                  "text": "This culminated with an interview and subsequent job offer from Xoxide Incorporated {later turned Turn5 Inc.} which was the parent company to a number of niche e-commerce businesses operating in a variety of verticals {Beauty, Automotive, Tech}. I found their company through a Craigslist post in the web / design category. I can still pull up my original cover letter {which I just looked at and am considering reusing in my current job search endeavors}.",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://miro.medium.com/v2/resize:fit:1400/format:webp/1*lm5BUxr0dDq73bWoi3vy4w.png"
-                },
-                {
-                  "text": "",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-05T01:56:45.940Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785876992914_d5eaf": {
           "draft": {
@@ -2331,53 +2022,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876992914_d5eaf_0",
-              "blocks": [
-                {
-                  "text": "...",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://miro.medium.com/v2/resize:fit:4000/format:webp/1*dtGgrSm7amTRi_5jQMVeIw.png"
-                },
-                {
-                  "text": "F.O.R.D. — Found On Road Designing",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/5WSx4J20/1-GFvd-yw-Ap-PELXmtr-Fbx-Vug.webp"
-                },
-                {
-                  "text": "The company had set up its new HQ at a warehouse office facility in Great Valley, PA {~20 miles outside of Philly}, and was owned and operated by two brothers; one of which wasn't even old enough to drink at the company holiday party. I had been provided a brand new PC replete with a dual-screen monitor setup and a Canon Rebel DSLR with a kit lens.\n\nI was the sole resource for all print related initiatives including package design, catalogue design, and large-format printing needs.\n\nI also was the product photographer & image manipulation specialist; covering all manner of product photography; specializing in lighting, establishing systematic product photography protocols {for visual uniformity at scale}, photo-retouching, as well as requiring technical product knowledge and scrutinizing attention to detail.\n\nin addition to that, I was the designer for all social & advertising channels; including marketing campaigns, banner and display ads, and email marketing.\n\nUsing data from our e-mail segmentation, we brought those audience insights into our flagship website, where I served as the graphic designer turned web designer; responsible for feature development with a specific focus on user experience through wireframe prototyping, user testing, and data-backed solutioning [sic].\n\nIn many respects, Turn5 Inc. served as my formal education.\n\nI learned first and foremost how to work within a team environment, where everyone's role was crucial towards the company's success. There, I learned the ins-and-outs and nuance to graphic design, product photography and related production processes, email and display ad marketing, printed packaging and catalogs, and in the latter half of my nearly four years there, served as a web designer focused on user experience — by the books — as applied to a {then} forty-million per year ecommerce giant born from a garage somewhere in the suburbs of southeastern Pennsylvania.",
-                  "font": "jakarta",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-06T16:29:19.672Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785894676956_6z7bq": {
           "draft": {
@@ -2445,27 +2090,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877150834_0fjtr_0",
-              "blocks": [
-                {
-                  "text": "Circa 2018",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/Ps3PcGJL/IMG-20170913-181223-1-01.jpg"
-                }
-              ],
-              "createdAt": "2026-08-05T01:51:02.978Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785877792112_ycfkf": {
           "draft": {
@@ -2486,27 +2111,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785877792112_ycfkf_0",
-              "blocks": [
-                {
-                  "text": "...",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/XrxGt0D4/1-UATKEet6-Vtc-Lk-A8r-Yspj-FQ.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T01:54:58.973Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785877903918_bthe8": {
           "draft": {
@@ -2587,46 +2192,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876662439_ltquz_0",
-              "blocks": [
-                {
-                  "text": "This is really just meant to convey the value that comes from an alternative approach.\n\nA reimagining of John Mayer's single-string solo — nothing too crazy, but there's care for craft, storytelling, and a pleasantness about it.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ZACKGORT/main/waitingontheworldtochange_zackgort_v1720p.mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T21:21:46.185Z"
-            },
-            {
-              "id": "entry_seed_letter_1785876662439_ltquz_1",
-              "blocks": [
-                {
-                  "text": "what I hope this clip conveys is the value I bring from my approach.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ZACKGORT/main/waitingontheworldtochange_zackgort_v1720p.mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T21:16:43.589Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785878083203_24qxy": {
           "draft": {
@@ -2647,46 +2213,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785878083203_24qxy_0",
-              "blocks": [
-                {
-                  "text": "oh oh oh oh",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/sweetsolo_v1%20(1080p)%20(1).mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T21:18:37.588Z"
-            },
-            {
-              "id": "entry_seed_letter_1785878083203_24qxy_1",
-              "blocks": [
-                {
-                  "text": "oh oh oh oh.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/sweetsolo_v1%20(1080p)%20(1).mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T21:17:23.503Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785878264315_6yoig": {
           "draft": {
@@ -2707,27 +2234,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785878264315_6yoig_0",
-              "blocks": [
-                {
-                  "text": "...the moments that make up a dull day",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/pinkfloyd-parkbenchjam_comp_v1%20(540p).mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T21:18:09.802Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785884584244_13v2s": {
           "draft": {
@@ -2748,27 +2255,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785884584244_13v2s_0",
-              "blocks": [
-                {
-                  "text": "My Wolfgang",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://raw.githubusercontent.com/ZACKGORT/ifimaybefrank/main/mp4/nothingelsematterswolfgang720.mp4"
-                }
-              ],
-              "createdAt": "2026-08-04T23:03:25.807Z"
-            }
-          ]
+          "entries": []
         }
       }
     },
@@ -2805,27 +2292,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876666609_mjkax_0",
-              "blocks": [
-                {
-                  "text": "Christopher Nolan's The Odyssey seems to ask the audience to perform too much of the imagining themselves, favoring exposition where the medium of film could instead communicate experience directly.\n\nThat feels especially strange given the production itself.\n\nThis isn't a dialogue-driven chamber piece. It's a $250M+ epic shot on 70mm IMAX using bespoke bleeding-edge camera technology. The medium is literally engineered to immerse an audience in scale, geography, and time.It's a bit like the GAU-8 Avenger 30mm autocannon: the airplane exists to carry the weapon. Likewise, much of this production exists to carry those extraordinary IMAX cameras. And those cameras only run for roughly three minutes per magazine. Every second of exposed film should feel intentional.\n\nSo use it.\n\nDon't tell me the voyage was harrowing.\n\nMake me endure it.\n\nThe encounter with Polyphemus should have unfolded over days of mounting dread—rationing food, failing escape attempts, the psychological erosion of waiting to be eaten one by one. Instead, the sequence feels compressed into what amounts to snack time, a nap, and suddenly we're gone.\n\nLikewise, the voyages at sea rarely communicate the exhausting scale of Odysseus' return. Too often they feel less like an odyssey and more like calling an Uber between bars.\n\nHomer's epic isn't memorable because Odysseus visits remarkable places. It's memorable because every mile costs him something. Film has a unique ability to make an audience feel the weight of time, distance, weather, hunger, isolation, and hope.\n\nWhen that weight is abbreviated, the odyssey risks becoming an itinerary.\n\nFurthermore, when you every scene features an A-lister, it serves as a tax on my buy-in into this cinematic world — like, I literally exclaimed \"hey, that's Charlize!\" when she popped up on screen, then I spent the next few minutes pondering her casting choice rather than pay attention to the she shared with Matt Damon, who had different hair in every scene, which I also thought about enough so to form an opinion on it. ",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 24,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-04T21:22:30.952Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785885287491_aurpd": {
           "draft": {
@@ -2963,144 +2430,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785885287491_aurpd_0",
-              "blocks": [
-                {
-                  "text": "The Setup\n\nCrazy things things happen in the corporate world. Mind you, this was an acclaimed NYC studio acquired by a larger distribution group out of Texas, and teams were redistributed into an agency-format \"pod\" org structure. I was a \"Manager, UX (Senior IC II) often partnered with an adjacent Senior Solutions Architect for enterprise-scale migrating into the Salesforce Commerce capability. My clients: Aquasana (what's under your sink), Simpson Strong-tie (holding your house together), Hardinge (what built the materials that built your house).",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 22,
-                  "tracking": 0,
-                  "leading": 120,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/MkTGC2NX/6feetapart.webp"
-                },
-                {
-                  "text": "The Call\n\nTrue story: Your boss calls you asking you to take on a project straight from the board. It's top priority, zero-to-one, & you are 100% resourced to it effective now. \n\nFast forward two weeks; boss texts you \"good luck\" two minutes before the presentation starts (he called you at 11pm the night prior too, just to be sure). \n\nNo worries boss, \"we got this\" (I say we, because what I was presenting was team approved).",
-                  "font": "jakarta",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 50,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "Anyway, call is going great, but the client had a question, to which I responded somewhat apologetically {classic humility theater tactic that softens your defense}.",
-                  "font": "newsreader",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "bullet",
-                  "link": ""
-                },
-                {
-                  "text": "\nThe client, mid-call: \"No, no, no!\"",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 38,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "bullet",
-                  "link": ""
-                },
-                {
-                  "text": "My boss, texting in real time: \"Careful!\"",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 43,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "The client, thirty seconds later: \n\n\"No, no no, you are right. We love it.\"",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 45,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "They approved the work on the call with warm notes for the thoughtfulness just prepared for them.\n\nYou get a phone call immmediately after the video conference ends. It's your boss. He's upset that you upset the client. Like, really upset. He's never heard a client yell like that on a call in his career.\n",
-                  "font": "jakarta",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 150,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "So, how would you go about this?",
-                  "font": "fraunces",
-                  "weight": 400,
-                  "italic": false,
-                  "size": 43,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "\nI took that one on the chin, so to speak, but nothing chipped on my shoulder, but perhaps damned the boss' perception of me. I did convey to my mentor my concerns, offering the video call recording for assurance — I assume it was acknkowledged in some sense, since I wasn't immediately fired.",
-                  "font": "jakarta",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                },
-                {
-                  "text": "FWIW: This is also at the impetus of COVID, a time where faces were defaulted to lettered thumbnails, with voices tempered by a tap. Spreadsheet over spreadsheets, tasks with no target, especially ones dressed up in powerpoints or .pdf. There came about an apparent frustration in the air. I felt it. So I offered a fresh way to engage the client.\n\nOf particular note with this particular client, one of my strongest innovations was \"Cards Against Bad UX\".\n\nBasically, I gamified client workshopping with a \"Cards Against Bad UX\" format; I humanized requirements gathering resulting in a renewed interest toward truly capturing the client's business req's. & the format enabled me to engage the client with their cameras off and muted mics.",
-                  "font": "mono",
-                  "weight": 200,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-04T23:25:43.296Z"
-            }
-          ]
+          "entries": []
         }
       }
     },
@@ -3199,150 +2529,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785876927812_an63k_0",
-              "blocks": [
-                {
-                  "text": "I once chased a Zebra through the streets of West Philadelphia.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "bullet",
-                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
-                },
-                {
-                  "text": "a scene straight from Jumanji.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/d49fwjK2/zebra3.webp"
-                },
-                {
-                  "text": "normal neighborhood happenings.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/V0FXtQzf/zebra5.webp"
-                },
-                {
-                  "text": "I was a genuine part of its safe capture.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/KxTJNsBB/zebra6.webp"
-                },
-                {
-                  "text": "Snap back to reality, ope, there goes gravity",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T02:50:11.196Z"
-            },
-            {
-              "id": "entry_seed_letter_1785876927812_an63k_1",
-              "blocks": [
-                {
-                  "text": "I once chased a zebra through the streets of West Philly",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/ZzdZ0kyx/zebra1.webp"
-                },
-                {
-                  "text": "I was stopped at an intersection, when a scene straight out of Jumanji galloped past my peripherals.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/d49fwjK2/zebra3.webp"
-                },
-                {
-                  "text": "The chase took us from west Philly, down City Line Ave into the hills of Bala Cynwyd.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/V0FXtQzf/zebra5.webp"
-                },
-                {
-                  "text": "The police won't give me credit, but they lost the zebra a few times. I, on my bicycle, was able to follow the zebra closely and signal to the 'professionals' the zebra's location. One cop tried to grab the reigns and got hocked 15 feet back into oblivian; almost positive he broke some ribs. I was right next to him when that happened and immediately reconsidered grabbing the leash while on my carbon fiber bicycle.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/KxTJNsBB/zebra6.webp"
-                },
-                {
-                  "text": "Which is all to say, that unlikely things occur with me. My approach is unlike what you might expect, and the outcome is better than you would expect.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/RpbbSXfC/zebra4.webp"
-                }
-              ],
-              "createdAt": "2026-08-04T21:43:47.033Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785888871921_ize07": {
           "draft": {
@@ -3428,92 +2615,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785888871921_ize07_0",
-              "blocks": [
-                {
-                  "text": "possibility.",
-                  "font": "jakarta",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 24,
-                  "tracking": 0,
-                  "leading": 100,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/5hJTV5sh/philly-laundry-g35.jpg"
-                },
-                {
-                  "text": "palpability.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/fdyYsYKy/parallelpark2.webp"
-                },
-                {
-                  "text": "precision.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/Hfmt3S8p/parallelpark3.webp"
-                },
-                {
-                  "text": "power play.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/tf52zLw/parallelpark4.webp"
-                },
-                {
-                  "text": "pas perfunctory.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": true,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/DHJDpkQY/parallelpark5.webp"
-                },
-                {
-                  "text": "proponent.",
-                  "font": "jakarta",
-                  "weight": 700,
-                  "italic": false,
-                  "size": 20,
-                  "tracking": 0,
-                  "leading": 130,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "none",
-                  "link": "https://i.ibb.co/cSyb2bfd/parallelpark6.webp"
-                }
-              ],
-              "createdAt": "2026-08-05T00:44:16.866Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1785884758486_zjqhv": {
           "draft": {
@@ -3534,27 +2636,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
             ],
             "editingEntryId": null
           },
-          "entries": [
-            {
-              "id": "entry_seed_letter_1785884758486_zjqhv_0",
-              "blocks": [
-                {
-                  "text": "1. Don't be an asshole.\n2. Don't be other genitalia either.\n3. Own your shit. Own the shit. Own all of it.\n4. Don't expect folks to remember a 4th rule.\n5. Say what you mean, and be choice with your words.",
-                  "font": "newsreader",
-                  "weight": 300,
-                  "italic": false,
-                  "size": 33,
-                  "tracking": 29,
-                  "leading": 136,
-                  "fill": 0,
-                  "layout": "single",
-                  "list": "number",
-                  "link": ""
-                }
-              ],
-              "createdAt": "2026-08-04T23:08:45.941Z"
-            }
-          ]
+          "entries": []
         },
         "letter_1786124712651_4ftn9": {
           "draft": {
@@ -6792,6 +5874,7 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
   const btnImportExport = document.getElementById('btnImportExport');
   const importExportPopover = document.getElementById('importExportPopover');
   const menuExportJournal = document.getElementById('menuExportJournal');
+  const menuExportJournalCode = document.getElementById('menuExportJournalCode');
   const menuImportJournal = document.getElementById('menuImportJournal');
   const importJournalInput = document.getElementById('importJournalInput');
 
@@ -6825,7 +5908,10 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
     if (supportPopover.classList.contains('open') && !e.target.closest('.file-ctrl')) closeSupportPopover();
   });
 
-  async function exportWholeJournal(){
+  // ── builds the same journal-full payload shape used both for the
+  // portable JSON backup and for the paste-into-source JS export — the
+  // two just deliver it differently.
+  async function buildWholeJournalPayload(){
     flushDraftNow();
     const payload = { app:'journal', kind:'journal-full', exportedAt: new Date().toISOString(), categories: JSON.parse(JSON.stringify(categories)), data:{} };
     for (const cat of categories){
@@ -6851,12 +5937,43 @@ body.custom-cursor-active.write-native-cursor{cursor:auto}
       }
       payload.data[UNSORTED_ID] = { roster: unsortedRoster, letters: lettersOut };
     }
+    return payload;
+  }
+
+  async function exportWholeJournal(){
+    const payload = await buildWholeJournalPayload();
     downloadJSON(payload, 'journal-' + fileTimestamp() + '.json');
+  }
+
+  function downloadText(text, filename, mime){
+    const blob = new Blob([text], { type: mime || 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── same data as the JSON export, formatted as a drop-in replacement
+  // for the SEED_JOURNAL block near the top of this file's <script>.
+  // To bake the latest content in as the shipped default: open the
+  // downloaded file, copy everything, then in this file's source
+  // replace from "const SEED_JOURNAL = {" through the matching "};"
+  // right after it with the copied text.
+  async function exportWholeJournalAsCode(){
+    const payload = await buildWholeJournalPayload();
+    const code = '  const SEED_JOURNAL = ' + JSON.stringify(payload, null, 2) + ';\n';
+    downloadText(code, 'seed-journal-' + fileTimestamp() + '.js', 'text/javascript');
   }
 
   menuExportJournal.addEventListener('click', async () => {
     closeImportExportPopover();
     await exportWholeJournal();
+  });
+
+  menuExportJournalCode.addEventListener('click', async () => {
+    closeImportExportPopover();
+    await exportWholeJournalAsCode();
   });
 
   menuImportJournal.addEventListener('click', () => { closeImportExportPopover(); importJournalInput.click(); });
