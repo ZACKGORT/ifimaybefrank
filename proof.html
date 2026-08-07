@@ -225,20 +225,49 @@
     font-family:var(--mono); color:var(--muted); font-size:13px;
   }
 
-  /* raw JSON overlay */
-  #rawOverlay{
+  /* raw JSON / structured HTML overlays */
+  .overlay{
     display:none;
     position:fixed; inset:0; background:rgba(0,0,0,0.85);
     z-index:50; padding:40px;
   }
-  #rawOverlay.active{display:block;}
-  #rawOverlay pre{
+  .overlay.active{display:block;}
+  .overlay-panel{
     max-width:900px; margin:0 auto; height:100%;
-    overflow:auto; background:var(--panel); border:1px solid var(--line);
-    border-radius:6px; padding:24px;
+    display:flex; flex-direction:column;
+    background:var(--panel); border:1px solid var(--line);
+    border-radius:6px; overflow:hidden;
+  }
+  .overlay-bar{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:11px;
+    letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--muted);
+    flex-shrink:0;
+  }
+  .overlay-bar .overlay-title{flex:1; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .overlay-actions{display:flex; gap:8px;}
+  .overlay-actions button{
+    font-family:var(--mono); font-size:11px; letter-spacing:0.04em; text-transform:uppercase;
+    background:transparent; color:var(--muted); border:1px solid var(--line);
+    border-radius:3px; padding:6px 10px; cursor:pointer;
+    transition:color .15s, border-color .15s;
+  }
+  .overlay-actions button:hover{color:var(--fg); border-color:var(--fg);}
+  .overlay-actions button.copied{color:var(--accent); border-color:var(--accent);}
+  .overlay pre{
+    margin:0; flex:1; overflow:auto; padding:24px;
     font-family:var(--mono); font-size:12px; color:var(--fg);
     white-space:pre-wrap; word-break:break-word;
   }
+  .overlay-hint{
+    padding:8px 14px; border-top:1px solid var(--line);
+    font-family:var(--mono); font-size:10.5px; color:var(--muted);
+    flex-shrink:0;
+  }
+  .overlay-hint label{display:flex; align-items:center; gap:6px; cursor:pointer;}
 </style>
 </head>
 <body>
@@ -259,13 +288,40 @@
     <span class="brand">proofsheet</span>
     <span class="meta" id="metaLine">—</span>
     <button id="rawBtn">raw json</button>
+    <button id="exportAllBtn">export all · html</button>
     <button id="loadNewBtn">load another</button>
   </header>
   <nav class="side" id="side"></nav>
   <main class="stage" id="stage"></main>
 </div>
 
-<div id="rawOverlay"><pre id="rawPre"></pre></div>
+<div class="overlay" id="rawOverlay">
+  <div class="overlay-panel">
+    <div class="overlay-bar">
+      <span class="overlay-title">raw json</span>
+      <div class="overlay-actions">
+        <button id="rawCopyBtn">copy</button>
+        <button id="rawCloseBtn">close</button>
+      </div>
+    </div>
+    <pre id="rawPre"></pre>
+  </div>
+</div>
+
+<div class="overlay" id="htmlOverlay">
+  <div class="overlay-panel">
+    <div class="overlay-bar">
+      <span class="overlay-title" id="htmlOverlayTitle">structured html</span>
+      <div class="overlay-actions">
+        <button id="htmlCopyBtn">copy</button>
+        <button id="htmlDownloadBtn">download</button>
+        <button id="htmlCloseBtn">close</button>
+      </div>
+    </div>
+    <pre id="htmlPre"></pre>
+    <div class="overlay-hint">markup uses inline styles for visual fidelity, plus data-* attributes (font/weight/size/tracking/leading/list/link) so it stays editable in your canon file.</div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -320,11 +376,83 @@
     fileInput.value = '';
   });
 
+  const htmlOverlay = document.getElementById('htmlOverlay');
+  const htmlPre = document.getElementById('htmlPre');
+  const htmlOverlayTitle = document.getElementById('htmlOverlayTitle');
+
+  function openOverlay(el){ el.classList.add('active'); }
+  function closeOverlay(el){ el.classList.remove('active'); }
+
+  // clicking the dim background closes an overlay; clicking inside the
+  // panel (text, buttons) should not.
+  [rawOverlay, htmlOverlay].forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov); });
+    ov.querySelector('.overlay-panel').addEventListener('click', e => e.stopPropagation());
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape'){ closeOverlay(rawOverlay); closeOverlay(htmlOverlay); }
+  });
+
   document.getElementById('rawBtn').addEventListener('click', () => {
     rawPre.textContent = JSON.stringify(doc, null, 2);
-    rawOverlay.classList.add('active');
+    openOverlay(rawOverlay);
   });
-  rawOverlay.addEventListener('click', () => rawOverlay.classList.remove('active'));
+  document.getElementById('rawCloseBtn').addEventListener('click', () => closeOverlay(rawOverlay));
+  document.getElementById('rawCopyBtn').addEventListener('click', (e) => copyToClipboard(rawPre.textContent, e.currentTarget));
+
+  document.getElementById('exportAllBtn').addEventListener('click', () => {
+    htmlOverlayTitle.textContent = 'structured html · entire journal';
+    htmlPre.textContent = documentToHTML();
+    htmlPre.dataset.filename = ((doc && doc.kind) || 'journal') + '-export.html';
+    openOverlay(htmlOverlay);
+  });
+  document.getElementById('htmlCloseBtn').addEventListener('click', () => closeOverlay(htmlOverlay));
+  document.getElementById('htmlCopyBtn').addEventListener('click', (e) => copyToClipboard(htmlPre.textContent, e.currentTarget));
+  document.getElementById('htmlDownloadBtn').addEventListener('click', () => {
+    downloadText(htmlPre.textContent, htmlPre.dataset.filename || 'export.html');
+  });
+
+  function copyToClipboard(text, btn){
+    const restore = btn ? btn.textContent : null;
+    const flash = (ok) => {
+      if (!btn) return;
+      btn.textContent = ok ? 'copied ✓' : 'copy failed';
+      btn.classList.toggle('copied', ok);
+      setTimeout(() => { btn.textContent = restore; btn.classList.remove('copied'); }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => flash(true)).catch(() => flash(false));
+    } else {
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        flash(true);
+      }catch(e){ flash(false); }
+    }
+  }
+
+  function downloadText(text, filename){
+    const blob = new Blob([text], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function copyCurrentVersionHTML(btn){
+    const html = currentVersionToHTML();
+    copyToClipboard(html, btn);
+  }
 
   function handleFile(file){
     errEl.textContent = '';
@@ -489,6 +617,13 @@
       toolbar.appendChild(pill);
     });
 
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'pill';
+    copyBtn.textContent = 'copy this version → html';
+    copyBtn.style.marginLeft = 'auto';
+    copyBtn.addEventListener('click', () => copyCurrentVersionHTML(copyBtn));
+    toolbar.appendChild(copyBtn);
+
     stageEl.appendChild(toolbar);
 
     // resolve blocks for current version
@@ -600,6 +735,149 @@
       .replace(/&/g,'&amp;')
       .replace(/</g,'&lt;')
       .replace(/>/g,'&gt;');
+  }
+  function escapeAttr(s){
+    return escapeHtml(s).replace(/"/g,'&quot;');
+  }
+  function indent(str, spaces){
+    const pad = ' '.repeat(spaces);
+    return String(str).split('\n').map(l => pad + l).join('\n');
+  }
+
+  // ---------- structured HTML export ----------
+  // Mirrors renderBlock()'s visual output, but as a copy-pasteable HTML
+  // string rather than live DOM: same inline styling for visual fidelity,
+  // plus data-* attributes so each block stays editable wherever it lands.
+
+  function styleAttrForBlock(b){
+    const fillPct = typeof b.fill === 'number' ? b.fill : 0;
+    const opacity = Math.max(0.28, 1 - (fillPct / 100) * 0.85);
+    return [
+      `font-family:${FONT_MAP[b.font] || FONT_MAP.jakarta}`,
+      `font-weight:${b.weight || 400}`,
+      `font-style:${b.italic ? 'italic' : 'normal'}`,
+      `font-size:${b.size || 18}px`,
+      `letter-spacing:${((b.tracking || 0) / 1000)}em`,
+      `line-height:${((b.leading || 140) / 100)}`,
+      `opacity:${opacity}`
+    ].join('; ');
+  }
+
+  function textLinesHTML(b){
+    const rawText = b.text || '';
+    const lines = rawText.split('\n').filter(l => l.trim().length > 0);
+    if ((b.list === 'number' || b.list === 'bullet') && lines.length > 1){
+      const tag = b.list === 'number' ? 'ol' : 'ul';
+      const items = lines
+        .map(line => `  <li>${escapeHtml(line.replace(/^\s*\d+\.\s*/, ''))}</li>`)
+        .join('\n');
+      return `<${tag}>\n${items}\n</${tag}>`;
+    }
+    return rawText.split('\n')
+      .map(line => line.trim() === ''
+        ? `<p class="line" style="height:0.6em"></p>`
+        : `<p class="line">${escapeHtml(line)}</p>`)
+      .join('\n');
+  }
+
+  function blockToHTML(b){
+    const classes = ['block'].concat(b.layout === 'col2' ? ['col2'] : []).join(' ');
+    const isImg = b.link && IMG_EXT.test(b.link);
+    const isVid = b.link && VID_EXT.test(b.link);
+    const isMediaLink = isImg || isVid;
+
+    let media = '';
+    if (isImg){
+      media = `<img src="${escapeAttr(b.link)}" alt="${escapeAttr((b.text || '').slice(0, 120))}" loading="lazy">`;
+    } else if (isVid){
+      media = `<video src="${escapeAttr(b.link)}" controls></video>`;
+    }
+    const mediaLine = media ? `${indent(media, 2)}\n` : '';
+
+    let textInner = textLinesHTML(b);
+    if (b.link && !isMediaLink){
+      textInner = `<a class="textlink" href="${escapeAttr(b.link)}" target="_blank" rel="noopener" style="color:inherit">\n${indent(textInner, 2)}\n</a>`;
+    }
+
+    const dataAttrs = [
+      `data-font="${escapeAttr(b.font || 'jakarta')}"`,
+      `data-weight="${b.weight || 400}"`,
+      `data-italic="${!!b.italic}"`,
+      `data-size="${b.size || 18}"`,
+      `data-tracking="${b.tracking || 0}"`,
+      `data-leading="${b.leading || 140}"`,
+      `data-fill="${b.fill || 0}"`,
+      `data-layout="${escapeAttr(b.layout || 'single')}"`,
+      `data-list="${escapeAttr(b.list || 'none')}"`,
+      b.link ? `data-link="${escapeAttr(b.link)}"` : ''
+    ].filter(Boolean).join(' ');
+
+    return `<div class="${classes}" ${dataAttrs}>\n${mediaLine}` +
+      `  <div class="block-text" style="${styleAttrForBlock(b)}">\n` +
+      `${indent(textInner, 4)}\n  </div>\n</div>`;
+  }
+
+  function blocksToHTML(blocks){
+    const visible = (blocks || []).filter(b => (b.text && b.text.trim()) || b.link);
+    if (!visible.length) return '<div class="empty-block"><!-- empty --></div>';
+    return visible.map(blockToHTML).join('\n\n');
+  }
+
+  function versionBlocksFor(letterObj, versionKey){
+    if (!letterObj) return [];
+    if (versionKey === 'draft') return (letterObj.draft && letterObj.draft.blocks) || [];
+    const entry = (letterObj.entries || []).find(e => e.id === versionKey);
+    return (entry && entry.blocks) || [];
+  }
+
+  function currentVersionToHTML(){
+    const letterObj = getLetterObj();
+    if (!letterObj) return '<!-- nothing here yet -->';
+    const catData = doc.data[currentCategoryId];
+    const letterMeta = (catData && catData.roster || []).find(l => l.id === currentLetterId) || {};
+    const blocks = versionBlocksFor(letterObj, currentVersion);
+    const bodyHTML = blocksToHTML(blocks);
+    return `<article class="letter" data-letter-id="${escapeAttr(currentLetterId)}" data-version="${escapeAttr(currentVersion)}">\n` +
+      `  <header class="letter-head">\n` +
+      `    <h3 class="letter-title">${escapeHtml(letterMeta.title || '(untitled)')}</h3>\n` +
+      (letterMeta.deck ? `    <p class="letter-deck">${escapeHtml(letterMeta.deck)}</p>\n` : '') +
+      `  </header>\n` +
+      `  <div class="letter-body">\n${indent(bodyHTML, 4)}\n  </div>\n` +
+      `</article>`;
+  }
+
+  function categoryLettersHTML(catData){
+    const roster = (catData && catData.roster) || [];
+    const letters = roster.map(l => {
+      const letterObj = (catData.letters && catData.letters[l.id]) || null;
+      const draftBlocks = (letterObj && letterObj.draft && letterObj.draft.blocks) || [];
+      const bodyHTML = blocksToHTML(draftBlocks);
+      return `<article class="letter" data-letter-id="${escapeAttr(l.id)}">\n` +
+        `  <header class="letter-head">\n` +
+        `    <h3 class="letter-title">${escapeHtml(l.title || '(untitled)')}</h3>\n` +
+        (l.deck ? `    <p class="letter-deck">${escapeHtml(l.deck)}</p>\n` : '') +
+        `  </header>\n` +
+        `  <div class="letter-body">\n${indent(bodyHTML, 4)}\n  </div>\n` +
+        `</article>`;
+    });
+    return letters.length ? letters.join('\n\n') : '<!-- no letters -->';
+  }
+
+  function categoryToHTML(cat){
+    const catData = doc.data[cat.id];
+    const lettersHTML = categoryLettersHTML(catData);
+    return `<section class="category" data-category-id="${escapeAttr(cat.id)}">\n` +
+      `  <header class="category-head">\n` +
+      `    <h2 class="category-title">${escapeHtml(cat.title || cat.id)}</h2>\n` +
+      (cat.deck ? `    <p class="category-deck">${escapeHtml(cat.deck)}</p>\n` : '') +
+      `  </header>\n${indent(lettersHTML, 2)}\n</section>`;
+  }
+
+  function documentToHTML(){
+    const cats = doc.categories || [];
+    const catsHTML = cats.map(categoryToHTML).join('\n\n');
+    return `<!-- proofsheet structured export · ${new Date().toISOString()} -->\n` +
+      `<div class="journal-export" data-app="${escapeAttr(doc.app || 'journal')}" data-kind="${escapeAttr(doc.kind || '')}">\n${indent(catsHTML, 2)}\n</div>`;
   }
 })();
 </script>
