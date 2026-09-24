@@ -13,41 +13,33 @@
 :root[data-theme="dark"]{--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#94919b;--sb:#7b7882;--sh:#fff}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);transition:background .25s,color .25s;-webkit-tap-highlight-color:transparent}
+
+/* ── replace the native scrollbar with a thin progress line ── */
+html,body{scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
+.scroll-line{
+  position:fixed;top:0;left:0;right:0;height:2px;z-index:60;
+  pointer-events:none;overflow:hidden;
+}
+.scroll-line > span{
+  display:block;height:100%;width:100%;
+  background:var(--ink);opacity:.55;
+  transform:scaleX(0);transform-origin:0 50%;
+  will-change:transform;
+}
+@media (prefers-reduced-motion:reduce){
+  .scroll-line > span{opacity:.4}
+}
+@media print{ .scroll-line{display:none!important} }
+
 #app{max-width:780px;margin:0 auto;padding:28px 24px calc(160px + var(--kb,0px));min-height:100vh;box-sizing:border-box;cursor:text}
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:38px;font:300 12px/1 var(--mono);color:var(--mute);letter-spacing:.02em;cursor:default}
-
-/* ── logo pin: the .wm-slot holds the layout space where the logo used to
-   live in flow, so when .wm detaches to position:fixed the header's
-   space-between doesn't slam the controls left. The visible logo animates
-   via FLIP (JS measures before/after and applies a compensating transform). ── */
 .wm-slot{position:relative;display:inline-block;font:400 28px/1 var(--sans);letter-spacing:-.02em}
 .wm-spacer{visibility:hidden;display:block}
-.wm{
-  position:absolute;top:0;left:0;
-  font:inherit;letter-spacing:inherit;color:var(--ink);
-  transform-origin:top left;
-  transition:transform .42s cubic-bezier(.22,1,.36,1);
-  will-change:transform;
-  pointer-events:none;
-  white-space:nowrap;
-}
-.wm.wm-pinned{
-  position:fixed;
-  top:16px;left:16px;
-  font-size:18px;
-  padding:6px 12px;
-  margin:-6px -12px;
-  background:color-mix(in srgb, var(--bg) 85%, transparent);
-  border-radius:9px;
-  -webkit-backdrop-filter:blur(10px) saturate(1.2);
-  backdrop-filter:blur(10px) saturate(1.2);
-  z-index:20;
-  pointer-events:auto;
-  cursor:pointer;
-}
+.wm{position:absolute;top:0;left:0;font:inherit;letter-spacing:inherit;color:var(--ink);transform-origin:top left;transition:transform .42s cubic-bezier(.22,1,.36,1);will-change:transform;pointer-events:none;white-space:nowrap}
+.wm.wm-pinned{position:fixed;top:16px;left:16px;font-size:18px;padding:6px 12px;margin:-6px -12px;background:color-mix(in srgb, var(--bg) 85%, transparent);border-radius:9px;-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);z-index:20;pointer-events:auto;cursor:pointer}
 .wm.wm-pinned:hover{background:color-mix(in srgb, var(--bg) 95%, transparent)}
 @media (prefers-reduced-motion:reduce){.wm{transition:none}}
-
 .ctl{font:inherit;color:inherit;background:none;border:0;padding:6px 0;margin-left:18px;cursor:pointer;transition:color .15s;touch-action:manipulation}
 .ctl:hover{color:var(--ink)}
 .w{display:inline-block;white-space:nowrap}
@@ -76,9 +68,6 @@ textarea::placeholder{color:var(--mute);-webkit-text-fill-color:var(--mute)}
 .row.s .st{background-image:linear-gradient(120deg,transparent 35%,var(--sh) 50%,transparent 65%),var(--base-img);background-size:200% 100%,100% 100%;background-repeat:no-repeat;background-position:150% 0,0 0;animation:shine 3.2s linear infinite}
 @keyframes shine{0%{background-position:150% 0,0 0}70%,100%{background-position:-50% 0,0 0}}
 @media (prefers-reduced-motion:reduce){.row.s .st{animation:none}}
-
-/* ── branch toggle ──
-   collapsed = right, expanded = down, hover flips toward the other state */
 .tw{position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:28px;display:none;align-items:center;justify-content:center;background:none;border:0;padding:0;cursor:pointer;color:var(--sb);touch-action:manipulation}
 .row.has>.tw{display:flex}
 .tw::before{content:'';display:block;width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .18s ease}
@@ -87,7 +76,6 @@ li.z>.row>.tw:hover::before{transform:rotate(90deg)}
 li:not(.z)>.row>.tw:hover::before{transform:rotate(-90deg)}
 .tw:hover{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.tw::before{transition:none}}
-
 .badge{margin-left:9px;flex:0 0 auto;font:400 10px/1 var(--mono);color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:3px 7px;letter-spacing:.02em}
 li.z>.row{opacity:.88}
 li[role="treeitem"]{outline:none}
@@ -142,7 +130,6 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   .badge{display:none}
   @page{margin:18mm}
 }
-/* ── custom cursor: geometry is driven entirely from JS, so no size transitions ── */
 body.custom-cursor-active,body.custom-cursor-active #app,body.custom-cursor-active .row,body.custom-cursor-active header{cursor:none}
 .write-cursor-dot,.write-cursor-ellipse{position:fixed;top:0;left:0;z-index:500;pointer-events:none;transform:translate(-9999px,-9999px);opacity:0;transition:opacity .18s ease;will-change:transform,width,height}
 .write-cursor-dot.visible,.write-cursor-ellipse.visible{opacity:1}
@@ -156,6 +143,7 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 </style>
 </head>
 <body>
+<div class="scroll-line" id="scrollLine" aria-hidden="true"><span id="scrollFill"></span></div>
 <div id="app">
   <header><span class="wm-slot"><span class="wm-spacer" aria-hidden="true">frankly</span><span class="wm" id="wm">frankly</span></span><span><button class="ctl" id="import">import</button><input type="file" id="file" accept="application/json,.json" hidden><button class="ctl" id="export">export json</button><button class="ctl" id="reset">reset demo</button><button class="ctl" id="theme">dark mode</button></span></header>
   <div id="tree"></div>
@@ -171,13 +159,11 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 const $ = id => document.getElementById(id);
 const treeEl = $('tree');
 
-/* ─────────────── storage keys ─────────────── */
 const K        = 'frankly:doc:v1';
 const K_LEGACY = ['digress:v1'];
 const KT       = 'frankly:theme';
 const KT_LEGACY= ['digress:theme'];
 
-/* ─────────────── your media ─────────────── */
 const MEDIA = {
   walkIn:  'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksintoelevators.mp4',
   walkOut: 'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksoutofelevators.mp4',
@@ -198,29 +184,18 @@ const fine   = matchMedia('(hover:hover) and (pointer:fine)');
 const ICON_MUTED = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.5 6.2l3 3.6M13.5 6.2l-3 3.6"/></svg>';
 const ICON_SOUND = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.2 5.8a3 3 0 010 4.4M12.4 3.8a6 6 0 010 8.4"/></svg>';
 
-/* ─────────────── ids ─────────────── */
 let uid = 0;
 const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
-/* ─────────────── seed: four categorical roots ───────────────
-   Philosophy / Work / Life / Balance.
-
+/* ─────────────── seed ───────────────
    Load state:
-     Philosophy  — collapsed (19)
-     Work        — expanded
-       BNY       — collapsed (40)
-       GNC       — collapsed (45)
-     Life        — expanded
-       Art School       — collapsed (18)
-       Autodidact       — collapsed (9)
-       Startup Life     — collapsed (9)
-       Philadelphia Exp — leaf
-       PHI↔NYC          — collapsed (1)
-     Balance     — collapsed (14)
+     Philosophy  — collapsed
+     Work        — expanded, both case studies collapsed
+     Life        — expanded, chapters collapsed
+     Balance     — collapsed
 
-   Each `k: [...]` opens one nested array and must close with `]}`.
-   Count brackets if the page goes blank. */
+   Each `k: [...]` opens one nested array and must close with `]}`. */
 const seed = () => [
 
   /* ═══ PHILOSOPHY — collapsed ═══ */
@@ -235,9 +210,7 @@ const seed = () => [
         ]}
       ]}
     ]},
-
     { t: "..." },
-
     { t: "Anyways", k: [
       { t: "Here, just write the damn thing.", k: [
         { t: "Write it before it escapes your ability to articulate it.", k: [
@@ -262,7 +235,7 @@ const seed = () => [
     ]}
   ]},
 
-  /* ═══ WORK — expanded, children collapsed ═══ */
+  /* ═══ WORK — expanded, case studies collapsed ═══ */
   { t: "Work", k: [
 
     { t: "BNY Melon — Pershing X", z: true, k: [
@@ -272,25 +245,25 @@ const seed = () => [
       { t: "Agency: Publicis Sapient", c: "#8e8e93" },
       { t: "Role: Senior UX Designer, Product Design Lead (IA / flows)", c: "#8e8e93" },
 
-      { t: "The problem was simple to state and brutal to solve.", k: [
+      { t: "The problem was simple to state and brutal to solve.", z: true, k: [
         { t: "Advisors worked across a tangle of disconnected tools." },
         { t: "Context was lost at every handoff." },
         { t: "Data had to be re-entered, again and again." }
       ]},
 
-      { t: "So we flattened it.", k: [
+      { t: "So we flattened it.", z: true, k: [
         { t: "One dashboard. Interconnected." },
         { t: "A client's full financial picture in one place." },
         { t: "Work moves across modules without re-entry." }
       ]},
 
-      { t: "That's Wove.", k: [
+      { t: "That's Wove.", z: true, k: [
         { t: "An industry-first platform." },
         { t: "Built with BNY Melon power, scale, and security." },
         { t: "Advisors work faster. They serve more clients." }
       ]},
 
-      { t: "My piece:", k: [
+      { t: "My piece:", z: true, k: [
         { t: "Information architecture." },
         { t: "Task and flow mapping." },
         { t: "Cross-module navigation." },
@@ -308,10 +281,10 @@ const seed = () => [
 
       { t: "The screens:", k: [
         { t: "Account Opening", k: [ { t: "https://i.ibb.co/HGv7ymj/4.jpg" } ] },
-        { t: "BNY 1", k: [ { t: "https://i.ibb.co/XkM2hn8n/bny1.png" } ] },
-        { t: "BNY 2", k: [ { t: "https://i.ibb.co/vvMZmq94/bny2.png" } ] },
-        { t: "BNY 3", k: [ { t: "https://i.ibb.co/xS49C07B/bny3.png" } ] },
-        { t: "BNY 4", k: [ { t: "https://i.ibb.co/wZY2bhKF/bny4.png" } ] }
+        { t: "BNY 1", z: true, k: [ { t: "https://i.ibb.co/XkM2hn8n/bny1.png" } ] },
+        { t: "BNY 2", z: true, k: [ { t: "https://i.ibb.co/vvMZmq94/bny2.png" } ] },
+        { t: "BNY 3", z: true, k: [ { t: "https://i.ibb.co/xS49C07B/bny3.png" } ] },
+        { t: "BNY 4", z: true, k: [ { t: "https://i.ibb.co/wZY2bhKF/bny4.png" } ] }
       ]}
     ]},
 
@@ -321,7 +294,7 @@ const seed = () => [
       { t: "Agency: Elva Design Group", c: "#8e8e93" },
       { t: "Role: Senior UX Designer", c: "#8e8e93" },
 
-      { t: "The brief was simple. The context was not.", k: [
+      { t: "The brief was simple. The context was not.", z: true, k: [
         { t: "GNC had just come through a bankruptcy." },
         { t: "They asked us to shake things up." },
         { t: "A total overhaul." },
@@ -329,21 +302,21 @@ const seed = () => [
         { t: "A ground-up build on the Shopify platform." }
       ]},
 
-      { t: "{We} dove deep.", k: [
+      { t: "{We} dove deep.", z: true, k: [
         { t: "Market research." },
         { t: "[Client-supplied] user data." },
         { t: "Wireframe feature prototyping." },
         { t: "A modular, component-based design system — optimized for continued optimization." }
       ]},
 
-      { t: "Heavy lift. Huge gains.", k: [
+      { t: "Heavy lift. Huge gains.", z: true, k: [
         { t: "Lead UX: IA, UI prototypes, design systems." },
         { t: "Paired with PM, Dev Lead, Design Team, Client-Side Stakeholders." },
         { t: "12-week engagement. Tight cadence. Fast-on-our-feet design + strategy." },
         { t: "Weekly exec reviews." }
       ]},
 
-      { t: "What we shipped:", k: [
+      { t: "What we shipped:", z: true, k: [
         { t: "A modern, mobile-first navigation schema." },
         { t: "A retail taxonomy strategy that separated GNC from its competition." },
         { t: "Not just from its competition — from the whole e-retail space." }
@@ -355,20 +328,20 @@ const seed = () => [
 
       { t: "The screens:", k: [
         { t: "Handheld", k: [ { t: "https://i.ibb.co/cSQCgNQY/work1.webp" } ] },
-        { t: "Mobile Overview", k: [ { t: "https://i.ibb.co/pBMMxY1Z/11.webp" } ] },
-        { t: "Mobile Closeup", k: [ { t: "https://i.ibb.co/7N2rDqrN/8.webp" } ] },
-        { t: "Desktop Navigation", k: [ { t: "https://i.ibb.co/vx76zjgf/10.webp" } ] },
-        { t: "Desktop Homepage", k: [ { t: "https://i.ibb.co/rft2bf0T/9.webp" } ] },
-        { t: "Mobile Commerce", k: [ { t: "https://i.ibb.co/cXg5Phdc/3.webp" } ] },
-        { t: "Product Detail Page", k: [ { t: "https://i.ibb.co/99h2bQMh/6.webp" } ] },
-        { t: "Rewards Program", k: [ { t: "https://i.ibb.co/yB4RwkTf/7.webp" } ] },
-        { t: "Research", k: [ { t: "https://i.ibb.co/spHgPH6N/1.webp" } ] }
+        { t: "Mobile Overview", z: true, k: [ { t: "https://i.ibb.co/pBMMxY1Z/11.webp" } ] },
+        { t: "Mobile Closeup", z: true, k: [ { t: "https://i.ibb.co/7N2rDqrN/8.webp" } ] },
+        { t: "Desktop Navigation", z: true, k: [ { t: "https://i.ibb.co/vx76zjgf/10.webp" } ] },
+        { t: "Desktop Homepage", z: true, k: [ { t: "https://i.ibb.co/rft2bf0T/9.webp" } ] },
+        { t: "Mobile Commerce", z: true, k: [ { t: "https://i.ibb.co/cXg5Phdc/3.webp" } ] },
+        { t: "Product Detail Page", z: true, k: [ { t: "https://i.ibb.co/99h2bQMh/6.webp" } ] },
+        { t: "Rewards Program", z: true, k: [ { t: "https://i.ibb.co/yB4RwkTf/7.webp" } ] },
+        { t: "Research", z: true, k: [ { t: "https://i.ibb.co/spHgPH6N/1.webp" } ] }
       ]}
     ]}
 
   ]},
 
-  /* ═══ LIFE — expanded, children collapsed ═══ */
+  /* ═══ LIFE — expanded, chapters collapsed ═══ */
   { t: "Life", k: [
 
     { t: "Art School \"Stop Out\"", z: true, k: [
@@ -376,9 +349,7 @@ const seed = () => [
       { t: "Pratt Institute of Art was expensive, and loans or financial aid were simply out of reach {though not as simple as it may seem}.", c: "#8e8e93" },
       { t: "At nineteen years old, there wasn't much that I could afford, so I worked in construction and demolition, at the bowling alley, the hardware store, the grocery store, and at the gas station." },
       { t: "At this point, I was already in my twenties, without a degree and with zero applicable skills beyond what I could [\"bull\"-expletive] with my so-called 'talent'." },
-
       { t: "3.8 GPA (unweighted); all honors & advanced placement; varsity athlete", c: "#8e8e93" },
-
       { t: "I applied to only two schools my senior year, circa 2001-2002.", k: [
         { t: "1. Carnegie Melon" },
         { t: "2. Pratt Institute" },
@@ -387,7 +358,6 @@ const seed = () => [
         { t: "Pratt offered $8K/year." },
         { t: "Tuition was comparable at ~$40k/year." }
       ]},
-
       { t: "Truth is, I come from a hyper conservative family. I had zero say in the financials of my future." },
       { t: "The moment my parents saw a savings of \"nearly ten thousand dollars per year\" ($8K scholarship apparently rounds up to $10K in their minds), they completely took Carnegie Melon University off of the table." },
       { t: "There was further justification citing the campus visit to CMU, where I was assigned to stay at a fraternity house for the 2-day parent & student visit. My father, who never let me touch alcohol before (I didn't partake), saw this as a sign of what they should expect. So, given their concern for that, coupled with the travel distance being 3x what it would take to go to New York, plus the fact that ... I digress." },
@@ -470,7 +440,6 @@ function ensureIds(a, seen){
   });
 }
 
-/* ─────────────── load + migration ─────────────── */
 const safeGet = k => { try { return localStorage.getItem(k) } catch(_) { return null } };
 
 function readDoc(raw){
@@ -495,7 +464,6 @@ if(!doc){
 let root = (doc && doc.length) ? doc : seed();
 ensureIds(root, new Set());
 
-/* ─────────────── toast ─────────────── */
 const toast = m => {
   const t = $('toast');
   t.textContent = m;
@@ -504,7 +472,6 @@ const toast = m => {
   t._h = setTimeout(() => t.classList.remove('on'), 2200);
 };
 
-/* ─────────────── persistence ─────────────── */
 let wt = null, wpending = false;
 
 function persistNow(){
@@ -529,7 +496,6 @@ addEventListener('pagehide', flushSave);
 addEventListener('beforeunload', flushSave);
 document.addEventListener('visibilitychange', () => { if(document.hidden) flushSave() });
 
-/* ─────────────── history ─────────────── */
 let hist = [], hi = -1, lastT = 0, lastTyping = false;
 let histDirty = false, histT = null;
 
@@ -588,7 +554,6 @@ addEventListener('keydown', e => {
   else if(k === 'y'){ e.preventDefault(); redo() }
 });
 
-/* ─────────────── tree queries ─────────────── */
 const liOf     = id => treeEl.querySelector('li[role="treeitem"][data-id="' + id + '"]');
 const focusRow = id => { const r = liOf(id); if(r) r.focus() };
 
@@ -608,7 +573,6 @@ const countDesc = k => k.reduce((s, n) => s + 1 + countDesc(n.k), 0);
 let editing = null, rendering = false, groups = [];
 let pendingCaret = null;
 
-/* ─────────────── text pressure (chrome only) ─────────────── */
 function splitNode(root){
   const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
   while(tw.nextNode()) if(!tw.currentNode.parentElement.classList.contains('c')) nodes.push(tw.currentNode);
@@ -643,7 +607,6 @@ function collect(){
   document.querySelectorAll('.tools').forEach(t => add(t, 700));
 }
 
-/* ─────────────── media ─────────────── */
 const IMG = /^(?:https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?|https?:\/\/(?:images\.unsplash\.com|i\.imgur\.com|pbs\.twimg\.com|images\.pexels\.com)\/\S+|data:image\/(?:png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+\/=]+)$/i;
 const VID = /^(?:https?:\/\/\S+\.(?:mp4|webm|mov|m4v|ogv)(?:[?#]\S*)?|data:video\/(?:mp4|webm|ogg);base64,[A-Za-z0-9+\/=]+)$/i;
 const isImg = t => IMG.test(t.trim());
@@ -656,7 +619,6 @@ const vio = new IntersectionObserver(es => es.forEach(e => {
 
 const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px' };
 
-/* ─────────────── hints ─────────────── */
 const HI   = '<b>click</b> a line to edit &nbsp;·&nbsp; <b>right-click</b> for color &nbsp;·&nbsp; click below to add';
 const HE   = '<b>enter</b> next &nbsp;·&nbsp; <b>shift+enter</b> branch &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>⌫</b> on empty deletes &nbsp;·&nbsp; <b>esc</b> done';
 const HI_T = '<b>tap</b> a line to edit &nbsp;·&nbsp; <b>long-press</b> for color &nbsp;·&nbsp; tap below to add';
@@ -667,7 +629,6 @@ function setHint(){
   collect();
 }
 
-/* ─────────────── build ─────────────── */
 function paint(n, row, li){
   row.classList.toggle('g', isG(n.c));
   row.classList.toggle('s', !!n.s);
@@ -844,7 +805,6 @@ function buildNode(n, d){
   return li;
 }
 
-/* ─────────────── targeted patch ─────────────── */
 function focusTextarea(li, id){
   const ta = li.querySelector('textarea');
   if(!ta) return;
@@ -872,7 +832,6 @@ function patchNode(id, caretPos){
   return next;
 }
 
-/* ─────────────── full render ─────────────── */
 function render(){
   if(!root.length) root.push(mk());
   if(editing && !find(editing)) editing = null;
@@ -906,7 +865,6 @@ function build(a, d){
   return ul;
 }
 
-/* ─────────────── structural ops ─────────────── */
 function revealPath(id){
   const chain = [];
   (function walk(a, anc){
@@ -1034,8 +992,6 @@ function indent(n, cp){
   pendingCaret = { id: n.id, pos: cp };
   if(pli){
     patchNode(pv.id);
-    /* patchNode rebuilds only pv's subtree. n's old li is still a sibling
-       in the parent's ul — remove every stale match for n's id. */
     const fresh = liOf(n.id);
     if(fresh){
       treeEl.querySelectorAll('li[role="treeitem"][data-id="' + n.id + '"]')
@@ -1084,7 +1040,6 @@ function reorder(n, dir, cp){
   save();
 }
 
-/* ─────────────── editing keys ─────────────── */
 function key(e, n){
   if(e.isComposing || e.keyCode === 229) return;
   if(e.metaKey || e.ctrlKey) return;
@@ -1154,7 +1109,6 @@ function key(e, n){
   }
 }
 
-/* ─────────────── tree keyboard nav ─────────────── */
 function navKey(e, n, li){
   if(e.target !== li) return;
   const k = e.key;
@@ -1202,7 +1156,6 @@ function navKey(e, n, li){
   }
 }
 
-/* ─────────────── click to edit / add ─────────────── */
 $('app').addEventListener('mousedown', e => {
   if(Date.now() < lpUntil) return;
   if(e.target.tagName === 'TEXTAREA' || e.target.closest('.tools,header,.tw,.spk,#menu')) return;
@@ -1233,7 +1186,6 @@ $('app').addEventListener('mousedown', e => {
 
 addEventListener('resize', () => { const t = document.querySelector('textarea'); if(t) fit(t) });
 
-/* ─────────────── color toolbar ─────────────── */
 const menu = $('menu');
 let target = null;
 
@@ -1323,7 +1275,6 @@ menu.addEventListener('click', e => {
   save();
 });
 
-/* ─────────────── reset / theme ─────────────── */
 const html = document.documentElement;
 let rt;
 const label = (el, t) => { el.textContent = t; collect() };
@@ -1425,7 +1376,6 @@ $('theme').onclick = () => {
 };
 paintTheme();
 
-/* ─────────────── long-press ─────────────── */
 let lpTimer = null, lpPos = null, lpId = null, lpUntil = 0;
 function cancelLP(){ if(lpTimer){ clearTimeout(lpTimer); lpTimer = null } }
 
@@ -1452,7 +1402,6 @@ document.addEventListener('pointermove', e => {
 document.addEventListener('pointerup', cancelLP, { passive: true });
 document.addEventListener('pointercancel', cancelLP, { passive: true });
 
-/* ─────────────── keyboard-aware viewport inset ─────────────── */
 (function kbAware(){
   const vv = window.visualViewport;
   if(!vv) return;
@@ -1470,7 +1419,42 @@ document.addEventListener('pointercancel', cancelLP, { passive: true });
   adj();
 })();
 
-/* ─────────────── ghost hint ─────────────── */
+/* ─────────────── scroll progress line ───────────────
+   Replaces the native scrollbar with a 2px fill at the top edge.
+   rAF-coalesced; exact tracking (no lerp) so it reads as a scroll
+   indicator, not an animation. Remeasures on resize, orientation
+   change, font load, and any mutation inside the tree (collapse,
+   expand, edit) — all of which change document height. */
+(function initScrollLine(){
+  const fill = $('scrollFill');
+  if(!fill) return;
+  let raf = null;
+  const update = () => {
+    raf = null;
+    const doc = document.documentElement;
+    const max = Math.max(1, doc.scrollHeight - doc.clientHeight);
+    const y = window.scrollY || doc.scrollTop || 0;
+    const p = y <= 0 ? 0 : (y >= max ? 1 : y / max);
+    fill.style.transform = 'scaleX(' + p.toFixed(5) + ')';
+  };
+  const request = () => { if(!raf) raf = requestAnimationFrame(update); };
+
+  addEventListener('scroll', request, { passive: true });
+  addEventListener('resize', request);
+  addEventListener('orientationchange', request);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) request() });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(request);
+
+  if(window.MutationObserver){
+    new MutationObserver(request).observe(treeEl, {
+      childList: true, subtree: true,
+      attributes: true, attributeFilter: ['class']
+    });
+  }
+
+  update();
+})();
+
 const cur = { x: innerWidth / 2, y: innerHeight / 2 };
 const m   = { x: cur.x, y: cur.y };
 const ghost = $('ghost');
@@ -1543,7 +1527,6 @@ function loop(){
 }
 requestAnimationFrame(loop);
 
-/* ─────────────── custom cursor ─────────────── */
 (function initWriteCursor(){
   if(!fine.matches) return;
   const dot = $('writeCursorDot'), ell = $('writeCursorEllipse');
@@ -1696,7 +1679,6 @@ requestAnimationFrame(loop);
   document.addEventListener('visibilitychange', () => { document.hidden ? stopLoop() : startLoop() });
 })();
 
-/* ─────────────── bottom-edge blur ─────────────── */
 (function gradualBlur(){
   const box = $('blurB'), N = 5, S = 2, inc = 100 / N, r = x => Math.round(x * 10) / 10;
   for(let i = 1; i <= N; i++){
@@ -1714,11 +1696,6 @@ requestAnimationFrame(loop);
   }
 })();
 
-/* ─────────────── logo pin ───────────────
-   Smooth detach from header to top-left corner on scroll, and back on
-   return. Uses FLIP — measure before, mutate layout, measure after,
-   invert with a transform, then animate to identity — so the slide is a
-   pure GPU transform rather than a top/left jump. */
 (function initWmPin(){
   const wm = document.getElementById('wm');
   if(!wm) return;
