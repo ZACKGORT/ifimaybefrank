@@ -28,8 +28,32 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .wm.wm-pinned{position:fixed;top:16px;left:16px;font-size:18px;padding:6px 12px;margin:-6px -12px;background:color-mix(in srgb, var(--bg) 85%, transparent);border-radius:9px;-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);z-index:20;pointer-events:auto;cursor:pointer}
 .wm.wm-pinned:hover{background:color-mix(in srgb, var(--bg) 95%, transparent)}
 @media (prefers-reduced-motion:reduce){.wm{transition:none}}
+.header-utils{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .ctl{font:inherit;color:inherit;background:none;border:0;padding:6px 0;margin-left:18px;cursor:pointer;transition:color .15s;touch-action:manipulation}
 .ctl:hover{color:var(--ink)}
+
+/* mobile-only menu trigger (hidden on desktop) */
+.menu-trigger{
+  display:none;
+  align-items:center;gap:7px;
+  background:none;border:0;padding:6px 0;margin:0;
+  font:400 10px/1 var(--mono);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--mute);
+  cursor:pointer;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  transition:color .15s;
+}
+.menu-trigger:hover,.menu-trigger:focus-visible{color:var(--ink);outline:none}
+.menu-trigger:active{opacity:.7}
+.menu-trigger .mt-chevron{display:block;transition:transform .3s ease}
+.menu-trigger.pulse .mt-chevron{animation:mt-bob 2.4s ease-in-out infinite}
+@keyframes mt-bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(2px)}
+}
+@media (prefers-reduced-motion:reduce){.menu-trigger.pulse .mt-chevron{animation:none}}
 
 .cat-bar{
   display:flex;align-items:baseline;justify-content:space-between;gap:12px;
@@ -182,9 +206,10 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 #treeToggle svg{display:block}
 
 /* ══════════════════════════════════════════════════════
-   PULL-DOWN DRAWER (touch only)
+   PULL-DOWN MEGA MENU (touch only)
    Hidden above the viewport. Pulled down from the top edge
-   when the page is at scroll-top. Reveals the category wheel.
+   when the page is at scroll-top, or opened via the header
+   trigger. Contents: category wheel + utility action list.
 ═══════════════════════════════════════════════════════ */
 .pull-scrim{
   position:fixed;inset:0;z-index:129;
@@ -204,33 +229,89 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   box-shadow:0 26px 56px rgba(0,0,0,.42);
   overflow:hidden;
   will-change:transform;
-  touch-action:none;
   transform:translateY(0);
   display:none;
+  flex-direction:column;
 }
-html.pull-enabled .pull-drawer{display:block}
+html.pull-enabled .pull-drawer{display:flex}
 html.pull-enabled .pull-scrim{display:block}
-.pull-drawer .wheel-host{position:absolute;inset:0}
-.pull-handle{
-  position:absolute;top:8px;left:50%;
-  transform:translateX(-50%);
-  width:36px;height:4px;
+
+.pull-drawer .pull-handle{
+  position:relative;
+  flex:none;
+  margin:9px auto 3px;
+  width:38px;height:4px;
   border-radius:2px;
   background:var(--line);
   opacity:.75;
   pointer-events:none;
-  z-index:2;
 }
+
+.pull-drawer .wheel-host{
+  position:relative;
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+}
+
+.pull-actions{
+  flex:none;
+  padding:0 18px calc(12px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid var(--line);
+  background:var(--bg);
+}
+.pull-actions-label{
+  font:400 10px/1 var(--mono);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--mute);
+  opacity:.6;
+  padding:12px 6px 4px;
+}
+.pull-action{
+  all:unset;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  padding:14px 8px;
+  border-radius:9px;
+  cursor:pointer;
+  font:400 15px/1.15 var(--sans);
+  color:var(--ink);
+  letter-spacing:-.005em;
+  transition:background .15s,color .15s;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.pull-action:hover,.pull-action:focus-visible{
+  background:color-mix(in srgb, var(--line) 38%, transparent);
+  outline:none;
+}
+.pull-action:active{ background:color-mix(in srgb, var(--line) 48%, transparent) }
+.pull-action + .pull-action{ border-top:1px solid color-mix(in srgb, var(--line) 55%, transparent) }
+.pull-action .pa-label{ display:block; font-weight:400 }
+.pull-action .pa-arrow{
+  flex:none;
+  color:var(--mute);
+  opacity:.55;
+  transition:transform .15s,opacity .15s;
+}
+.pull-action:hover .pa-arrow,.pull-action:focus-visible .pa-arrow{ opacity:.9; transform:translateX(2px) }
+
 @media (prefers-reduced-motion:reduce){
   .pull-scrim{transition:none}
 }
 
 @media (hover:none),(pointer:coarse),(max-width:768px){
+  .header-utils .ctl{ display:none }
+  .menu-trigger{ display:inline-flex }
+
   .row{min-height:44px;padding-top:3px;padding-bottom:3px;padding-left:22px}
   .tools{opacity:1;gap:4px;margin-top:6px}
   .tools button{min-height:44px;padding:4px 10px;gap:7px}
   .tools i{font-size:11px;padding:3px 6px}
-  .ctl{padding:12px 0;margin-left:14px}
   #menu{padding:14px;gap:12px}
   #menu .mr{gap:10px;max-width:min(280px,80vw)}
   #menu button{width:36px;height:36px}
@@ -264,7 +345,7 @@ html.pull-enabled .pull-scrim{display:block}
 }
 
 @media print{
-  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay,.pull-drawer,.pull-scrim{display:none!important}
+  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay,.pull-drawer,.pull-scrim,.menu-trigger{display:none!important}
   body{background:#fff;color:#000}
   #app{max-width:none;padding:0;min-height:0}
   .row{min-height:0;font-size:13pt!important}
@@ -325,7 +406,22 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 <body>
 <div class="scroll-line" id="scrollLine" aria-hidden="true"><span id="scrollFill"></span></div>
 <div id="app">
-  <header><span class="wm-slot"><span class="wm-spacer" aria-hidden="true">frankly</span><span class="wm" id="wm">frankly</span></span><span><button class="ctl" id="import">import</button><input type="file" id="file" accept="application/json,.json" hidden><button class="ctl" id="export">export json</button><button class="ctl" id="reset">reset demo</button><button class="ctl" id="theme">dark mode</button></span></header>
+  <header>
+    <span class="wm-slot"><span class="wm-spacer" aria-hidden="true">frankly</span><span class="wm" id="wm">frankly</span></span>
+    <span class="header-utils">
+      <button class="ctl" id="import">import</button>
+      <input type="file" id="file" accept="application/json,.json" hidden>
+      <button class="ctl" id="export">export json</button>
+      <button class="ctl" id="reset">reset demo</button>
+      <button class="ctl" id="theme">dark mode</button>
+      <button class="menu-trigger pulse" id="menuTrigger" type="button" aria-label="Open menu">
+        <span>menu</span>
+        <svg class="mt-chevron" viewBox="0 0 10 10" width="9" height="9" aria-hidden="true">
+          <path d="M1 3.2 L5 7 L9 3.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </span>
+  </header>
   <div class="cat-bar">
     <span class="cat-name" id="catName" contenteditable="true" spellcheck="false"></span>
     <span class="cat-hint">
@@ -348,6 +444,33 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 <div class="pull-drawer" id="pullDrawer" aria-hidden="true">
   <div class="pull-handle" aria-hidden="true"></div>
   <div class="wheel-host" id="pullWheelHost"></div>
+  <nav class="pull-actions" aria-label="Utilities">
+    <div class="pull-actions-label">Actions</div>
+    <button class="pull-action" data-act="import" type="button">
+      <span class="pa-label">import json</span>
+      <svg class="pa-arrow" viewBox="0 0 8 12" width="7" height="11" aria-hidden="true">
+        <path d="M1.5 1.5 L6.5 6 L1.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="pull-action" data-act="export" type="button">
+      <span class="pa-label">export json</span>
+      <svg class="pa-arrow" viewBox="0 0 8 12" width="7" height="11" aria-hidden="true">
+        <path d="M1.5 1.5 L6.5 6 L1.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="pull-action" data-act="reset" type="button">
+      <span class="pa-label">reset demo</span>
+      <svg class="pa-arrow" viewBox="0 0 8 12" width="7" height="11" aria-hidden="true">
+        <path d="M1.5 1.5 L6.5 6 L1.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="pull-action" data-act="theme" type="button">
+      <span class="pa-label">dark mode</span>
+      <svg class="pa-arrow" viewBox="0 0 8 12" width="7" height="11" aria-hidden="true">
+        <path d="M1.5 1.5 L6.5 6 L1.5 10.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </nav>
 </div>
 
 <div id="blurB" aria-hidden="true"></div>
@@ -1647,8 +1770,9 @@ const clean = a => a.filter(n => n.t.trim() || n.k.length).map(n => {
   return o;
 });
 
-$('export').onclick = function(){
-  const txt = JSON.stringify({
+/* ── export payload + runner (shared by desktop button and drawer) ── */
+function exportPayload(){
+  return JSON.stringify({
     app: 'frankly', version: 2,
     exportedAt: new Date().toISOString(),
     currentCategory: categories[currentIndex] ? categories[currentIndex].name : null,
@@ -1657,6 +1781,9 @@ $('export').onclick = function(){
       statements: clean(c.tree)
     }))
   }, null, 2);
+}
+function runExport(){
+  const txt = exportPayload();
   try {
     const u = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
     const a = document.createElement('a');
@@ -1664,11 +1791,16 @@ $('export').onclick = function(){
     a.download = 'frankly-' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(u), 1000);
-    label(this, 'exported ✓');
+    return 'exported ✓';
   } catch(e) {
     try { navigator.clipboard.writeText(txt) } catch(_) {}
-    label(this, 'copied ✓');
+    return 'copied ✓';
   }
+}
+
+$('export').onclick = function(){
+  const ok = runExport();
+  label(this, ok);
   setTimeout(() => label(this, 'export json'), 1800);
 };
 
@@ -1750,12 +1882,19 @@ if(!th){ for(const k of KT_LEGACY){ th = safeGet(k); if(th) break } }
 if(th) html.dataset.theme = th;
 
 const isDark = () => (html.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
-const paintTheme = () => { $('theme').textContent = isDark() ? 'light mode' : 'dark mode' };
+
+function paintTheme(){
+  const txt = isDark() ? 'light mode' : 'dark mode';
+  $('theme').textContent = txt;
+  const dt = document.querySelector('.pull-action[data-act="theme"] .pa-label');
+  if(dt) dt.textContent = txt;
+}
+
 $('theme').onclick = () => {
-  const t = isDark() ? 'dark' : 'light';
+  const t = isDark() ? 'light' : 'dark';
   html.dataset.theme = t;
   try { localStorage.setItem(KT, t) } catch(e) {}
-  label($('theme'), isDark() ? 'light mode' : 'dark mode');
+  paintTheme();
 };
 paintTheme();
 
@@ -1831,6 +1970,9 @@ document.addEventListener('pointercancel', cancelLP, { passive: true });
   update();
 })();
 
+/* ══════════════════════════════════════════════════════
+   SVG tree lines + hover-collapse hot zone
+═══════════════════════════════════════════════════════ */
 const SVG_NS   = 'http://www.w3.org/2000/svg';
 const TL_W     = 28;
 const TL_TRUNK = 11;
@@ -1974,6 +2116,9 @@ addEventListener('scroll', () => {
   hideTreeToggle();
 }, { passive: true });
 
+/* ══════════════════════════════════════════════════════
+   Ghost cursor tooltip
+═══════════════════════════════════════════════════════ */
 const cur = { x: innerWidth / 2, y: innerHeight / 2 };
 const m   = { x: cur.x, y: cur.y };
 const ghost = $('ghost');
@@ -1988,7 +2133,7 @@ document.addEventListener('visibilitychange', () => {
 addEventListener('mousemove', e => {
   cur.x = e.clientX; cur.y = e.clientY;
   moved = true;
-  blocked = !!(e.target.closest && e.target.closest('.row,.tools,header,#menu,.cat-bar,.wheel-overlay,.tree-lines,.wm-pinned,.cat-del'));
+  blocked = !!(e.target.closest && e.target.closest('.row,.tools,header,#menu,.cat-bar,.wheel-overlay,.tree-lines,.wm-pinned,.cat-del,.pull-drawer,.pull-scrim'));
 });
 document.addEventListener('mouseleave', () => { moved = false });
 addEventListener('touchmove', e => {
@@ -2089,6 +2234,7 @@ function loop(){
 }
 requestAnimationFrame(loop);
 
+/* ─────────────── custom cursor ─────────────── */
 (function initWriteCursor(){
   if(!fine.matches) return;
   const dot = $('writeCursorDot'), ell = $('writeCursorEllipse');
@@ -2319,6 +2465,7 @@ function createOptionWheel(root, options){
     items: [],
     defaultSelected: 0,
     onChange: null,
+    onSelect: null,
     textColor: '#a6a6a6',
     activeColor: '#ffffff',
     side: 'left',
@@ -2525,6 +2672,7 @@ function createOptionWheel(root, options){
       else if (d < -cfg.count / 2) d += cfg.count;
     }
     applyTarget(curIdx + d, true);
+    if (typeof o.onSelect === 'function') o.onSelect(index, cfg.items[index]);
   }
 
   function onKeyDown(e){
@@ -2713,11 +2861,12 @@ function createOptionWheel(root, options){
 })();
 
 /* ══════════════════════════════════════════════════════
-   PULL-DOWN DRAWER (touch only)
-   At scroll-top, a downward drag from the top edge peeks a
-   drawer that hosts the same category wheel. Release past
-   threshold opens it. Tap an item or the scrim to commit,
-   drag up or tap nothing to cancel.
+   PULL-DOWN MEGA MENU (touch only)
+   • Drag from the top edge at scroll-top, or tap the header
+     trigger, to peek the drawer.
+   • Contents: category wheel (flex) + utility action list.
+   • Commits category on change; actions trigger the same
+     handlers as the desktop buttons.
 ═══════════════════════════════════════════════════════ */
 (function initPullDrawer(){
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -2726,14 +2875,15 @@ function createOptionWheel(root, options){
   const drawer = $('pullDrawer');
   const scrim  = $('pullScrim');
   const host   = $('pullWheelHost');
+  const trigger = $('menuTrigger');
   if(!drawer || !scrim || !host) return;
 
   document.documentElement.classList.add('pull-enabled');
 
-  const EDGE_ZONE   = 76;    // px from top where a pull can start
+  const EDGE_ZONE   = 84;    // px from top where a pull can start
   const OPEN_THRESH = 0.30;  // release-past progress required to commit open
   const SPRING      = 1.35;  // resistance curve aggressiveness
-  const DRAWER_H    = () => Math.min(window.innerHeight * 0.58, 540);
+  const DRAWER_H    = () => Math.min(window.innerHeight * 0.78, 660);
 
   let pulling  = false;
   let pStartY  = 0;
@@ -2744,6 +2894,7 @@ function createOptionWheel(root, options){
   let open     = false;
   let animating = false;
   let suppressClickUntil = 0;
+  let resetArmTimer = null;
 
   function setProgress(p){
     progress = Math.max(0, Math.min(1, p));
@@ -2768,6 +2919,49 @@ function createOptionWheel(root, options){
     requestAnimationFrame(step);
   }
 
+  function wheelFontSize(){
+    const w = window.innerWidth;
+    if(w < 400) return 1.75;
+    if(w < 520) return 2.0;
+    if(w < 760) return 2.3;
+    return 2.6;
+  }
+  function wheelInset(){
+    const w = window.innerWidth;
+    if(w < 400) return 24;
+    if(w < 520) return 30;
+    return 40;
+  }
+
+  function commitCategory(idx){
+    if(idx < categories.length && idx !== currentIndex){
+      currentIndex = idx;
+      root = categories[currentIndex].tree;
+      render();
+      save();
+    }
+  }
+
+  function createCategoryFromDrawer(){
+    const cat = { id: nid(), name: '', tree: [mk()] };
+    categories.push(cat);
+    currentIndex = categories.length - 1;
+    root = cat.tree;
+    render();
+    save();
+    requestAnimationFrame(function(){
+      catNameEl.focus();
+      try {
+        const rng = document.createRange();
+        rng.selectNodeContents(catNameEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(rng);
+      } catch(_){}
+    });
+    toast('new category — name it, then write');
+  }
+
   function buildWheel(){
     const names = categories.map(c => c.name || 'Untitled');
     names.push('+ New category');
@@ -2778,7 +2972,7 @@ function createOptionWheel(root, options){
       textColor: 'var(--mute)',
       activeColor: 'var(--ink)',
       side: 'left',
-      fontSize: 2.05,
+      fontSize: wheelFontSize(),
       spacing: 1.4,
       curve: 1,
       tilt: 6.5,
@@ -2786,9 +2980,21 @@ function createOptionWheel(root, options){
       fade: 0.22,
       minOpacity: 0.06,
       smoothing: 200,
-      inset: 30,
+      inset: wheelInset(),
       loop: false,
-      draggable: true
+      draggable: true,
+      onChange: function(idx){
+        commitCategory(idx);
+      },
+      onSelect: function(idx){
+        if(idx >= categories.length){
+          createCategoryFromDrawer();
+          closeDrawer();
+        } else {
+          // category already committed via onChange
+          closeDrawer();
+        }
+      }
     });
   }
 
@@ -2803,48 +3009,24 @@ function createOptionWheel(root, options){
     easeTo(1);
   }
 
-  function commitPicked(picked){
-    if(picked < categories.length){
-      if(picked !== currentIndex){
-        currentIndex = picked;
-        root = categories[currentIndex].tree;
-        render();
-        save();
-      }
-      return;
-    }
-    // "+ New category" tail
-    const cat = { id: nid(), name: '', tree: [mk()] };
-    categories.push(cat);
-    currentIndex = categories.length - 1;
-    root = cat.tree;
-    render();
-    save();
-    requestAnimationFrame(() => {
-      catNameEl.focus();
-      try {
-        const rng = document.createRange();
-        rng.selectNodeContents(catNameEl);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(rng);
-      } catch(_){}
-    });
-    toast('new category — name it, then write');
-  }
-
-  function closeDrawer(commit){
+  function closeDrawer(){
     if(!open && progress === 0) return;
-    const picked = wheel ? wheel.selected : currentIndex;
     if(wheel){ wheel.destroy(); wheel = null; }
     open = false;
     drawer.setAttribute('aria-hidden', 'true');
-    easeTo(0, () => {
-      drawer.style.height = '';
-      if(commit) commitPicked(picked);
+    easeTo(0, () => { drawer.style.height = ''; });
+  }
+
+  /* ── open via header trigger ── */
+  if(trigger){
+    trigger.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      openDrawer();
     });
   }
 
+  /* ── open via top-edge pull ── */
   document.addEventListener('touchstart', e => {
     if(open) return;
     if(animating) return;
@@ -2855,7 +3037,7 @@ function createOptionWheel(root, options){
     const t = e.touches[0];
     if(!t) return;
     if(t.clientY > EDGE_ZONE) return;
-    if(e.target.closest('header,.cat-bar,#menu,.wheel-overlay,button,a,input,textarea,.pull-drawer,.pull-scrim')) return;
+    if(e.target.closest('.cat-bar,#menu,.wheel-overlay,button,a,input,textarea,.pull-drawer,.pull-scrim')) return;
     pulling = true;
     pStartY = t.clientY;
     pStartX = t.clientX;
@@ -2896,34 +3078,87 @@ function createOptionWheel(root, options){
   document.addEventListener('touchend', endPull, { passive: true });
   document.addEventListener('touchcancel', endPull, { passive: true });
 
+  /* ── close via scrim tap ── */
   scrim.addEventListener('click', () => {
     if(Date.now() < suppressClickUntil) return;
-    if(open) closeDrawer(true);
+    if(open) closeDrawer();
   });
 
-  let downPt = null;
-  host.addEventListener('pointerdown', e => {
-    downPt = { x: e.clientX, y: e.clientY };
-  }, true);
-  host.addEventListener('click', e => {
-    if(!open) return;
-    if(Date.now() < suppressClickUntil) return;
-    if(downPt){
-      const d = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
-      downPt = null;
-      if(d > 12) return;   // it was a drag, not a tap
-    }
-    setTimeout(() => { closeDrawer(true); }, 60);
+  /* ── utility actions inside the drawer ── */
+  drawer.querySelectorAll('.pull-action').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const act = btn.dataset.act;
+
+      if(act === 'import'){
+        // let the file dialog open; keep the drawer open behind it
+        $('file').click();
+        return;
+      }
+
+      if(act === 'export'){
+        const ok = runExport();
+        const lbl = btn.querySelector('.pa-label');
+        const prev = lbl.textContent;
+        lbl.textContent = ok;
+        setTimeout(() => { lbl.textContent = prev }, 1800);
+        closeDrawer();
+        return;
+      }
+
+      if(act === 'reset'){
+        if(btn.dataset.arm){
+          clearTimeout(resetArmTimer);
+          delete btn.dataset.arm;
+          categories = seed();
+          ensureCategoryShapes(categories);
+          currentIndex = 0;
+          root = categories[0].tree;
+          editing = null;
+          pendingCaret = null;
+          render();
+          save();
+          btn.querySelector('.pa-label').textContent = 'reset demo';
+          toast('reset demo');
+          closeDrawer();
+        } else {
+          btn.dataset.arm = '1';
+          btn.querySelector('.pa-label').textContent = 'sure? tap again';
+          clearTimeout(resetArmTimer);
+          resetArmTimer = setTimeout(() => {
+            delete btn.dataset.arm;
+            btn.querySelector('.pa-label').textContent = 'reset demo';
+          }, 2800);
+        }
+        return;
+      }
+
+      if(act === 'theme'){
+        const t = isDark() ? 'light' : 'dark';
+        html.dataset.theme = t;
+        try { localStorage.setItem(KT, t) } catch(e) {}
+        paintTheme();
+        // keep drawer open so the user sees the effect
+        return;
+      }
+    });
   });
 
   addEventListener('resize', () => {
-    if(!open && progress === 0) return;
     drawerH = DRAWER_H();
+    if(!open && progress === 0) return;
     drawer.style.height = drawerH + 'px';
     if(open) setProgress(1);
+    else setProgress(progress);
   });
 
-  window.__pullDrawer = { open: openDrawer, close: () => closeDrawer(false) };
+  // establish the hidden transform immediately so a trigger-open
+  // doesn't briefly reveal the drawer at the top
+  drawerH = DRAWER_H();
+  setProgress(0);
+
+  window.__pullDrawer = { open: openDrawer, close: closeDrawer };
 })();
 
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist() } catch(e) {}
