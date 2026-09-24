@@ -77,8 +77,8 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .c{display:inline-block}
 ul{list-style:none;margin:0;padding:0}
 .top>li{margin-bottom:6px}
-.kids{margin-left:12px;position:relative}
-.kids>li{position:relative;padding-left:28px}
+.kids{margin-left:12px;position:relative;--ind:28px}
+.kids>li{position:relative;padding-left:var(--ind)}
 
 .tree-lines{
   position:absolute;left:0;top:0;
@@ -102,7 +102,7 @@ ul{list-style:none;margin:0;padding:0}
   cursor:pointer;
 }
 
-.row{position:relative;min-height:44px;padding:4px 0 4px 18px;box-sizing:border-box;display:flex;align-items:center;font-size:var(--fs);line-height:1.25;cursor:text}
+.row{position:relative;min-height:44px;padding:4px 0 4px 24px;box-sizing:border-box;display:flex;align-items:center;font-size:var(--fs);line-height:1.25;cursor:text}
 .row.ed{flex-direction:column;align-items:flex-start;justify-content:center}
 .row.im{align-items:flex-start}
 .pic{display:block;max-width:100%;max-height:min(60vh,480px);height:auto;object-fit:contain;border-radius:6px}
@@ -180,8 +180,9 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 }
 #treeToggle.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #treeToggle svg{display:block}
-@media (hover:none),(pointer:coarse){
-  .row{min-height:52px}
+
+@media (hover:none),(pointer:coarse),(max-width:768px){
+  .row{min-height:44px;padding-top:3px;padding-bottom:3px;padding-left:22px}
   .tools{opacity:1;gap:4px;margin-top:6px}
   .tools button{min-height:44px;padding:4px 10px;gap:7px}
   .tools i{font-size:11px;padding:3px 6px}
@@ -191,7 +192,7 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   #menu button{width:36px;height:36px}
   #menu .gs{width:52px;border-radius:17px}
   #menu .tx{padding:10px 2px}
-  .tw{width:26px;height:40px}
+  .tw{width:20px;height:40px}
   .tw::before{border-left-width:5.5px;border-top-width:5px;border-bottom-width:5px}
   .spk{opacity:1;width:40px;height:40px}
   .cat-hint .ch-text{display:none}
@@ -199,7 +200,27 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   .cat-del{width:32px;height:32px;margin:-7px -6px}
   .cat-del svg{width:14px;height:14px}
   #treeToggle{display:none}
+
+  /* VERY aggressive collapse → nearly flush by depth 4 */
+  .kids{margin-left:0;--ind:6px}
+  .kids .kids{--ind:4px}
+  .kids .kids .kids{--ind:2px}
+  .kids .kids .kids .kids{--ind:1px}
+  .kids .kids .kids .kids .kids,
+  .kids .kids .kids .kids .kids .kids,
+  .kids .kids .kids .kids .kids .kids .kids{--ind:0px}
+
+  .kids>li{margin-bottom:2px}
+
+  /* tight twisty for the deepest levels */
+  .kids .kids .kids .kids .tw{width:16px}
+  .kids .kids .kids .kids .tw::before{
+    border-left-width:4px;
+    border-top-width:3.5px;
+    border-bottom-width:3.5px;
+  }
 }
+
 @media print{
   #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay{display:none!important}
   body{background:#fff;color:#000}
@@ -318,7 +339,7 @@ const isG   = c => c && c.startsWith('linear');
 const first = c => (c.match(/#[0-9a-f]{3,8}/i) || [c])[0];
 const ss    = t => { t = t < 0 ? 0 : t > 1 ? 1 : t; return t*t*(3-2*t) };
 
-const coarse = matchMedia('(hover:none),(pointer:coarse)');
+const coarse = matchMedia('(hover:none),(pointer:coarse),(max-width:768px)');
 const RM     = matchMedia('(prefers-reduced-motion: reduce)');
 const fine   = matchMedia('(hover:hover) and (pointer:fine)');
 
@@ -845,7 +866,13 @@ function buildNode(n, d){
 
   row.className = 'row' + (isG(n.c) ? ' g' : '') + (n.s ? ' s' : '') + (ed ? ' ed' : '') + (n.k.length ? ' has' : '');
   row.dataset.id = n.id;
-  row.style.setProperty('--fs', Math.max(18, 34 - d * 5) + 'px');
+
+  const isMobile = coarse.matches;
+  const baseSize = isMobile ? 21 : 34;
+  const step     = isMobile ? 2.6 : 5;
+  const minSize  = isMobile ? 13.5 : 18;
+  row.style.setProperty('--fs', Math.max(minSize, baseSize - d * step) + 'px');
+
   paint(n, row, li);
 
   if(n.k.length){
@@ -1676,7 +1703,7 @@ if(th) html.dataset.theme = th;
 const isDark = () => (html.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
 const paintTheme = () => { $('theme').textContent = isDark() ? 'light mode' : 'dark mode' };
 $('theme').onclick = () => {
-  const t = isDark() ? 'dark' : 'light';
+  const t = isDark() ? 'light' : 'dark';
   html.dataset.theme = t;
   try { localStorage.setItem(KT, t) } catch(e) {}
   label($('theme'), isDark() ? 'light mode' : 'dark mode');
@@ -1764,6 +1791,17 @@ const TL_TRUNK = 11;
 const TL_R     = 8;
 const TL_END   = 22;
 
+/* per-ul metrics derived from --ind; honest about zero (mobile flush) */
+function tlMetrics(ul){
+  let w = parseFloat(getComputedStyle(ul).getPropertyValue('--ind'));
+  if(!isFinite(w)) w = 28;          // desktop fallback only when unset
+  if(w < 0) w = 0;
+  const trunk = Math.max(1.2, w * 0.39);
+  const rad   = Math.max(0.8, Math.min(w * 0.29, 8));
+  const end   = Math.max(trunk + rad + 0.5, w * 0.78);
+  return { w, trunk, rad, end };
+}
+
 function drawTreeLines(){
   treeEl.querySelectorAll('ul.kids').forEach(ul => {
     const old = ul.querySelector(':scope > svg.tree-lines');
@@ -1774,6 +1812,8 @@ function drawTreeLines(){
 
     const parentLi = ul.closest('li');
     const parentId = parentLi ? parentLi.dataset.id : '';
+
+    const M = tlMetrics(ul);
 
     const ulRect = ul.getBoundingClientRect();
     const items = [];
@@ -1791,29 +1831,30 @@ function drawTreeLines(){
     const h = Math.max(1, Math.round(ulRect.height));
     const parts = [];
 
-    parts.push(`<rect class="tl-hit" x="0" y="0" width="${TL_W}" height="${h}" fill="none"/>`);
+    parts.push(`<rect class="tl-hit" x="0" y="0" width="${Math.max(M.w, M.end + 1)}" height="${h}" fill="none"/>`);
 
     if(items.length > 1){
       const y0 = items[0].y.toFixed(1);
       const y1 = items[items.length - 1].y.toFixed(1);
-      parts.push(`<path class="tl-trunk" d="M ${TL_TRUNK} ${y0} V ${y1}"/>`);
+      parts.push(`<path class="tl-trunk" d="M ${M.trunk} ${y0} V ${y1}"/>`);
     }
 
     for(const it of items){
       const cy = it.y;
-      const top = (cy - TL_R).toFixed(1);
+      const top = (cy - M.rad).toFixed(1);
       const bot = cy.toFixed(1);
-      const d = `M ${TL_TRUNK} ${top} A ${TL_R} ${TL_R} 0 0 0 ${TL_TRUNK + TL_R} ${bot} H ${TL_END}`;
+      const d = `M ${M.trunk} ${top} A ${M.rad} ${M.rad} 0 0 0 ${(M.trunk + M.rad).toFixed(1)} ${bot} H ${M.end.toFixed(1)}`;
       const style = it.color ? ` style="stroke:${it.color}"` : '';
       parts.push(`<path class="tl-elbow"${style} d="${d}"/>`);
     }
 
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'tree-lines');
-    svg.setAttribute('width', TL_W);
+    svg.setAttribute('width', Math.max(M.w, M.end + 1));
     svg.setAttribute('height', h);
     svg.setAttribute('aria-hidden', 'true');
     if(parentId) svg.setAttribute('data-parent', parentId);
+    svg.dataset.trunk = M.trunk;
     svg.innerHTML = parts.join('');
     ul.insertBefore(svg, ul.firstChild);
   });
@@ -1854,7 +1895,8 @@ treeEl.addEventListener('mouseover', e => {
   hotLine = svg;
   svg.classList.add('hot');
   const r = svg.getBoundingClientRect();
-  treeToggle.style.left = (r.left + TL_TRUNK) + 'px';
+  const tk = parseFloat(svg.dataset.trunk) || TL_TRUNK;
+  treeToggle.style.left = (r.left + tk) + 'px';
   treeToggle.style.top  = (r.top + 8) + 'px';
   treeToggle.classList.add('on');
 });
