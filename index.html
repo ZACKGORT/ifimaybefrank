@@ -30,8 +30,11 @@ ul{list-style:none;margin:0;padding:0}
 .row.ed{flex-direction:column;align-items:flex-start;justify-content:center}
 .row.im{align-items:flex-start}
 .pic{display:block;max-width:100%;max-height:min(60vh,480px);height:auto;object-fit:contain;border-radius:6px}
-/* no user-select:none — caretPositionFromPoint needs a selectable text node,
-   and #app's mousedown preventDefault already blocks selection */
+.picwrap{position:relative;display:inline-block;max-width:100%}
+.spk{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border:0;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;opacity:0;transition:opacity .18s;cursor:pointer;touch-action:manipulation;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.picwrap:hover .spk,.spk:focus-visible{opacity:1}
+.spk:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.spk svg{display:block}
 .st{font-weight:400;white-space:pre-wrap;overflow-wrap:break-word;max-width:100%}
 textarea{display:block;width:100%;max-width:100%;min-width:3ch;font:inherit;font-weight:400;line-height:inherit;color:inherit;caret-color:currentColor;background:transparent;border:0;outline:0;padding:0;margin:0;resize:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:break-word}
 @supports (field-sizing:content){textarea{field-sizing:content;width:auto}}
@@ -41,23 +44,18 @@ textarea::placeholder{color:var(--mute);-webkit-text-fill-color:var(--mute)}
 .row.s .st{background-image:linear-gradient(120deg,transparent 35%,var(--sh) 50%,transparent 65%),var(--base-img);background-size:200% 100%,100% 100%;background-repeat:no-repeat;background-position:150% 0,0 0;animation:shine 3.2s linear infinite}
 @keyframes shine{0%{background-position:150% 0,0 0}70%,100%{background-position:-50% 0,0 0}}
 @media (prefers-reduced-motion:reduce){.row.s .st{animation:none}}
+
+/* ── branch toggle ──
+   collapsed = right, expanded = down, hover flips toward the other state */
 .tw{position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:28px;display:none;align-items:center;justify-content:center;background:none;border:0;padding:0;cursor:pointer;color:var(--sb);touch-action:manipulation}
 .row.has>.tw{display:flex}
-/* base = collapsed = right */
 .tw::before{content:'';display:block;width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .18s ease}
-
-/* expanded = down */
 li:not(.z)>.row>.tw::before{transform:rotate(90deg)}
-
-/* collapsed + hover = down */
 li.z>.row>.tw:hover::before{transform:rotate(90deg)}
-
-/* expanded + hover = up */
 li:not(.z)>.row>.tw:hover::before{transform:rotate(-90deg)}
-
-
 .tw:hover{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.tw::before{transition:none}}
+
 .badge{margin-left:9px;flex:0 0 auto;font:400 10px/1 var(--mono);color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:3px 7px;letter-spacing:.02em}
 li.z>.row{opacity:.88}
 li[role="treeitem"]{outline:none}
@@ -98,10 +96,11 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   #menu .gs{width:52px;border-radius:17px}
   #menu .tx{padding:10px 2px}
   .tw{width:26px;height:40px}
-  .tw::before{border-left-width:5.5px;border-right-width:5.5px;border-bottom-width:6px}
+  .tw::before{border-left-width:5.5px;border-top-width:5px;border-bottom-width:5px}
+  .spk{opacity:1;width:40px;height:40px}
 }
 @media print{
-  #hint,#blurB,#toast,#menu,#ghost,.write-cursor-dot,.write-cursor-ellipse,header span:last-child{display:none!important}
+  #hint,#blurB,#toast,#menu,#ghost,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child{display:none!important}
   body{background:#fff;color:#000}
   #app{max-width:none;padding:0;min-height:0}
   .row{min-height:0;font-size:13pt!important}
@@ -160,6 +159,10 @@ const ss    = t => { t = t < 0 ? 0 : t > 1 ? 1 : t; return t*t*(3-2*t) };
 const coarse = matchMedia('(hover:none),(pointer:coarse)');
 const RM     = matchMedia('(prefers-reduced-motion: reduce)');
 const fine   = matchMedia('(hover:hover) and (pointer:fine)');
+
+/* ─────────────── icons ─────────────── */
+const ICON_MUTED = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.5 6.2l3 3.6M13.5 6.2l-3 3.6"/></svg>';
+const ICON_SOUND = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.2 5.8a3 3 0 010 4.4M12.4 3.8a6 6 0 010 8.4"/></svg>';
 
 /* ─────────────── ids ───────────────
    Ids are now stable: they persist through save/load and only get assigned
@@ -326,11 +329,6 @@ const countDesc = k => k.reduce((s, n) => s + 1 + countDesc(n.k), 0);
 let editing = null, rendering = false, groups = [];
 let pendingCaret = null;   /* {id, pos} — carried across exactly one intentional rebuild */
 
-const currentCaret = () => {
-  const a = document.activeElement;
-  return (a && a.tagName === 'TEXTAREA') ? a.selectionStart : null;
-};
-
 /* ─────────────── text pressure (chrome only) ─────────────── */
 function splitNode(root){
   const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
@@ -485,16 +483,59 @@ function buildNode(n, d){
       row.classList.add('im');
       const v = isVid(n.t), im = document.createElement(v ? 'video' : 'img');
       im.className = 'pic';
+
       if(v){
         im.muted = true; im.loop = true; im.autoplay = true; im.playsInline = true; im.preload = 'metadata';
         im.setAttribute('muted',''); im.setAttribute('playsinline','');
-        im.src = n.t.trim(); vio.observe(im);
+        im.src = n.t.trim();
+
+        const wrap = document.createElement('span');
+        wrap.className = 'picwrap';
+        wrap.appendChild(im);
+
+        const spk = document.createElement('button');
+        spk.type = 'button';
+        spk.className = 'spk';
+
+        const paintSpk = () => {
+          spk.innerHTML = im.muted ? ICON_MUTED : ICON_SOUND;
+          spk.setAttribute('aria-label', im.muted ? 'unmute clip' : 'mute clip');
+          spk.setAttribute('aria-pressed', String(!im.muted));
+        };
+        im._paint = paintSpk;      /* so the audio-focus sweep can repaint other clips */
+        paintSpk();
+
+        spk.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation() });
+        spk.addEventListener('click', e => {
+          e.stopPropagation();
+          if(im.muted){
+            /* one unmuted clip at a time — silence every other video, and keep
+               its button in sync with the real state */
+            treeEl.querySelectorAll('video').forEach(o => {
+              if(o === im || o.muted) return;
+              o.muted = true;
+              if(o._paint) o._paint();
+            });
+            im.muted = false;
+            const p = im.play();
+            if(p) p.catch(() => { im.muted = true; paintSpk() });
+          } else {
+            im.muted = true;
+          }
+          paintSpk();
+        });
+
+        wrap.appendChild(spk);
+        row.appendChild(wrap);
+        vio.observe(im);
+
+        im.onerror = () => { row.classList.remove('im'); wrap.replaceWith(txt()) };
       } else {
         im.alt = ''; im.draggable = false; im.loading = 'lazy';
         im.referrerPolicy = 'no-referrer'; im.src = n.t.trim();
+        im.onerror = () => { row.classList.remove('im'); im.replaceWith(txt()) };
+        row.appendChild(im);
       }
-      im.onerror = () => { row.classList.remove('im'); im.replaceWith(txt()) };
-      row.appendChild(im);
     } else row.appendChild(txt());
 
     if(n.z && n.k.length){
@@ -868,7 +909,7 @@ function navKey(e, n, li){
 /* ─────────────── click to edit / add ─────────────── */
 $('app').addEventListener('mousedown', e => {
   if(Date.now() < lpUntil) return;
-  if(e.target.tagName === 'TEXTAREA' || e.target.closest('.tools,header,.tw,#menu')) return;
+  if(e.target.tagName === 'TEXTAREA' || e.target.closest('.tools,header,.tw,.spk,#menu')) return;
   e.preventDefault();
 
   const row = e.target.closest('.row');
@@ -984,8 +1025,7 @@ menu.addEventListener('click', e => {
     const row = li.querySelector(':scope > .row');
     if(row) paint(r.n, row, li);
     /* repaint in place — no DOM construction, no caret loss */
-    if(editing === target) focusRow(target);
-    else focusRow(target);
+    focusRow(target);
   }
   save();
 });
@@ -1100,7 +1140,7 @@ function cancelLP(){ if(lpTimer){ clearTimeout(lpTimer); lpTimer = null } }
 
 document.addEventListener('pointerdown', e => {
   if(e.pointerType !== 'touch') return;
-  if(e.target.closest('.tools,#menu,header,.tw')) return;
+  if(e.target.closest('.tools,#menu,header,.tw,.spk')) return;
   const row = e.target.closest('.row'); if(!row) return;
   lpPos = { x: e.clientX, y: e.clientY };
   lpId = row.dataset.id;
@@ -1400,4 +1440,4 @@ coarse.addEventListener('change', setHint);
 render();
 </script>
 </body>
-</html>                                                                                                                                                                 
+</html>
