@@ -30,7 +30,9 @@ ul{list-style:none;margin:0;padding:0}
 .row.ed{flex-direction:column;align-items:flex-start;justify-content:center}
 .row.im{align-items:flex-start}
 .pic{display:block;max-width:100%;max-height:min(60vh,480px);height:auto;object-fit:contain;border-radius:6px}
-.st{font-weight:400;white-space:pre-wrap;overflow-wrap:break-word;user-select:none;max-width:100%}
+/* no user-select:none — caretPositionFromPoint needs a selectable text node,
+   and #app's mousedown preventDefault already blocks selection */
+.st{font-weight:400;white-space:pre-wrap;overflow-wrap:break-word;max-width:100%}
 textarea{display:block;width:100%;max-width:100%;min-width:3ch;font:inherit;font-weight:400;line-height:inherit;color:inherit;caret-color:currentColor;background:transparent;border:0;outline:0;padding:0;margin:0;resize:none;overflow:hidden;white-space:pre-wrap;overflow-wrap:break-word}
 @supports (field-sizing:content){textarea{field-sizing:content;width:auto}}
 textarea::placeholder{color:var(--mute);-webkit-text-fill-color:var(--mute)}
@@ -39,22 +41,28 @@ textarea::placeholder{color:var(--mute);-webkit-text-fill-color:var(--mute)}
 .row.s .st{background-image:linear-gradient(120deg,transparent 35%,var(--sh) 50%,transparent 65%),var(--base-img);background-size:200% 100%,100% 100%;background-repeat:no-repeat;background-position:150% 0,0 0;animation:shine 3.2s linear infinite}
 @keyframes shine{0%{background-position:150% 0,0 0}70%,100%{background-position:-50% 0,0 0}}
 @media (prefers-reduced-motion:reduce){.row.s .st{animation:none}}
-
-/* ── branch toggle ── */
 .tw{position:absolute;left:0;top:50%;transform:translateY(-50%);width:18px;height:28px;display:none;align-items:center;justify-content:center;background:none;border:0;padding:0;cursor:pointer;color:var(--sb);touch-action:manipulation}
 .row.has>.tw{display:flex}
-.tw::before{content:'';display:block;width:0;height:0;border-left:4.5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .18s ease}
-li.z>.row>.tw::before{transform:rotate(-90deg)}
+/* base = collapsed = right */
+.tw::before{content:'';display:block;width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .18s ease}
+
+/* expanded = down */
+li:not(.z)>.row>.tw::before{transform:rotate(90deg)}
+
+/* collapsed + hover = down */
+li.z>.row>.tw:hover::before{transform:rotate(90deg)}
+
+/* expanded + hover = up */
+li:not(.z)>.row>.tw:hover::before{transform:rotate(-90deg)}
+
+
 .tw:hover{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.tw::before{transition:none}}
 .badge{margin-left:9px;flex:0 0 auto;font:400 10px/1 var(--mono);color:var(--mute);border:1px solid var(--line);border-radius:999px;padding:3px 7px;letter-spacing:.02em}
 li.z>.row{opacity:.88}
-
-/* ── treeitem focus ── */
 li[role="treeitem"]{outline:none}
 li[role="treeitem"]:focus{outline:none}
 li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset:4px;border-radius:6px}
-
 #menu .tx.on{color:var(--ink)}
 .tools{display:flex;gap:12px;margin-top:2px;font:300 11px/1 var(--mono);color:var(--mute);opacity:.55;transition:opacity .2s;-webkit-text-fill-color:currentColor}
 .row:hover .tools,.tools:focus-within{opacity:1}
@@ -72,13 +80,12 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 #menu button{width:22px;height:22px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--c);transition:transform .12s;touch-action:manipulation}
 #menu .mr button:not(.tx){box-shadow:inset 0 0 0 1px rgba(128,128,128,.35)}
 #menu button:hover{transform:scale(1.15)}
+#menu button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 #menu .gs{width:34px;border-radius:11px}
 #menu .f{justify-content:space-between}
 #menu .tx{width:auto;height:auto;padding:2px 0;border-radius:0;background:none;color:var(--mute);font:inherit}
 #menu .tx:hover{color:var(--ink);transform:none}
 #ghost{position:fixed;left:0;top:0;z-index:400;margin-top:-6px;pointer-events:none;white-space:nowrap;font:300 11px/1 var(--mono);letter-spacing:.02em;color:var(--mute);opacity:0;transition:opacity .2s ease;will-change:transform,opacity}
-
-/* ── touch / coarse pointer ── */
 @media (hover:none),(pointer:coarse){
   .row{min-height:52px}
   .tools{opacity:1;gap:4px;margin-top:6px}
@@ -91,11 +98,8 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   #menu .gs{width:52px;border-radius:17px}
   #menu .tx{padding:10px 2px}
   .tw{width:26px;height:40px}
-  .tw::before{border-left-width:5.5px;border-top-width:5px;border-bottom-width:5px}
+  .tw::before{border-left-width:5.5px;border-right-width:5.5px;border-bottom-width:6px}
 }
-@media (max-width:420px){:root{--fs-scale:.86}}
-
-/* ── print ── */
 @media print{
   #hint,#blurB,#toast,#menu,#ghost,.write-cursor-dot,.write-cursor-ellipse,header span:last-child{display:none!important}
   body{background:#fff;color:#000}
@@ -106,17 +110,14 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   .badge{display:none}
   @page{margin:18mm}
 }
-
-/* ── custom cursor (from nvrvr_styles) ── */
+/* ── custom cursor: geometry is driven entirely from JS, so no size transitions ── */
 body.custom-cursor-active,body.custom-cursor-active #app,body.custom-cursor-active .row,body.custom-cursor-active header{cursor:none}
-.write-cursor-dot,.write-cursor-ellipse{position:fixed;top:0;left:0;z-index:500;pointer-events:none;transform:translate(-9999px,-9999px);opacity:0;transition:opacity .18s ease;will-change:transform}
+.write-cursor-dot,.write-cursor-ellipse{position:fixed;top:0;left:0;z-index:500;pointer-events:none;transform:translate(-9999px,-9999px);opacity:0;transition:opacity .18s ease;will-change:transform,width,height}
 .write-cursor-dot.visible,.write-cursor-ellipse.visible{opacity:1}
-.write-cursor-dot{transition:opacity .18s ease,width .18s ease,height .18s ease,margin .18s ease,border-radius .18s ease}
-.write-cursor-dot.text{width:2px;height:var(--dh,24px);margin:calc(var(--dh,24px)/-2) 0 0 -1px;border-radius:1px}
-body.custom-cursor-active textarea{cursor:none}
-.write-cursor-dot{width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--ink)}
+.write-cursor-dot{background:var(--ink)}
 .write-cursor-ellipse{width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid var(--ink);border-radius:50%;opacity:0}
 .write-cursor-ellipse.visible{opacity:.32}
+body.custom-cursor-active textarea{cursor:none}
 body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-native-cursor #app,body.custom-cursor-active.write-native-cursor .row,body.custom-cursor-active.write-native-cursor header{cursor:auto}
 .write-native-cursor .write-cursor-dot,.write-native-cursor .write-cursor-ellipse{opacity:0!important}
 @media (hover:none),(pointer:coarse){.write-cursor-dot,.write-cursor-ellipse{display:none!important}}
@@ -135,483 +136,1268 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 <div class="write-cursor-ellipse" id="writeCursorEllipse" aria-hidden="true"></div>
 <div class="write-cursor-dot" id="writeCursorDot" aria-hidden="true"></div>
 <script>
-const $=id=>document.getElementById(id);
-const K='digress:v1', PAL=['#e5484d','#f76b15','#e0a800','#30a46c','#0091ff','#8e4ec6','#e93d82'];
-const GRAY=['#1b1b1b','#3f3f46','#6b6b73','#8e8e93','#b0b0b6','#d4d4d8','#f2f0ea'];
-const G=['#ff5f6d,#ffc371','#0061ff,#22c1c3','#8e2de2,#00c9a7','#ff0080,#7928ca','#11998e,#38ef7d','#f12711,#f5af19','#5227FF,#FF9FFC,#B497CF'].map(s=>`linear-gradient(90deg,${s})`);
-const isG=c=>c&&c.startsWith('linear'), first=c=>(c.match(/#[0-9a-f]{3,8}/i)||[c])[0];
-const coarse=matchMedia('(hover:none),(pointer:coarse)');
-const RM=matchMedia('(prefers-reduced-motion: reduce)');
-const fine=matchMedia('(hover:hover) and (pointer:fine)');
+const $ = id => document.getElementById(id);
+const treeEl = $('tree');
 
-let uid=1; const nid=()=>'n'+(uid++);
-const mk=(t='')=>({id:nid(),t,c:null,s:false,z:false,k:[]});
-const seed=()=>([{"t":"Before we start, you should know:","k":[{"t":"this is basically it; the whole idea."},{"t":"suffice to say, I loathe to write as a writer."},{"t":"i prefer to convey as a creative.","k":[{"t":"w/out worrying about APA, MLA, or the fcking Oxford Comma.","k":[{"t":"(look — you weren't bothered by my shorthand, my lack of formatting and apparent typos, and my complete disregard for posture ;)","c":"#8e8e93"},{"t":"But, you are able to follow, yes?","c":"#f2f0ea"}]}]}]},{"t":"..."},{"t":"Anyways","k":[{"t":"Here, just write the damn thing.","k":[{"t":"Write it before it escapes your ability to articulate it.","k":[{"t":"Write freely, but with structure.","k":[{"t":"Write in a familiar format.","k":[{"t":"Write with directionality.","k":[{"t":"Also, here is my dog, Wolfgang..."},{"t":"https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/park123.avif"}]}]}]}]}]}]}]);
-const fix=a=>a.forEach(n=>{n.id=nid();n.c=n.c||null;n.s=!!n.s;n.z=!!n.z;n.k=n.k||[];fix(n.k)});
-let root=null; try{root=JSON.parse(localStorage.getItem(K))}catch(e){}
-if(!Array.isArray(root)||!root.length) root=seed();
-fix(root);
-const strip=(k,v)=>k==='id'?undefined:v;
-let hist=[],hi=-1,lastT=0,lastTyping=false;
-const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)};
-const persist=()=>{try{localStorage.setItem(K,JSON.stringify(root,strip));return true}catch(e){toast('couldn’t save locally — export json to keep this');return false}};
+/* ─────────────── storage keys ───────────────
+   Renamed from 'digress:*' to 'frankly:*'. This is the one-time window where
+   the rename is free: on boot we read the old key, write forward, and leave
+   the old value untouched as a backup. After this ships, changing it again
+   costs a migration. */
+const K        = 'frankly:doc:v1';
+const K_LEGACY = ['digress:v1'];
+const KT       = 'frankly:theme';
+const KT_LEGACY= ['digress:theme'];
+
+const PAL  = ['#e5484d','#f76b15','#e0a800','#30a46c','#0091ff','#8e4ec6','#e93d82'];
+const GRAY = ['#1b1b1b','#3f3f46','#6b6b73','#8e8e93','#b0b0b6','#d4d4d8','#f2f0ea'];
+const G    = ['#ff5f6d,#ffc371','#0061ff,#22c1c3','#8e2de2,#00c9a7','#ff0080,#7928ca','#11998e,#38ef7d','#f12711,#f5af19','#5227FF,#FF9FFC,#B497CF'].map(s => `linear-gradient(90deg,${s})`);
+
+const isG   = c => c && c.startsWith('linear');
+const first = c => (c.match(/#[0-9a-f]{3,8}/i) || [c])[0];
+const ss    = t => { t = t < 0 ? 0 : t > 1 ? 1 : t; return t*t*(3-2*t) };
+
+const coarse = matchMedia('(hover:none),(pointer:coarse)');
+const RM     = matchMedia('(prefers-reduced-motion: reduce)');
+const fine   = matchMedia('(hover:hover) and (pointer:fine)');
+
+/* ─────────────── ids ───────────────
+   Ids are now stable: they persist through save/load and only get assigned
+   to nodes that lack one or that duplicate one already seen. */
+let uid = 0;
+const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
+
+const seed = () => ([{"t":"Before we start, you should know:","k":[{"t":"this is basically it; the whole idea."},{"t":"suffice to say, I loathe to write as a writer."},{"t":"i prefer to convey as a creative.","k":[{"t":"w/out worrying about APA, MLA, or the fcking Oxford Comma.","k":[{"t":"(look — you weren't bothered by my shorthand, my lack of formatting and apparent typos, and my complete disregard for posture ;)","c":"#8e8e93"},{"t":"But, you are able to follow, yes?","c":"#f2f0ea"}]}]}]},{"t":"..."},{"t":"Anyways","k":[{"t":"Here, just write the damn thing.","k":[{"t":"Write it before it escapes your ability to articulate it.","k":[{"t":"Write freely, but with structure.","k":[{"t":"Write in a familiar format.","k":[{"t":"Write with directionality.","k":[{"t":"Also, here is my dog, Wolfgang..."},{"t":"https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/park123.avif"}]}]}]}]}]}]}]);
+
+function ensureIds(a, seen){
+  a.forEach(n => {
+    if(typeof n.id !== 'string' || !n.id || seen.has(n.id)) n.id = nid();
+    seen.add(n.id);
+    n.c = typeof n.c === 'string' ? n.c : null;
+    n.s = !!n.s;
+    n.z = !!n.z;
+    n.k = Array.isArray(n.k) ? n.k : [];
+    ensureIds(n.k, seen);
+  });
+}
+
+/* ─────────────── load + migration ─────────────── */
+const safeGet = k => { try { return localStorage.getItem(k) } catch(_) { return null } };
+
+function readDoc(raw){
+  if(!raw) return null;
+  let d;
+  try { d = JSON.parse(raw) } catch(_) { return null }
+  const st = Array.isArray(d) ? d
+           : (d && Array.isArray(d.doc)) ? d.doc
+           : (d && Array.isArray(d.statements)) ? d.statements
+           : null;
+  return (st && st.length) ? st : null;
+}
+
+let bootedFromLegacy = false;
+let doc = readDoc(safeGet(K));
+if(!doc){
+  for(const k of K_LEGACY){
+    doc = readDoc(safeGet(k));
+    if(doc){ bootedFromLegacy = true; break }
+  }
+}
+let root = (doc && doc.length) ? doc : seed();
+ensureIds(root, new Set());
+
+/* ─────────────── toast ─────────────── */
+const toast = m => {
+  const t = $('toast');
+  t.textContent = m;
+  t.classList.add('on');
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove('on'), 2200);
+};
+
+/* ─────────────── persistence: coalesced write ───────────────
+   persist() schedules; persistNow() actually writes. Flushed on pagehide,
+   beforeunload, and tab-hide so a close never loses the last few seconds. */
+let wt = null, wpending = false;
+
+function persistNow(){
+  try {
+    localStorage.setItem(K, JSON.stringify({ app:'frankly', v:1, doc: root }));
+    return true;
+  } catch(e) {
+    toast('couldn’t save locally — export json to keep this');
+    return false;
+  }
+}
+function persist(){
+  wpending = true;
+  if(wt) return;
+  wt = setTimeout(() => { wt = null; if(wpending){ wpending = false; persistNow() } }, 400);
+}
+function flushSave(){
+  if(wt){ clearTimeout(wt); wt = null }
+  if(wpending){ wpending = false; persistNow() }
+}
+addEventListener('pagehide', flushSave);
+addEventListener('beforeunload', flushSave);
+document.addEventListener('visibilitychange', () => { if(document.hidden) flushSave() });
+
+/* ─────────────── history ───────────────
+   Same grouping rule as before, but the mid-burst stringify is deferred
+   instead of running on every keystroke. */
+let hist = [], hi = -1, lastT = 0, lastTyping = false;
+let histDirty = false, histT = null;
+
+const snap = () => JSON.stringify(root);
+
+function commitHist(){
+  if(histDirty){
+    histDirty = false;
+    if(histT){ clearTimeout(histT); histT = null }
+    hist[hi] = snap();
+  }
+}
+
 function save(typing){
   persist();
-  const j=JSON.stringify(root,strip); if(hist[hi]===j)return;
-  const now=Date.now();
-  if(typing&&lastTyping&&now-lastT<900&&hi>0) hist[hi]=j; else {hist=hist.slice(0,hi+1);hist.push(j);hi++;if(hist.length>300){hist.shift();hi--}}
-  lastT=now;lastTyping=!!typing;
+  const now = Date.now();
+  if(typing && lastTyping && now - lastT < 900 && hi > 0){
+    histDirty = true;
+    lastT = now;
+    if(histT) clearTimeout(histT);
+    histT = setTimeout(() => {
+      histT = null;
+      if(histDirty){ histDirty = false; hist[hi] = snap() }
+    }, 600);
+    return;
+  }
+  commitHist();
+  const j = snap();
+  if(hist[hi] === j){ lastT = now; lastTyping = !!typing; return }
+  hist = hist.slice(0, hi + 1);
+  hist.push(j);
+  hi++;
+  if(hist.length > 300){ hist.shift(); hi-- }
+  lastT = now;
+  lastTyping = !!typing;
 }
-hist=[JSON.stringify(root,strip)];hi=0;
-function restore(j){root=JSON.parse(j);fix(root);editing=null;persist();render()}
-const undo=()=>{if(hi>0){restore(hist[--hi]);toast('undone')}};
-const redo=()=>{if(hi<hist.length-1){restore(hist[++hi]);toast('redone')}};
-addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey)return;const k=e.key.toLowerCase();if(k==='z'){e.preventDefault();e.shiftKey?redo():undo()}else if(k==='y'){e.preventDefault();redo()}});
 
-const liEl=id=>document.querySelector('li[role="treeitem"][data-id="'+id+'"]');
-const focusRow=id=>{const r=liEl(id);if(r)r.focus()};
-const find=(id,a=root,p=null)=>{for(let i=0;i<a.length;i++){if(a[i].id===id)return{n:a[i],a,i,p};const r=find(id,a[i].k,a[i]);if(r)return r}return null};
-const flat=(a=root,o=[])=>{a.forEach(n=>{o.push(n);flat(n.k,o)});return o};
-const countDesc=k=>k.reduce((s,n)=>s+1+countDesc(n.k),0);
-let editing=null, rendering=false, groups=[], caret=null;
+hist = [snap()]; hi = 0;
+if(bootedFromLegacy) persistNow();
 
-const HI='<b>click</b> a line to edit &nbsp;·&nbsp; <b>right-click</b> for color &nbsp;·&nbsp; click below to add';
-const HE='<b>enter</b> next &nbsp;·&nbsp; <b>shift+enter</b> branch &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>⌫</b> on empty deletes &nbsp;·&nbsp; <b>esc</b> done';
-const HI_T='<b>tap</b> a line to edit &nbsp;·&nbsp; <b>long-press</b> for color &nbsp;·&nbsp; tap below to add';
-const HE_T='<b>enter</b> next &nbsp;·&nbsp; <b>branch</b> below &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>esc</b> done';
+function restore(j){
+  root = JSON.parse(j);
+  ensureIds(root, new Set());
+  editing = null;
+  pendingCaret = null;
+  persist();
+  render();
+}
+const undo = () => { commitHist(); if(hi > 0){ restore(hist[--hi]); toast('undone') } };
+const redo = () => { commitHist(); if(hi < hist.length - 1){ restore(hist[++hi]); toast('redone') } };
 
-/* text pressure lives on the chrome only: logo, controls, hints */
+addEventListener('keydown', e => {
+  if(!(e.metaKey || e.ctrlKey) || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if(k === 'z'){ e.preventDefault(); e.shiftKey ? redo() : undo() }
+  else if(k === 'y'){ e.preventDefault(); redo() }
+});
+
+/* ─────────────── tree queries ─────────────── */
+const liOf     = id => treeEl.querySelector('li[role="treeitem"][data-id="' + id + '"]');
+const focusRow = id => { const r = liOf(id); if(r) r.focus() };
+
+function find(id, a = root, p = null){
+  for(let i = 0; i < a.length; i++){
+    if(a[i].id === id) return { n: a[i], a, i, p };
+    const r = find(id, a[i].k, a[i]);
+    if(r) return r;
+  }
+  return null;
+}
+/* every node, regardless of collapse state — for structural decisions */
+const allNodes = (a = root, o = []) => { a.forEach(n => { o.push(n); allNodes(n.k, o) }); return o };
+/* only what is actually rendered — for keyboard navigation */
+const visible  = (a = root, o = []) => { a.forEach(n => { o.push(n); if(!n.z) visible(n.k, o) }); return o };
+
+const countDesc = k => k.reduce((s, n) => s + 1 + countDesc(n.k), 0);
+
+let editing = null, rendering = false, groups = [];
+let pendingCaret = null;   /* {id, pos} — carried across exactly one intentional rebuild */
+
+const currentCaret = () => {
+  const a = document.activeElement;
+  return (a && a.tagName === 'TEXTAREA') ? a.selectionStart : null;
+};
+
+/* ─────────────── text pressure (chrome only) ─────────────── */
 function splitNode(root){
-  const tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), nodes=[];
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), nodes = [];
   while(tw.nextNode()) if(!tw.currentNode.parentElement.classList.contains('c')) nodes.push(tw.currentNode);
-  nodes.forEach(t=>{
-    const f=document.createDocumentFragment();
-    t.nodeValue.split(/(\s+)/).forEach(w=>{
-      if(!w)return;
-      if(/^\s+$/.test(w)){f.appendChild(document.createTextNode(w));return}
-      const sp=document.createElement('span'); sp.className='w';
-      [...w].forEach(ch=>{const c=document.createElement('span');c.className='c';c.textContent=ch;sp.appendChild(c)});
+  nodes.forEach(t => {
+    const f = document.createDocumentFragment();
+    t.nodeValue.split(/(\s+)/).forEach(w => {
+      if(!w) return;
+      if(/^\s+$/.test(w)){ f.appendChild(document.createTextNode(w)); return }
+      const sp = document.createElement('span'); sp.className = 'w';
+      [...w].forEach(ch => { const c = document.createElement('span'); c.className = 'c'; c.textContent = ch; sp.appendChild(c) });
       f.appendChild(sp);
     });
     t.replaceWith(f);
   });
 }
-function collect(){
-  groups=[];
-  const add=(el,hi)=>{
-    if(!el)return; splitNode(el);
-    const c=[...el.querySelectorAll('.c')];
-    c.forEach(x=>{x._b=parseInt(getComputedStyle(x).fontWeight)||400;x._t=undefined});
-    groups.push({s:el,c,hi});
-  };
-  add(document.querySelector('.wm'),900); add($('export'),700); add($('import'),700); add($('reset'),700); add($('theme'),700); add($('ht'),700);
-  document.querySelectorAll('.tools').forEach(t=>add(t,700));
-}
-const IMG=/^(?:https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?|https?:\/\/(?:images\.unsplash\.com|i\.imgur\.com|pbs\.twimg\.com|images\.pexels\.com)\/\S+|data:image\/(?:png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+\/=]+)$/i;
-const isImg=t=>IMG.test(t.trim());
-const VID=/^(?:https?:\/\/\S+\.(?:mp4|webm|mov|m4v|ogv)(?:[?#]\S*)?|data:video\/(?:mp4|webm|ogg);base64,[A-Za-z0-9+\/=]+)$/i;
-const isVid=t=>VID.test(t.trim());
-/* videos loop silently like gifs and only play while on screen */
-const vio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const p=e.target.play();if(p)p.catch(()=>{})}else e.target.pause()}),{threshold:.1});
-const fit=t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'};
 
-function edit(id){
-  const p=editing&&find(editing);
-  editing=id;
-  if(p&&p.n.id!==id&&!p.n.t.trim()&&!p.n.k.length&&flat().length>1) p.a.splice(p.i,1);
-  render(); save();
+function collect(){
+  groups = [];
+  const add = (el, hi) => {
+    if(!el) return;
+    splitNode(el);
+    const c = [...el.querySelectorAll('.c')];
+    /* base weight must be read once. getComputedStyle returns the *animated*
+       weight, so recomputing it every collect() made the base drift upward. */
+    c.forEach(x => {
+      if(x._b === undefined) x._b = parseInt(getComputedStyle(x).fontWeight) || 400;
+      x._t = undefined;
+    });
+    groups.push({ s: el, c, hi });
+  };
+  add(document.querySelector('.wm'), 900);
+  add($('export'), 700); add($('import'), 700); add($('reset'), 700); add($('theme'), 700);
+  add($('ht'), 700);
+  document.querySelectorAll('.tools').forEach(t => add(t, 700));
 }
-function addPeer(n){ if(!n.t.trim())return; const r=find(n.id),m=mk(); r.a.splice(r.i+1,0,m); edit(m.id) }
-function addChild(n){ if(!n.t.trim())return; const m=mk(); n.k.push(m); n.z=false; edit(m.id) }
-function remove(id){
-  const r=find(id); if(!r)return;
-  const f=flat(), i=f.indexOf(r.n), prev=f[i-1];
-  r.a.splice(r.i,1);
-  const after=flat();
-  if(!after.length){ const m=mk(); root.push(m); edit(m.id); return }
-  /* prev is never inside the removed subtree; fall back to whatever now sits at the same index */
-  const to=prev||after[Math.min(i,after.length-1)];
-  edit(to?to.id:null);
-}
+
+/* ─────────────── media ─────────────── */
+const IMG = /^(?:https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?|https?:\/\/(?:images\.unsplash\.com|i\.imgur\.com|pbs\.twimg\.com|images\.pexels\.com)\/\S+|data:image\/(?:png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+\/=]+)$/i;
+const VID = /^(?:https?:\/\/\S+\.(?:mp4|webm|mov|m4v|ogv)(?:[?#]\S*)?|data:video\/(?:mp4|webm|ogg);base64,[A-Za-z0-9+\/=]+)$/i;
+const isImg = t => IMG.test(t.trim());
+const isVid = t => VID.test(t.trim());
+
+const vio = new IntersectionObserver(es => es.forEach(e => {
+  if(e.isIntersecting){ const p = e.target.play(); if(p) p.catch(() => {}) }
+  else e.target.pause();
+}), { threshold: .1 });
+
+const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px' };
+
+/* ─────────────── hints ─────────────── */
+const HI   = '<b>click</b> a line to edit &nbsp;·&nbsp; <b>right-click</b> for color &nbsp;·&nbsp; click below to add';
+const HE   = '<b>enter</b> next &nbsp;·&nbsp; <b>shift+enter</b> branch &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>⌫</b> on empty deletes &nbsp;·&nbsp; <b>esc</b> done';
+const HI_T = '<b>tap</b> a line to edit &nbsp;·&nbsp; <b>long-press</b> for color &nbsp;·&nbsp; tap below to add';
+const HE_T = '<b>enter</b> next &nbsp;·&nbsp; <b>branch</b> below &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>esc</b> done';
+
 function setHint(){
-  const h=editing?(coarse.matches?HE_T:HE):(coarse.matches?HI_T:HI);
-  $('ht').innerHTML=h; collect();
+  $('ht').innerHTML = editing ? (coarse.matches ? HE_T : HE) : (coarse.matches ? HI_T : HI);
+  collect();
 }
+
+/* ─────────────── build ─────────────── */
+function paint(n, row, li){
+  row.classList.toggle('g', isG(n.c));
+  row.classList.toggle('s', !!n.s);
+  row.style.color = '';
+  row.style.removeProperty('--grad');
+  row.style.removeProperty('--base-img');
+  row.style.removeProperty('--cc');
+  li.style.removeProperty('--lc');
+  if(n.c){
+    if(isG(n.c)){ row.style.setProperty('--grad', n.c); row.style.setProperty('--cc', first(n.c)) }
+    else row.style.color = n.c;
+    li.style.setProperty('--lc', first(n.c));
+  }
+  if(n.s){
+    const b = n.c || 'var(--sb)';
+    row.style.setProperty('--base-img', isG(n.c) ? n.c : `linear-gradient(${b},${b})`);
+    if(n.c && !isG(n.c)) row.style.setProperty('--cc', n.c);
+  }
+}
+
+function buildNode(n, d){
+  const li = document.createElement('li');
+  const row = document.createElement('div');
+  const ed = n.id === editing;
+
+  li.setAttribute('role', 'treeitem');
+  li.setAttribute('aria-level', d + 1);
+  li.dataset.id = n.id;
+  if(n.k.length) li.setAttribute('aria-expanded', n.z ? 'false' : 'true');
+  if(n.z) li.classList.add('z');
+
+  row.className = 'row' + (isG(n.c) ? ' g' : '') + (n.s ? ' s' : '') + (ed ? ' ed' : '') + (n.k.length ? ' has' : '');
+  row.dataset.id = n.id;
+  row.style.setProperty('--fs', Math.max(18, 34 - d * 5) + 'px');
+  paint(n, row, li);
+
+  if(n.k.length){
+    const tw = document.createElement('button');
+    tw.type = 'button'; tw.className = 'tw'; tw.tabIndex = -1;
+    tw.setAttribute('aria-hidden', 'true');
+    tw.title = n.z ? 'expand branch' : 'collapse branch';
+    tw.addEventListener('mousedown', e => e.preventDefault());
+    tw.addEventListener('click', e => { e.stopPropagation(); toggleCollapse(n) });
+    row.appendChild(tw);
+  }
+
+  if(ed){
+    const i = document.createElement('textarea'), t = document.createElement('div');
+    t.className = 'tools' + (n.t.trim() ? '' : ' e');
+    [['↵','next',() => addPeer(n)],['⇧↵','branch',() => addChild(n)],['⌫','delete',() => remove(n.id)]].forEach(([k,l,f]) => {
+      const b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = `<i>${k}</i>${l}`; b.onclick = f; t.appendChild(b);
+    });
+    t.addEventListener('mousedown', e => e.preventDefault());
+    i.rows = 1; i.value = n.t; i.spellcheck = false;
+    i.placeholder = d ? 'digress…' : 'say something…';
+    i.oninput = () => {
+      if(/\n/.test(i.value)) i.value = i.value.replace(/\n+/g, ' ');
+      n.t = i.value;
+      t.classList.toggle('e', !i.value.trim());
+      fit(i);
+      save(true);
+    };
+    i.onkeydown = e => key(e, n);
+    i.onpaste = e => {
+      const tx = (e.clipboardData || window.clipboardData).getData('text');
+      const ls = tx.split(/\r?\n/).map(x => x.trim().replace(/^([-*•]|\d+[.)])\s+/, '')).filter(Boolean);
+      if(ls.length < 2) return;
+      e.preventDefault();
+      const head = i.value.slice(0, i.selectionStart), tail = i.value.slice(i.selectionEnd);
+      const r = find(n.id); if(!r) return;
+      let last = n;
+      n.t = head + ls[0];
+      ls.slice(1).forEach((l, j) => { const m = mk(l); r.a.splice(r.i + 1 + j, 0, m); last = m });
+      last.t += tail;
+      const cp = last.t.length - tail.length;
+      editing = last.id;
+      pendingCaret = { id: last.id, pos: cp };
+      render();
+      save();
+    };
+    i.onblur = () => { if(!rendering && editing === n.id) edit(null) };
+    row.append(i, t);
+  } else {
+    li.tabIndex = 0;
+    li.onkeydown = e => navKey(e, n, li);
+
+    const txt = () => { const s = document.createElement('div'); s.className = 'st'; s.textContent = n.t; return s };
+    if(isImg(n.t) || isVid(n.t)){
+      row.classList.add('im');
+      const v = isVid(n.t), im = document.createElement(v ? 'video' : 'img');
+      im.className = 'pic';
+      if(v){
+        im.muted = true; im.loop = true; im.autoplay = true; im.playsInline = true; im.preload = 'metadata';
+        im.setAttribute('muted',''); im.setAttribute('playsinline','');
+        im.src = n.t.trim(); vio.observe(im);
+      } else {
+        im.alt = ''; im.draggable = false; im.loading = 'lazy';
+        im.referrerPolicy = 'no-referrer'; im.src = n.t.trim();
+      }
+      im.onerror = () => { row.classList.remove('im'); im.replaceWith(txt()) };
+      row.appendChild(im);
+    } else row.appendChild(txt());
+
+    if(n.z && n.k.length){
+      const b = document.createElement('span');
+      b.className = 'badge';
+      b.textContent = countDesc(n.k);
+      row.appendChild(b);
+    }
+  }
+
+  li.appendChild(row);
+  if(n.k.length && !n.z){
+    const ul = document.createElement('ul');
+    ul.className = 'kids';
+    ul.setAttribute('role', 'group');
+    n.k.forEach(c => ul.appendChild(buildNode(c, d + 1)));
+    li.appendChild(ul);
+  }
+  return li;
+}
+
+/* ─────────────── targeted patch ───────────────
+   Replaces one <li> in place. This is what replaced the full re-render:
+   nothing outside this node's subtree is touched, so scroll and focus hold. */
+function focusTextarea(li, id){
+  const ta = li.querySelector('textarea');
+  if(!ta) return;
+  ta.focus({ preventScroll: true });
+  if(pendingCaret && pendingCaret.id === id){
+    const p = Math.max(0, Math.min(pendingCaret.pos, ta.value.length));
+    try { ta.setSelectionRange(p, p) } catch(_) {}
+    pendingCaret = null;
+  }
+  fit(ta);
+}
+
+function patchNode(id, caretPos){
+  const li = liOf(id); if(!li) return null;
+  const r = find(id); if(!r) return null;
+  const d = (parseInt(li.getAttribute('aria-level'), 10) || 1) - 1;
+  if(caretPos != null) pendingCaret = { id, pos: caretPos };
+  const next = buildNode(r.n, d);
+  li.replaceWith(next);
+  const ta = next.querySelector('textarea');
+  if(ta){
+    const taId = ta.closest('li').dataset.id;
+    focusTextarea(next, taId);
+  }
+  return next;
+}
+
+/* ─────────────── full render (undo/redo/import/reset only) ─────────────── */
 function render(){
   if(!root.length) root.push(mk());
-  if(editing&&!find(editing)) editing=null;
-  rendering=true; vio.disconnect();
-  const el=$('tree'); el.innerHTML=''; el.appendChild(build(root,0));
-  rendering=false;
-  const i=el.querySelector('textarea');
+  if(editing && !find(editing)) editing = null;
+  rendering = true;
+  vio.disconnect();
+  treeEl.innerHTML = '';
+  treeEl.appendChild(build(root, 0));
+  rendering = false;
+
+  const i = treeEl.querySelector('textarea');
   if(i){
-    i.focus({preventScroll:true});
-    const c=caret==null?i.value.length:Math.min(caret,i.value.length);caret=null;
-    try{i.setSelectionRange(c,c)}catch(_){}
+    i.focus({ preventScroll: true });
+    const id = i.closest('li').dataset.id;
+    const pos = (pendingCaret && pendingCaret.id === id)
+      ? Math.min(pendingCaret.pos, i.value.length)
+      : i.value.length;
+    pendingCaret = null;
+    try { i.setSelectionRange(pos, pos) } catch(_) {}
     fit(i);
-    requestAnimationFrame(()=>{try{i.scrollIntoView({block:'nearest'})}catch(_){}});
   }
   setHint();
   window.dispatchEvent(new Event('cursorsync'));
 }
-function build(a,d){
-  const ul=document.createElement('ul'); ul.className=d?'kids':'top'; ul.setAttribute('role',d?'group':'tree');
-  if(!d)ul.setAttribute('aria-label','statements');
-  a.forEach(n=>{
-    const li=document.createElement('li'), row=document.createElement('div'), ed=n.id===editing;
-    li.setAttribute('role','treeitem'); li.setAttribute('aria-level',d+1); li.dataset.id=n.id;
-    if(n.k.length)li.setAttribute('aria-expanded',n.z?'false':'true');
-    if(n.z)li.classList.add('z');
-    row.className='row'+(isG(n.c)?' g':'')+(n.s?' s':'')+(ed?' ed':'')+(n.k.length?' has':''); row.dataset.id=n.id;
-    row.style.setProperty('--fs',Math.max(18,34-d*5)+'px');
-    if(n.c){
-      if(isG(n.c)){row.style.setProperty('--grad',n.c);row.style.setProperty('--cc',first(n.c))} else row.style.color=n.c;
-      li.style.setProperty('--lc',first(n.c));
-    }
-    if(n.s){
-      const b=n.c||'var(--sb)';
-      row.style.setProperty('--base-img',isG(n.c)?n.c:`linear-gradient(${b},${b})`);
-      if(n.c&&!isG(n.c))row.style.setProperty('--cc',n.c);
-    }
-    if(n.k.length){
-      const tw=document.createElement('button');
-      tw.type='button'; tw.className='tw'; tw.tabIndex=-1; tw.setAttribute('aria-hidden','true');
-      tw.title=n.z?'expand branch':'collapse branch';
-      tw.addEventListener('mousedown',e=>e.preventDefault());
-      tw.addEventListener('click',e=>{e.stopPropagation();n.z=!n.z;render();save();focusRow(n.id)});
-      row.appendChild(tw);
-    }
-    if(ed){
-      const i=document.createElement('textarea'), t=document.createElement('div');
-      t.className='tools'+(n.t.trim()?'':' e');
-      [['↵','next',()=>addPeer(n)],['⇧↵','branch',()=>addChild(n)],['⌫','delete',()=>remove(n.id)]].forEach(([k,l,f])=>{
-        const b=document.createElement('button'); b.type='button'; b.innerHTML=`<i>${k}</i>${l}`; b.onclick=f; t.appendChild(b);
-      });
-      t.addEventListener('mousedown',e=>e.preventDefault());
-      i.rows=1; i.value=n.t; i.spellcheck=false; i.placeholder=d?'digress…':'say something…';
-      i.oninput=()=>{ if(/\n/.test(i.value))i.value=i.value.replace(/\n+/g,' '); n.t=i.value; t.classList.toggle('e',!i.value.trim()); fit(i); save(true) };
-      i.onkeydown=e=>key(e,n);
-      i.onpaste=e=>{
-        const tx=(e.clipboardData||window.clipboardData).getData('text');
-        const ls=tx.split(/\r?\n/).map(x=>x.trim().replace(/^([-*•]|\d+[.)])\s+/,'')).filter(Boolean);
-        if(ls.length<2)return; e.preventDefault();
-        const b=i.value.slice(0,i.selectionStart), a=i.value.slice(i.selectionEnd), r=find(n.id); let last=n;
-        n.t=b+ls[0]; ls.slice(1).forEach((l,j)=>{const m=mk(l);r.a.splice(r.i+1+j,0,m);last=m});
-        last.t+=a; caret=last.t.length-a.length; edit(last.id);
-      };
-      i.onblur=()=>{if(!rendering&&editing===n.id)edit(null)};
-      row.append(i,t);
-    }else{
-      li.tabIndex=0;
-      li.onkeydown=e=>navKey(e,n,li);
-      const txt=()=>{const s=document.createElement('div'); s.className='st'; s.textContent=n.t; return s};
-      if(isImg(n.t)||isVid(n.t)){
-        /* a statement that is an image or video url renders as the media */
-        row.classList.add('im');
-        const v=isVid(n.t), im=document.createElement(v?'video':'img');
-        im.className='pic';
-        if(v){im.muted=true;im.loop=true;im.autoplay=true;im.playsInline=true;im.preload='metadata';im.setAttribute('muted','');im.setAttribute('playsinline','');im.src=n.t.trim();vio.observe(im)}
-        else{im.alt='';im.draggable=false;im.loading='lazy';im.referrerPolicy='no-referrer';im.src=n.t.trim()}
-        im.onerror=()=>{row.classList.remove('im'); im.replaceWith(txt())};
-        row.appendChild(im);
-      }else row.appendChild(txt());
-      if(n.z&&n.k.length){const b=document.createElement('span');b.className='badge';b.textContent=countDesc(n.k);row.appendChild(b)}
-    }
-    li.appendChild(row);
-    if(n.k.length&&!n.z) li.appendChild(build(n.k,d+1));
-    ul.appendChild(li);
-  });
+
+function build(a, d){
+  const ul = document.createElement('ul');
+  ul.className = d ? 'kids' : 'top';
+  ul.setAttribute('role', d ? 'group' : 'tree');
+  if(!d) ul.setAttribute('aria-label', 'statements');
+  a.forEach(n => ul.appendChild(buildNode(n, d)));
   return ul;
 }
-function key(e,n){
-  if(e.isComposing||e.keyCode===229)return;
-  if(e.metaKey||e.ctrlKey)return;
-  const r=find(n.id), t=e.target, sel=t.selectionStart;
-  if(e.key==='Enter'){
-    e.preventDefault();
-    if(e.shiftKey)return addChild(n);
-    const v=n.t;
-    if(sel>0&&sel<v.length&&t.selectionEnd===sel){n.t=v.slice(0,sel).trimEnd();const m=mk(v.slice(sel).trimStart());r.a.splice(r.i+1,0,m);caret=0;edit(m.id)}
-    else addPeer(n);
-  }else if(e.key==='Tab'){
-    e.preventDefault(); caret=sel;
-    if(!e.shiftKey){if(r.i>0){const pv=r.a[r.i-1];r.a.splice(r.i,1);pv.k.push(n);pv.z=false;edit(n.id)}}
-    else if(r.p){const pr=find(r.p.id);r.a.splice(r.i,1);pr.a.splice(pr.i+1,0,n);edit(n.id)}
-  }else if(e.altKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){
-    e.preventDefault(); const j=r.i+(e.key==='ArrowUp'?-1:1);
-    if(j>=0&&j<r.a.length){[r.a[r.i],r.a[j]]=[r.a[j],r.a[r.i]];caret=sel;edit(n.id)}
-  }else if(e.key==='Backspace'&&!n.t&&!n.k.length){
-    const f=flat(); if(f.length<2)return; e.preventDefault();
-    const j=f.indexOf(n), to=f[j-1]||f[j+1]; r.a.splice(r.i,1); edit(to.id);
-  }else if((e.key==='ArrowUp'&&sel===0)||(e.key==='ArrowDown'&&t.selectionEnd===t.value.length)){
-    e.preventDefault(); const f=flat(), x=f[f.indexOf(n)+(e.key==='ArrowUp'?-1:1)]; if(x)edit(x.id);
-  }else if(e.key==='Escape'){const id=n.id;edit(null);focusRow(id)}
-  caret=null;
+
+/* ─────────────── structural ops ─────────────── */
+function revealPath(id){
+  const chain = [];
+  (function walk(a, anc){
+    for(const n of a){
+      if(n.id === id){ chain.push(...anc); return true }
+      if(walk(n.k, anc.concat(n))) return true;
+    }
+    return false;
+  })(root, []);
+  chain.forEach(n => { n.z = false });
 }
-/* keyboard navigation on a set (non-editing) treeitem */
-function navKey(e,n,li){
-  const k=e.key;
-  if(k==='Enter'||k==='F2'){e.preventDefault();edit(n.id);return}
-  if(k==='ContextMenu'||(e.shiftKey&&k==='F10')){
-    e.preventDefault();const b=li.getBoundingClientRect();openMenu(n.id,b.left+20,b.bottom,true);return;
+
+function edit(id, caretPos){
+  const prev = editing;
+  if(prev === id){ if(id) patchNode(id, caretPos); return }
+
+  editing = null;
+  if(prev){
+    const p = find(prev);
+    if(p && !p.n.t.trim() && !p.n.k.length && allNodes().length > 1){
+      const pli = liOf(prev);
+      p.a.splice(p.i, 1);
+      if(pli) pli.remove();
+      if(p.p && !p.p.k.length && liOf(p.p.id)) patchNode(p.p.id);
+    } else {
+      patchNode(prev);
+    }
   }
-  if(k===' '){e.preventDefault();if(n.k.length){n.z=!n.z;render();save();focusRow(n.id)}return}
-  if(k==='ArrowDown'||k==='ArrowUp'){
-    e.preventDefault();
-    const f=flat(), x=f[f.indexOf(n)+(k==='ArrowUp'?-1:1)];
-    if(x)focusRow(x.id);
+
+  editing = id;
+  if(id){
+    if(caretPos != null) pendingCaret = { id, pos: caretPos };
+    if(!liOf(id)) revealPath(id);
+    patchNode(id);
+  }
+  setHint();
+  save();
+}
+
+function toggleCollapse(n){
+  n.z = !n.z;
+  patchNode(n.id);
+  focusRow(n.id);
+  save();
+}
+
+function addPeer(n){
+  if(!n.t.trim()) return;
+  const r = find(n.id); if(!r) return;
+  const m = mk();
+  r.a.splice(r.i + 1, 0, m);
+  const li = liOf(n.id);
+  editing = m.id;
+  pendingCaret = { id: m.id, pos: 0 };
+  if(li && li.parentElement){
+    const d = (parseInt(li.getAttribute('aria-level'), 10) || 1) - 1;
+    const nli = buildNode(m, d);
+    li.parentElement.insertBefore(nli, li.nextSibling);
+    focusTextarea(nli, m.id);
+  } else render();
+  setHint();
+  save();
+}
+
+function addChild(n){
+  if(!n.t.trim()) return;
+  const m = mk();
+  const gainedFirst = !n.k.length;
+  n.k.push(m);
+  n.z = false;
+  editing = m.id;
+  pendingCaret = { id: m.id, pos: 0 };
+  if(gainedFirst) patchNode(n.id);
+  else {
+    const li = liOf(n.id);
+    const ul = li && li.querySelector(':scope > ul.kids');
+    if(ul){
+      const parentLevel = parseInt(li.getAttribute('aria-level'), 10) || 1;
+      ul.appendChild(buildNode(m, parentLevel));
+      const nli = liOf(m.id);
+      if(nli) focusTextarea(nli, m.id);
+    } else patchNode(n.id);
+  }
+  setHint();
+  save();
+}
+
+function remove(id){
+  const r = find(id); if(!r) return;
+  const vis = visible();
+  const idx = vis.findIndex(x => x.id === id);
+  const prevId = idx > 0 ? vis[idx - 1].id : null;
+  const li = liOf(id);
+  const parent = r.p;
+  r.a.splice(r.i, 1);
+  if(li) li.remove();
+  if(parent && !parent.k.length && liOf(parent.id)) patchNode(parent.id);
+
+  const after = visible();
+  if(!after.length){
+    const m = mk();
+    root.push(m);
+    editing = m.id;
+    pendingCaret = { id: m.id, pos: 0 };
+    render();
+    save();
     return;
   }
-  if(k==='ArrowRight'){
+  let to = after[0];
+  if(prevId){
+    const j = after.findIndex(x => x.id === prevId);
+    if(j >= 0) to = after[j + 1] || after[j];
+  }
+  edit(to.id);
+}
+
+function indent(n, cp){
+  const r = find(n.id); if(!r || r.i === 0) return;
+  const pv = r.a[r.i - 1];
+  r.a.splice(r.i, 1);
+  pv.k.push(n);
+  pv.z = false;
+  editing = n.id;
+  pendingCaret = { id: n.id, pos: cp };
+  const pli = liOf(pv.id);
+  if(pli) patchNode(pv.id); else render();
+  const nli = liOf(n.id);
+  if(nli) focusTextarea(nli, n.id);
+  setHint();
+  save();
+}
+
+function outdent(n, cp){
+  const r = find(n.id); if(!r || !r.p) return;
+  const pr = find(r.p.id);
+  const gp = pr.p;
+  r.a.splice(r.i, 1);
+  pr.a.splice(pr.i + 1, 0, n);
+  editing = n.id;
+  pendingCaret = { id: n.id, pos: cp };
+  if(gp) patchNode(gp.id); else render();
+  const nli = liOf(n.id);
+  if(nli) focusTextarea(nli, n.id);
+  setHint();
+  save();
+}
+
+function reorder(n, dir, cp){
+  const r = find(n.id); if(!r) return;
+  const j = r.i + dir;
+  if(j < 0 || j >= r.a.length) return;
+  const other = r.a[j];
+  r.a[r.i] = other; r.a[j] = n;
+  const li = liOf(n.id), oli = liOf(other.id);
+  editing = n.id;
+  pendingCaret = { id: n.id, pos: cp };
+  if(li && oli && li.parentElement === oli.parentElement){
+    if(dir < 0) li.parentElement.insertBefore(li, oli);
+    else li.parentElement.insertBefore(li, oli.nextSibling);
+    if(li.querySelector('textarea')) focusTextarea(li, n.id);
+  } else if(r.p){
+    patchNode(r.p.id);
+  } else render();
+  save();
+}
+
+/* ─────────────── editing keys ─────────────── */
+function key(e, n){
+  if(e.isComposing || e.keyCode === 229) return;
+  if(e.metaKey || e.ctrlKey) return;
+  const r = find(n.id); if(!r) return;
+  const t = e.target, sel = t.selectionStart, selEnd = t.selectionEnd;
+
+  if(e.key === 'Enter'){
     e.preventDefault();
-    if(!n.k.length)return;
-    if(n.z){n.z=false;render();save();focusRow(n.id)} else focusRow(n.k[0].id);
+    if(e.shiftKey){ addChild(n); return }
+    const v = n.t;
+    if(sel > 0 && sel < v.length && selEnd === sel){
+      const tail = v.slice(sel).trimStart();
+      n.t = v.slice(0, sel).trimEnd();
+      const m = mk(tail);
+      r.a.splice(r.i + 1, 0, m);
+      editing = m.id;
+      pendingCaret = { id: m.id, pos: 0 };
+      const li = liOf(n.id);
+      if(li && li.parentElement){
+        const d = (parseInt(li.getAttribute('aria-level'), 10) || 1) - 1;
+        const nli = buildNode(m, d);
+        li.parentElement.insertBefore(nli, li.nextSibling);
+        t.value = n.t;
+        fit(t);
+        focusTextarea(nli, m.id);
+        setHint();
+        save(true);
+      } else {
+        render();
+        save(true);
+      }
+    } else addPeer(n);
     return;
   }
-  if(k==='ArrowLeft'){
+
+  if(e.key === 'Tab'){
     e.preventDefault();
-    if(n.k.length&&!n.z){n.z=true;render();save();focusRow(n.id);return}
-    const r=find(n.id); if(r&&r.p)focusRow(r.p.id);
+    if(!e.shiftKey) indent(n, sel); else outdent(n, sel);
     return;
   }
-  if(k==='Home'||k==='End'){
-    e.preventDefault(); const f=flat(); if(!f.length)return;
-    focusRow((k==='Home'?f[0]:f[f.length-1]).id);
+
+  if(e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')){
+    e.preventDefault();
+    reorder(n, e.key === 'ArrowUp' ? -1 : 1, sel);
+    return;
+  }
+
+  if(e.key === 'Backspace' && !n.t && !n.k.length){
+    if(allNodes().length < 2) return;
+    e.preventDefault();
+    remove(n.id);
+    return;
+  }
+
+  if((e.key === 'ArrowUp' && sel === 0) || (e.key === 'ArrowDown' && selEnd === t.value.length)){
+    e.preventDefault();
+    const f = visible();
+    const x = f[f.indexOf(n) + (e.key === 'ArrowUp' ? -1 : 1)];
+    if(x) edit(x.id);
+    return;
+  }
+
+  if(e.key === 'Escape'){
+    const id = n.id;
+    edit(null);
+    focusRow(id);
   }
 }
-$('app').addEventListener('mousedown',e=>{
-  if(Date.now()<lpUntil)return;                                   /* suppress post-long-press click */
-  if(e.target.tagName==='TEXTAREA'||e.target.closest('.tools,header,.tw,#menu'))return;
+
+/* ─────────────── tree keyboard nav ─────────────── */
+function navKey(e, n, li){
+  if(e.target !== li) return;
+  const k = e.key;
+
+  if(k === 'Enter' || k === 'F2'){ e.preventDefault(); edit(n.id); return }
+
+  if(k === 'ContextMenu' || (e.shiftKey && k === 'F10')){
+    e.preventDefault();
+    const b = li.getBoundingClientRect();
+    openMenu(n.id, b.left + 20, b.bottom, true);
+    return;
+  }
+
+  if(k === ' '){ e.preventDefault(); if(n.k.length) toggleCollapse(n); return }
+
+  if(k === 'ArrowDown' || k === 'ArrowUp'){
+    e.preventDefault();
+    const f = visible();
+    const x = f[f.indexOf(n) + (k === 'ArrowUp' ? -1 : 1)];
+    if(x) focusRow(x.id);
+    return;
+  }
+
+  if(k === 'ArrowRight'){
+    e.preventDefault();
+    if(!n.k.length) return;
+    if(n.z){ n.z = false; patchNode(n.id); focusRow(n.id); save() }
+    else focusRow(n.k[0].id);
+    return;
+  }
+
+  if(k === 'ArrowLeft'){
+    e.preventDefault();
+    if(n.k.length && !n.z){ toggleCollapse(n); return }
+    const r = find(n.id);
+    if(r && r.p) focusRow(r.p.id);
+    return;
+  }
+
+  if(k === 'Home' || k === 'End'){
+    e.preventDefault();
+    const f = visible();
+    if(!f.length) return;
+    focusRow((k === 'Home' ? f[0] : f[f.length - 1]).id);
+  }
+}
+
+/* ─────────────── click to edit / add ─────────────── */
+$('app').addEventListener('mousedown', e => {
+  if(Date.now() < lpUntil) return;
+  if(e.target.tagName === 'TEXTAREA' || e.target.closest('.tools,header,.tw,#menu')) return;
   e.preventDefault();
-  const row=e.target.closest('.row');
-  if(row){ if(e.button===0) edit(row.dataset.id); return }
-  if(e.button!==0)return;
-  const last=root[root.length-1];
-  if(last&&!last.t.trim()) edit(last.id); else {const m=mk();root.push(m);edit(m.id)}
-});
-addEventListener('resize',()=>{const t=document.querySelector('textarea');if(t)fit(t)});
 
-/* color menu: flat + gradient */
-const menu=$('menu'); let target=null; menu.setAttribute('role','menu');
-menu.innerHTML=`<div class="mr">${PAL.map(c=>`<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>`+
- `<div class="mr">${GRAY.map(c=>`<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>`+
- `<div class="mr">${G.map((g,i)=>`<button class="gs" style="--c:${g}" data-c="${g}" aria-label="gradient ${i+1}"></button>`).join('')}</div>`+
- `<div class="mr f"><button class="tx" data-c="">no color</button><button class="tx" data-act="shine">shiny</button><button class="tx" data-act="rm">remove</button></div>`;
-const hide=()=>{menu.style.display='none'};
-function openMenu(id,x,y,kb){
-  target=id; menu.style.display='flex';
-  const rr=find(id), sb=menu.querySelector('[data-act=shine]'), on=!!(rr&&rr.n.s);
-  sb.classList.toggle('on',on); sb.textContent=on?'shiny ✓':'shiny';
-  menu.style.left=Math.max(8,Math.min(x,innerWidth-menu.offsetWidth-8))+'px';
-  menu.style.top=Math.max(8,Math.min(y,innerHeight-menu.offsetHeight-8))+'px';
-  if(kb)menu.querySelector('button').focus();
-}
-document.addEventListener('contextmenu',e=>{
-  const row=e.target.closest('.row'); if(!row){hide();return}
-  e.preventDefault(); cancelLP(); openMenu(row.dataset.id,e.clientX,e.clientY);
-});
-document.addEventListener('mousedown',e=>{if(!menu.contains(e.target))hide()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.style.display==='flex'){hide();focusRow(target)}});
-addEventListener('scroll',hide,{passive:true});
-menu.addEventListener('mousedown',e=>e.preventDefault());
-menu.addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  const r=find(target);
-  if(r){
-    if(b.dataset.act==='rm'){ hide(); remove(target); if(!editing)focusRow(target); return }
-    if(b.dataset.act==='shine') r.n.s=!r.n.s;
-    else r.n.c=b.dataset.c||null;
+  const row = e.target.closest('.row');
+  if(row){ if(e.button === 0) edit(row.dataset.id); return }
+  if(e.button !== 0) return;
+
+  const last = root[root.length - 1];
+  if(last && !last.t.trim()){
+    edit(last.id);
+    return;
   }
-  hide(); render(); save(); if(!editing)focusRow(target);
+  const m = mk();
+  root.push(m);
+  editing = m.id;
+  pendingCaret = { id: m.id, pos: 0 };
+  const ul = treeEl.querySelector(':scope > ul.top');
+  if(ul){
+    ul.appendChild(buildNode(m, 0));
+    const nli = liOf(m.id);
+    if(nli) focusTextarea(nli, m.id);
+    setHint();
+    save();
+  } else render();
 });
 
-/* reset demo (two-step) + theme toggle */
-const html=document.documentElement; let rt;
-const label=(el,t)=>{el.textContent=t;collect()};
-/* json export: the current writing, nested, without internal ids */
-const clean=a=>a.filter(n=>n.t.trim()||n.k.length).map(n=>{const o={text:n.t};if(n.c)o.color=n.c;if(n.s)o.shiny=true;if(n.z)o.collapsed=true;const k=clean(n.k);if(k.length)o.children=k;return o});
-$('export').onclick=function(){
-  const txt=JSON.stringify({app:'frankly',version:1,exportedAt:new Date().toISOString(),statements:clean(root)},null,2);
-  try{
-    const u=URL.createObjectURL(new Blob([txt],{type:'application/json'})), a=document.createElement('a');
-    a.href=u;a.download='frankly-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();
-    setTimeout(()=>URL.revokeObjectURL(u),1000); label(this,'exported ✓');
-  }catch(e){ try{navigator.clipboard.writeText(txt)}catch(_){} label(this,'copied ✓') }
-  setTimeout(()=>label(this,'export json'),1800);
-};
-/* json import (validated) */
-const okc=c=>typeof c==='string'&&(/^#[0-9a-f]{3,8}$/i.test(c)||/^linear-gradient\([#a-z0-9(),.%\s-]+\)$/i.test(c));
-const sane=(a,d=0)=>!Array.isArray(a)||d>40?[]:a.slice(0,2000).map(x=>x&&typeof x.text==='string'?{t:x.text.slice(0,20000),c:okc(x.color)?x.color:null,s:x.shiny===true,z:x.collapsed===true,k:sane(x.children,d+1)}:null).filter(Boolean);
-$('import').onclick=()=>$('file').click();
-$('file').onchange=async e=>{
-  const f=e.target.files[0]; e.target.value=''; if(!f)return;
-  try{const d=JSON.parse(await f.text()), st=sane(Array.isArray(d)?d:d.statements); if(!st.length)throw 0; root=st;fix(root);editing=null;render();save();toast('imported — cmd+z to undo')}
-  catch(_){toast('that file doesn’t look like a frankly export')}
-};
-$('reset').onclick=function(){
-  if(this.dataset.arm){clearTimeout(rt);delete this.dataset.arm;root=seed();fix(root);editing=null;render();save();label(this,'reset demo')}
-  else{this.dataset.arm=1;label(this,'sure? click again');rt=setTimeout(()=>{delete this.dataset.arm;label(this,'reset demo')},2500)}
-};
-let th=null; try{th=localStorage.getItem('digress:theme')}catch(e){}
-if(th) html.dataset.theme=th;
-const isDark=()=>(html.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark';
-const paint=()=>{$('theme').textContent=isDark()?'light mode':'dark mode'};
-$('theme').onclick=()=>{const t=isDark()?'light':'dark';html.dataset.theme=t;try{localStorage.setItem('digress:theme',t)}catch(e){};label($('theme'),isDark()?'light mode':'dark mode')};
-paint();
+addEventListener('resize', () => { const t = document.querySelector('textarea'); if(t) fit(t) });
 
-/* ── long-press for the color menu (touch only; iOS never fires contextmenu) ── */
-let lpTimer=null,lpPos=null,lpId=null,lpUntil=0;
-function cancelLP(){ if(lpTimer){clearTimeout(lpTimer);lpTimer=null} }
-document.addEventListener('pointerdown',e=>{
-  if(e.pointerType!=='touch')return;
-  if(e.target.closest('.tools,#menu,header,.tw'))return;
-  const row=e.target.closest('.row'); if(!row)return;
-  lpPos={x:e.clientX,y:e.clientY}; lpId=row.dataset.id;
+/* ─────────────── color toolbar ───────────────
+   Was role="menu" with no menu keyboard behavior. Now an honest toolbar:
+   roving tabindex, arrow keys, Home/End, Escape returns to the statement. */
+const menu = $('menu');
+let target = null;
+
+menu.setAttribute('role', 'toolbar');
+menu.setAttribute('aria-label', 'statement color');
+menu.innerHTML =
+  `<div class="mr" role="group" aria-label="colors">${PAL.map(c => `<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>` +
+  `<div class="mr" role="group" aria-label="grays">${GRAY.map(c => `<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>` +
+  `<div class="mr" role="group" aria-label="gradients">${G.map((g, i) => `<button class="gs" style="--c:${g}" data-c="${g}" aria-label="gradient ${i + 1}"></button>`).join('')}</div>` +
+  `<div class="mr f" role="group" aria-label="actions"><button class="tx" data-c="">no color</button><button class="tx" data-act="shine">shiny</button><button class="tx" data-act="rm">remove</button></div>`;
+
+const menuBtns  = () => [...menu.querySelectorAll('button')];
+const hide      = () => { menu.style.display = 'none' };
+
+function menuFocus(i){
+  const bs = menuBtns();
+  if(!bs.length) return;
+  i = ((i % bs.length) + bs.length) % bs.length;
+  bs.forEach((b, j) => { b.tabIndex = j === i ? 0 : -1 });
+  bs[i].focus();
+}
+
+function openMenu(id, x, y, kb){
+  target = id;
+  menu.style.display = 'flex';
+  const rr = find(id);
+  const sb = menu.querySelector('[data-act=shine]');
+  const on = !!(rr && rr.n.s);
+  sb.classList.toggle('on', on);
+  sb.textContent = on ? 'shiny ✓' : 'shiny';
+  menu.style.left = Math.max(8, Math.min(x, innerWidth  - menu.offsetWidth  - 8)) + 'px';
+  menu.style.top  = Math.max(8, Math.min(y, innerHeight - menu.offsetHeight - 8)) + 'px';
+  menuBtns().forEach((b, j) => { b.tabIndex = j === 0 ? 0 : -1 });
+  if(kb) menuFocus(0);
+}
+
+menu.addEventListener('keydown', e => {
+  const bs = menuBtns();
+  const i = bs.indexOf(document.activeElement);
+  if(i < 0) return;
+  const COLS = 7;
+  let j = -1;
+  if(e.key === 'ArrowRight')      j = i + 1;
+  else if(e.key === 'ArrowLeft')  j = i - 1;
+  else if(e.key === 'ArrowDown')  j = Math.min(i + COLS, bs.length - 1);
+  else if(e.key === 'ArrowUp')    j = Math.max(i - COLS, 0);
+  else if(e.key === 'Home')       j = 0;
+  else if(e.key === 'End')        j = bs.length - 1;
+  else if(e.key === 'Escape'){ e.preventDefault(); hide(); focusRow(target); return }
+  else return;
+  e.preventDefault();
+  menuFocus(j);
+});
+
+document.addEventListener('contextmenu', e => {
+  const row = e.target.closest('.row');
+  if(!row){ hide(); return }
+  e.preventDefault();
   cancelLP();
-  lpTimer=setTimeout(()=>{
-    lpTimer=null; lpUntil=Date.now()+700;
-    if(navigator.vibrate)try{navigator.vibrate(8)}catch(_){}
-    openMenu(lpId,lpPos.x,lpPos.y,true);
-  },450);
-},{passive:true});
-document.addEventListener('pointermove',e=>{
-  if(e.pointerType!=='touch'||!lpTimer)return;
-  if(Math.hypot(e.clientX-lpPos.x,e.clientY-lpPos.y)>10)cancelLP();
-},{passive:true});
-document.addEventListener('pointerup',cancelLP,{passive:true});
-document.addEventListener('pointercancel',cancelLP,{passive:true});
+  openMenu(row.dataset.id, e.clientX, e.clientY, false);
+});
 
-/* ── keyboard-aware viewport inset ── */
+document.addEventListener('mousedown', e => { if(!menu.contains(e.target)) hide() });
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && menu.style.display === 'flex'){ hide(); focusRow(target) }
+});
+addEventListener('scroll', hide, { passive: true });
+menu.addEventListener('mousedown', e => e.preventDefault());
+
+menu.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  const r = find(target);
+  hide();
+
+  if(b.dataset.act === 'rm'){ if(r) remove(target); return }
+  if(!r) return;
+
+  if(b.dataset.act === 'shine') r.n.s = !r.n.s;
+  else r.n.c = b.dataset.c || null;
+
+  const li = liOf(target);
+  if(li){
+    const row = li.querySelector(':scope > .row');
+    if(row) paint(r.n, row, li);
+    /* repaint in place — no DOM construction, no caret loss */
+    if(editing === target) focusRow(target);
+    else focusRow(target);
+  }
+  save();
+});
+
+/* ─────────────── reset / theme ─────────────── */
+const html = document.documentElement;
+let rt;
+const label = (el, t) => { el.textContent = t; collect() };
+
+/* export: the friendly shape, ids stripped */
+const clean = a => a.filter(n => n.t.trim() || n.k.length).map(n => {
+  const o = { text: n.t };
+  if(n.c) o.color = n.c;
+  if(n.s) o.shiny = true;
+  if(n.z) o.collapsed = true;
+  const k = clean(n.k);
+  if(k.length) o.children = k;
+  return o;
+});
+
+$('export').onclick = function(){
+  const txt = JSON.stringify({
+    app: 'frankly', version: 1,
+    exportedAt: new Date().toISOString(),
+    statements: clean(root)
+  }, null, 2);
+  try {
+    const u = URL.createObjectURL(new Blob([txt], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = u;
+    a.download = 'frankly-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 1000);
+    label(this, 'exported ✓');
+  } catch(e) {
+    try { navigator.clipboard.writeText(txt) } catch(_) {}
+    label(this, 'copied ✓');
+  }
+  setTimeout(() => label(this, 'export json'), 1800);
+};
+
+/* import (validated) */
+const okc = c => typeof c === 'string' && (
+  /^#[0-9a-f]{3,8}$/i.test(c) ||
+  /^linear-gradient\([#a-z0-9(),.%\s-]+\)$/i.test(c)
+);
+const sane = (a, d = 0) => (!Array.isArray(a) || d > 40) ? [] :
+  a.slice(0, 2000).map(x => (x && typeof x.text === 'string') ? {
+    t: x.text.slice(0, 20000),
+    c: okc(x.color) ? x.color : null,
+    s: x.shiny === true,
+    z: x.collapsed === true,
+    k: sane(x.children, d + 1)
+  } : null).filter(Boolean);
+
+$('import').onclick = () => $('file').click();
+$('file').onchange = async e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if(!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    const st = sane(Array.isArray(d) ? d : d.statements);
+    if(!st.length) throw 0;
+    root = st;
+    ensureIds(root, new Set());
+    editing = null;
+    pendingCaret = null;
+    render();
+    save();
+    toast('imported — cmd+z to undo');
+  } catch(_) {
+    toast('that file doesn’t look like a frankly export');
+  }
+};
+
+$('reset').onclick = function(){
+  if(this.dataset.arm){
+    clearTimeout(rt);
+    delete this.dataset.arm;
+    root = seed();
+    ensureIds(root, new Set());
+    editing = null;
+    pendingCaret = null;
+    render();
+    save();
+    label(this, 'reset demo');
+  } else {
+    this.dataset.arm = 1;
+    label(this, 'sure? click again');
+    rt = setTimeout(() => { delete this.dataset.arm; label(this, 'reset demo') }, 2500);
+  }
+};
+
+let th = safeGet(KT);
+if(!th){ for(const k of KT_LEGACY){ th = safeGet(k); if(th) break } }
+if(th) html.dataset.theme = th;
+
+const isDark = () => (html.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+const paintTheme = () => { $('theme').textContent = isDark() ? 'light mode' : 'dark mode' };
+$('theme').onclick = () => {
+  const t = isDark() ? 'light' : 'dark';
+  html.dataset.theme = t;
+  try { localStorage.setItem(KT, t) } catch(e) {}
+  label($('theme'), isDark() ? 'light mode' : 'dark mode');
+};
+paintTheme();
+
+/* ─────────────── long-press (touch only) ─────────────── */
+let lpTimer = null, lpPos = null, lpId = null, lpUntil = 0;
+function cancelLP(){ if(lpTimer){ clearTimeout(lpTimer); lpTimer = null } }
+
+document.addEventListener('pointerdown', e => {
+  if(e.pointerType !== 'touch') return;
+  if(e.target.closest('.tools,#menu,header,.tw')) return;
+  const row = e.target.closest('.row'); if(!row) return;
+  lpPos = { x: e.clientX, y: e.clientY };
+  lpId = row.dataset.id;
+  cancelLP();
+  lpTimer = setTimeout(() => {
+    lpTimer = null;
+    lpUntil = Date.now() + 700;
+    if(navigator.vibrate) try { navigator.vibrate(8) } catch(_) {}
+    openMenu(lpId, lpPos.x, lpPos.y, true);
+  }, 450);
+}, { passive: true });
+
+document.addEventListener('pointermove', e => {
+  if(e.pointerType !== 'touch' || !lpTimer) return;
+  if(Math.hypot(e.clientX - lpPos.x, e.clientY - lpPos.y) > 10) cancelLP();
+}, { passive: true });
+
+document.addEventListener('pointerup', cancelLP, { passive: true });
+document.addEventListener('pointercancel', cancelLP, { passive: true });
+
+/* ─────────────── keyboard-aware viewport inset ─────────────── */
 (function kbAware(){
-  const vv=window.visualViewport; if(!vv)return;
-  let raf=null;
-  const adj=()=>{
-    if(raf)return;
-    raf=requestAnimationFrame(()=>{
-      raf=null;
-      const kb=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop));
-      document.documentElement.style.setProperty('--kb',(kb>60?kb:0)+'px');
+  const vv = window.visualViewport;
+  if(!vv) return;
+  let raf = null;
+  const adj = () => {
+    if(raf) return;
+    raf = requestAnimationFrame(() => {
+      raf = null;
+      const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+      document.documentElement.style.setProperty('--kb', (kb > 60 ? kb : 0) + 'px');
     });
   };
-  vv.addEventListener('resize',adj); vv.addEventListener('scroll',adj); adj();
+  vv.addEventListener('resize', adj);
+  vv.addEventListener('scroll', adj);
+  adj();
 })();
 
-/* pressure loop: only the chrome group under the pointer reacts */
-const cur={x:innerWidth/2,y:innerHeight/2}, m={x:cur.x,y:cur.y};
-const ghost=$('ghost'); let moved=false,blocked=true,gOp=-1,running=!document.hidden;
-document.addEventListener('visibilitychange',()=>{
-  const was=running; running=!document.hidden;
-  if(running&&!was)requestAnimationFrame(loop);
+/* ─────────────── ghost hint ───────────────
+   Was anchored to the band below tree.getBoundingClientRect().bottom, which
+   goes negative the moment the document is taller than the viewport — so the
+   hint vanished for exactly the people with the most content. Now it keys off
+   "pointer is over empty background", with soft fades at the viewport edges
+   and outside the content column. */
+const cur = { x: innerWidth / 2, y: innerHeight / 2 };
+const m   = { x: cur.x, y: cur.y };
+const ghost = $('ghost');
+let moved = false, blocked = true, gOp = -1, running = !document.hidden;
+
+document.addEventListener('visibilitychange', () => {
+  const was = running;
+  running = !document.hidden;
+  if(running && !was) requestAnimationFrame(loop);
 });
-addEventListener('mousemove',e=>{cur.x=e.clientX;cur.y=e.clientY;moved=true;blocked=!!(e.target.closest&&e.target.closest('.row,.tools,header,#menu'))});
-document.addEventListener('mouseleave',()=>{moved=false});
-addEventListener('touchmove',e=>{const t=e.touches[0];cur.x=t.clientX;cur.y=t.clientY},{passive:true});
+
+addEventListener('mousemove', e => {
+  cur.x = e.clientX; cur.y = e.clientY;
+  moved = true;
+  blocked = !!(e.target.closest && e.target.closest('.row,.tools,header,#menu'));
+});
+document.addEventListener('mouseleave', () => { moved = false });
+addEventListener('touchmove', e => {
+  const t = e.touches[0];
+  cur.x = t.clientX; cur.y = t.clientY;
+}, { passive: true });
+
+function hintAmount(){
+  if(!moved || blocked || editing || !fine.matches) return 0;
+  const vw = innerWidth, vh = innerHeight;
+  const tr = treeEl.getBoundingClientRect();
+  const edge = Math.min(cur.x, vw - cur.x, cur.y, vh - cur.y);
+  const edgeK = ss(edge / 36);
+  const dx = Math.max(tr.left - cur.x, cur.x - tr.right, 0);
+  const colK = 1 - ss(dx / 90);
+  return edgeK * colK;
+}
+
 function loop(){
-  if(!running)return;
-  m.x+=(cur.x-m.x)/12; m.y+=(cur.y-m.y)/12;
-  /* ghost hint: only lives in the band of empty space just below the last statement */
-  let go=0;
-  if(moved&&!blocked&&fine.matches){
-    const tr=$('tree').getBoundingClientRect(), d=cur.y-tr.bottom;
-    const ss=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
-    const dx=Math.max(tr.left-cur.x,cur.x-tr.right,0);
-    go=ss((d-6)/44)*(1-ss((d-90)/90))*(1-ss(dx/80));
+  if(!running) return;
+  m.x += (cur.x - m.x) / 12;
+  m.y += (cur.y - m.y) / 12;
+
+  const go = Math.round(hintAmount() * 100) / 100;
+  if(go !== gOp){ gOp = go; ghost.style.opacity = go }
+  if(go > 0){
+    const w = ghost.offsetWidth;
+    let x = cur.x + 28;
+    if(x + w > innerWidth - 12) x = cur.x - 28 - w;
+    ghost.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(cur.y) + 'px)';
   }
-  go=Math.round(go*100)/100;
-  if(go!==gOp){gOp=go;ghost.style.opacity=go}
-  if(go>0){
-    const w=ghost.offsetWidth; let x=cur.x+28; if(x+w>innerWidth-12)x=cur.x-28-w;
-    ghost.style.transform='translate('+Math.round(x)+'px,'+Math.round(cur.y)+'px)';
-  }
+
   for(const g of groups){
-    const sr=g.s.getBoundingClientRect();
-    if(!sr.width)continue;
-    const on=!RM.matches&&fine.matches&&cur.y>=sr.top-8&&cur.y<=sr.bottom+8&&cur.x>=sr.left-60&&cur.x<=sr.right+60;
-    const maxD=Math.max(70,Math.min(sr.width/2,200));
+    const sr = g.s.getBoundingClientRect();
+    if(!sr.width) continue;
+    const on = !RM.matches && fine.matches &&
+      cur.y >= sr.top - 8 && cur.y <= sr.bottom + 8 &&
+      cur.x >= sr.left - 60 && cur.x <= sr.right + 60;
+    const maxD = Math.max(70, Math.min(sr.width / 2, 200));
     for(const c of g.c){
-      let tg=0;
+      let tg = 0;
       if(on){
-        const r=c.getBoundingClientRect();
-        tg=Math.max(0,1-Math.hypot(m.x-(r.x+r.width/2),m.y-(r.y+r.height/2))/maxD);
-        tg=tg*tg*(3-2*tg);
+        const r = c.getBoundingClientRect();
+        tg = Math.max(0, 1 - Math.hypot(m.x - (r.x + r.width / 2), m.y - (r.y + r.height / 2)) / maxD);
+        tg = tg * tg * (3 - 2 * tg);
       }
-      const p=c._t===undefined?-1:c._t;
-      if(p===tg)continue;
-      const n=p<0?tg:(Math.abs(tg-p)<.004?tg:p+(tg-p)*.18);
-      c._t=n; c.style.fontWeight=Math.round(c._b+(g.hi-c._b)*n);
+      const p = c._t === undefined ? -1 : c._t;
+      if(p === tg) continue;
+      const n = p < 0 ? tg : (Math.abs(tg - p) < .004 ? tg : p + (tg - p) * .18);
+      c._t = n;
+      c.style.fontWeight = Math.round(c._b + (g.hi - c._b) * n);
     }
   }
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-/* ── custom cursor (from nvrvr_styles) — fine pointers only ── */
+/* ─────────────── custom cursor ───────────────
+   The line now snaps to a real character boundary via caretPositionFromPoint
+   and spans the real line box, so it shows the insertion point exactly. Over a
+   textarea the native caret is authoritative and the custom cursor yields. */
 (function initWriteCursor(){
-  if(!fine.matches)return;
-  const dot=document.getElementById('writeCursorDot'), ellipse=document.getElementById('writeCursorEllipse');
-  if(!dot||!ellipse)return;
-  const NATIVE_SELECTOR=['button','a','input','select','[role="button"]','.letter-hotspot'].join(', ');
-  let lastTx=null,ptrX=0,ptrY=0,prevFrameX=0,prevFrameY=0,frameInit=false,ellAngle=0,ellScaleX=1,ellScaleY=1,rafId=null;
-  const ELLIPSE_LERP=0.22,SPEED_SATURATE=34,MAX_STRETCH=0.6;
-  const shortAngleLerp=(current,target,factor)=>{const diff=((target-current+540)%360)-180;return current+diff*factor};
-  function step(){
-    if(!frameInit){prevFrameX=ptrX;prevFrameY=ptrY;frameInit=true}
-    const dx=ptrX-prevFrameX,dy=ptrY-prevFrameY;
-    prevFrameX=ptrX;prevFrameY=ptrY;
-    const speed=Math.hypot(dx,dy);
-    const angleTarget=speed>0.4?Math.atan2(dy,dx)*(180/Math.PI):ellAngle;
-    const stretch=Math.min(speed/SPEED_SATURATE,1)*MAX_STRETCH;
-    ellAngle=shortAngleLerp(ellAngle,angleTarget,ELLIPSE_LERP);
-    ellScaleX+=(1+stretch-ellScaleX)*ELLIPSE_LERP;
-    ellScaleY+=(1-stretch*0.45-ellScaleY)*ELLIPSE_LERP;
-    ellipse.style.transform='translate('+ptrX+'px,'+ptrY+'px) rotate('+ellAngle+'deg) scale('+ellScaleX+','+ellScaleY+')';
-    rafId=requestAnimationFrame(step);
+  if(!fine.matches) return;
+  const dot = $('writeCursorDot'), ell = $('writeCursorEllipse');
+  if(!dot || !ell) return;
+
+  const NATIVE = 'button,a,input,select,[role="button"],.letter-hotspot';
+  const LERP = 0.35;
+
+  let px = 0, py = 0, lastPX = -1e9, lastPY = -1e9;
+  let frameInit = false, ppx = 0, ppy = 0;
+  let rafId = null, lastMove = 0;
+  let mode = 'dot';                       /* 'dot' | 'line' | 'native' */
+  let lastEl = null, snap = null;
+  let ellAngle = 0, ellSX = 1, ellSY = 1;
+
+  let cur = { x: 0, y: 0, w: 6, h: 6, mt: -3, ml: -3, r: 3 };
+  let tgt = { x: 0, y: 0, w: 6, h: 6, mt: -3, ml: -3, r: 3 };
+
+  function snapToText(st, x, y){
+    let node = null, off = 0;
+    if(document.caretPositionFromPoint){
+      const p = document.caretPositionFromPoint(x, y);
+      if(p){ node = p.offsetNode; off = p.offset }
+    } else if(document.caretRangeFromPoint){
+      const r = document.caretRangeFromPoint(x, y);
+      if(r){ node = r.startContainer; off = r.startOffset }
+    }
+    if(!node || node.nodeType !== 3 || !st.contains(node)) return null;
+
+    const rng = document.createRange();
+    rng.setStart(node, off);
+    rng.setEnd(node, off);
+    const q = rng.getClientRects()[0] || rng.getBoundingClientRect();
+
+    const cs = getComputedStyle(st);
+    const lh = parseFloat(cs.lineHeight);
+    const fallbackH = isFinite(lh) ? lh : parseFloat(cs.fontSize) * 1.25;
+
+    if(!q || (!q.height && !q.width)){
+      rng.selectNodeContents(st);
+      const ls = rng.getClientRects();
+      const last = ls[ls.length - 1];
+      if(!last) return null;
+      return { x: last.right, top: last.top, h: last.height || fallbackH };
+    }
+    return { x: q.left, top: q.top, h: q.height || fallbackH };
   }
-  const startLoop=()=>{if(!rafId&&!document.hidden)rafId=requestAnimationFrame(step)};
-  const stopLoop=()=>{if(rafId){cancelAnimationFrame(rafId);rafId=null}};
+
+  function setText(el){
+    const ta = el && el.nodeType === 1 && el.closest('textarea');
+    if(ta){ mode = 'native'; lastEl = null; snap = null; return }
+
+    const st = el && el.nodeType === 1 && el.closest('.st');
+    if(st){
+      mode = 'line';
+      if(st !== lastEl){ lastEl = st; snap = null; lastPX = -1e9; lastPY = -1e9 }
+      return;
+    }
+    mode = 'dot';
+    lastEl = null;
+    snap = null;
+  }
+
+  function step(){
+    if(!frameInit){ ppx = px; ppy = py; frameInit = true }
+    const dx = px - ppx, dy = py - ppy;
+    ppx = px; ppy = py;
+
+    /* ellipse: speed-based stretch, dot mode only */
+    const speed = Math.hypot(dx, dy);
+    const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
+    const stretch = Math.min(speed / 34, 1) * 0.6;
+    const diff = ((angleTarget - ellAngle + 540) % 360) - 180;
+    ellAngle += diff * 0.22;
+    ellSX += (1 + stretch - ellSX) * 0.22;
+    ellSY += (1 - stretch * 0.45 - ellSY) * 0.22;
+    ell.style.transform = 'translate(' + px + 'px,' + py + 'px) rotate(' + ellAngle + 'deg) scale(' + ellSX + ',' + ellSY + ')';
+
+    /* dot vs line target */
+    if(mode === 'line' && lastEl){
+      if(px !== lastPX || py !== lastPY){
+        snap = snapToText(lastEl, px, py);
+        lastPX = px; lastPY = py;
+      }
+      if(snap){
+        tgt = { x: snap.x, y: snap.top, w: 2, h: snap.h, mt: 0, ml: -1, r: 1 };
+      } else {
+        const cs = getComputedStyle(lastEl);
+        const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.25;
+        const r = lastEl.getBoundingClientRect();
+        tgt = {
+          x: Math.max(r.left, Math.min(px, r.right)),
+          y: py - lh / 2,
+          w: 2, h: lh, mt: 0, ml: -1, r: 1
+        };
+      }
+    } else {
+      tgt = { x: px, y: py, w: 6, h: 6, mt: -3, ml: -3, r: 3 };
+    }
+
+    cur.x  += (tgt.x  - cur.x ) * LERP;
+    cur.y  += (tgt.y  - cur.y ) * LERP;
+    cur.w  += (tgt.w  - cur.w ) * LERP;
+    cur.h  += (tgt.h  - cur.h ) * LERP;
+    cur.mt += (tgt.mt - cur.mt) * LERP;
+    cur.ml += (tgt.ml - cur.ml) * LERP;
+    cur.r  += (tgt.r  - cur.r ) * LERP;
+
+    dot.style.width        = cur.w.toFixed(2)  + 'px';
+    dot.style.height       = cur.h.toFixed(2)  + 'px';
+    dot.style.margin       = cur.mt.toFixed(2) + 'px 0 0 ' + cur.ml.toFixed(2) + 'px';
+    dot.style.borderRadius = cur.r.toFixed(2)  + 'px';
+    dot.style.transform    = 'translate(' + cur.x.toFixed(2) + 'px,' + cur.y.toFixed(2) + 'px)';
+
+    /* idle: stop after 1.5s of no pointer movement and no residual lerp */
+    const settled = Math.abs(tgt.x - cur.x) < 0.06 && Math.abs(tgt.y - cur.y) < 0.06 &&
+                    Math.abs(tgt.w - cur.w) < 0.06 && Math.abs(tgt.h - cur.h) < 0.06;
+    if(settled && performance.now() - lastMove > 1500){ rafId = null; return }
+
+    rafId = requestAnimationFrame(step);
+  }
+
+  const startLoop = () => { if(!rafId && !document.hidden) rafId = requestAnimationFrame(step) };
+  const stopLoop  = () => { if(rafId){ cancelAnimationFrame(rafId); rafId = null } };
+
   function hideAll(){
-    dot.classList.remove('visible');ellipse.classList.remove('visible');
-    document.body.classList.remove('write-native-cursor','custom-cursor-active');
+    dot.classList.remove('visible');
+    ell.classList.remove('visible');
+    document.body.classList.remove('write-native-cursor', 'custom-cursor-active');
     stopLoop();
   }
-  /* line cursor over set statements only; while a field is in focus it stays a normal dot */
-  function setText(el){
-    const tx=(!document.querySelector('textarea')&&el&&el.nodeType===1)?el.closest('.st'):null;
-    if(tx!==lastTx){lastTx=tx;dot.classList.toggle('text',!!tx);if(tx)dot.style.setProperty('--dh',Math.round(parseFloat(getComputedStyle(tx).fontSize)*1.15)+'px')}
-  }
-  window.addEventListener('cursorsync',()=>setText(document.elementFromPoint(ptrX,ptrY)));
-  window.addEventListener('mousemove',e=>{
-    if(!fine.matches)return;
-    const overNative=!!(e.target&&e.target.nodeType===1&&e.target.closest(NATIVE_SELECTOR));
+
+  window.addEventListener('cursorsync', () => setText(document.elementFromPoint(px, py)));
+
+  window.addEventListener('mousemove', e => {
+    if(!fine.matches) return;
+    const overNative = !!(e.target && e.target.nodeType === 1 && e.target.closest(NATIVE));
     document.body.classList.add('custom-cursor-active');
-    document.body.classList.toggle('write-native-cursor',overNative);
     setText(e.target);
-    ptrX=e.clientX;ptrY=e.clientY;
-    dot.style.transform='translate('+ptrX+'px,'+ptrY+'px)';
-    dot.classList.add('visible');ellipse.classList.add('visible');
-    startLoop();
+
+    const isNative = mode === 'native' || overNative;
+    document.body.classList.toggle('write-native-cursor', isNative);
+
+    px = e.clientX; py = e.clientY;
+    lastMove = performance.now();
+
+    dot.classList.toggle('visible', !isNative);
+    ell.classList.toggle('visible', !isNative && mode === 'dot');
+    if(!isNative) startLoop();
   });
-  document.addEventListener('mouseleave',hideAll);
-  document.addEventListener('visibilitychange',()=>{document.hidden?stopLoop():startLoop()});
+
+  document.addEventListener('mouseleave', hideAll);
+  document.addEventListener('visibilitychange', () => { document.hidden ? stopLoop() : startLoop() });
 })();
 
-/* progressive blur at the bottom edge (GradualBlur: bezier curve, exponential, 5 layers) */
+/* ─────────────── bottom-edge blur ─────────────── */
 (function gradualBlur(){
-  const box=$('blurB'), N=5, S=2, inc=100/N, r=x=>Math.round(x*10)/10;
-  for(let i=1;i<=N;i++){
-    let p=i/N; p=p*p*(3-2*p);
-    const bv=(Math.pow(2,p*4)*0.0625*S).toFixed(3);
-    let g=`transparent ${r(inc*i-inc)}%, black ${r(inc*i)}%`;
-    if(r(inc*i+inc)<=100)g+=`, black ${r(inc*i+inc)}%`;
-    if(r(inc*i+inc*2)<=100)g+=`, transparent ${r(inc*i+inc*2)}%`;
-    const d=document.createElement('div');
-    d.style.cssText=`position:absolute;inset:0;-webkit-mask-image:linear-gradient(to bottom,${g});mask-image:linear-gradient(to bottom,${g});-webkit-backdrop-filter:blur(${bv}rem);backdrop-filter:blur(${bv}rem)`;
+  const box = $('blurB'), N = 5, S = 2, inc = 100 / N, r = x => Math.round(x * 10) / 10;
+  for(let i = 1; i <= N; i++){
+    let p = i / N; p = p * p * (3 - 2 * p);
+    const bv = (Math.pow(2, p * 4) * 0.0625 * S).toFixed(3);
+    let g = `transparent ${r(inc * i - inc)}%, black ${r(inc * i)}%`;
+    if(r(inc * i + inc) <= 100)     g += `, black ${r(inc * i + inc)}%`;
+    if(r(inc * i + inc * 2) <= 100) g += `, transparent ${r(inc * i + inc * 2)}%`;
+    const d = document.createElement('div');
+    d.style.cssText =
+      `position:absolute;inset:0;` +
+      `-webkit-mask-image:linear-gradient(to bottom,${g});mask-image:linear-gradient(to bottom,${g});` +
+      `-webkit-backdrop-filter:blur(${bv}rem);backdrop-filter:blur(${bv}rem)`;
     box.appendChild(d);
   }
 })();
-try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-coarse.addEventListener('change',setHint);
+
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist() } catch(e) {}
+
+coarse.addEventListener('change', setHint);
 render();
 </script>
 </body>
-</html>
+</html>                                                                                                                                                                 
