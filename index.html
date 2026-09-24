@@ -7,9 +7,9 @@
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-:root{--bg:#f6f4ef;--ink:#1b1b1b;--line:#c9c5bb;--mute:#8a867d;--sb:#9a968b;--sh:#111;--sans:'Satoshi',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#77747b;--sb:#7b7882;--sh:#fff}}
-:root[data-theme="dark"]{--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#77747b;--sb:#7b7882;--sh:#fff}
+:root{--bg:#f6f4ef;--ink:#1b1b1b;--line:#c9c5bb;--mute:#6c685f;--sb:#9a968b;--sh:#111;--sans:'Satoshi',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#94919b;--sb:#7b7882;--sh:#fff}}
+:root[data-theme="dark"]{--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#94919b;--sb:#7b7882;--sh:#fff}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);transition:background .25s,color .25s}
 #app{max-width:780px;margin:0 auto;padding:28px 24px 160px;min-height:100vh;box-sizing:border-box;cursor:text}
@@ -45,6 +45,9 @@ textarea::placeholder{color:var(--mute);-webkit-text-fill-color:var(--mute)}
 .tools button:hover{color:var(--ink)}
 .tools i{font-style:normal;padding:2px 5px;border:1px solid var(--line);border-radius:4px;font-size:10px}
 .tools.e button:nth-child(-n+2){opacity:.4}
+#toast{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translate(-50%,8px);z-index:8;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--bg);font:400 11px/1 var(--mono);color:var(--ink);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.row:focus-visible{outline:1.5px solid var(--mute);outline-offset:4px;border-radius:6px}
 #hint{position:fixed;left:0;right:0;bottom:0;text-align:center;font:300 11px/1.6 var(--mono);letter-spacing:.02em;color:var(--mute);padding:16px 16px calc(14px + env(safe-area-inset-bottom,0px));pointer-events:none;z-index:6}
 #blurB{position:fixed;left:0;right:0;bottom:0;height:calc(7rem + env(safe-area-inset-bottom,0px));pointer-events:none;z-index:5;isolation:isolate}
 #hint b{font-weight:500;color:var(--ink);opacity:.75}
@@ -74,10 +77,11 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 </head>
 <body>
 <div id="app">
-  <header><span class="wm">frankly</span><span><button class="ctl" id="export">export json</button><button class="ctl" id="reset">reset demo</button><button class="ctl" id="theme">dark mode</button></span></header>
+  <header><span class="wm">frankly</span><span><button class="ctl" id="import">import</button><input type="file" id="file" accept="application/json,.json" hidden><button class="ctl" id="export">export json</button><button class="ctl" id="reset">reset demo</button><button class="ctl" id="theme">dark mode</button></span></header>
   <div id="tree"></div>
 </div>
 <div id="blurB" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <div id="hint"><span id="ht"></span></div>
 <div id="menu"></div>
 <div id="ghost" aria-hidden="true">say something new or say something else</div>
@@ -96,10 +100,26 @@ const fix=a=>a.forEach(n=>{n.id=nid();n.c=n.c||null;n.s=!!n.s;n.k=n.k||[];fix(n.
 let root=null; try{root=JSON.parse(localStorage.getItem(K))}catch(e){}
 if(!Array.isArray(root)||!root.length) root=seed();
 fix(root);
-const save=()=>{try{localStorage.setItem(K,JSON.stringify(root))}catch(e){}};
-const find=(id,a=root)=>{for(let i=0;i<a.length;i++){if(a[i].id===id)return{n:a[i],a,i};const r=find(id,a[i].k);if(r)return r}return null};
+const strip=(k,v)=>k==='id'?undefined:v;
+let hist=[],hi=-1,lastT=0,lastTyping=false;
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)};
+const persist=()=>{try{localStorage.setItem(K,JSON.stringify(root,strip));return true}catch(e){toast('couldn’t save locally — export json to keep this');return false}};
+function save(typing){
+  persist();
+  const j=JSON.stringify(root,strip); if(hist[hi]===j)return;
+  const now=Date.now();
+  if(typing&&lastTyping&&now-lastT<900&&hi>0) hist[hi]=j; else {hist=hist.slice(0,hi+1);hist.push(j);hi++;if(hist.length>300){hist.shift();hi--}}
+  lastT=now;lastTyping=!!typing;
+}
+hist=[JSON.stringify(root,strip)];hi=0;
+function restore(j){root=JSON.parse(j);fix(root);editing=null;persist();render()}
+const undo=()=>{if(hi>0){restore(hist[--hi]);toast('undone')}};
+const redo=()=>{if(hi<hist.length-1){restore(hist[++hi]);toast('redone')}};
+addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||e.altKey)return;const k=e.key.toLowerCase();if(k==='z'){e.preventDefault();e.shiftKey?redo():undo()}else if(k==='y'){e.preventDefault();redo()}});
+const focusRow=id=>{const r=document.querySelector('.row[data-id="'+id+'"]');if(r)r.focus()};
+const find=(id,a=root,p=null)=>{for(let i=0;i<a.length;i++){if(a[i].id===id)return{n:a[i],a,i,p};const r=find(id,a[i].k,a[i]);if(r)return r}return null};
 const flat=(a=root,o=[])=>{a.forEach(n=>{o.push(n);flat(n.k,o)});return o};
-let editing=null, rendering=false, groups=[];
+let editing=null, rendering=false, groups=[], caret=null;
 const HI='<b>click</b> a line to edit &nbsp;·&nbsp; <b>right-click</b> for color &nbsp;·&nbsp; click below to add';
 const HE='<b>enter</b> next &nbsp;·&nbsp; <b>shift+enter</b> branch &nbsp;·&nbsp; <b>⌫</b> on empty deletes &nbsp;·&nbsp; <b>esc</b> done';
 
@@ -127,7 +147,7 @@ function collect(){
     c.forEach(x=>{x._b=parseInt(getComputedStyle(x).fontWeight)||400;x._t=undefined});
     groups.push({s:el,c,hi});
   };
-  add(document.querySelector('.wm'),900); add($('export'),700); add($('reset'),700); add($('theme'),700); add($('ht'),700);
+  add(document.querySelector('.wm'),900); add($('export'),700); add($('import'),700); add($('reset'),700); add($('theme'),700); add($('ht'),700);
   document.querySelectorAll('.tools').forEach(t=>add(t,700));
 }
 const IMG=/^(?:https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?|https?:\/\/(?:images\.unsplash\.com|i\.imgur\.com|pbs\.twimg\.com|images\.pexels\.com)\/\S+|data:image\/(?:png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+\/=]+)$/i;
@@ -154,16 +174,17 @@ function render(){
   const el=$('tree'); el.innerHTML=''; el.appendChild(build(root,0));
   rendering=false;
   const i=el.querySelector('textarea');
-  if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);fit(i)}
+  if(i){i.focus();const c=caret==null?i.value.length:Math.min(caret,i.value.length);caret=null;i.setSelectionRange(c,c);fit(i)}
   $('ht').innerHTML=editing?HE:HI;
   collect();
   window.dispatchEvent(new Event('cursorsync'));
 }
 function build(a,d){
-  const ul=document.createElement('ul'); ul.className=d?'kids':'top';
+  const ul=document.createElement('ul'); ul.className=d?'kids':'top'; ul.setAttribute('role',d?'group':'tree');
   a.forEach(n=>{
     const li=document.createElement('li'), row=document.createElement('div'), ed=n.id===editing;
     row.className='row'+(isG(n.c)?' g':'')+(n.s?' s':'')+(ed?' ed':''); row.dataset.id=n.id;
+    li.setAttribute('role','treeitem'); li.setAttribute('aria-level',d+1);
     row.style.setProperty('--fs',Math.max(18,34-d*5)+'px');
     if(n.c){
       if(isG(n.c)){row.style.setProperty('--grad',n.c);row.style.setProperty('--cc',first(n.c))} else row.style.color=n.c;
@@ -182,11 +203,26 @@ function build(a,d){
       });
       t.addEventListener('mousedown',e=>e.preventDefault());
       i.rows=1; i.value=n.t; i.spellcheck=false; i.placeholder=d?'digress…':'say something…';
-      i.oninput=()=>{ if(/\n/.test(i.value))i.value=i.value.replace(/\n+/g,' '); n.t=i.value; t.classList.toggle('e',!i.value.trim()); fit(i); save() };
+      i.oninput=()=>{ if(/\n/.test(i.value))i.value=i.value.replace(/\n+/g,' '); n.t=i.value; t.classList.toggle('e',!i.value.trim()); fit(i); save(true) };
       i.onkeydown=e=>key(e,n);
+      i.onpaste=e=>{
+        const tx=(e.clipboardData||window.clipboardData).getData('text');
+        const ls=tx.split(/\r?\n/).map(x=>x.trim().replace(/^([-*•]|\d+[.)])\s+/,'')).filter(Boolean);
+        if(ls.length<2)return; e.preventDefault();
+        const b=i.value.slice(0,i.selectionStart), a=i.value.slice(i.selectionEnd), r=find(n.id); let last=n;
+        n.t=b+ls[0]; ls.slice(1).forEach((l,j)=>{const m=mk(l);r.a.splice(r.i+1+j,0,m);last=m});
+        last.t+=a; caret=last.t.length-a.length; edit(last.id);
+      };
       i.onblur=()=>{if(!rendering&&editing===n.id)edit(null)};
       row.append(i,t);
     }else{
+      row.tabIndex=0;
+      row.onkeydown=e=>{
+        if(e.target!==row)return;
+        if(e.key==='Enter'||e.key==='F2'){e.preventDefault();edit(n.id)}
+        else if(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')){e.preventDefault();const b=row.getBoundingClientRect();openMenu(n.id,b.left+20,b.bottom,true)}
+        else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const f=flat(),x=f[f.indexOf(n)+(e.key==='ArrowUp'?-1:1)];if(x)focusRow(x.id)}
+      };
       const txt=()=>{const s=document.createElement('div'); s.className='st'; s.textContent=n.t; return s};
       if(isImg(n.t)||isVid(n.t)){
         /* a statement that is an image or video url renders as the media */
@@ -204,14 +240,29 @@ function build(a,d){
   return ul;
 }
 function key(e,n){
-  const r=find(n.id), t=e.target;
-  if(e.key==='Enter'){ e.preventDefault(); e.shiftKey?addChild(n):addPeer(n) }
-  else if(e.key==='Backspace'&&!n.t&&!n.k.length){
+  if(e.isComposing||e.keyCode===229)return;
+  if(e.metaKey||e.ctrlKey)return;
+  const r=find(n.id), t=e.target, sel=t.selectionStart;
+  if(e.key==='Enter'){
+    e.preventDefault();
+    if(e.shiftKey)return addChild(n);
+    const v=n.t;
+    if(sel>0&&sel<v.length&&t.selectionEnd===sel){n.t=v.slice(0,sel).trimEnd();const m=mk(v.slice(sel).trimStart());r.a.splice(r.i+1,0,m);caret=0;edit(m.id)}
+    else addPeer(n);
+  }else if(e.key==='Tab'){
+    e.preventDefault(); caret=sel;
+    if(!e.shiftKey){if(r.i>0){const pv=r.a[r.i-1];r.a.splice(r.i,1);pv.k.push(n);edit(n.id)}}
+    else if(r.p){const pr=find(r.p.id);r.a.splice(r.i,1);pr.a.splice(pr.i+1,0,n);edit(n.id)}
+  }else if(e.altKey&&(e.key==='ArrowUp'||e.key==='ArrowDown')){
+    e.preventDefault(); const j=r.i+(e.key==='ArrowUp'?-1:1);
+    if(j>=0&&j<r.a.length){[r.a[r.i],r.a[j]]=[r.a[j],r.a[r.i]];caret=sel;edit(n.id)}
+  }else if(e.key==='Backspace'&&!n.t&&!n.k.length){
     const f=flat(); if(f.length<2)return; e.preventDefault();
     const j=f.indexOf(n), to=f[j-1]||f[j+1]; r.a.splice(r.i,1); edit(to.id);
-  }else if((e.key==='ArrowUp'&&t.selectionStart===0)||(e.key==='ArrowDown'&&t.selectionEnd===t.value.length)){
+  }else if((e.key==='ArrowUp'&&sel===0)||(e.key==='ArrowDown'&&t.selectionEnd===t.value.length)){
     e.preventDefault(); const f=flat(), x=f[f.indexOf(n)+(e.key==='ArrowUp'?-1:1)]; if(x)edit(x.id);
-  }else if(e.key==='Escape') edit(null);
+  }else if(e.key==='Escape'){const id=n.id;edit(null);focusRow(id)}
+  caret=null;
 }
 $('app').addEventListener('mousedown',e=>{
   if(e.target.tagName==='TEXTAREA'||e.target.closest('.tools,header'))return;
@@ -225,29 +276,33 @@ $('app').addEventListener('mousedown',e=>{
 addEventListener('resize',()=>{const t=document.querySelector('textarea');if(t)fit(t)});
 
 /* color menu: flat + gradient */
-const menu=$('menu'); let target=null;
-menu.innerHTML=`<div class="mr">${PAL.map(c=>`<button style="--c:${c}" data-c="${c}"></button>`).join('')}</div>`+
- `<div class="mr">${GRAY.map(c=>`<button style="--c:${c}" data-c="${c}"></button>`).join('')}</div>`+
- `<div class="mr">${G.map(g=>`<button class="gs" style="--c:${g}" data-c="${g}"></button>`).join('')}</div>`+
+const menu=$('menu'); let target=null; menu.setAttribute('role','menu');
+menu.innerHTML=`<div class="mr">${PAL.map(c=>`<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>`+
+ `<div class="mr">${GRAY.map(c=>`<button style="--c:${c}" data-c="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</div>`+
+ `<div class="mr">${G.map((g,i)=>`<button class="gs" style="--c:${g}" data-c="${g}" aria-label="gradient ${i+1}"></button>`).join('')}</div>`+
  `<div class="mr f"><button class="tx" data-c="">no color</button><button class="tx" data-act="shine">shiny</button><button class="tx" data-act="rm">remove</button></div>`;
 const hide=()=>{menu.style.display='none'};
+function openMenu(id,x,y,kb){
+  target=id; menu.style.display='flex';
+  const rr=find(id), sb=menu.querySelector('[data-act=shine]'), on=!!(rr&&rr.n.s);
+  sb.classList.toggle('on',on); sb.textContent=on?'shiny ✓':'shiny';
+  menu.style.left=Math.max(8,Math.min(x,innerWidth-menu.offsetWidth-8))+'px';
+  menu.style.top=Math.max(8,Math.min(y,innerHeight-menu.offsetHeight-8))+'px';
+  if(kb)menu.querySelector('button').focus();
+}
 document.addEventListener('contextmenu',e=>{
   const row=e.target.closest('.row'); if(!row){hide();return}
-  e.preventDefault(); target=row.dataset.id; menu.style.display='flex';
-  const rr=find(target), sb=menu.querySelector('[data-act=shine]'), on=!!(rr&&rr.n.s);
-  sb.classList.toggle('on',on); sb.textContent=on?'shiny ✓':'shiny';
-  menu.style.left=Math.max(8,Math.min(e.clientX,innerWidth-menu.offsetWidth-8))+'px';
-  menu.style.top=Math.max(8,Math.min(e.clientY,innerHeight-menu.offsetHeight-8))+'px';
+  e.preventDefault(); openMenu(row.dataset.id,e.clientX,e.clientY);
 });
 document.addEventListener('mousedown',e=>{if(!menu.contains(e.target))hide()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')hide()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.style.display==='flex'){hide();focusRow(target)}});
 addEventListener('scroll',hide,{passive:true});
 menu.addEventListener('mousedown',e=>e.preventDefault());
 menu.addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b)return;
   const r=find(target);
   if(r){ if(b.dataset.act==='rm'){ r.a.splice(r.i,1); if(editing===target)editing=null } else if(b.dataset.act==='shine') r.n.s=!r.n.s; else r.n.c=b.dataset.c||null }
-  hide(); render(); save();
+  hide(); render(); save(); if(!editing)focusRow(target);
 });
 
 /* reset demo (two-step) + theme toggle */
@@ -264,6 +319,15 @@ $('export').onclick=function(){
   }catch(e){ try{navigator.clipboard.writeText(txt)}catch(_){} label(this,'copied ✓') }
   setTimeout(()=>label(this,'export json'),1800);
 };
+/* json import (validated) */
+const okc=c=>typeof c==='string'&&(/^#[0-9a-f]{3,8}$/i.test(c)||/^linear-gradient\([#a-z0-9(),.%\s-]+\)$/i.test(c));
+const sane=(a,d=0)=>!Array.isArray(a)||d>40?[]:a.slice(0,2000).map(x=>x&&typeof x.text==='string'?{t:x.text.slice(0,20000),c:okc(x.color)?x.color:null,s:x.shiny===true,k:sane(x.children,d+1)}:null).filter(Boolean);
+$('import').onclick=()=>$('file').click();
+$('file').onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f)return;
+  try{const d=JSON.parse(await f.text()), st=sane(Array.isArray(d)?d:d.statements); if(!st.length)throw 0; root=st;fix(root);editing=null;render();save();toast('imported — cmd+z to undo')}
+  catch(_){toast('that file doesn’t look like a frankly export')}
+};
 $('reset').onclick=function(){
   if(this.dataset.arm){clearTimeout(rt);delete this.dataset.arm;root=seed();fix(root);editing=null;render();save();label(this,'reset demo')}
   else{this.dataset.arm=1;label(this,'sure? click again');rt=setTimeout(()=>{delete this.dataset.arm;label(this,'reset demo')},2500)}
@@ -277,7 +341,7 @@ paint();
 
 /* pressure loop: only the chrome group under the pointer reacts */
 const cur={x:innerWidth/2,y:innerHeight/2}, m={x:cur.x,y:cur.y};
-const fine=matchMedia('(hover:hover) and (pointer:fine)'), ghost=$('ghost'); let moved=false,blocked=true,gOp=-1;
+const RM=matchMedia('(prefers-reduced-motion: reduce)'); const fine=matchMedia('(hover:hover) and (pointer:fine)'), ghost=$('ghost'); let moved=false,blocked=true,gOp=-1;
 addEventListener('mousemove',e=>{cur.x=e.clientX;cur.y=e.clientY;moved=true;blocked=!!(e.target.closest&&e.target.closest('.row,.tools,header,#menu'))});
 document.addEventListener('mouseleave',()=>{moved=false});
 addEventListener('touchmove',e=>{const t=e.touches[0];cur.x=t.clientX;cur.y=t.clientY},{passive:true});
@@ -301,7 +365,7 @@ addEventListener('touchmove',e=>{const t=e.touches[0];cur.x=t.clientX;cur.y=t.cl
   for(const g of groups){
     const sr=g.s.getBoundingClientRect();
     if(!sr.width)continue;
-    const on=cur.y>=sr.top-8&&cur.y<=sr.bottom+8&&cur.x>=sr.left-60&&cur.x<=sr.right+60;
+    const on=!RM.matches&&cur.y>=sr.top-8&&cur.y<=sr.bottom+8&&cur.x>=sr.left-60&&cur.x<=sr.right+60;
     const maxD=Math.max(70,Math.min(sr.width/2,200));
     for(const c of g.c){
       let tg=0;
@@ -378,6 +442,7 @@ addEventListener('touchmove',e=>{const t=e.touches[0];cur.x=t.clientX;cur.y=t.cl
     box.appendChild(d);
   }
 })();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 render();
 </script>
 </body>
