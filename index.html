@@ -138,15 +138,19 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 const $ = id => document.getElementById(id);
 const treeEl = $('tree');
 
-/* ─────────────── storage keys ───────────────
-   Renamed from 'digress:*' to 'frankly:*'. This is the one-time window where
-   the rename is free: on boot we read the old key, write forward, and leave
-   the old value untouched as a backup. After this ships, changing it again
-   costs a migration. */
+/* ─────────────── storage keys ─────────────── */
 const K        = 'frankly:doc:v1';
 const K_LEGACY = ['digress:v1'];
 const KT       = 'frankly:theme';
 const KT_LEGACY= ['digress:theme'];
+
+/* ─────────────── your media ───────────────
+   Paste mp4 / webm / mov URLs here. Any statement whose text is one of these
+   renders as a silent looping clip with a speaker toggle in the corner. */
+const MEDIA = {
+  walkIn:  'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksintoelevators.mp4',
+  walkOut: 'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksoutofelevators.mp4',
+};
 
 const PAL  = ['#e5484d','#f76b15','#e0a800','#30a46c','#0091ff','#8e4ec6','#e93d82'];
 const GRAY = ['#1b1b1b','#3f3f46','#6b6b73','#8e8e93','#b0b0b6','#d4d4d8','#f2f0ea'];
@@ -160,18 +164,56 @@ const coarse = matchMedia('(hover:none),(pointer:coarse)');
 const RM     = matchMedia('(prefers-reduced-motion: reduce)');
 const fine   = matchMedia('(hover:hover) and (pointer:fine)');
 
-/* ─────────────── icons ─────────────── */
 const ICON_MUTED = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.5 6.2l3 3.6M13.5 6.2l-3 3.6"/></svg>';
 const ICON_SOUND = '<svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6h2L7.5 3.5v9L4.5 10h-2z"/><path d="M10.2 5.8a3 3 0 010 4.4M12.4 3.8a6 6 0 010 8.4"/></svg>';
 
-/* ─────────────── ids ───────────────
-   Ids are now stable: they persist through save/load and only get assigned
-   to nodes that lack one or that duplicate one already seen. */
+/* ─────────────── ids ─────────────── */
 let uid = 0;
 const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
-const seed = () => ([{"t":"Before we start, you should know:","k":[{"t":"this is basically it; the whole idea."},{"t":"suffice to say, I loathe to write as a writer."},{"t":"i prefer to convey as a creative.","k":[{"t":"w/out worrying about APA, MLA, or the fcking Oxford Comma.","k":[{"t":"(look — you weren't bothered by my shorthand, my lack of formatting and apparent typos, and my complete disregard for posture ;)","c":"#8e8e93"},{"t":"But, you are able to follow, yes?","c":"#f2f0ea"}]}]}]},{"t":"..."},{"t":"Anyways","k":[{"t":"Here, just write the damn thing.","k":[{"t":"Write it before it escapes your ability to articulate it.","k":[{"t":"Write freely, but with structure.","k":[{"t":"Write in a familiar format.","k":[{"t":"Write with directionality.","k":[{"t":"Also, here is my dog, Wolfgang..."},{"t":"https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/park123.avif"}]}]}]}]}]}]}]);
+/* ─────────────── seed ───────────────
+   Multi-line so a bracket mismatch is visible. Each `k: [...]` opens one array
+   and one nested object; every one must close with `]}`. */
+const seed = () => [
+
+  { t: "Before we start, you should know:", k: [
+    { t: "this is basically it; the whole idea." },
+    { t: "suffice to say, I loathe to write as a writer." },
+    { t: "i prefer to convey as a creative.", k: [
+      { t: "w/out worrying about APA, MLA, or the fcking Oxford Comma.", k: [
+        { t: "(look — you weren't bothered by my shorthand, my lack of formatting and apparent typos, and my complete disregard for posture ;)", c: "#8e8e93" },
+        { t: "But, you are able to follow, yes?", c: "#f2f0ea" }
+      ]}
+    ]}
+  ]},
+
+  { t: "..." },
+
+  { t: "Anyways", k: [
+    { t: "Here, just write the damn thing.", k: [
+      { t: "Write it before it escapes your ability to articulate it.", k: [
+        { t: "Write freely, but with structure.", k: [
+          { t: "Write in a familiar format.", k: [
+            { t: "Write with directionality.", k: [
+              { t: "Also, here is my dog, Wolfgang..." },
+              { t: "https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/park123.avif", k: [
+                { t: "Wolfie loved walking into elevators", k: [
+                  { t: MEDIA.walkIn, k: [
+                    { t: "& walking out into a world full of wonder", k: [
+                      { t: MEDIA.walkOut }
+                    ]}
+                  ]}
+                ]}
+              ]}
+            ]}
+          ]}
+        ]}
+      ]}
+    ]}
+  ]}
+
+];
 
 function ensureIds(a, seen){
   a.forEach(n => {
@@ -219,9 +261,7 @@ const toast = m => {
   t._h = setTimeout(() => t.classList.remove('on'), 2200);
 };
 
-/* ─────────────── persistence: coalesced write ───────────────
-   persist() schedules; persistNow() actually writes. Flushed on pagehide,
-   beforeunload, and tab-hide so a close never loses the last few seconds. */
+/* ─────────────── persistence ─────────────── */
 let wt = null, wpending = false;
 
 function persistNow(){
@@ -246,9 +286,7 @@ addEventListener('pagehide', flushSave);
 addEventListener('beforeunload', flushSave);
 document.addEventListener('visibilitychange', () => { if(document.hidden) flushSave() });
 
-/* ─────────────── history ───────────────
-   Same grouping rule as before, but the mid-burst stringify is deferred
-   instead of running on every keystroke. */
+/* ─────────────── history ─────────────── */
 let hist = [], hi = -1, lastT = 0, lastTyping = false;
 let histDirty = false, histT = null;
 
@@ -319,15 +357,13 @@ function find(id, a = root, p = null){
   }
   return null;
 }
-/* every node, regardless of collapse state — for structural decisions */
 const allNodes = (a = root, o = []) => { a.forEach(n => { o.push(n); allNodes(n.k, o) }); return o };
-/* only what is actually rendered — for keyboard navigation */
 const visible  = (a = root, o = []) => { a.forEach(n => { o.push(n); if(!n.z) visible(n.k, o) }); return o };
 
 const countDesc = k => k.reduce((s, n) => s + 1 + countDesc(n.k), 0);
 
 let editing = null, rendering = false, groups = [];
-let pendingCaret = null;   /* {id, pos} — carried across exactly one intentional rebuild */
+let pendingCaret = null;
 
 /* ─────────────── text pressure (chrome only) ─────────────── */
 function splitNode(root){
@@ -352,8 +388,6 @@ function collect(){
     if(!el) return;
     splitNode(el);
     const c = [...el.querySelectorAll('.c')];
-    /* base weight must be read once. getComputedStyle returns the *animated*
-       weight, so recomputing it every collect() made the base drift upward. */
     c.forEach(x => {
       if(x._b === undefined) x._b = parseInt(getComputedStyle(x).fontWeight) || 400;
       x._t = undefined;
@@ -502,15 +536,13 @@ function buildNode(n, d){
           spk.setAttribute('aria-label', im.muted ? 'unmute clip' : 'mute clip');
           spk.setAttribute('aria-pressed', String(!im.muted));
         };
-        im._paint = paintSpk;      /* so the audio-focus sweep can repaint other clips */
+        im._paint = paintSpk;
         paintSpk();
 
         spk.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation() });
         spk.addEventListener('click', e => {
           e.stopPropagation();
           if(im.muted){
-            /* one unmuted clip at a time — silence every other video, and keep
-               its button in sync with the real state */
             treeEl.querySelectorAll('video').forEach(o => {
               if(o === im || o.muted) return;
               o.muted = true;
@@ -557,9 +589,7 @@ function buildNode(n, d){
   return li;
 }
 
-/* ─────────────── targeted patch ───────────────
-   Replaces one <li> in place. This is what replaced the full re-render:
-   nothing outside this node's subtree is touched, so scroll and focus hold. */
+/* ─────────────── targeted patch ─────────────── */
 function focusTextarea(li, id){
   const ta = li.querySelector('textarea');
   if(!ta) return;
@@ -587,7 +617,7 @@ function patchNode(id, caretPos){
   return next;
 }
 
-/* ─────────────── full render (undo/redo/import/reset only) ─────────────── */
+/* ─────────────── full render ─────────────── */
 function render(){
   if(!root.length) root.push(mk());
   if(editing && !find(editing)) editing = null;
@@ -937,9 +967,7 @@ $('app').addEventListener('mousedown', e => {
 
 addEventListener('resize', () => { const t = document.querySelector('textarea'); if(t) fit(t) });
 
-/* ─────────────── color toolbar ───────────────
-   Was role="menu" with no menu keyboard behavior. Now an honest toolbar:
-   roving tabindex, arrow keys, Home/End, Escape returns to the statement. */
+/* ─────────────── color toolbar ─────────────── */
 const menu = $('menu');
 let target = null;
 
@@ -1024,7 +1052,6 @@ menu.addEventListener('click', e => {
   if(li){
     const row = li.querySelector(':scope > .row');
     if(row) paint(r.n, row, li);
-    /* repaint in place — no DOM construction, no caret loss */
     focusRow(target);
   }
   save();
@@ -1035,7 +1062,6 @@ const html = document.documentElement;
 let rt;
 const label = (el, t) => { el.textContent = t; collect() };
 
-/* export: the friendly shape, ids stripped */
 const clean = a => a.filter(n => n.t.trim() || n.k.length).map(n => {
   const o = { text: n.t };
   if(n.c) o.color = n.c;
@@ -1067,7 +1093,6 @@ $('export').onclick = function(){
   setTimeout(() => label(this, 'export json'), 1800);
 };
 
-/* import (validated) */
 const okc = c => typeof c === 'string' && (
   /^#[0-9a-f]{3,8}$/i.test(c) ||
   /^linear-gradient\([#a-z0-9(),.%\s-]+\)$/i.test(c)
@@ -1134,7 +1159,7 @@ $('theme').onclick = () => {
 };
 paintTheme();
 
-/* ─────────────── long-press (touch only) ─────────────── */
+/* ─────────────── long-press ─────────────── */
 let lpTimer = null, lpPos = null, lpId = null, lpUntil = 0;
 function cancelLP(){ if(lpTimer){ clearTimeout(lpTimer); lpTimer = null } }
 
@@ -1179,12 +1204,7 @@ document.addEventListener('pointercancel', cancelLP, { passive: true });
   adj();
 })();
 
-/* ─────────────── ghost hint ───────────────
-   Was anchored to the band below tree.getBoundingClientRect().bottom, which
-   goes negative the moment the document is taller than the viewport — so the
-   hint vanished for exactly the people with the most content. Now it keys off
-   "pointer is over empty background", with soft fades at the viewport edges
-   and outside the content column. */
+/* ─────────────── ghost hint ─────────────── */
 const cur = { x: innerWidth / 2, y: innerHeight / 2 };
 const m   = { x: cur.x, y: cur.y };
 const ghost = $('ghost');
@@ -1257,10 +1277,7 @@ function loop(){
 }
 requestAnimationFrame(loop);
 
-/* ─────────────── custom cursor ───────────────
-   The line now snaps to a real character boundary via caretPositionFromPoint
-   and spans the real line box, so it shows the insertion point exactly. Over a
-   textarea the native caret is authoritative and the custom cursor yields. */
+/* ─────────────── custom cursor ─────────────── */
 (function initWriteCursor(){
   if(!fine.matches) return;
   const dot = $('writeCursorDot'), ell = $('writeCursorEllipse');
@@ -1272,7 +1289,7 @@ requestAnimationFrame(loop);
   let px = 0, py = 0, lastPX = -1e9, lastPY = -1e9;
   let frameInit = false, ppx = 0, ppy = 0;
   let rafId = null, lastMove = 0;
-  let mode = 'dot';                       /* 'dot' | 'line' | 'native' */
+  let mode = 'dot';
   let lastEl = null, snap = null;
   let ellAngle = 0, ellSX = 1, ellSY = 1;
 
@@ -1329,7 +1346,6 @@ requestAnimationFrame(loop);
     const dx = px - ppx, dy = py - ppy;
     ppx = px; ppy = py;
 
-    /* ellipse: speed-based stretch, dot mode only */
     const speed = Math.hypot(dx, dy);
     const angleTarget = speed > 0.4 ? Math.atan2(dy, dx) * (180 / Math.PI) : ellAngle;
     const stretch = Math.min(speed / 34, 1) * 0.6;
@@ -1339,7 +1355,6 @@ requestAnimationFrame(loop);
     ellSY += (1 - stretch * 0.45 - ellSY) * 0.22;
     ell.style.transform = 'translate(' + px + 'px,' + py + 'px) rotate(' + ellAngle + 'deg) scale(' + ellSX + ',' + ellSY + ')';
 
-    /* dot vs line target */
     if(mode === 'line' && lastEl){
       if(px !== lastPX || py !== lastPY){
         snap = snapToText(lastEl, px, py);
@@ -1375,7 +1390,6 @@ requestAnimationFrame(loop);
     dot.style.borderRadius = cur.r.toFixed(2)  + 'px';
     dot.style.transform    = 'translate(' + cur.x.toFixed(2) + 'px,' + cur.y.toFixed(2) + 'px)';
 
-    /* idle: stop after 1.5s of no pointer movement and no residual lerp */
     const settled = Math.abs(tgt.x - cur.x) < 0.06 && Math.abs(tgt.y - cur.y) < 0.06 &&
                     Math.abs(tgt.w - cur.w) < 0.06 && Math.abs(tgt.h - cur.h) < 0.06;
     if(settled && performance.now() - lastMove > 1500){ rafId = null; return }
