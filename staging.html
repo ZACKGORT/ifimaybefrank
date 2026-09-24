@@ -11,7 +11,7 @@
 :root{--bg:#f6f4ef;--ink:#1b1b1b;--line:#c9c5bb;--mute:#6c685f;--sb:#9a968b;--sh:#111;--kb:0px;--danger:#c0442b;--sans:'Satoshi',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#94919b;--sb:#7b7882;--sh:#fff;--danger:#e87c62}}
 :root[data-theme="dark"]{--bg:#111112;--ink:#f2f0ea;--line:#3f3f46;--mute:#94919b;--sb:#7b7882;--sh:#fff;--danger:#e87c62}
-html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%;overscroll-behavior-y:none}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);transition:background .25s,color .25s;-webkit-tap-highlight-color:transparent}
 html,body{scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none}
@@ -181,6 +181,50 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 #treeToggle.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #treeToggle svg{display:block}
 
+/* ══════════════════════════════════════════════════════
+   PULL-DOWN DRAWER (touch only)
+   Hidden above the viewport. Pulled down from the top edge
+   when the page is at scroll-top. Reveals the category wheel.
+═══════════════════════════════════════════════════════ */
+.pull-scrim{
+  position:fixed;inset:0;z-index:129;
+  background:rgba(0,0,0,.5);
+  -webkit-backdrop-filter:blur(6px);
+  backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease;
+}
+.pull-scrim.on{opacity:1;pointer-events:auto}
+.pull-drawer{
+  position:fixed;left:0;right:0;top:0;z-index:130;
+  height:0;
+  background:var(--bg);
+  border-bottom-left-radius:22px;
+  border-bottom-right-radius:22px;
+  box-shadow:0 26px 56px rgba(0,0,0,.42);
+  overflow:hidden;
+  will-change:transform;
+  touch-action:none;
+  transform:translateY(0);
+  display:none;
+}
+html.pull-enabled .pull-drawer{display:block}
+html.pull-enabled .pull-scrim{display:block}
+.pull-drawer .wheel-host{position:absolute;inset:0}
+.pull-handle{
+  position:absolute;top:8px;left:50%;
+  transform:translateX(-50%);
+  width:36px;height:4px;
+  border-radius:2px;
+  background:var(--line);
+  opacity:.75;
+  pointer-events:none;
+  z-index:2;
+}
+@media (prefers-reduced-motion:reduce){
+  .pull-scrim{transition:none}
+}
+
 @media (hover:none),(pointer:coarse),(max-width:768px){
   .row{min-height:44px;padding-top:3px;padding-bottom:3px;padding-left:22px}
   .tools{opacity:1;gap:4px;margin-top:6px}
@@ -201,7 +245,6 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
   .cat-del svg{width:14px;height:14px}
   #treeToggle{display:none}
 
-  /* VERY aggressive collapse → nearly flush by depth 4 */
   .kids{margin-left:0;--ind:6px}
   .kids .kids{--ind:4px}
   .kids .kids .kids{--ind:2px}
@@ -212,7 +255,6 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 
   .kids>li{margin-bottom:2px}
 
-  /* tight twisty for the deepest levels */
   .kids .kids .kids .kids .tw{width:16px}
   .kids .kids .kids .kids .tw::before{
     border-left-width:4px;
@@ -222,7 +264,7 @@ li[role="treeitem"]:focus-visible{outline:1.5px solid var(--mute);outline-offset
 }
 
 @media print{
-  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay{display:none!important}
+  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay,.pull-drawer,.pull-scrim{display:none!important}
   body{background:#fff;color:#000}
   #app{max-width:none;padding:0;min-height:0}
   .row{min-height:0;font-size:13pt!important}
@@ -301,6 +343,13 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
   <div class="wheel-host" id="wheelHost"></div>
   <div class="wheel-hint">release to open · esc to cancel</div>
 </div>
+
+<div class="pull-scrim" id="pullScrim" aria-hidden="true"></div>
+<div class="pull-drawer" id="pullDrawer" aria-hidden="true">
+  <div class="pull-handle" aria-hidden="true"></div>
+  <div class="wheel-host" id="pullWheelHost"></div>
+</div>
+
 <div id="blurB" aria-hidden="true"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="hint"><span id="ht"></span></div>
@@ -1703,7 +1752,7 @@ if(th) html.dataset.theme = th;
 const isDark = () => (html.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
 const paintTheme = () => { $('theme').textContent = isDark() ? 'light mode' : 'dark mode' };
 $('theme').onclick = () => {
-  const t = isDark() ? 'light' : 'dark';
+  const t = isDark() ? 'dark' : 'light';
   html.dataset.theme = t;
   try { localStorage.setItem(KT, t) } catch(e) {}
   label($('theme'), isDark() ? 'light mode' : 'dark mode');
@@ -1715,7 +1764,7 @@ function cancelLP(){ if(lpTimer){ clearTimeout(lpTimer); lpTimer = null } }
 
 document.addEventListener('pointerdown', e => {
   if(e.pointerType !== 'touch') return;
-  if(e.target.closest('.tools,#menu,header,.tw,.spk,.cat-bar,.wheel-overlay,.tree-lines')) return;
+  if(e.target.closest('.tools,#menu,header,.tw,.spk,.cat-bar,.wheel-overlay,.tree-lines,.pull-drawer,.pull-scrim')) return;
   const row = e.target.closest('.row'); if(!row) return;
   lpPos = { x: e.clientX, y: e.clientY };
   lpId = row.dataset.id;
@@ -1782,19 +1831,15 @@ document.addEventListener('pointercancel', cancelLP, { passive: true });
   update();
 })();
 
-/* ══════════════════════════════════════════════════════
-   SVG tree lines + hover-collapse hot zone
-═══════════════════════════════════════════════════════ */
 const SVG_NS   = 'http://www.w3.org/2000/svg';
 const TL_W     = 28;
 const TL_TRUNK = 11;
 const TL_R     = 8;
 const TL_END   = 22;
 
-/* per-ul metrics derived from --ind; honest about zero (mobile flush) */
 function tlMetrics(ul){
   let w = parseFloat(getComputedStyle(ul).getPropertyValue('--ind'));
-  if(!isFinite(w)) w = 28;          // desktop fallback only when unset
+  if(!isFinite(w)) w = 28;
   if(w < 0) w = 0;
   const trunk = Math.max(1.2, w * 0.39);
   const rad   = Math.max(0.8, Math.min(w * 0.29, 8));
@@ -1929,12 +1974,6 @@ addEventListener('scroll', () => {
   hideTreeToggle();
 }, { passive: true });
 
-/* ══════════════════════════════════════════════════════
-   Ghost cursor tooltip — three zones
-   • left gutter  → "hold shift for menu" pinned to viewport left
-   • right gutter → "hold shift for menu" pinned to viewport right
-   • whitespace   → "say something new or say something else" near cursor
-═══════════════════════════════════════════════════════ */
 const cur = { x: innerWidth / 2, y: innerHeight / 2 };
 const m   = { x: cur.x, y: cur.y };
 const ghost = $('ghost');
@@ -1959,25 +1998,22 @@ addEventListener('touchmove', e => {
 
 const GHOST_GUTTER = 'hold shift for menu';
 const GHOST_WHITE  = 'say something new or say something else';
-const GUTTER_PAD   = 6;   // px margin around tree to declare a gutter
-const EDGE_MARGIN  = 24;  // px from viewport edge for the anchored tooltip
+const GUTTER_PAD   = 6;
+const EDGE_MARGIN  = 24;
 
 function hintState(){
   if(!moved || blocked || editing || !fine.matches) return { a: 0, mode: null, anchor: null };
   const vw = innerWidth, vh = innerHeight;
   const tr = treeEl.getBoundingClientRect();
 
-  /* Left gutter: anywhere left of the tree, softening only very near
-     the viewport edge and very near the tree boundary. */
   if(cur.x < tr.left - GUTTER_PAD){
-    const dTree = tr.left - cur.x - GUTTER_PAD;      // px past the boundary
-    const dEdge = cur.x;                             // px from viewport left
-    const kTree = ss(Math.min(1, dTree / 32));       // fade in over 32px
-    const kEdge = ss(Math.min(1, (dEdge - 6) / 22)); // fade out at extreme edge
+    const dTree = tr.left - cur.x - GUTTER_PAD;
+    const dEdge = cur.x;
+    const kTree = ss(Math.min(1, dTree / 32));
+    const kEdge = ss(Math.min(1, (dEdge - 6) / 22));
     return { a: Math.min(kTree, kEdge), mode: 'gutter', anchor: 'left' };
   }
 
-  /* Right gutter */
   if(cur.x > tr.right + GUTTER_PAD){
     const dTree = cur.x - tr.right - GUTTER_PAD;
     const dEdge = vw - cur.x;
@@ -1986,7 +2022,6 @@ function hintState(){
     return { a: Math.min(kTree, kEdge), mode: 'gutter', anchor: 'right' };
   }
 
-  /* Whitespace (below/around tree content, still inside its horizontal band) */
   const edge = Math.min(cur.x, vw - cur.x, cur.y, vh - cur.y);
   const edgeK = ss(edge / 36);
   const dx = Math.max(tr.left - cur.x, cur.x - tr.right, 0);
@@ -2054,7 +2089,6 @@ function loop(){
 }
 requestAnimationFrame(loop);
 
-/* ─────────────── custom cursor ─────────────── */
 (function initWriteCursor(){
   if(!fine.matches) return;
   const dot = $('writeCursorDot'), ell = $('writeCursorEllipse');
@@ -2676,6 +2710,220 @@ function createOptionWheel(root, options){
   document.addEventListener('visibilitychange', function(){
     if(document.hidden && wheelOpen) closeWheel(false);
   });
+})();
+
+/* ══════════════════════════════════════════════════════
+   PULL-DOWN DRAWER (touch only)
+   At scroll-top, a downward drag from the top edge peeks a
+   drawer that hosts the same category wheel. Release past
+   threshold opens it. Tap an item or the scrim to commit,
+   drag up or tap nothing to cancel.
+═══════════════════════════════════════════════════════ */
+(function initPullDrawer(){
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if(!isTouch) return;
+
+  const drawer = $('pullDrawer');
+  const scrim  = $('pullScrim');
+  const host   = $('pullWheelHost');
+  if(!drawer || !scrim || !host) return;
+
+  document.documentElement.classList.add('pull-enabled');
+
+  const EDGE_ZONE   = 76;    // px from top where a pull can start
+  const OPEN_THRESH = 0.30;  // release-past progress required to commit open
+  const SPRING      = 1.35;  // resistance curve aggressiveness
+  const DRAWER_H    = () => Math.min(window.innerHeight * 0.58, 540);
+
+  let pulling  = false;
+  let pStartY  = 0;
+  let pStartX  = 0;
+  let drawerH  = DRAWER_H();
+  let progress = 0;
+  let wheel    = null;
+  let open     = false;
+  let animating = false;
+  let suppressClickUntil = 0;
+
+  function setProgress(p){
+    progress = Math.max(0, Math.min(1, p));
+    const y = -drawerH * (1 - progress);
+    drawer.style.transform = 'translateY(' + y.toFixed(1) + 'px)';
+    scrim.style.opacity = String(Math.min(1, progress * 1.15));
+    scrim.classList.toggle('on', progress > 0.01);
+  }
+
+  function easeTo(target, cb){
+    animating = true;
+    const start = progress;
+    const dur = 280;
+    const t0 = performance.now();
+    function step(now){
+      const t = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      setProgress(start + (target - start) * e);
+      if(t < 1) requestAnimationFrame(step);
+      else { animating = false; if(cb) cb(); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function buildWheel(){
+    const names = categories.map(c => c.name || 'Untitled');
+    names.push('+ New category');
+    host.innerHTML = '';
+    return createOptionWheel(host, {
+      items: names,
+      defaultSelected: currentIndex,
+      textColor: 'var(--mute)',
+      activeColor: 'var(--ink)',
+      side: 'left',
+      fontSize: 2.05,
+      spacing: 1.4,
+      curve: 1,
+      tilt: 6.5,
+      blur: 2,
+      fade: 0.22,
+      minOpacity: 0.06,
+      smoothing: 200,
+      inset: 30,
+      loop: false,
+      draggable: true
+    });
+  }
+
+  function openDrawer(){
+    if(open) return;
+    open = true;
+    drawerH = DRAWER_H();
+    drawer.style.height = drawerH + 'px';
+    wheel = buildWheel();
+    drawer.setAttribute('aria-hidden', 'false');
+    suppressClickUntil = Date.now() + 320;
+    easeTo(1);
+  }
+
+  function commitPicked(picked){
+    if(picked < categories.length){
+      if(picked !== currentIndex){
+        currentIndex = picked;
+        root = categories[currentIndex].tree;
+        render();
+        save();
+      }
+      return;
+    }
+    // "+ New category" tail
+    const cat = { id: nid(), name: '', tree: [mk()] };
+    categories.push(cat);
+    currentIndex = categories.length - 1;
+    root = cat.tree;
+    render();
+    save();
+    requestAnimationFrame(() => {
+      catNameEl.focus();
+      try {
+        const rng = document.createRange();
+        rng.selectNodeContents(catNameEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(rng);
+      } catch(_){}
+    });
+    toast('new category — name it, then write');
+  }
+
+  function closeDrawer(commit){
+    if(!open && progress === 0) return;
+    const picked = wheel ? wheel.selected : currentIndex;
+    if(wheel){ wheel.destroy(); wheel = null; }
+    open = false;
+    drawer.setAttribute('aria-hidden', 'true');
+    easeTo(0, () => {
+      drawer.style.height = '';
+      if(commit) commitPicked(picked);
+    });
+  }
+
+  document.addEventListener('touchstart', e => {
+    if(open) return;
+    if(animating) return;
+    const overlayOn = $('wheelOverlay').classList.contains('on');
+    if(overlayOn) return;
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    if(y > 0.5) return;
+    const t = e.touches[0];
+    if(!t) return;
+    if(t.clientY > EDGE_ZONE) return;
+    if(e.target.closest('header,.cat-bar,#menu,.wheel-overlay,button,a,input,textarea,.pull-drawer,.pull-scrim')) return;
+    pulling = true;
+    pStartY = t.clientY;
+    pStartX = t.clientX;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if(!pulling) return;
+    const t = e.touches[0];
+    if(!t) return;
+    const dy = t.clientY - pStartY;
+    const dx = t.clientX - pStartX;
+
+    if(dy < -6){ pulling = false; return; }
+    if(Math.abs(dx) > Math.abs(dy) * 1.4 && dy < 30){ pulling = false; return; }
+
+    if(dy > 0){
+      try { e.preventDefault(); } catch(_){}
+      drawerH = DRAWER_H();
+      if(drawer.style.height !== drawerH + 'px') drawer.style.height = drawerH + 'px';
+      const raw = dy / drawerH;
+      const eased = 1 - Math.exp(-raw * SPRING);
+      setProgress(eased);
+    }
+  }, { passive: false });
+
+  function endPull(){
+    if(!pulling) return;
+    pulling = false;
+    if(progress >= OPEN_THRESH){
+      openDrawer();
+      if(progress >= 1) return;
+      easeTo(1);
+    } else {
+      easeTo(0, () => { drawer.style.height = ''; });
+    }
+  }
+
+  document.addEventListener('touchend', endPull, { passive: true });
+  document.addEventListener('touchcancel', endPull, { passive: true });
+
+  scrim.addEventListener('click', () => {
+    if(Date.now() < suppressClickUntil) return;
+    if(open) closeDrawer(true);
+  });
+
+  let downPt = null;
+  host.addEventListener('pointerdown', e => {
+    downPt = { x: e.clientX, y: e.clientY };
+  }, true);
+  host.addEventListener('click', e => {
+    if(!open) return;
+    if(Date.now() < suppressClickUntil) return;
+    if(downPt){
+      const d = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
+      downPt = null;
+      if(d > 12) return;   // it was a drag, not a tap
+    }
+    setTimeout(() => { closeDrawer(true); }, 60);
+  });
+
+  addEventListener('resize', () => {
+    if(!open && progress === 0) return;
+    drawerH = DRAWER_H();
+    drawer.style.height = drawerH + 'px';
+    if(open) setProgress(1);
+  });
+
+  window.__pullDrawer = { open: openDrawer, close: () => closeDrawer(false) };
 })();
 
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist() } catch(e) {}
