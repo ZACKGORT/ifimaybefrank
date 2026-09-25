@@ -510,16 +510,15 @@ const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
 /* ══════════════════════════════════════════════════════
-   SEED — the canonical demo state.
+   SEED — canonical demo. #helpZack leads.
    text → t,  color → c,  shiny → s,  collapsed → z,  children → k
 ══════════════════════════════════════════════════════ */
 const SEED_DATA = {
   "app": "frankly",
   "version": 2,
   "theme": "dark",
-  "currentCategory": "Non Sequitur",
+  "currentCategory": "#helpZack",
   "categories": [
-
     {
       "name": "#helpZack",
       "statements": [
@@ -531,46 +530,40 @@ const SEED_DATA = {
               "text": "It's really that simple.",
               "color": null, "shiny": false, "collapsed": false,
               "children": [
+                { "text": "My NYC driver's license expired", "color": null, "shiny": false, "collapsed": false },
                 {
-                  "text": "My NYC driver's license expired",
+                  "text": "I was 'between states' at the time (& recently unemployed)",
                   "color": null, "shiny": false, "collapsed": false,
                   "children": [
                     {
-                      "text": "But, I was homeless at the time (and unemployed)",
-                      "color": null, "shiny": false, "collapsed": false,
+                      "text": "So, I tried ordering a birth certificate replacement so I could transfer from NY to PA; a much smoother process.",
+                      "color": null, "shiny": false, "collapsed": true,
                       "children": [
-                        { "text": "…which meant I didn't have an address to mail my replacement to.", "color": null, "shiny": false, "collapsed": false },
                         {
-                          "text": "So, I tried ordering a birth certificate replacement so I could transfer from NY to PA; a much smoother process.",
-                          "color": null, "shiny": false, "collapsed": false,
+                          "text": "But, the first birth certificate replacement I ordered came back with my name spelled incorrectly, and with a brand new birthdate.",
+                          "color": null, "shiny": false, "collapsed": true,
                           "children": [
                             {
-                              "text": "But, the first birth certificate replacement I ordered came back with my name spelled incorrectly, and with a brand new birthdate.",
-                              "color": null, "shiny": false, "collapsed": false,
+                              "text": "So, this document was moot.",
+                              "color": null, "shiny": false, "collapsed": true,
                               "children": [
                                 {
-                                  "text": "So, this document was moot.",
-                                  "color": null, "shiny": false, "collapsed": false,
+                                  "text": "I ordered another, calling out the mistakes from my latest order, noting that my details were submitted correctly in the transaction.",
+                                  "color": null, "shiny": false, "collapsed": true,
                                   "children": [
                                     {
-                                      "text": "I ordered another, calling out the mistakes from my latest order, noting that my details were submitted correctly in the transaction.",
-                                      "color": null, "shiny": false, "collapsed": false,
+                                      "text": "Four months later, I received my second replacement birth certificate.",
+                                      "color": null, "shiny": false, "collapsed": true,
                                       "children": [
                                         {
-                                          "text": "Four months later, I received my second replacement birth certificate.",
-                                          "color": null, "shiny": false, "collapsed": false,
+                                          "text": "They corrected my birthdate, but still printed my name incorrectly.",
+                                          "color": null, "shiny": false, "collapsed": true,
                                           "children": [
                                             {
-                                              "text": "They corrected my birthdate, but still printed my name incorrectly.",
-                                              "color": null, "shiny": false, "collapsed": false,
+                                              "text": "So, I ordered yet another, this time with highlighted annotations, a photocopy of my social security card, along with other collateral showing my correct birthdate and name.",
+                                              "color": null, "shiny": false, "collapsed": true,
                                               "children": [
-                                                {
-                                                  "text": "So, I ordered yet another, this time with highlighted annotations, a photocopy of my social security card, along with other collateral showing my correct birthdate and name.",
-                                                  "color": null, "shiny": false, "collapsed": false,
-                                                  "children": [
-                                                    { "text": "They sent a third replacement birth certicate with my name and birthdate both misprinted.", "color": null, "shiny": false, "collapsed": false }
-                                                  ]
-                                                }
+                                                { "text": "They sent a third replacement birth certicate with my name and birthdate both misprinted.", "color": null, "shiny": false, "collapsed": false }
                                               ]
                                             }
                                           ]
@@ -584,27 +577,28 @@ const SEED_DATA = {
                           ]
                         }
                       ]
-                    }
+                    },
+                    { "text": "which meant I lacked a NY address to mail my replacement to.", "color": null, "shiny": false, "collapsed": false }
                   ]
-                }
+                },
+                { "text": "I now require court order to change my name back to the correct spelling, and to correct my misprinted birthdate.", "color": null, "shiny": true, "collapsed": false }
               ]
             },
-            { "text": "I now require court order to change my name back to the correct spelling, and to correct my misprinted birthdate.", "color": null, "shiny": false, "collapsed": false }
-          ]
-        },
-        {
-          "text": "That aside, right now, I have cleared the biggest hurdles",
-          "color": null, "shiny": false, "collapsed": false,
-          "children": [
             {
-              "text": "I've paid down all of my outstanding traffic/court citations/violations",
-              "color": "#30a46c", "shiny": false, "collapsed": false,
+              "text": "That aside, right now, I have cleared the biggest hurdles",
+              "color": null, "shiny": false, "collapsed": false,
               "children": [
                 {
-                  "text": "actual scenario:",
-                  "color": null, "shiny": true, "collapsed": false,
+                  "text": "I've paid down all of my outstanding traffic/court citations/violations",
+                  "color": "linear-gradient(90deg,#11998e,#38ef7d)", "shiny": false, "collapsed": false,
                   "children": [
-                    { "text": "a Pennsylvania cop wrote a NYC driver a ticket for running a red right turn traffic signal; but any NYC driver knows not to even go through a yellow light, along with a stout refusal to turn right on red…", "color": "#e5484d", "shiny": false, "collapsed": false }
+                    {
+                      "text": "actual scenario:",
+                      "color": null, "shiny": true, "collapsed": false,
+                      "children": [
+                        { "text": "a Pennsylvania cop wrote a NYC driver a ticket for running a red right turn traffic signal; but any NYC driver knows not to even go through a yellow light, along with a stout refusal to turn right on red…", "color": "#e5484d", "shiny": false, "collapsed": false }
+                      ]
+                    }
                   ]
                 }
               ]
@@ -612,8 +606,8 @@ const SEED_DATA = {
           ]
         },
         {
-          "text": "Two hurdles left:",
-          "color": null, "shiny": false, "collapsed": false,
+          "text": "What is next?",
+          "color": null, "shiny": false, "collapsed": true,
           "children": [
             { "text": "1. Pay license restoration fee", "color": null, "shiny": false, "collapsed": false },
             { "text": "2. Get back up to a NYC DMV to get my license reprinted.", "color": null, "shiny": false, "collapsed": false }
@@ -621,7 +615,7 @@ const SEED_DATA = {
         },
         {
           "text": "What this accomplishes:",
-          "color": null, "shiny": false, "collapsed": false,
+          "color": null, "shiny": false, "collapsed": true,
           "children": [
             {
               "text": "I will have my physical driver's license.",
@@ -665,22 +659,8 @@ const SEED_DATA = {
             }
           ]
         },
-        {
-          "text": "Evidence that I am not a freeloading lazy schmuck:",
-          "color": null, "shiny": false, "collapsed": false,
-          "children": [
-            {
-              "text": "https://zack.cx",
-              "color": null, "shiny": false, "collapsed": false,
-              "children": [
-                { "text": "neverever.land (personal provenance concept)", "color": null, "shiny": false, "collapsed": false },
-                { "text": "intoview.pro (professional provenance concept)", "color": null, "shiny": false, "collapsed": false }
-              ]
-            }
-          ]
-        }
       ]
-    }
+    },
   ]
 };
 
