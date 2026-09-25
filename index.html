@@ -129,6 +129,7 @@ ul{list-style:none;margin:0;padding:0}
 .row.ed{flex-direction:column;align-items:flex-start;justify-content:center}
 .row.im{align-items:flex-start}
 .pic{display:block;max-width:100%;max-height:min(60vh,480px);height:auto;object-fit:contain;border-radius:6px}
+.frame{display:block;width:100%;max-width:100%;height:min(70vh,560px);border:1px solid var(--line);border-radius:6px;background:var(--bg);color-scheme:light dark}
 .picwrap{position:relative;display:inline-block;max-width:100%}
 .spk{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border:0;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;opacity:0;transition:opacity .18s;cursor:pointer;touch-action:manipulation;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .picwrap:hover .spk,.spk:focus-visible{opacity:1}
@@ -342,7 +343,7 @@ html.pull-enabled .pull-drawer{display:flex}
 }
 
 @media print{
-  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,header span:last-child,.cat-bar,.wheel-overlay,.pull-drawer,.pull-scrim,.menu-trigger{display:none!important}
+  #hint,#blurB,#toast,#menu,#ghost,#treeToggle,.write-cursor-dot,.write-cursor-ellipse,.spk,.frame,header span:last-child,.cat-bar,.wheel-overlay,.pull-drawer,.pull-scrim,.menu-trigger{display:none!important}
   body{background:#fff;color:#000}
   #app{max-width:none;padding:0;min-height:0}
   .row{min-height:0;font-size:13pt!important}
@@ -494,11 +495,6 @@ const K_OLD      = 'frankly:doc:v1';
 const K_LEGACY   = ['digress:v1'];
 const KT         = 'frankly:theme';
 const KT_LEGACY  = ['digress:theme'];
-
-const MEDIA = {
-  walkIn:  'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksintoelevators.mp4',
-  walkOut: 'https://raw.githubusercontent.com/ZACKGORT/WOLFGANGLOVE/main/media/walksoutofelevators.mp4',
-};
 
 const PAL  = ['#e5484d','#f76b15','#e0a800','#30a46c','#0091ff','#8e4ec6','#e93d82'];
 const GRAY = ['#1b1b1b','#3f3f46','#6b6b73','#8e8e93','#b0b0b6','#d4d4d8','#f2f0ea'];
@@ -1013,7 +1009,8 @@ const SEED_DATA = {
             { "text": "right-click {or long-press} a line for color, gradients, shine, remove", "color": null, "shiny": false, "collapsed": false },
             { "text": "hold ⇧ to open the category wheel", "color": null, "shiny": false, "collapsed": false },
             { "text": "cmd / ctrl + z → undo · + shift → redo", "color": null, "shiny": false, "collapsed": false },
-            { "text": "import & export json whenever you like", "color": null, "shiny": false, "collapsed": false }
+            { "text": "import & export json whenever you like", "color": null, "shiny": false, "collapsed": false },
+            { "text": "drop a url and it embeds as an iframe", "color": null, "shiny": false, "collapsed": false }
           ]
         },
         {
@@ -1270,18 +1267,12 @@ function splitNode(root){
   });
 }
 
+/* ── collect() is now cheap: it just records the elements.
+     Per-character splitting is deferred to ensureSplit(), which fires
+     only when the cursor enters a group's vertical band. ── */
 function collect(){
   groups = [];
-  const add = (el, hi) => {
-    if(!el) return;
-    splitNode(el);
-    const c = [...el.querySelectorAll('.c')];
-    c.forEach(x => {
-      if(x._b === undefined) x._b = parseInt(getComputedStyle(x).fontWeight) || 400;
-      x._t = undefined;
-    });
-    groups.push({ s: el, c, hi });
-  };
+  const add = (el, hi) => { if(el) groups.push({ s: el, c: null, hi }); };
   add(document.querySelector('.wm'), 900);
   add($('export'), 700); add($('import'), 700); add($('reset'), 700); add($('theme'), 700);
   add($('ht'), 700);
@@ -1289,15 +1280,38 @@ function collect(){
   document.querySelectorAll('.tools').forEach(t => add(t, 700));
 }
 
+function ensureSplit(g){
+  if(g.c) return;
+  splitNode(g.s);
+  const cs = g.s.querySelectorAll('.c');
+  g.c = cs.length ? [...cs] : [];
+  for(const x of g.c){
+    if(x._b === undefined) x._b = parseInt(getComputedStyle(x).fontWeight) || 400;
+    x._t = undefined;
+  }
+}
+
 const IMG = /^(?:https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?|https?:\/\/(?:images\.unsplash\.com|i\.imgur\.com|pbs\.twimg\.com|images\.pexels\.com)\/\S+|data:image\/(?:png|jpe?g|gif|webp|avif);base64,[A-Za-z0-9+\/=]+)$/i;
 const VID = /^(?:https?:\/\/\S+\.(?:mp4|webm|mov|m4v|ogv)(?:[?#]\S*)?|data:video\/(?:mp4|webm|ogg);base64,[A-Za-z0-9+\/=]+)$/i;
+const URL_RE = /^https?:\/\/\S+$/i;
 const isImg = t => IMG.test(t.trim());
 const isVid = t => VID.test(t.trim());
+const isUrl = t => URL_RE.test(t.trim());
+const isFrame = t => isUrl(t) && !isImg(t) && !isVid(t);
 
+/* ── Videos: only one plays at a time, and only when ~20% visible.
+     preload is 'none' so nothing is fetched at boot; play() triggers load. ── */
 const vio = new IntersectionObserver(es => es.forEach(e => {
-  if(e.isIntersecting){ const p = e.target.play(); if(p) p.catch(() => {}) }
-  else e.target.pause();
-}), { threshold: .1 });
+  const v = e.target;
+  if(e.isIntersecting){
+    treeEl.querySelectorAll('video').forEach(o => {
+      if(o !== v && !o.paused) o.pause();
+    });
+    const p = v.play(); if(p) p.catch(() => {});
+  } else {
+    if(!v.paused) v.pause();
+  }
+}), { threshold: .2 });
 
 const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; };
 
@@ -1423,7 +1437,8 @@ function buildNode(n, d){
       im.className = 'pic';
 
       if(v){
-        im.muted = true; im.loop = true; im.autoplay = true; im.playsInline = true; im.preload = 'metadata';
+        im.muted = true; im.loop = true; im.playsInline = true;
+        im.preload = 'none';
         im.setAttribute('muted',''); im.setAttribute('playsinline','');
         im.src = n.t.trim();
 
@@ -1475,6 +1490,19 @@ function buildNode(n, d){
         im.onerror = () => { row.classList.remove('im'); im.replaceWith(txt()) };
         row.appendChild(im);
       }
+    } else if(isFrame(n.t)){
+      row.classList.add('im');
+      const wrap = document.createElement('span');
+      wrap.className = 'picwrap';
+      const ifr = document.createElement('iframe');
+      ifr.className = 'frame';
+      ifr.src = n.t.trim();
+      ifr.setAttribute('loading', 'lazy');
+      ifr.setAttribute('allowfullscreen', '');
+      ifr.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+      wrap.appendChild(ifr);
+      row.appendChild(wrap);
+      ifr.addEventListener('load', scheduleTreeLines);
     } else row.appendChild(txt());
 
     if(n.z && n.k.length){
@@ -2068,14 +2096,6 @@ const label = (el, t) => { el.textContent = t; collect() };
 
 /* ─────────────────────────────────────────────
    EXPORT — captures full visual + structural state
-   Every statement carries:
-     • text        the statement body
-     • color       hex/gradient string, or null
-     • shiny       true/false (shine animation)
-     • collapsed   true/false (branch fold state)
-     • children    nested statements (branches only)
-   Plus top-level: theme, currentCategory, exportedAt.
-   Import is fully backwards compatible.
 ───────────────────────────────────────────── */
 const clean = a => a.filter(n => n.t.trim() || n.k.length).map(n => {
   const o = {
@@ -2340,9 +2360,6 @@ function drawTreeLines(){
 
     parts.push(`<rect class="tl-hit" x="0" y="0" width="${Math.max(M.w, M.end + 1)}" height="${h}" fill="none"/>`);
 
-    /* Trunk spans from the top of the first elbow's arc to the top of the
-       last elbow's arc — so the trunk's endpoints coincide exactly with the
-       arc start points. This is what keeps the corner aligned. */
     if(items.length > 1){
       const y0 = (items[0].y - M.rad).toFixed(1);
       const y1 = (items[items.length - 1].y - M.rad).toFixed(1);
@@ -2448,20 +2465,25 @@ const ghost = $('ghost');
 let moved = false, blocked = true, gOp = -1, running = !document.hidden, ghostKey = null;
 
 document.addEventListener('visibilitychange', () => {
-  const was = running;
   running = !document.hidden;
-  if(running && !was) requestAnimationFrame(loop);
+  if(running){ stillFrames = 0; lastMove = performance.now(); startGhostLoop(); }
 });
 
 addEventListener('mousemove', e => {
   cur.x = e.clientX; cur.y = e.clientY;
   moved = true;
   blocked = !!(e.target.closest && e.target.closest('.row,.tools,header,#menu,.cat-bar,.wheel-overlay,.tree-lines,.wm-pinned,.cat-del,.pull-drawer,.pull-scrim'));
+  lastMove = performance.now();
+  stillFrames = 0;
+  startGhostLoop();
 });
 document.addEventListener('mouseleave', () => { moved = false });
 addEventListener('touchmove', e => {
   const t = e.touches[0];
   cur.x = t.clientX; cur.y = t.clientY;
+  lastMove = performance.now();
+  stillFrames = 0;
+  startGhostLoop();
 }, { passive: true });
 
 const GHOST_GUTTER = 'hold shift for menu';
@@ -2497,8 +2519,20 @@ function hintState(){
   return { a: edgeK * colK, mode: 'whitespace', anchor: null };
 }
 
+/* ── Ghost loop: starts on input, stops when idle. The character-split
+     work happens only for groups the cursor actually approaches. ── */
+let rafId = null;
+let lastMove = performance.now();
+let stillFrames = 0;
+
+function startGhostLoop(){
+  if(rafId == null && running) rafId = requestAnimationFrame(loop);
+}
+
 function loop(){
+  rafId = null;
   if(!running) return;
+
   m.x += (cur.x - m.x) / 12;
   m.y += (cur.y - m.y) / 12;
 
@@ -2518,17 +2552,13 @@ function loop(){
     const w = ghost.offsetWidth;
     const h = ghost.offsetHeight;
     let x, y = cur.y;
-
-    if(st.anchor === 'left'){
-      x = EDGE_MARGIN;
-    } else if(st.anchor === 'right'){
-      x = innerWidth - w - EDGE_MARGIN;
-    } else {
+    if(st.anchor === 'left'){ x = EDGE_MARGIN; }
+    else if(st.anchor === 'right'){ x = innerWidth - w - EDGE_MARGIN; }
+    else {
       x = cur.x + 28;
       if(x + w > innerWidth - 12) x = cur.x - 28 - w;
     }
     y = Math.max(16, Math.min(innerHeight - h - 12, y));
-
     ghost.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
   }
 
@@ -2538,6 +2568,9 @@ function loop(){
     const on = !RM.matches && fine.matches &&
       cur.y >= sr.top - 8 && cur.y <= sr.bottom + 8 &&
       cur.x >= sr.left - 60 && cur.x <= sr.right + 60;
+    if(!on && !g.c) continue;        /* never split, not hovered: skip entirely */
+    if(on && !g.c) ensureSplit(g);   /* split on first approach */
+    if(!g.c || !g.c.length) continue;
     const maxD = Math.max(70, Math.min(sr.width / 2, 200));
     for(const c of g.c){
       let tg = 0;
@@ -2553,9 +2586,19 @@ function loop(){
       c.style.fontWeight = Math.round(c._b + (g.hi - c._b) * n);
     }
   }
-  requestAnimationFrame(loop);
+
+  /* Idle detection: after ~1.6s of no input and no visible ghost, settle
+     for ~25 frames then release the rAF loop entirely. */
+  if(performance.now() - lastMove > 1600 && gOp === 0){
+    stillFrames++;
+    if(stillFrames > 25) return;
+  } else {
+    stillFrames = 0;
+  }
+
+  rafId = requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
+startGhostLoop();
 
 /* ─────────────── custom cursor ─────────────── */
 (function initWriteCursor(){
@@ -2568,7 +2611,7 @@ requestAnimationFrame(loop);
 
   let px = 0, py = 0, lastPX = -1e9, lastPY = -1e9;
   let frameInit = false, ppx = 0, ppy = 0;
-  let rafId = null, lastMove = 0;
+  let cRafId = null, cLastMove = 0;
   let mode = 'dot';
   let lastEl = null, snap = null;
   let ellAngle = 0, ellSX = 1, ellSY = 1;
@@ -2577,8 +2620,6 @@ requestAnimationFrame(loop);
   let tgt = { x: 0, y: 0, w: 6, h: 6, mt: -3, ml: -3, r: 3 };
 
   function snapToText(st, x, y){
-    /* Guard: if the .st we're trying to snap to has been removed from the
-       DOM (e.g. because clicking it swapped in a textarea), bail out. */
     if(!st || !st.isConnected) return null;
 
     let node = null, off = 0;
@@ -2639,12 +2680,8 @@ requestAnimationFrame(loop);
     ellSY += (1 - stretch * 0.45 - ellSY) * 0.22;
     ell.style.transform = 'translate(' + px + 'px,' + py + 'px) rotate(' + ellAngle + 'deg) scale(' + ellSX + ',' + ellSY + ')';
 
-    /* If our line-mode target has been detached (e.g. swapped for a textarea),
-       fall back to dot mode so we don't anchor to a zero-rect. */
     if(mode === 'line' && lastEl && !lastEl.isConnected){
-      mode = 'dot';
-      lastEl = null;
-      snap = null;
+      mode = 'dot'; lastEl = null; snap = null;
     }
 
     if(mode === 'line' && lastEl){
@@ -2658,11 +2695,7 @@ requestAnimationFrame(loop);
         const cs = getComputedStyle(lastEl);
         const lh = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.25;
         const r = lastEl.getBoundingClientRect();
-        tgt = {
-          x: Math.max(r.left, Math.min(px, r.right)),
-          y: py - lh / 2,
-          w: 2, h: lh, mt: 0, ml: -1, r: 1
-        };
+        tgt = { x: Math.max(r.left, Math.min(px, r.right)), y: py - lh / 2, w: 2, h: lh, mt: 0, ml: -1, r: 1 };
       }
     } else {
       tgt = { x: px, y: py, w: 6, h: 6, mt: -3, ml: -3, r: 3 };
@@ -2684,13 +2717,13 @@ requestAnimationFrame(loop);
 
     const settled = Math.abs(tgt.x - cur.x) < 0.06 && Math.abs(tgt.y - cur.y) < 0.06 &&
                     Math.abs(tgt.w - cur.w) < 0.06 && Math.abs(tgt.h - cur.h) < 0.06;
-    if(settled && performance.now() - lastMove > 1500){ rafId = null; return }
+    if(settled && performance.now() - cLastMove > 1500){ cRafId = null; return }
 
-    rafId = requestAnimationFrame(step);
+    cRafId = requestAnimationFrame(step);
   }
 
-  const startLoop = () => { if(!rafId && !document.hidden) rafId = requestAnimationFrame(step) };
-  const stopLoop  = () => { if(rafId){ cancelAnimationFrame(rafId); rafId = null } };
+  const startLoop = () => { if(!cRafId && !document.hidden) cRafId = requestAnimationFrame(step) };
+  const stopLoop  = () => { if(cRafId){ cancelAnimationFrame(cRafId); cRafId = null } };
 
   function hideAll(){
     dot.classList.remove('visible');
@@ -2699,9 +2732,6 @@ requestAnimationFrame(loop);
     stopLoop();
   }
 
-  /* Central place that decides whether the custom cursor should be visible,
-     given (a) the element under the pointer, and (b) whether we're currently
-     hovering a textarea (edit mode) or a native interactive element. */
   function refreshCursor(el, x, y){
     if(!el){ hideAll(); return }
     if(el.nodeType !== 1) el = el.parentElement;
@@ -2716,7 +2746,7 @@ requestAnimationFrame(loop);
     document.body.classList.toggle('write-native-cursor', isNative);
 
     px = x; py = y;
-    lastMove = performance.now();
+    cLastMove = performance.now();
 
     dot.classList.toggle('visible', !isNative);
     ell.classList.toggle('visible', !isNative && mode === 'dot');
@@ -2724,10 +2754,6 @@ requestAnimationFrame(loop);
     if(isNative) stopLoop(); else startLoop();
   }
 
-  /* Re-evaluate whenever the tree re-renders. This is what fixes the
-     "two cursors" bug: clicking a statement swaps .st for a <textarea>,
-     but the mouse never moves — so without this, the custom cursor stays
-     frozen in line mode over top of the native caret. */
   window.addEventListener('cursorsync', () => {
     const el = document.elementFromPoint(px, py);
     if(el) refreshCursor(el, px, py);
@@ -3217,9 +3243,6 @@ function createOptionWheel(root, options){
 
 /* ══════════════════════════════════════════════════════
    PULL-DOWN MEGA MENU (touch only)
-   Froster-glass aesthetic identical to the desktop wheel
-   overlay: full-viewport blur scrim + floating drawer
-   contents with no panel chrome.
 ═══════════════════════════════════════════════════════ */
 (function initPullDrawer(){
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
