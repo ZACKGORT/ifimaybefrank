@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/ZACKGORT/WOLFLIFE/main/wolfielife.svg">
-<title>Frankly,</title>
+<title>Frankly</title>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
@@ -130,6 +130,7 @@ ul{list-style:none;margin:0;padding:0}
 .row.ed{flex-direction:column;align-items:flex-start;justify-content:center}
 .row.im{align-items:flex-start}
 .pic{display:block;max-width:100%;max-height:min(60vh,480px);height:auto;object-fit:contain;border-radius:6px}
+.pic-inline{max-height:min(50vh,400px);margin-top:6px}
 .frame{display:block;width:100%;max-width:100%;height:min(70vh,560px);border:1px solid var(--line);border-radius:6px;background:var(--bg);color-scheme:light dark}
 .picwrap{position:relative;display:inline-block;max-width:100%}
 .spk{position:absolute;right:8px;bottom:8px;width:32px;height:32px;border:0;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;opacity:0;transition:opacity .18s;cursor:pointer;touch-action:manipulation;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
@@ -137,6 +138,9 @@ ul{list-style:none;margin:0;padding:0}
 .spk:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .spk svg{display:block}
 .st{font-weight:400;white-space:pre-wrap;overflow-wrap:break-word;max-width:100%}
+.rich-content{display:flex;flex-direction:column;gap:4px;max-width:100%;min-width:0}
+.rich-content .st{min-width:0}
+.rich-content .pic-inline{align-self:flex-start}
 .st a{
   color:inherit;
   text-decoration:underline;
@@ -449,7 +453,7 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 <div class="scroll-line" id="scrollLine" aria-hidden="true"><span id="scrollFill"></span></div>
 <div id="app">
   <header>
-    <span class="wm-slot"><span class="wm-spacer" aria-hidden="true">frankly</span><span class="wm" id="wm">frankly</span></span>
+    <span class="wm-slot"><span class="wm-spacer" aria-hidden="true">Frankly</span><span class="wm" id="wm">Frankly</span></span>
     <span class="header-utils">
       <button class="ctl" id="import">import</button>
       <input type="file" id="file" accept="application/json,.json" hidden>
@@ -560,16 +564,17 @@ const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
 /* ══════════════════════════════════════════════════════
-   SEED — canonical demo. #helpZack leads.
+   SEED — canonical demo.
    text → t,  color → c,  shiny → s,  collapsed → z,  children → k
 ══════════════════════════════════════════════════════ */
 const SEED_DATA = {
   "app": "frankly",
   "version": 2,
-  "exportedAt": "2026-09-26T18:52:27.754Z",
+  "exportedAt": "2026-09-27T20:42:18.864Z",
   "theme": "dark",
-  "currentCategory": "wtf is this?",
+  "currentCategory": "non sequitur",
   "categories": [
+
     {
       "name": "non sequitur",
       "statements": [
@@ -633,7 +638,7 @@ const SEED_DATA = {
             },
             {
               "text": "Anyways",
-              "color": null,
+              "color": "#f2f0ea",
               "shiny": true,
               "collapsed": true,
               "children": [
@@ -729,16 +734,16 @@ const SEED_DATA = {
           "text": "Work",
           "color": null,
           "shiny": false,
-          "collapsed": false,
+          "collapsed": true,
           "children": [
             {
               "text": "Case Studies:",
-              "color": null,
+              "color": "linear-gradient(90deg,#5227FF,#FF9FFC,#B497CF)",
               "shiny": false,
               "collapsed": false,
               "children": [
                 {
-                  "text": "BNY Mellon — Pershing X",
+                  "text": "BNY Mellon — Pershing X (https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.avif)",
                   "color": "#0091ff",
                   "shiny": false,
                   "collapsed": true,
@@ -1016,7 +1021,7 @@ const SEED_DATA = {
                   ]
                 },
                 {
-                  "text": "General Nutrition Centers",
+                  "text": "General Nutrition Centers (https://i.ibb.co/7N2rDqrN/8.webp)",
                   "color": "#e5484d",
                   "shiny": false,
                   "collapsed": true,
@@ -2227,14 +2232,24 @@ const isFrame = t => isUrl(t) && !isImg(t) && !isVid(t);
 
 /* ── RICH TEXT ──
    Splits a plain text string into text nodes + <a> elements for emails
-   and (parenthesized) URLs. Bare URLs in text are left alone — use
-   parens to make them clickable, or paste a bare URL alone to embed. */
+   and (parenthesized) URLs. Parenthesized image URLs are extracted and
+   returned separately so callers can render them below the text. Bare
+   URLs in text are left alone — use parens to make them clickable, or
+   paste a bare URL alone to embed. */
 const EMAIL_RE = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
 const RICH_RE  = /(\(https?:\/\/[^\s)]+\)|[\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g;
 const PAREN_URL_RE = /^\((https?:\/\/[^\s)]+)\)$/;
+const PAREN_IMG_RE = /\s*\((https?:\/\/\S+\.(?:png|jpe?g|gif|webp|avif|svg|bmp)(?:[?#]\S*)?)\)\s*/gi;
 
 function renderRich(st, text){
-  const parts = text.split(RICH_RE);
+  // Pull out parenthesized image URLs first — they become inline images.
+  const inlineImgs = [];
+  const cleaned = String(text).replace(PAREN_IMG_RE, (m, url) => {
+    inlineImgs.push(url);
+    return ' ';
+  }).replace(/\s{2,}/g, ' ').trim();
+
+  const parts = cleaned.split(RICH_RE);
   for(const p of parts){
     if(!p) continue;
     const pm = p.match(PAREN_URL_RE);
@@ -2254,6 +2269,7 @@ function renderRich(st, text){
       st.appendChild(document.createTextNode(p));
     }
   }
+  return inlineImgs;
 }
 
 const vio = new IntersectionObserver(es => es.forEach(e => {
@@ -2385,7 +2401,27 @@ function buildNode(n, d){
     li.tabIndex = 0;
     li.onkeydown = e => navKey(e, n, li);
 
-    const txt = () => { const s = document.createElement('div'); s.className = 'st'; renderRich(s, n.t); return s };
+    const txt = () => {
+      const wrap = document.createElement('div');
+      wrap.className = 'rich-content';
+      const s = document.createElement('div');
+      s.className = 'st';
+      const imgs = renderRich(s, n.t);
+      wrap.appendChild(s);
+      imgs.forEach(src => {
+        const im = document.createElement('img');
+        im.className = 'pic pic-inline';
+        im.alt = '';
+        im.loading = 'lazy';
+        im.draggable = false;
+        im.referrerPolicy = 'no-referrer';
+        im.src = src;
+        im.addEventListener('load', scheduleTreeLines);
+        im.addEventListener('error', () => { im.remove(); scheduleTreeLines(); });
+        wrap.appendChild(im);
+      });
+      return wrap;
+    };
     if(isImg(n.t) || isVid(n.t)){
       row.classList.add('im');
       const v = isVid(n.t), im = document.createElement(v ? 'video' : 'img');
@@ -2458,7 +2494,11 @@ function buildNode(n, d){
       wrap.appendChild(ifr);
       row.appendChild(wrap);
       ifr.addEventListener('load', scheduleTreeLines);
-    } else row.appendChild(txt());
+    } else {
+      const content = txt();
+      row.appendChild(content);
+      if(content.querySelector('.pic-inline')) row.classList.add('im');
+    }
 
     if(n.z && n.k.length){
       const b = document.createElement('span');
