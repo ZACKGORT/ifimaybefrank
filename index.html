@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/ZACKGORT/WOLFLIFE/main/wolfielife.svg">
-<title>Frankly</title>
+<title>frankly</title>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@1,2,3,4,5,6,7,8,9&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
@@ -453,7 +453,7 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
 <div class="scroll-line" id="scrollLine" aria-hidden="true"><span id="scrollFill"></span></div>
 <div id="app">
   <header>
-    <span class="wm-slot"><span class="wm-spacer" aria-hidden="true">Frankly</span><span class="wm" id="wm">Frankly</span></span>
+    <span class="wm-slot"><span class="wm-spacer" aria-hidden="true">frankly</span><span class="wm" id="wm">frankly</span></span>
     <span class="header-utils">
       <button class="ctl" id="import">import</button>
       <input type="file" id="file" accept="application/json,.json" hidden>
@@ -564,14 +564,14 @@ const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
 /* ══════════════════════════════════════════════════════
-   SEED — canonical demo. #helpZack leads.
+   SEED — canonical demo. non sequitur leads.
    text → t,  color → c,  shiny → s,  collapsed → z,  children → k
 ══════════════════════════════════════════════════════ */
 const SEED_DATA = {
   "app": "frankly",
   "version": 2,
-  "exportedAt": "2026-09-28T19:46:44.200Z",
-  "theme": "light",
+  "exportedAt": "2026-09-28T20:11:39.551Z",
+  "theme": "dark",
   "currentCategory": "non sequitur",
   "categories": [
     {
@@ -739,13 +739,13 @@ const SEED_DATA = {
               "text": "Case Studies:",
               "color": "linear-gradient(90deg,#5227FF,#FF9FFC,#B497CF)",
               "shiny": true,
-              "collapsed": true,
+              "collapsed": false,
               "children": [
                 {
-                  "text": "BNY Mellon — Pershing X (https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.avif)",
+                  "text": "BNY Mellon — Pershing X",
                   "color": "#0091ff",
                   "shiny": false,
-                  "collapsed": false,
+                  "collapsed": true,
                   "children": [
                     {
                       "text": "Wove.",
@@ -753,6 +753,12 @@ const SEED_DATA = {
                       "shiny": false,
                       "collapsed": false,
                       "children": [
+                        {
+                          "text": "https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.avif",
+                          "color": null,
+                          "shiny": false,
+                          "collapsed": false
+                        },
                         {
                           "text": "Design systems, dashboards, data, & due diligence.",
                           "color": null,
@@ -1020,16 +1026,22 @@ const SEED_DATA = {
                   ]
                 },
                 {
-                  "text": "General Nutrition Centers (https://i.ibb.co/7N2rDqrN/8.webp)",
+                  "text": "General Nutrition Centers",
                   "color": "#e5484d",
                   "shiny": false,
                   "collapsed": true,
                   "children": [
                     {
+                      "text": "https://i.ibb.co/7N2rDqrN/8.webp",
+                      "color": null,
+                      "shiny": false,
+                      "collapsed": false
+                    },
+                    {
                       "text": "This is the Whey.",
                       "color": null,
                       "shiny": false,
-                      "collapsed": false,
+                      "collapsed": true,
                       "children": [
                         {
                           "text": "Client: General Nutrition Centers (GNC)",
@@ -1055,7 +1067,7 @@ const SEED_DATA = {
                       "text": "The brief was simple. The context was not.",
                       "color": null,
                       "shiny": false,
-                      "collapsed": false,
+                      "collapsed": true,
                       "children": [
                         {
                           "text": "GNC had just come through a bankruptcy.",
@@ -2532,11 +2544,15 @@ function focusTextarea(li, id){
 
 function patchNode(id, caretPos){
   const li = liOf(id); if(!li) return null;
+  if(!li.isConnected) return null;
   const r = find(id); if(!r) return null;
   const d = (parseInt(li.getAttribute('aria-level'), 10) || 1) - 1;
   if(caretPos != null) pendingCaret = { id, pos: caretPos };
   const next = buildNode(r.n, d);
+  if(!li.parentNode) return null;
+  rendering = true;
   li.replaceWith(next);
+  rendering = false;
   const ta = next.querySelector('textarea');
   if(ta){
     const taId = ta.closest('li').dataset.id;
