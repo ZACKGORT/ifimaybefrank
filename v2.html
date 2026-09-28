@@ -128,6 +128,22 @@ body.ed #tb{display:flex}#tb .b{min-height:36px;padding:0 10px;flex:none}
 #cm .k{flex:none;color:var(--mute);font-size:10px}
 #cm button.hl{background:color-mix(in srgb,var(--ink) 9%,transparent)}
 #cm button.dg{color:#e5484d}
+/* no stray text selection while dragging/panning */
+#cv,#cv *,body.grab,body.grab *{user-select:none;-webkit-user-select:none}
+#cv textarea,#cv input.fn:not([readonly]){user-select:text;-webkit-user-select:text}
+body.grab textarea{user-select:none;-webkit-user-select:none}
+.ed textarea::selection{background:color-mix(in srgb,var(--ink) 22%,transparent);color:inherit}
+/* zoom slosh gauge */
+#zg{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:4;width:44px;height:140px;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);overflow:clip;isolation:isolate;background:color-mix(in srgb,var(--ink) 9%,var(--bg));font:500 11px/1 var(--mono);font-variant-numeric:tabular-nums;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;transition:opacity .25s,border-color .2s}
+#zg:focus-visible,#zg[data-held='1']{border-color:var(--ink)}
+body.ed #zg{opacity:0;pointer-events:none}
+#zg .zv{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);pointer-events:none}
+#zg .zl{position:absolute;inset:0;background:var(--ink);clip-path:polygon(0 100%,100% 100%,100% 100%,0 100%)}
+#zg .zl .zv{color:var(--bg)}
+#zg .zt{position:absolute;right:0;bottom:0;width:22%;height:100%;background-image:linear-gradient(to top,color-mix(in srgb,currentColor 22%,transparent) 0 1px,transparent 1px);background-size:100% 25%;background-position:bottom;pointer-events:none}
+#zg .zo{position:absolute;left:0;width:34%;height:1px;background:currentColor;opacity:.6;pointer-events:none}
+#zg .zm{position:absolute;top:0;left:10%;right:10%;height:2px;margin-top:-1px;border-radius:1px;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none}
+#zg[data-held='1'] .zm{opacity:1}
 </style>
 </head>
 <body>
@@ -137,6 +153,7 @@ body.ed #tb{display:flex}#tb .b{min-height:36px;padding:0 10px;flex:none}
 <svg id="ring" aria-hidden="true"><path id="rb"/><path id="rs"/></svg>
 <div id="hd"><div class="l"><button id="bk">Frankly</button><span class="sl ci">/</span><input id="cn" class="ci" placeholder="untitled" spellcheck="false"></div><div class="r"><button class="b ci" id="cd">delete</button><button class="b ci" id="fb">folders</button><button class="b" id="mb">menu</button></div></div>
 <div id="hint"></div>
+<div id="zg" role="slider" tabindex="0" aria-label="Zoom" aria-orientation="vertical" aria-valuemin="12" aria-valuemax="250" title="drag to zoom · double-click for 100%"></div>
 <div id="tb"></div>
 <div id="ov" aria-hidden="true"><div id="wh"></div><button class="b" id="cx">close</button>
 <div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="reset">reset demo</button></div></div>
@@ -383,7 +400,7 @@ const dark=()=>(root.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').m
 function paintTheme(){theme?root.dataset.theme=theme:delete root.dataset.theme;document.querySelector('[data-a=theme]').textContent=dark()?'light theme':'dark theme'}
 
 /* camera */
-function apply(){world.style.transform=`translate(${cam.x}px,${cam.y}px) scale(${cam.s})`;cv.style.backgroundSize=`${24*cam.s}px ${24*cam.s}px`;cv.style.backgroundPosition=`${cam.x}px ${cam.y}px`;updateZero();save()}
+function apply(){world.style.transform=`translate(${cam.x}px,${cam.y}px) scale(${cam.s})`;cv.style.backgroundSize=`${24*cam.s}px ${24*cam.s}px`;cv.style.backgroundPosition=`${cam.x}px ${cam.y}px`;updateZero();zsync();save()}
 /* zero-point indicator: crosshair when visible, border-wrapping segment + arrow when off-screen */
 const rB=$('rb'),rS=$('rs');let rg={};
 function ringGeom(w,h){if(rg.w===w&&rg.h===h)return rg;
@@ -408,11 +425,11 @@ function updateZero(){
   ring(on,zx,zy,vw,vh)
 }
 addEventListener('resize',updateZero);
-function zoomAt(cx,cy,ns){ns=clamp(ns,.25,2);const k=ns/cam.s;cam.x=cx-(cx-cam.x)*k;cam.y=cy-(cy-cam.y)*k;cam.s=ns;apply()}
+function zoomAt(cx,cy,ns){ns=clamp(ns,ZMIN,ZMAX);const k=ns/cam.s;cam.x=cx-(cx-cam.x)*k;cam.y=cy-(cy-cam.y)*k;cam.s=ns;apply()}
 const wx=x=>(x-cam.x)/cam.s,wy=y=>(y-cam.y)/cam.s;
 let fl=0;function fly(t,d=460){cancelAnimationFrame(fl);if(RM.matches){Object.assign(cam,t);apply();return}const a={...cam},t0=performance.now();const step=n=>{const p=Math.min(1,(n-t0)/d),e=1-Math.pow(1-p,3);for(const k of['x','y','s'])cam[k]=a[k]+(t[k]-a[k])*e;apply();if(p<1)fl=requestAnimationFrame(step)};fl=requestAnimationFrame(step)}
 function view(f){const hh=fel(f.id).offsetHeight,s=clamp(Math.min((innerWidth-32)/FW,(innerHeight-150)/hh,1.15),.35,1.15);return{s,x:innerWidth/2-(f.x+FW/2)*s,y:innerHeight/2-(f.y+hh/2)*s}}
-function fit(anim){const L=V?F:C;if(!L.length)return;let a=1e9,b=1e9,c=-1e9,d=-1e9;L.forEach(f=>{const e=fel(f.id);a=Math.min(a,f.x);b=Math.min(b,f.y);c=Math.max(c,f.x+e.offsetWidth);d=Math.max(d,f.y+e.offsetHeight)});const s=clamp(Math.min((innerWidth-48)/(c-a),(innerHeight-150)/(d-b),1),.25,1),t={s,x:innerWidth/2-(a+c)/2*s,y:innerHeight/2-(b+d)/2*s};anim?fly(t):(Object.assign(cam,t),apply())}
+function fit(anim){const L=V?F:C;if(!L.length)return;let a=1e9,b=1e9,c=-1e9,d=-1e9;L.forEach(f=>{const e=fel(f.id);a=Math.min(a,f.x);b=Math.min(b,f.y);c=Math.max(c,f.x+e.offsetWidth);d=Math.max(d,f.y+e.offsetHeight)});const s=clamp(Math.min((innerWidth-48)/(c-a),(innerHeight-150)/(d-b),1),ZMIN,1),t={s,x:innerWidth/2-(a+c)/2*s,y:innerHeight/2-(b+d)/2*s};anim?fly(t):(Object.assign(cam,t),apply())}
 function vis(){const t=document.activeElement;if(!t||t.tagName!=='TEXTAREA')return;const lim=(vv?vv.height:innerHeight)-72,r=t.getBoundingClientRect();if(r.bottom>lim){cam.y-=r.bottom-lim;apply()}else if(r.top<70){cam.y+=70-r.top;apply()}}
 if(vv){const f=()=>{const k=Math.max(0,Math.round(innerHeight-vv.height-vv.offsetTop));root.style.setProperty('--kb',(k>60?k:0)+'px');vis()};vv.addEventListener('resize',f);vv.addEventListener('scroll',f)}
 cv.onscroll=()=>{cv.scrollTop=cv.scrollLeft=0};
@@ -536,7 +553,7 @@ if(fd)setCur(fd.dataset.id)});
 cv.addEventListener('pointermove',e=>{const p=P.get(e.pointerId);if(!p||!G)return;p.x=e.clientX;p.y=e.clientY;
 if(G.t==='pinch'){if(P.size<2)return;const[a,b]=[...P.values()],d=Math.hypot(a.x-b.x,a.y-b.y)||1;zoomAt((a.x+b.x)/2,(a.y+b.y)/2,cam.s*d/G.d);G.d=d;return}
 if(G.t==='none')return;const dx=e.clientX-G.sx,dy=e.clientY-G.sy;
-if(!G.moved){if(Math.hypot(dx,dy)<6)return;if(G.ta&&!G.touch){G.t='none';return}G.moved=true;try{cv.setPointerCapture(e.pointerId)}catch(_){}document.body.classList.add('grab')}
+if(!G.moved){if(Math.hypot(dx,dy)<6)return;if(G.ta&&!G.touch){G.t='none';return}G.moved=true;getSelection().removeAllRanges();try{cv.setPointerCapture(e.pointerId)}catch(_){}document.body.classList.add('grab')}
 if(G.t==='drag'){G.f.x=G.fx+dx/cam.s;G.f.y=G.fy+dy/cam.s;const el=fel(G.f.id);el.style.left=G.f.x+'px';el.style.top=G.f.y+'px';save()}
 else{cam.x=G.cx+dx;cam.y=G.cy+dy;apply()}});
 const end=e=>{P.delete(e.pointerId);if(!G)return;if(G.t==='pinch'){if(P.size<2){G=null;save()}return}
@@ -545,7 +562,7 @@ if(!V&&g.f){openCat(g.f);return}
 const now=Date.now(),k=g.f?g.f.id:'bg';
 if(last.k===k&&now-last.t<350&&!g.ta&&(g.f||!g.tgt.closest('.fold'))){last.k=null;g.f?rename(g.f):V?newFolder(wx(e.clientX),wy(e.clientY)):newCat(wx(e.clientX)-100,wy(e.clientY)-60)}else{last.k=k;last.t=now}};
 cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
-cv.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(fl);const m=e.deltaMode?16:1;if(e.ctrlKey||e.metaKey)zoomAt(e.clientX,e.clientY,cam.s*Math.exp(-e.deltaY*m*.01));else{cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;apply()}},{passive:false});
+cv.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(fl);const m=e.deltaMode?16:1;if(e.ctrlKey||e.metaKey)zoomAt(e.clientX,e.clientY,cam.s*Math.exp(-clamp(e.deltaY*m,-40,40)*.0075));else{cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;apply()}},{passive:false});
 document.addEventListener('pointerdown',()=>hint.style.opacity=0,{once:true});
 
 /* wheel */
@@ -653,7 +670,7 @@ const catMenu=c=>[
 
 const canvasMenu=(x,y)=>[
 V?{l:'new folder here',f:()=>newFolder(wx(x),wy(y))}:{l:'new category here',f:()=>newCat(wx(x)-100,wy(y)-60)},'-',
-{l:'fit all',f:()=>fit(true)},{l:'go to zero',f:home},'-',
+{l:'fit all',f:()=>fit(true)},{l:'zoom 100%',k:'0',f:()=>zoomTo(1)},{l:'go to zero',f:home},'-',
 {l:'undo',k:mod+'Z',f:undo},{l:'redo',k:mod+'⇧Z',f:redo},'-',
 V?{l:'back to categories',k:'Esc',f:closeCat}:null,
 {l:'switch category',k:'hold ⇧',f:()=>ow('tap')},'-',
@@ -662,7 +679,7 @@ V?{l:'back to categories',k:'Esc',f:closeCat}:null,
 function showCtx(x,y,t){const li=t.closest('li[data-id]'),fe=t.closest('.fold'),ce=t.closest('.cat'),o=fe||ce;if(o)setCur(o.dataset.id);
 openMenu(li?lineMenu(li.dataset.id):fe?foldMenu(fobj(fe.dataset.id)):ce?catMenu(fobj(ce.dataset.id)):canvasMenu(x,y),x,y)}
 addEventListener('contextmenu',e=>{const t=e.target;if(!t.closest)return;if(t.closest('#cm'))return e.preventDefault();
-if(W||t.closest('#hd,#tb,#ov,#file')||t.tagName==='INPUT')return;
+if(W||t.closest('#hd,#tb,#ov,#file,#zg')||t.tagName==='INPUT')return;
 e.preventDefault();if(G&&G.t!=='pinch')G.t='none';showCtx(e.clientX,e.clientY,t)});
 
 /* touch: long-press opens the same menu */
@@ -671,6 +688,32 @@ cv.addEventListener('pointerdown',e=>{clearTimeout(lp);if(e.pointerType!=='touch
 const x=e.clientX,y=e.clientY,t=e.target;
 lp=setTimeout(()=>{if(G&&G.t!=='pinch'&&!G.moved&&P.size===1){G.t='none';showCtx(x,y,t)}},550)});
 ['pointerup','pointercancel','pointermove'].forEach(n=>cv.addEventListener(n,()=>{if(n!=='pointermove'||(G&&G.moved))clearTimeout(lp)}));
+
+/* zoom: log-scaled range, gentler wheel, slosh gauge (vanilla port of react-bits SloshGauge) */
+const ZMIN=.12,ZMAX=2.5,LR=Math.log(ZMAX/ZMIN),s2v=s=>100*Math.log(clamp(s,ZMIN,ZMAX)/ZMIN)/LR,v2s=v=>ZMIN*Math.exp(clamp(v,0,100)/100*LR);
+const zg=$('zg');zg.insertAdjacentHTML('beforeend','<span class="zv"></span><div class="zl"><span class="zv"></span></div><div class="zt"></div><div class="zo"></div><div class="zm"></div>');
+const[zvA,zvB]=zg.querySelectorAll('.zv'),zl=zg.querySelector('.zl'),zm=zg.querySelector('.zm'),Z={x:s2v(1),v:0,L:s2v(1),raf:0,last:0,held:false,r:null};
+zg.querySelector('.zo').style.top=(100-s2v(1))+'%';
+function zpaint(){const W=zg.clientWidth,Hh=zg.clientHeight,th=RM.matches?0:clamp(.45*Z.v*.07,-30,30),lean=Math.tan(th*Math.PI/180)*W/2,top=100-Z.x;
+zl.style.clipPath=`polygon(0 calc(${top}% + ${lean}px),100% calc(${top}% - ${lean}px),100% 100%,0 100%)`;zm.style.transform=`translateY(${(100-Z.L)*Hh/100}px)`}
+function ztick(now){const dt=Z.last?Math.min((now-Z.last)/1000,.05):1/120;Z.last=now;
+const vis=.15,k=1224-1044*vis,zeta=RM.matches?1:.26-.17*vis,c=2*zeta*Math.sqrt(k),rest=RM.matches?0:.42;
+for(let n=Math.ceil(dt*120),hh=dt/n;n>0;n--){Z.v=Z.v*Math.exp(-c*hh)+k*(Z.L-Z.x)*hh;Z.x+=Z.v*hh;if(Z.x>100){Z.x=100;Z.v=-Z.v*rest}else if(Z.x<0){Z.x=0;Z.v=-Z.v*rest}}
+if(!Z.held&&Math.abs(Z.L-Z.x)<.05&&Math.abs(Z.v)<2){Z.x=Z.L;Z.v=0}
+zpaint();if(!Z.held&&Z.x===Z.L&&Z.v===0){Z.raf=0;Z.last=0}else Z.raf=requestAnimationFrame(ztick)}
+const zwake=()=>{if(!Z.raf)Z.raf=requestAnimationFrame(ztick)};
+function zsync(){const t=Math.round(cam.s*100)+'%';zvA.textContent=zvB.textContent=t;zg.setAttribute('aria-valuenow',Math.round(cam.s*100));zg.setAttribute('aria-valuetext',t);
+if(Z.held)return;const L=s2v(cam.s);if(Math.abs(L-Z.L)>.01){Z.L=L;zwake()}}
+const zoomTo=s=>{s=clamp(s,ZMIN,ZMAX);const k=s/cam.s,cx=innerWidth/2,cy=innerHeight/2;fly({x:cx-(cx-cam.x)*k,y:cy-(cy-cam.y)*k,s},260)};
+function zmove(e){const v=clamp((Z.r.bottom-e.clientY)/Z.r.height*100,0,100);let s=v2s(v);if(Math.abs(s-1)<.05)s=1;Z.L=s2v(s);cancelAnimationFrame(fl);zoomAt(innerWidth/2,innerHeight/2,s);zwake()}
+const zup=()=>{if(!Z.held)return;Z.held=false;zg.dataset.held=0;zwake()};
+zg.onpointerdown=e=>{if(e.button)return;Z.held=true;Z.r=zg.getBoundingClientRect();zg.dataset.held=1;try{zg.setPointerCapture(e.pointerId)}catch(_){}zmove(e)};
+zg.onpointermove=e=>{if(Z.held)zmove(e)};zg.onpointerup=zg.onpointercancel=zg.onlostpointercapture=zup;zg.ondblclick=()=>zoomTo(1);
+zg.onkeydown=e=>{const d=e.shiftKey?10:2,v=s2v(cam.s),m={ArrowUp:v+d,ArrowRight:v+d,ArrowDown:v-d,ArrowLeft:v-d,PageUp:v+10,PageDown:v-10,Home:0,End:100}[e.key];
+if(e.key==='0'){zoomTo(1);return}if(m==null)return;e.preventDefault();zoomAt(innerWidth/2,innerHeight/2,v2s(m))};
+addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||W||e.target.matches('textarea,input'))return;
+if(e.key==='='||e.key==='+')zoomTo(cam.s*1.15);else if(e.key==='-')zoomTo(cam.s/1.15);else if(e.key==='0')zoomTo(1)});
+zsync();zpaint();
 
 /* boot */
 paintTheme();chrome();renderAll();apply();
