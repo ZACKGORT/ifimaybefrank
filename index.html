@@ -564,17 +564,16 @@ const nid = () => 'n' + (++uid).toString(36) + '-' + Math.random().toString(36).
 const mk  = (t = '') => ({ id: nid(), t, c: null, s: false, z: false, k: [] });
 
 /* ══════════════════════════════════════════════════════
-   SEED — canonical demo.
+   SEED — canonical demo. #helpZack leads.
    text → t,  color → c,  shiny → s,  collapsed → z,  children → k
 ══════════════════════════════════════════════════════ */
 const SEED_DATA = {
   "app": "frankly",
   "version": 2,
-  "exportedAt": "2026-09-27T20:42:18.864Z",
-  "theme": "dark",
+  "exportedAt": "2026-09-28T19:46:44.200Z",
+  "theme": "light",
   "currentCategory": "non sequitur",
   "categories": [
-
     {
       "name": "non sequitur",
       "statements": [
@@ -638,7 +637,7 @@ const SEED_DATA = {
             },
             {
               "text": "Anyways",
-              "color": "#f2f0ea",
+              "color": null,
               "shiny": true,
               "collapsed": true,
               "children": [
@@ -734,19 +733,19 @@ const SEED_DATA = {
           "text": "Work",
           "color": null,
           "shiny": false,
-          "collapsed": true,
+          "collapsed": false,
           "children": [
             {
               "text": "Case Studies:",
               "color": "linear-gradient(90deg,#5227FF,#FF9FFC,#B497CF)",
-              "shiny": false,
-              "collapsed": false,
+              "shiny": true,
+              "collapsed": true,
               "children": [
                 {
                   "text": "BNY Mellon — Pershing X (https://raw.githubusercontent.com/ZACKGORT/never/main/images/avif/1-Oen-HCQm-Ga10wp-Cz-R8o9-Pt-A.avif)",
                   "color": "#0091ff",
                   "shiny": false,
-                  "collapsed": true,
+                  "collapsed": false,
                   "children": [
                     {
                       "text": "Wove.",
