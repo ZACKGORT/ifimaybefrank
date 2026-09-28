@@ -133,6 +133,10 @@ body.ed #tb{display:flex}#tb .b{min-height:36px;padding:0 10px;flex:none}
 #cv textarea,#cv input.fn:not([readonly]){user-select:text;-webkit-user-select:text}
 body.grab textarea{user-select:none;-webkit-user-select:none}
 .ed textarea::selection{background:color-mix(in srgb,var(--ink) 22%,transparent);color:inherit}
+/* movable HUD */
+#tb{align-items:center;padding:5px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 86%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 8px 28px rgba(0,0,0,.28)}
+#tb .hg{flex:none;width:18px;align-self:stretch;margin-right:2px;cursor:grab;touch-action:none;color:var(--mute);opacity:.6;background-image:radial-gradient(currentColor 1px,transparent 1.3px);background-size:5px 5px;background-position:center;transition:opacity .15s}
+#tb .hg:hover,#tb .hg:active{opacity:1}#tb .hg:active{cursor:grabbing}
 /* zoom slosh gauge */
 #zg{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:4;width:44px;height:140px;box-sizing:border-box;border-radius:14px;border:1px solid var(--line);overflow:clip;isolation:isolate;background:color-mix(in srgb,var(--ink) 9%,var(--bg));font:500 11px/1 var(--mono);font-variant-numeric:tabular-nums;cursor:ns-resize;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;transition:opacity .25s,border-color .2s}
 #zg:focus-visible,#zg[data-held='1']{border-color:var(--ink)}
@@ -714,6 +718,21 @@ if(e.key==='0'){zoomTo(1);return}if(m==null)return;e.preventDefault();zoomAt(inn
 addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||W||e.target.matches('textarea,input'))return;
 if(e.key==='='||e.key==='+')zoomTo(cam.s*1.15);else if(e.key==='-')zoomTo(cam.s/1.15);else if(e.key==='0')zoomTo(1)});
 zsync();zpaint();
+
+/* movable HUD: drag the grip; position is remembered, double-click grip to re-dock */
+const tb=$('tb'),hg=h('span','hg');hg.title='drag to move · double-click to re-dock';tb.prepend(hg);
+let tp=null;try{tp=JSON.parse(localStorage.getItem('frankly:hud'))}catch(_){}
+function tbPlace(){if(!tp||!isFinite(tp.x)||!isFinite(tp.y)){tb.style.left=tb.style.top=tb.style.bottom=tb.style.transform='';return}
+const r=tb.getBoundingClientRect(),w=r.width||320,hh=r.height||48,vh=vv?vv.height+vv.offsetTop:innerHeight;
+Object.assign(tb.style,{left:clamp(tp.x,4,Math.max(4,innerWidth-w-4))+'px',top:clamp(tp.y,4,Math.max(4,vh-hh-4))+'px',bottom:'auto',transform:'none'})}
+const hsave=()=>{try{tp?localStorage.setItem('frankly:hud',JSON.stringify(tp)):localStorage.removeItem('frankly:hud')}catch(_){}};
+hg.onmousedown=e=>e.preventDefault();
+hg.onpointerdown=e=>{e.preventDefault();e.stopPropagation();const r=tb.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top,id=e.pointerId;
+try{hg.setPointerCapture(id)}catch(_){}
+const mv=ev=>{tp={x:ev.clientX-ox,y:ev.clientY-oy};tbPlace()},up=()=>{hg.removeEventListener('pointermove',mv);hg.removeEventListener('pointerup',up);hg.removeEventListener('pointercancel',up);hsave()};
+hg.addEventListener('pointermove',mv);hg.addEventListener('pointerup',up);hg.addEventListener('pointercancel',up)};
+hg.ondblclick=()=>{tp=null;hsave();tbPlace()};
+addEventListener('focusin',()=>setTimeout(tbPlace,0));addEventListener('resize',tbPlace);if(vv)vv.addEventListener('resize',tbPlace);
 
 /* boot */
 paintTheme();chrome();renderAll();apply();
