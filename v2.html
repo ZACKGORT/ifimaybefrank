@@ -71,7 +71,7 @@ body.in #bc{display:inline}
 body.grab .fold.cur,.fold.rzg{box-shadow:var(--s3)}body.grab .cat.cur .cb{box-shadow:var(--s3)}
 .cf{z-index:10}
 .cpw,.cpl{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}.cpl{z-index:11}
-.cp{position:absolute;left:calc(8% + var(--k)*1.5%);right:calc(8% + var(--k)*1.5%);top:12%;height:52%;z-index:calc(6 - var(--k));box-sizing:border-box;padding:7px 9px;overflow:hidden;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);box-shadow:var(--s1);opacity:0;transform:translateY(10px);transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .2s}
+.cp{position:absolute;left:calc(8% + var(--k)*1.5%);right:calc(8% + var(--k)*1.5%);top:12%;height:52%;z-index:calc(6 - var(--k));box-sizing:border-box;padding:7px 9px;overflow:hidden;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);box-shadow:var(--s1);opacity:1;transform:translateY(calc(var(--k)*-4px - 5px));transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .2s}
 .cp b{display:block;margin-bottom:6px;font:400 9px/1 var(--mono);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cp i{display:block;width:55%;height:2px;margin-bottom:4px;border-radius:2px;background:var(--line)}
 .cpi{position:absolute;left:50%;top:0;height:26px;padding:0 12px;display:flex;align-items:center;box-sizing:border-box;border:1.5px solid var(--line);border-radius:13px;background:var(--bg);color:var(--ink);font:300 11px/1 var(--mono);white-space:nowrap;box-shadow:var(--s1);opacity:0;transform:translate(-50%,40px) scale(.6);transition:transform .3s cubic-bezier(.23,1,.32,1),opacity .15s}
@@ -641,7 +641,7 @@ function chrome(){document.body.classList.toggle('in',!!V);$('cn').value=V?V.nam
 function updateBC(){const el=$('bc');if(!el)return;if(!V){el.textContent='';return}const f=F.find(x=>x.id===cur);el.textContent=f&&f.name?'/ '+f.name:''}
 /* category folder: one paper sheet per file-tree (its root name + depth), root-node pills surface on hover */
 function rExtras(el,c){const T=c.trees,dp=a=>a.length?1+Math.max(...a.map(n=>dp(n.k))):0,pw=h('span','cpw');
-T.slice(0,4).forEach((t,i)=>{const p=h('span','cp');p.style.setProperty('--k',i);p.append(h('b','',t.name||'untitled'));const d=Math.min(3,Math.max(1,dp(t.tree)));for(let l=0;l<d;l++){const r=h('i');r.style.marginLeft=l*7+'px';p.append(r)}pw.append(p)});
+const has=n=>!!(n.t&&n.t.trim())||n.k.some(has);T.filter(t=>t.tree.some(has)).slice(0,4).forEach((t,i)=>{const p=h('span','cp');p.style.setProperty('--k',i);p.append(h('b','',t.name||'untitled'));const d=Math.min(3,Math.max(1,dp(t.tree)));for(let l=0;l<d;l++){const r=h('i');r.style.marginLeft=l*7+'px';p.append(r)}pw.append(p)});
 const roots=[];T.forEach(t=>t.tree.forEach(n=>{if(n.t)roots.push(n.t.replace(/\s+/g,' ').trim())}));
 const list=roots.slice(0,6).map(x=>x.length>24?x.slice(0,23)+'…':x);if(roots.length>6)list[5]='+'+(roots.length-5)+' more';
 const rows=[];let row=[],w=0;list.forEach((x,i)=>{const b=28+x.length*6.4;if(row.length&&w+10+b>300){rows.push({row,w});row=[];w=0}row.push({i,b});w+=(row.length>1?10:0)+b});if(row.length)rows.push({row,w});
