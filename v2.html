@@ -69,6 +69,14 @@ body.in #bc{display:inline}
 .fold.cur{box-shadow:var(--s2)}.cat.cur .cb{box-shadow:var(--s2)}
 .fold:hover,.fold:focus-within{box-shadow:var(--s2)}.cat:hover .cb{box-shadow:var(--s2)}
 body.grab .fold.cur,.fold.rzg{box-shadow:var(--s3)}body.grab .cat.cur .cb{box-shadow:var(--s3)}
+.cf{z-index:10}
+.cpw,.cpl{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}.cpl{z-index:11}
+.cp{position:absolute;left:calc(8% + var(--k)*1.5%);right:calc(8% + var(--k)*1.5%);top:12%;height:52%;z-index:calc(6 - var(--k));box-sizing:border-box;padding:7px 9px;overflow:hidden;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);box-shadow:var(--s1);opacity:0;transform:translateY(10px);transition:transform .4s cubic-bezier(.23,1,.32,1),opacity .2s}
+.cp b{display:block;margin-bottom:6px;font:400 9px/1 var(--mono);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp i{display:block;width:55%;height:2px;margin-bottom:4px;border-radius:2px;background:var(--line)}
+.cpi{position:absolute;left:50%;top:0;height:26px;padding:0 12px;display:flex;align-items:center;box-sizing:border-box;border:1.5px solid var(--line);border-radius:13px;background:var(--bg);color:var(--ink);font:300 11px/1 var(--mono);white-space:nowrap;box-shadow:var(--s1);opacity:0;transform:translate(-50%,40px) scale(.6);transition:transform .3s cubic-bezier(.23,1,.32,1),opacity .15s}
+@media(hover:hover){.cat:hover .cp{opacity:1;transform:translateY(calc(var(--k)*-9px));transition-delay:calc(var(--k)*40ms)}
+.cat:hover .cpi{opacity:1;transform:translate(calc(-50% + var(--x)),var(--y)) rotate(var(--r));transition:transform .52s cubic-bezier(.34,1.57,.64,1) calc(var(--i)*45ms),opacity .16s ease calc(var(--i)*45ms)}}
 .fold.rzg{transition:box-shadow .35s,border-color .25s}
 .fold.wide{width:380px}
 .fbody{flex:none}
@@ -243,10 +251,15 @@ body.ed #zg{opacity:0;pointer-events:none}
 #tour .tour-next{min-height:38px}
 #fx{position:fixed;inset:0;z-index:200;background:var(--bg);visibility:hidden;pointer-events:none;transform-origin:0 0;opacity:0;will-change:transform,opacity;contain:layout paint;transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s ease}
 body.fxo #cv,body.fxo #tb{visibility:hidden}
+body.sp,body.sp #cv{cursor:grab}body.spd,body.spd #cv{cursor:grabbing}
+body.sp .fold,body.sp .cat,body.sp .fold *,body.sp .cat *{pointer-events:none!important}
 #fx.on{visibility:visible;pointer-events:auto}#fx iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
-#fxb{position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));z-index:2;border:0;background:#000;color:#fff;font:400 11px/1 var(--mono);padding:9px 14px;border-radius:99px;cursor:pointer;opacity:.9;transition:opacity .2s,transform .2s}
+#fxb{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));right:max(14px,env(safe-area-inset-right));z-index:3;border:0;background:#000;color:#fff;font:400 11px/1 var(--mono);padding:9px 14px;border-radius:99px;cursor:pointer;opacity:.9;transition:opacity .2s,transform .2s}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) #fxb{background:#fff;color:#000}}
 :root[data-theme="dark"] #fxb{background:#fff;color:#000}
+.fxh{display:none;position:absolute;top:0;width:44px;height:44px;z-index:3;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M7 7l14 14M21 7L7 21' stroke='%23fff' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M7 7l14 14M21 7L7 21' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 14 14,pointer}
+@media(hover:hover) and (pointer:fine){.fxh{display:block}}
+.fxh.l{left:0}.fxh.r{right:0}
 #fxb:hover,#fxb:focus-visible{opacity:1;transform:scale(1.04)}
 </style>
 </head>
@@ -317,6 +330,7 @@ body.fxo #cv,body.fxo #tb{visibility:hidden}
           <div><dt>drag</dt><dd>Pan · move a card</dd></div>
           <div><dt>⌘ + scroll</dt><dd>Zoom</dd></div>
           <div><dt>right-click</dt><dd>Actions menu</dd></div>
+          <div><dt>hold space + drag</dt><dd>Pan from anywhere</dd></div>
           <div><dt>hold ⇧</dt><dd>Command wheel</dd></div>
           <div><dt>drag ▦ grip</dt><dd>Reorder a line</dd></div>
         </dl>
@@ -338,7 +352,7 @@ body.fxo #cv,body.fxo #tb{visibility:hidden}
   </div>
 </div>
 
-<div id="fx" aria-hidden="true"><button id="fxb" type="button">back to canvas</button></div>
+<div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
 <script>
 const $=id=>document.getElementById(id),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const K='frankly:canvas:v2',TOUR_K='frankly:tour:v1',FW=264,vv=visualViewport,root=document.documentElement,cv=$('cv'),world=$('w'),ov=$('ov'),wh=$('wh'),hint=$('hint'),zeroEl=$('zero'),edgeEl=$('edge');
@@ -756,9 +770,17 @@ function renderAll(){world.innerHTML='';(V?F:C).forEach(f=>world.append(V?rFold(
 const cnt=a=>a.reduce((s,n)=>s+1+cnt(n.k),0),swap=()=>{world.classList.remove('sw');void world.offsetWidth;world.classList.add('sw')};
 function chrome(){document.body.classList.toggle('in',!!V);$('cn').value=V?V.name:'';updateBC()}
 function updateBC(){const el=$('bc');if(!el)return;if(!V){el.textContent='';return}const f=F.find(x=>x.id===cur);el.textContent=f&&f.name?'/ '+f.name:''}
+/* category folder: one paper sheet per file-tree (its root name + depth), root-node pills surface on hover */
+function rExtras(el,c){const T=c.trees,dp=a=>a.length?1+Math.max(...a.map(n=>dp(n.k))):0,pw=h('span','cpw');
+T.slice(0,4).forEach((t,i)=>{const p=h('span','cp');p.style.setProperty('--k',i);p.append(h('b','',t.name||'untitled'));const d=Math.min(3,Math.max(1,dp(t.tree)));for(let l=0;l<d;l++){const r=h('i');r.style.marginLeft=l*7+'px';p.append(r)}pw.append(p)});
+const roots=[];T.forEach(t=>t.tree.forEach(n=>{if(n.t)roots.push(n.t.replace(/\s+/g,' ').trim())}));
+const list=roots.slice(0,6).map(x=>x.length>24?x.slice(0,23)+'…':x);if(roots.length>6)list[5]='+'+(roots.length-5)+' more';
+const rows=[];let row=[],w=0;list.forEach((x,i)=>{const b=28+x.length*6.4;if(row.length&&w+10+b>300){rows.push({row,w});row=[];w=0}row.push({i,b});w+=(row.length>1?10:0)+b});if(row.length)rows.push({row,w});
+const pl=h('span','cpl');rows.forEach((r,ri)=>{let x=-r.w/2;r.row.forEach(({i,b})=>{const j=Math.abs(Math.sin(i*12.9898+4.14)*43758.5453)%1,e=h('span','cpi',list[i]);e.style.setProperty('--i',i);e.style.setProperty('--x',(x+b/2+(ri%2?1:-1)*8).toFixed(1)+'px');e.style.setProperty('--y',(-46-ri*38-j*6).toFixed(1)+'px');e.style.setProperty('--r',((j*2-1)*7).toFixed(2)+'deg');pl.append(e);x+=b+10})});
+el.insertBefore(pw,el.querySelector('.cf'));el.append(pl)}
 function rCat(c){const el=h('div','cat'+(c.id===cur?' cur':'')),n=c.trees.reduce((s,t)=>s+cnt(t.tree),0);el.dataset.id=c.id;el.style.left=c.x+'px';el.style.top=c.y+'px';
 el.innerHTML='<span class="cb"></span><span class="cf"><span class="cl"></span><span class="cs"></span></span>';
-el.querySelector('.cl').textContent=c.name||'untitled';el.querySelector('.cs').textContent=n+(n===1?' item':' items');return el}
+el.querySelector('.cl').textContent=c.name||'untitled';el.querySelector('.cs').textContent=n+(n===1?' item':' items');rExtras(el,c);return el}
 function openCat(c){if(V===c)return;if(V)cams[V.id]={...cam};else rc={...cam};V=c;lastCat=c.id;F=c.trees;cur=F[0]&&F[0].id;const has=cams[c.id];if(has)Object.assign(cam,has);renderAll();chrome();tidy();has?apply():fit();swap()}
 /* spacing: if folders overlap (or forced), re-flow them into tidy columns */
 function tidy(force){if(!V||F.length<2)return false;const G=56,it=F.map(f=>{const e=fel(f.id);return e?{f,w:e.offsetWidth,h:e.offsetHeight}:null}).filter(Boolean);
@@ -1023,7 +1045,7 @@ V?{l:'tidy up folders',f:()=>{tidy(true);fit(true)}}:null,{l:'fit all',f:()=>fit
 V?{l:'back to categories',k:'Esc',f:closeCat}:null,
 {l:'switch category',k:'hold ⇧',f:()=>ow('tap')},'-',
 {l:'help & shortcuts',k:'?',f:openHelp},'-',
-{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',f:()=>act('theme')}];
+{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',f:()=>act('theme')},'-',{l:'reset demo',f:()=>{if(confirm('Reset demo? This replaces everything on the canvas.')){const b=document.querySelector('#acts [data-a=reset]');rs=1;b&&b.click()}}}];
 
 function showCtx(x,y,t){const li=t.closest('li[data-id]'),fe=t.closest('.fold'),ce=t.closest('.cat'),o=fe||ce;if(o)setCur(o.dataset.id);
 openMenu(li?lineMenu(li.dataset.id):fe?foldMenu(fobj(fe.dataset.id)):ce?catMenu(fobj(ce.dataset.id)):canvasMenu(x,y),x,y)}
@@ -1116,7 +1138,16 @@ addEventListener('message',e=>{if(!FX||e.source!==FX.ifr.contentWindow||!e.data)
 if(d.fx==='close')closeFocus();
 else if(d.fx==='theme'){theme=d.v==='dark'||d.v==='light'?d.v:null;paintTheme();save()}
 else if(d.fx==='save'){try{const p=JSON.parse(d.v),c=(p.list||[]).find(c=>c.id===f.id);if(!c)return;f.tree=adopt(c.tree);if(!f.tree.length)f.tree.push(mk());f.name=typeof c.name==='string'?c.name:f.name;save()}catch(_){}}});
-$('fxb').onclick=closeFocus;
+$('fxb').onclick=$('fxl').onclick=$('fxr').onclick=closeFocus;
+/* space = temporary pan tool (Figma-style): objects ignore the pointer, any drag pans the canvas */
+let SP=0;const spOn=()=>{if(!SP){SP=1;document.body.classList.add('sp')}},spOff=()=>{SP=0;document.body.classList.remove('sp','spd')};
+const spOk=()=>{const a=document.activeElement,t=a&&a.tagName;if(FX||W||!cm.hidden||document.body.classList.contains('ed'))return false;if(t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||(a&&a.isContentEditable))return false;return a===document.body||!a||cv.contains(a)};
+addEventListener('keydown',e=>{if(e.code!=='Space'||e.metaKey||e.ctrlKey||e.altKey)return;if(SP){e.preventDefault();return}if(e.repeat||!spOk())return;e.preventDefault();spOn()},true);
+addEventListener('keyup',e=>{if(e.code==='Space'&&SP){e.preventDefault();spOff()}},true);
+addEventListener('blur',spOff);document.addEventListener('visibilitychange',()=>{if(document.hidden)spOff()});
+cv.addEventListener('pointerdown',()=>{if(SP)document.body.classList.add('spd')},true);
+addEventListener('pointerup',()=>document.body.classList.remove('spd'),true);addEventListener('pointercancel',()=>document.body.classList.remove('spd'),true);
+
 addEventListener('keydown',e=>{if(FX&&e.key==='Escape'){e.preventDefault();e.stopPropagation();closeFocus()}},true);
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==='f'){e.preventDefault();if(FX)closeFocus();else{const f=fobj(cur);if(V&&f)openFocus(f)}}});
 </script>
