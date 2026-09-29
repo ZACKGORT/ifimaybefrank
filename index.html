@@ -58,6 +58,7 @@ body.in #bc{display:inline}
 .fold{position:absolute;width:264px;min-width:180px;box-sizing:border-box;padding:8px 16px 14px;background:var(--bg);border:1px solid var(--line);border-radius:14px;transition:border-color .25s;display:flex;flex-direction:column}
 .fold.cur{border-color:color-mix(in srgb,var(--ink) 55%,var(--bg))}
 .fold.rzg{transition:none}
+.fold.cur,.cat.cur{z-index:4}.fold:hover,.cat:hover,.fold:focus-within{z-index:5}body.grab .fold.cur,body.grab .cat.cur,.fold.rzg{z-index:6}
 .fold.wide{width:380px}
 .fbody{flex:none}
 .fh{display:flex;align-items:center;gap:8px;cursor:grab;touch-action:none;flex:none}
