@@ -1045,7 +1045,7 @@ V?{l:'tidy up folders',f:()=>{tidy(true);fit(true)}}:null,{l:'fit all',f:()=>fit
 V?{l:'back to categories',k:'Esc',f:closeCat}:null,
 {l:'switch category',k:'hold ⇧',f:()=>ow('tap')},'-',
 {l:'help & shortcuts',k:'?',f:openHelp},'-',
-{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',f:()=>act('theme')},'-',{l:'reset demo',f:()=>{if(confirm('Reset demo? This replaces everything on the canvas.')){const b=document.querySelector('#acts [data-a=reset]');rs=1;b&&b.click()}}}];
+{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',f:()=>act('theme')},{l:'sound: '+(SND?'on':'off'),f:toggleSnd},'-',{l:'reset demo',f:()=>{if(confirm('Reset demo? This replaces everything on the canvas.')){const b=document.querySelector('#acts [data-a=reset]');rs=1;b&&b.click()}}}];
 
 function showCtx(x,y,t){const li=t.closest('li[data-id]'),fe=t.closest('.fold'),ce=t.closest('.cat'),o=fe||ce;if(o)setCur(o.dataset.id);
 openMenu(li?lineMenu(li.dataset.id):fe?foldMenu(fobj(fe.dataset.id)):ce?catMenu(fobj(ce.dataset.id)):canvasMenu(x,y),x,y)}
@@ -1119,7 +1119,7 @@ const shim='<script>(function(){var B='+boot+',K="frankly:categories:v1",KT="fra
 +'var S={getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v);if(k===K)parent.postMessage({fx:"save",v:v},"*");else if(k===KT)parent.postMessage({fx:"theme",v:v},"*")},removeItem:function(k){delete m[k]},clear:function(){m={}},key:function(i){return Object.keys(m)[i]||null},get length(){return Object.keys(m).length}};'
 +'try{Object.defineProperty(window,"localStorage",{get:function(){return S},configurable:true})}catch(e){}'
 +'addEventListener("message",function(e){if(e.data&&e.data.fx==="flush")dispatchEvent(new Event("pagehide"))});'
-+'addEventListener("keydown",function(e){var a=document.activeElement,t=a&&a.tagName,d=document.getElementById("menu"),w=document.getElementById("wheelOverlay");if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==="F"||e.key==="f")||(e.key==="Escape"&&!(t==="INPUT"||t==="TEXTAREA"||(a&&a.isContentEditable)||(d&&d.style.display==="flex")||(w&&w.classList.contains("on"))))){e.preventDefault();parent.postMessage({fx:"close"},"*")}},true)})()<\/script>';
++'addEventListener("keydown",function(e){var a=document.activeElement,t=a&&a.tagName,d=document.getElementById("menu"),w=document.getElementById("wheelOverlay");if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==="F"||e.key==="f")||(e.key==="Escape"&&!(t==="INPUT"||t==="TEXTAREA"||(a&&a.isContentEditable)||(d&&d.style.display==="flex")||(w&&w.classList.contains("on"))))){e.preventDefault();parent.postMessage({fx:"close"},"*")}},true);document.addEventListener("pointerdown",function(){parent.postMessage({fx:"snd",k:"tap"},"*")},true);addEventListener("keydown",function(e){var k=e.key==="Enter"?"flick":e.key==="Tab"?"slide":0;if(k)parent.postMessage({fx:"snd",k:k},"*")},true)})()<\/script>';
 const doc=nsSrc().replace(/<head>/i,m=>m+shim);
 const ifr=document.createElement('iframe');ifr.title='focus mode';ifr.srcdoc=doc;
 fxEl.prepend(ifr);FX={f,ifr};
@@ -1136,6 +1136,7 @@ fxEl.style.opacity=0;
 setTimeout(()=>{fxEl.classList.remove('on');fxEl.setAttribute('aria-hidden','true');fxEl.style.opacity='';fxEl.style.transform='';x.ifr.remove();FX=null;if(fel(x.f.id))rr(x.f)},520)}
 addEventListener('message',e=>{if(!FX||e.source!==FX.ifr.contentWindow||!e.data)return;const d=e.data,f=FX.f;
 if(d.fx==='close')closeFocus();
+else if(d.fx==='snd')snd(String(d.k));
 else if(d.fx==='theme'){theme=d.v==='dark'||d.v==='light'?d.v:null;paintTheme();save()}
 else if(d.fx==='save'){try{const p=JSON.parse(d.v),c=(p.list||[]).find(c=>c.id===f.id);if(!c)return;f.tree=adopt(c.tree);if(!f.tree.length)f.tree.push(mk());f.name=typeof c.name==='string'?c.name:f.name;save()}catch(_){}}});
 $('fxb').onclick=$('fxl').onclick=$('fxr').onclick=closeFocus;
@@ -1147,6 +1148,33 @@ addEventListener('keyup',e=>{if(e.code==='Space'&&SP){e.preventDefault();spOff()
 addEventListener('blur',spOff);document.addEventListener('visibilitychange',()=>{if(document.hidden)spOff()});
 cv.addEventListener('pointerdown',()=>{if(SP)document.body.classList.add('spd')},true);
 addEventListener('pointerup',()=>document.body.classList.remove('spd'),true);addEventListener('pointercancel',()=>document.body.classList.remove('spd'),true);
+/* paper sound: synthesized, very soft filtered-noise rustles (no audio files); toggle in the canvas menu */
+let AC=null,NB=null,MG=null,SND=(()=>{try{return localStorage.getItem('frankly:sound')!=='off'}catch(_){return true}})();
+const ensureAC=()=>{if(AC){if(AC.state==='suspended')AC.resume();return}const X=window.AudioContext||window.webkitAudioContext;if(!X)return;AC=new X();
+NB=AC.createBuffer(1,AC.sampleRate*1.5,AC.sampleRate);const d=NB.getChannelData(0);let b=0;for(let i=0;i<d.length;i++){b=b*.55+(Math.random()*2-1)*.45;d[i]=b*1.6}
+MG=AC.createBiquadFilter();MG.type='lowpass';MG.frequency.value=6500;const g=AC.createGain();g.gain.value=.9;MG.connect(g);g.connect(AC.destination)};
+['pointerdown','keydown'].forEach(t=>addEventListener(t,ensureAC,{capture:true,passive:true}));
+const SK={tap:{d:.045,a:3400,b:2600,q:.9,v:.05},flick:{d:.05,a:5200,b:4200,q:.8,v:.04},slide:{d:.15,a:2600,b:1500,q:.7,v:.035,w:2},rustle:{d:.16,a:2400,b:4200,q:.8,v:.03,w:3},lift:{d:.1,a:1700,b:3300,q:.9,v:.05},set:{d:.07,a:1100,b:800,q:.9,v:.07},open:{d:.24,a:2000,b:4400,q:.7,v:.045,w:3},close:{d:.2,a:4200,b:1800,q:.7,v:.04,w:2}},SL={};
+function snd(k){if(!SND||!AC||!NB)return;const p=SK[k];if(!p)return;const n=performance.now();if(SL[k]&&n-SL[k]<45)return;SL[k]=n;
+const t=AC.currentTime,r=.92+Math.random()*.16,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=NB;f.type='bandpass';f.Q.value=p.q;
+f.frequency.setValueAtTime(p.a*r,t);f.frequency.exponentialRampToValueAtTime(p.b*r,t+p.d);g.gain.setValueAtTime(.0001,t);
+if(p.w){const u=p.d/p.w;for(let i=0;i<p.w;i++){g.gain.linearRampToValueAtTime(p.v*(.55+Math.random()*.45),t+i*u+.006);g.gain.linearRampToValueAtTime(p.v*.15,t+(i+1)*u*.85)}}else g.gain.linearRampToValueAtTime(p.v,t+.004);
+g.gain.exponentialRampToValueAtTime(.0001,t+p.d);s.connect(f);f.connect(g);g.connect(MG);s.start(t,Math.random()*.9);s.stop(t+p.d+.03)}
+function toggleSnd(){SND=!SND;try{localStorage.setItem('frankly:sound',SND?'on':'off')}catch(_){}if(SND){ensureAC();snd('tap')}toast('sound '+(SND?'on':'off'))}
+let LF=0;
+document.addEventListener('pointerover',e=>{const c=e.target.closest&&e.target.closest('.cat');if(c&&e.pointerType==='mouse'&&!c.contains(e.relatedTarget))snd('rustle')},true);
+cv.addEventListener('pointerdown',e=>{if(SP){snd('tap');return}if(e.target.closest('.fh,.cat')){LF=1;snd('lift')}else if(e.target.closest('button'))snd('tap')},true);
+addEventListener('pointerup',()=>{if(LF&&G&&G.moved)snd('set');LF=0},true);
+addEventListener('keydown',e=>{const t=e.target;if(t&&(t.tagName==='TEXTAREA'||t.isContentEditable)&&!e.metaKey&&!e.ctrlKey){if(e.key==='Enter')snd('flick');else if(e.key==='Tab')snd('slide')}},true);
+new MutationObserver(()=>{if(!cm.hidden)snd('tap')}).observe(cm,{attributes:true,attributeFilter:['hidden']});
+try{const o=openCat;openCat=function(){snd('open');return o.apply(this,arguments)}}catch(_){}
+try{const o=closeCat;closeCat=function(){snd('close');return o.apply(this,arguments)}}catch(_){}
+try{const o=openFocus;openFocus=function(){snd('open');return o.apply(this,arguments)}}catch(_){}
+try{const o=closeFocus;closeFocus=function(){snd('close');return o.apply(this,arguments)}}catch(_){}
+try{const o=newFolder;newFolder=function(){snd('flick');return o.apply(this,arguments)}}catch(_){}
+try{const o=undo;undo=function(){snd('slide');return o.apply(this,arguments)}}catch(_){}
+try{const o=redo;redo=function(){snd('slide');return o.apply(this,arguments)}}catch(_){}
+
 
 addEventListener('keydown',e=>{if(FX&&e.key==='Escape'){e.preventDefault();e.stopPropagation();closeFocus()}},true);
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLowerCase()==='f'){e.preventDefault();if(FX)closeFocus();else{const f=fobj(cur);if(V&&f)openFocus(f)}}});
