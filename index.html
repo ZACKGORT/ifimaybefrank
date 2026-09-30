@@ -309,6 +309,18 @@ body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-me
 @media(pointer:coarse){#sf button{min-height:44px}}
 body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0392b}
 @media(max-width:900px){#hd .l{flex:1;min-width:0}#cn{flex:1;width:auto;min-width:40px}#bk{font-size:16px}#sf{top:calc(env(safe-area-inset-top,0px) + 58px)}#lt{padding-top:calc(env(safe-area-inset-top,0px) + 112px)}}
+
+#pal{position:fixed;inset:0;z-index:48;display:none}#pal.on{display:block}
+.pal-bg{position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pal-box{position:absolute;left:50%;top:max(12vh,calc(env(safe-area-inset-top,0px) + 56px));transform:translateX(-50%);width:min(620px,calc(100vw - 24px));max-height:min(520px,calc(100dvh - 120px));display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.35);overflow:hidden}
+#pali{border:0;outline:0;background:none;color:var(--ink);font:400 17px/1.2 var(--sans);padding:18px;width:100%;box-sizing:border-box;border-bottom:1px solid var(--line)}#pali::placeholder{color:var(--mute)}
+#pall{overflow-y:auto;padding:6px;overscroll-behavior:contain}
+.pg{font:300 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);padding:10px 10px 6px}
+.po{display:flex;align-items:baseline;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:var(--ink)}.po.hl{background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.po .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 14px/1.3 var(--sans)}
+.po .s,.po .k{flex:0 1 38%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute);font:300 10px/1.3 var(--mono);text-align:right}
+.po mark{background:none;color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.pe{padding:26px 14px;text-align:center;color:var(--mute);font:400 13px/1.5 var(--sans)}
 </style>
 </head>
 <body>
@@ -332,7 +344,7 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 <div id="zg" role="slider" tabindex="0" aria-label="Zoom" aria-orientation="vertical" aria-valuemin="12" aria-valuemax="250" title="drag to zoom · double-click for 100%"></div>
 <div id="tb"></div>
 <div id="ov" aria-hidden="true"><div id="wh"></div><button class="b" id="cx">close</button>
-<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="help">help</button><button class="b" data-a="reset">reset demo</button><button class="b" data-a="delcat">delete category</button></div></div>
+<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="search">search</button><button class="b" data-a="help">help</button><button class="b" data-a="reset">reset demo</button><button class="b" data-a="delcat">delete category</button></div></div>
 <input type="file" id="file" accept="application/json,.json" hidden>
 <div id="cm" hidden></div>
 <div id="toasts" aria-live="polite" aria-atomic="false"></div>
@@ -343,10 +355,12 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
   <button data-a="line" role="menuitem"><span>New line</span><span class="k">↵</span></button>
   <button data-a="folder" role="menuitem"><span>New folder here</span></button>
   <button data-a="category" role="menuitem"><span>New category</span></button>
+  <button data-a="search" role="menuitem"><span>Search &amp; commands</span><span class="k">⌘K</span></button>
   <hr>
   <button data-a="help" role="menuitem"><span>How it works</span><span class="k">?</span></button>
 </div>
 <div id="modal-root"></div>
+<div id="pal" role="dialog" aria-modal="true" aria-label="Search and commands" aria-hidden="true"><div class="pal-bg" id="palbg"></div><div class="pal-box"><input id="pali" type="text" role="combobox" aria-expanded="true" aria-controls="pall" aria-autocomplete="list" aria-label="Search letters, lines and actions" placeholder="Jump to a letter, line or action…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><div id="pall" role="listbox" aria-label="Results"></div></div></div>
 <div id="help" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="helptitle">
   <div class="help-bg" data-close></div>
   <div class="help-body">
@@ -375,6 +389,7 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
           <div><dt>drag</dt><dd>Pan · move a card</dd></div>
           <div><dt>⌘ + scroll</dt><dd>Zoom</dd></div>
           <div><dt>right-click</dt><dd>Actions menu</dd></div>
+          <div><dt>⌘ K</dt><dd>Search &amp; commands</dd></div>
           <div><dt>hold space + drag</dt><dd>Pan from anywhere</dd></div>
           <div><dt>hold ⇧</dt><dd>Command wheel</dd></div>
           <div><dt>drag ▦ grip</dt><dd>Reorder a line</dd></div>
@@ -786,7 +801,7 @@ const delCat=async()=>{if(!V)return;const ok=await confirmModal('Delete "'+(V.na
 $('mb').onclick=()=>ow('tap');
 addEventListener('keydown',e=>{
 if(W){if(e.key==='Escape'){e.preventDefault();cw(false)}else if(e.key==='Enter'){e.preventDefault();cw(true)}else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();W.tg=clamp(Math.round(W.tg)+(e.key==='ArrowUp'?-1:1),0,C.length)}return}
-if(e.key==='Escape'&&V&&!e.target.matches('textarea,input')){closeCat();return}
+if(e.key==='Escape'&&V&&!escDlg&&!e.target.matches('textarea,input')){closeCat();return}
 if(e.key==='Shift'&&!e.repeat)sT=setTimeout(()=>ow('shift'),380);else clearTimeout(sT);
 if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();e.shiftKey?redo():undo()}});
 addEventListener('keyup',e=>{if(e.key==='Shift'){clearTimeout(sT);if(W&&W.m==='shift')cw(true)}});
@@ -805,6 +820,7 @@ fabMenu.onclick=e=>{const b=e.target.closest('button[data-a]');if(!b)return;e.st
   else if(a==='folder'){if(!V){toast('Open a category first',{kind:'error'});return}lvOn()?lvNew():newFolder(wx(innerWidth/2),wy(innerHeight/2));toast('New folder created')}
   else if(a==='category'){newCat((C.length%4)*260,Math.floor(C.length/4)*230);toast('New category created')}
   else if(a==='help'){openHelp()}
+  else if(a==='search'){openPal()}
 };
 addEventListener('pointerdown',e=>{if(!fabMenu.classList.contains('on'))return;if(e.target.closest('#fab,#fab-menu'))return;setFabOpen(false)},true);
 addEventListener('keydown',e=>{if(e.key==='Escape'&&fabMenu.classList.contains('on'))setFabOpen(false)});
@@ -852,6 +868,7 @@ if(a==='fit'){cw(false);fit(true)}
 else if(a==='import')$('file').click();
 else if(a==='export'){const d={app:'frankly',version:2,exportedAt:new Date().toISOString(),theme:dark()?'dark':'light',categories:C.map(c=>({name:c.name,x:Math.round(c.x),y:Math.round(c.y),statements:c.trees.map(t=>({text:t.name,x:Math.round(t.x),y:Math.round(t.y),...(t.w?{w:Math.round(t.w)}:{}),collapsed:false,children:un(t.tree)}))}))},l=h('a');l.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));l.download='frankly-canvas.json';l.click();setTimeout(()=>URL.revokeObjectURL(l.href),1000);toast('Exported frankly-canvas.json')}
 else if(a==='theme'){theme=dark()?'light':'dark';paintTheme();save()}
+else if(a==='search'){cw(false);openPal()}
 else if(a==='help'){cw(false);openHelp()}
 else if(a==='delcat'){cw(false);delCat()}
 else if(a==='reset'){if(rs){rs=0;b.textContent='reset demo';cw(false);C=seed();V=null;F=[];lastCat=null;rc={x:0,y:0,s:1};cams={};H=[];hi=0;Object.assign(cam,{x:0,y:0,s:1});chrome();renderAll();fit();save();toast('Demo reset')}else{rs=1;b.textContent='tap again to reset';setTimeout(()=>{rs=0;b.textContent='reset demo'},2500)}}});
@@ -1107,6 +1124,68 @@ $('sf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)sfS
 addEventListener('keydown',e=>{if(!lvOn()||W||FX||e.metaKey||e.ctrlKey||e.altKey||(e.target.closest&&e.target.closest('textarea,input,[contenteditable]')))return;
   if(e.key==='ArrowLeft'){e.preventDefault();lvGo(lvI-1)}else if(e.key==='ArrowRight'){e.preventDefault();lvGo(lvI+1)}});
 lvRender();
+
+/* ══ command palette (⌘K) ══ */
+const palEl=$('pal'),palI=$('pali'),palL=$('pall');let palR=[],palH=0;
+const tx=a=>{for(const n of a){if(n.t&&n.t.trim())return n.t.trim().slice(0,60);const r=tx(n.k);if(r)return r}return''};
+const fname=f=>(f.name&&f.name.trim())||tx(f.tree)||'untitled';
+const fabDo=a=>{const b=fabMenu.querySelector(`[data-a="${a}"]`);if(b)b.click()};
+const psc=(text,toks)=>{const L=text.toLowerCase();let s=0;for(const t of toks){const i=L.indexOf(t);if(i<0)return -1;s+=100-Math.min(i,50)+(i===0||L[i-1]===' '?25:0)}return s};
+function palActs(){const v=!!V,a=[];
+  if(v){a.push(['New line',()=>fabDo('line'),'↵'],[lvOn()?'New letter':'New folder',()=>fabDo('folder')])}
+  a.push(['New category',()=>fabDo('category')]);
+  if(v&&fobj(cur))a.push(['Focus mode',()=>openFocus(fobj(cur)),mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F']);
+  if(v)a.push(['All categories',()=>sfSet('folders'),'Esc']);
+  if(!v||LV)a.push(['Canvas view',()=>sfSet('canvas')]);if(!v||!LV)a.push(['Letters view',()=>sfSet('letters')]);
+  a.push(['Undo',undo,mod+'Z'],['Redo',redo,mod+'⇧Z'],[dark()?'Switch to light theme':'Switch to dark theme',()=>act('theme')],['Export backup',()=>act('export')],['Import…',()=>act('import')],['Help & shortcuts',openHelp,'?'],['Take the tour',openTour]);
+  return a}
+function goFolder(c,f,cb){if(V!==c){LI[c.id]=f.id;openCat(c)}cur=f.id;
+  if(lvOn()){const i=lvOrder().findIndex(x=>x.id===f.id);if(i>=0)lvGo(i)}else{setCur(f.id);if(fel(f.id))fly(view(f))}
+  if(cb)setTimeout(cb,RM.matches?0:450)}
+function goLine(c,f,n){let ch=false;(function w(a,anc){for(const x of a){if(x===n){anc.forEach(z=>{if(z.z){z.z=false;ch=true}});return true}if(w(x.k,anc.concat(x)))return true}return false})(f.tree,[]);
+  goFolder(c,f,()=>{if(ch)rr(f);fo(n.id);const li=QR().querySelector(`li[data-id="${n.id}"]`);if(li)li.scrollIntoView({block:'center',behavior:RM.matches?'auto':'smooth'})})}
+function palBuild(q){const toks=q.trim().toLowerCase().split(/\s+/).filter(Boolean),any=toks.length>0,G=[];
+  const top=(arr,n)=>arr.filter(x=>!any||x.s>=0).sort((a,b)=>b.s-a.s).slice(0,n);
+  const A=top(palActs().map(([t,f,k])=>({t,f,k,s:psc(t,toks)})),any?5:8);
+  const Cs=top(C.map(c=>({t:c.name||'untitled',sub:c.trees.length+(c.trees.length===1?' letter':' letters'),f:()=>{if(V!==c)openCat(c)},s:psc(c.name||'untitled',toks)})),5);
+  const Ls=[];C.forEach(c=>{if(!any&&c!==V)return;c.trees.forEach(f=>{const t=fname(f);Ls.push({t,sub:c.name||'untitled',f:()=>goFolder(c,f),s:(x=>x<0?x:x+(c===V?5:0))(psc(t+' '+(c.name||''),toks))})})});
+  const Ln=[];if(any&&toks.join('').length>1)for(const c of C)for(const f of c.trees)(function w(a){for(const n of a){if(Ln.length>=40)return;const s=n.t?psc(n.t,toks):-1;if(s>=0)Ln.push({t:n.t.trim().slice(0,110),sub:(c.name||'untitled')+' › '+fname(f),f:()=>goLine(c,f,n),s:s-30+(c===V?5:0)});w(n.k)}})(f.tree);
+  const add=(name,items)=>{if(items.length)G.push({name,items,b:items[0].s})};
+  add('Actions',A);add('Categories',Cs);add(any?'Letters':'Letters here',top(Ls,any?6:12));add('Lines',top(Ln,8));
+  return{G:any?G.sort((a,b)=>b.b-a.b):G,toks}}
+function palHL(el,text,toks){const L=text.toLowerCase(),r=[];toks.forEach(t=>{const i=L.indexOf(t);if(i>=0)r.push([i,i+t.length])});r.sort((a,b)=>a[0]-b[0]);let p=0;r.forEach(([a,b])=>{if(a<p)return;if(a>p)el.append(text.slice(p,a));el.append(h('mark','',text.slice(a,b)));p=b});if(p<text.length)el.append(text.slice(p))}
+function palRender(){const q=palI.value,{G,toks}=palBuild(q);palR=[];palL.replaceChildren();
+  if(!G.length){palL.append(h('div','pe',q.trim()?'Nothing matches “'+q.trim()+'”. Try a word from a line, a letter or category name, or an action like “export”.':'Nothing here yet.'));palI.removeAttribute('aria-activedescendant');return}
+  G.forEach(g=>{const box=h('div');box.setAttribute('role','group');box.setAttribute('aria-label',g.name);box.append(h('div','pg',g.name));
+    g.items.forEach(it=>{const i=palR.length,o=h('div','po'),t=h('span','t');o.id='po'+i;o.setAttribute('role','option');o.setAttribute('aria-selected','false');palHL(t,it.t,toks);o.append(t);
+      if(it.sub)o.append(h('span','s',it.sub));if(it.k)o.append(h('span','k',it.k));
+      o.onmousemove=()=>{if(palH!==i)palSel(i)};o.onmousedown=e=>e.preventDefault();o.onclick=()=>palRun(i);palR.push({it,o});box.append(o)});palL.append(box)});
+  palSel(0)}
+function palSel(i){if(!palR.length)return;i=(i+palR.length)%palR.length;palH=i;palR.forEach((r,j)=>{r.o.classList.toggle('hl',j===i);r.o.setAttribute('aria-selected',String(j===i))});palI.setAttribute('aria-activedescendant','po'+i);palR[i].o.scrollIntoView({block:'nearest'})}
+function palRun(i){const r=palR[i];if(!r)return;closePal();setTimeout(()=>r.it.f(),0)}
+function openPal(){if(FX||palEl.classList.contains('on')||helpEl.classList.contains('on')||tourEl.classList.contains('on')||$('modal-root').querySelector('.modal'))return;closeMenu();setFabOpen(false);if(W)cw(false);palEl.classList.add('on');palEl.setAttribute('aria-hidden','false');palI.value='';palRender();palI.focus()}
+function closePal(){palEl.classList.remove('on');palEl.setAttribute('aria-hidden','true')}
+palI.addEventListener('input',palRender);$('palbg').onclick=closePal;
+palI.addEventListener('keydown',e=>{const k=e.key;
+  if(k==='ArrowDown'){e.preventDefault();palSel(palH+1)}else if(k==='ArrowUp'){e.preventDefault();palSel(palH-1)}
+  else if(k==='Enter'){e.preventDefault();if(!e.isComposing)palRun(palH)}else if(k==='Escape'){e.preventDefault();closePal()}else if(k==='Tab')e.preventDefault();
+  e.stopPropagation()});
+addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&(e.key||'').toLowerCase()==='k'){e.preventDefault();e.stopPropagation();palEl.classList.contains('on')?closePal():openPal()}},true);
+
+/* ══ a11y: dialogs make the background inert and give focus back ══ */
+const DL=[[helpEl,()=>helpEl.classList.contains('on')],[tourEl,()=>tourEl.classList.contains('on')],[palEl,()=>palEl.classList.contains('on')],[$('modal-root'),()=>!!$('modal-root').querySelector('.modal')],[fxEl,()=>!!FX]],TR=new Map();let lastF=null;
+addEventListener('focusin',e=>{if(!DL.some(([el])=>el.contains(e.target)))lastF=e.target},true);
+function trapSync(){DL.forEach(([el,open])=>{const on=open(),t=TR.get(el);
+  if(on&&!t){const off=[...document.body.children].filter(c=>c!==el&&!c.contains(el)&&!/^(SCRIPT|STYLE|LINK)$/.test(c.tagName)&&c.id!=='toasts'&&!c.inert);off.forEach(c=>{c.inert=true});TR.set(el,{off,prev:lastF});
+    if(!el.contains(document.activeElement)){const b=el.querySelector('input,textarea,button,[href]');if(b)b.focus()}}
+  else if(!on&&t){TR.delete(el);t.off.forEach(c=>{c.inert=false});const p=t.prev;if(p&&document.contains(p)){try{p.focus({preventScroll:true})}catch(_){}}}})}
+let escDlg=false;addEventListener('keydown',e=>{if(e.key==='Escape'){escDlg=DL.some(([,o])=>o());setTimeout(()=>{escDlg=false},0)}},true);
+DL.forEach(([el])=>new MutationObserver(trapSync).observe(el,{attributes:true,attributeFilter:['class'],childList:true}));setInterval(trapSync,400);
+
+/* ══ a11y: tree semantics ══ */
+function ariaTree(){document.querySelectorAll('.fold .fbody>ul.kids').forEach(ul=>{ul.setAttribute('role','tree');ul.setAttribute('aria-label','Lines');(function w(u,d){for(const li of u.children){if(li.tagName!=='LI')continue;li.setAttribute('role','treeitem');li.setAttribute('aria-level',d);const k=li.querySelector(':scope>ul.kids');if(k){li.setAttribute('aria-expanded',String(!li.classList.contains('z')));k.setAttribute('role','group');w(k,d+1)}else li.removeAttribute('aria-expanded')}})(ul,1)})}
+let aq=0;const ariaQ=()=>{if(aq)return;aq=requestAnimationFrame(()=>{aq=0;ariaTree()})};
+[world,ltk].forEach(el=>new MutationObserver(ariaQ).observe(el,{childList:true,subtree:true,attributes:true,attributeFilter:['class']}));ariaQ();
 </script>
 <script type="text/plain" id="ns-src"><!DOCTYPE html>
 <html lang="en">
