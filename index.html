@@ -980,17 +980,17 @@ document.addEventListener('pointerdown',()=>{hint.style.opacity=0},{once:true});
 const fxEl=$('fx');let FX=null;
 const adopt=a=>(Array.isArray(a)?a:[]).map(x=>({id:x.id||nid(),t:String(x.t||''),c:typeof x.c==='string'?x.c:null,s:!!x.s,z:!!x.z,k:adopt(x.k)}));
 const nsSrc=()=>document.getElementById('ns-src').textContent.replace(/<\\\/script/g,'<\/script');
-function openFocus(f){if(FX)return;closeMenu();flush();
+function openFocus(f){if(FX)return;closeMenu();flush();const ord=lvOrder();
 const el=fel(f.id),r=el?el.getBoundingClientRect():{top:innerHeight/2,left:innerWidth/2,right:innerWidth/2,bottom:innerHeight/2};
-const boot=JSON.stringify({id:f.id,name:f.name,tree:f.tree,theme}).replace(/</g,'\\u003c');
-const shim='<script>(function(){var B='+boot+',K="frankly:categories:v1",KT="frankly:theme",m={};m[K]=JSON.stringify({app:"frankly",v:2,current:0,list:[{id:B.id,name:B.name,tree:B.tree}]});if(B.theme)m[KT]=B.theme;'
+const boot=JSON.stringify({cur:Math.max(0,ord.indexOf(f)),list:ord.map(t=>({id:t.id,name:t.name,tree:t.tree})),theme}).replace(/</g,'\\u003c');
+const shim='<script>(function(){var B='+boot+',K="frankly:categories:v1",KT="frankly:theme",m={};m[K]=JSON.stringify({app:"frankly",v:2,current:B.cur,list:B.list});if(B.theme)m[KT]=B.theme;'
 +'var S={getItem:function(k){return k in m?m[k]:null},setItem:function(k,v){m[k]=String(v);if(k===K)parent.postMessage({fx:"save",v:v},"*");else if(k===KT)parent.postMessage({fx:"theme",v:v},"*")},removeItem:function(k){delete m[k]},clear:function(){m={}},key:function(i){return Object.keys(m)[i]||null},get length(){return Object.keys(m).length}};'
 +'try{Object.defineProperty(window,"localStorage",{get:function(){return S},configurable:true})}catch(e){}'
 +'addEventListener("message",function(e){if(e.data&&e.data.fx==="flush")dispatchEvent(new Event("pagehide"))});'
 +'addEventListener("keydown",function(e){var a=document.activeElement,t=a&&a.tagName,d=document.getElementById("menu"),w=document.getElementById("wheelOverlay");if((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==="F"||e.key==="f")||(e.key==="Escape"&&!(t==="INPUT"||t==="TEXTAREA"||(a&&a.isContentEditable)||(d&&d.style.display==="flex")||(w&&w.classList.contains("on"))))){e.preventDefault();parent.postMessage({fx:"close"},"*")}},true);document.addEventListener("pointerdown",function(){parent.postMessage({fx:"snd",k:"tap"},"*")},true);addEventListener("keydown",function(e){var k=e.key==="Enter"?"flick":e.key==="Tab"?"slide":0;if(k)parent.postMessage({fx:"snd",k:k},"*")},true)})()<\/script>';
 const doc=nsSrc().replace(/<head>/i,m=>m+shim);
 const ifr=document.createElement('iframe');ifr.title='focus mode';ifr.srcdoc=doc;
-fxEl.prepend(ifr);FX={f,ifr};
+fxEl.prepend(ifr);FX={f,ifr,ids:new Set(ord.map(t=>t.id))};
 const tf=r=>'translate('+r.left+'px,'+r.top+'px) scale('+Math.max(.02,(r.right-r.left)/innerWidth)+','+Math.max(.02,(r.bottom-r.top)/innerHeight)+')';
 fxEl.style.transition='none';fxEl.style.transform=tf(r);fxEl.style.opacity=0;fxEl.classList.add('on');fxEl.setAttribute('aria-hidden','false');
 let go=0;const start=()=>{if(go||FX!==fxs)return;go=1;try{ifr.contentWindow.focus()}catch(_){}
@@ -1001,12 +1001,16 @@ try{x.ifr.contentWindow.postMessage({fx:'flush'},'*')}catch(_){}
 const el=fel(x.f.id),r=el?el.getBoundingClientRect():null;
 if(r&&!RM.matches)fxEl.style.transform='translate('+r.left+'px,'+r.top+'px) scale('+Math.max(.02,(r.right-r.left)/innerWidth)+','+Math.max(.02,(r.bottom-r.top)/innerHeight)+')';
 fxEl.style.opacity=0;
-setTimeout(()=>{fxEl.classList.remove('on');fxEl.setAttribute('aria-hidden','true');fxEl.style.opacity='';fxEl.style.transform='';x.ifr.remove();FX=null;if(fel(x.f.id))rr(x.f)},520)}
+setTimeout(()=>{fxEl.classList.remove('on');fxEl.setAttribute('aria-hidden','true');fxEl.style.opacity='';fxEl.style.transform='';x.ifr.remove();FX=null;renderAll()},520)}
 addEventListener('message',e=>{if(!FX||e.source!==FX.ifr.contentWindow||!e.data)return;const d=e.data,f=FX.f;
 if(d.fx==='close')closeFocus();
 else if(d.fx==='snd')snd(String(d.k));
 else if(d.fx==='theme'){theme=d.v==='dark'||d.v==='light'?d.v:null;paintTheme();save()}
-else if(d.fx==='save'){try{const p=JSON.parse(d.v),c=(p.list||[]).find(c=>c.id===f.id);if(!c)return;f.tree=adopt(c.tree);if(!f.tree.length)f.tree.push(mk());f.name=typeof c.name==='string'?c.name:f.name;save()}catch(_){}}});
+else if(d.fx==='save'){try{const p=JSON.parse(d.v),L=p.list||[];if(!L.length)return;const keep=new Set(L.map(c=>c.id));
+L.forEach(c=>{let t=F.find(x=>x.id===c.id);if(!t){t={id:c.id,name:'',x:F.length?Math.max(...F.map(z=>z.x+(z.w||FW)))+56:0,y:F.length?Math.min(...F.map(z=>z.y)):0,tree:[]};F.push(t);FX.ids.add(c.id)}
+t.tree=adopt(c.tree);if(!t.tree.length)t.tree.push(mk());if(typeof c.name==='string')t.name=c.name});
+if(F.some(x=>FX.ids.has(x.id)&&!keep.has(x.id)))V.trees=F=F.filter(x=>!FX.ids.has(x.id)||keep.has(x.id));
+const t=F.find(x=>x.id===(L[clamp(p.current|0,0,L.length-1)]||{}).id);if(t){FX.f=t;cur=t.id}save()}catch(_){}}});
 $('fxb').onclick=$('fxl').onclick=$('fxr').onclick=closeFocus;
 /* space = temporary pan tool (Figma-style): objects ignore the pointer, any drag pans the canvas */
 let SP=0;const spOn=()=>{if(!SP){SP=1;document.body.classList.add('sp')}},spOff=()=>{SP=0;document.body.classList.remove('sp','spd')};
