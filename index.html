@@ -296,7 +296,12 @@ body.lv #cv,body.lv #zg,body.lv #zero,body.lv #edge,body.lv #ring,body.lv #hint,
 body.lv #lh{display:flex}body.lv.ed #lh{display:none}
 #lh .b{width:44px;min-height:44px;font-size:18px}#lh .b:disabled{opacity:.25}#lh .n{font:400 12px/1 var(--mono);min-width:56px;text-align:center}
 body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-menu{bottom:calc(env(safe-area-inset-bottom,0px) + 154px)}
-@media(max-width:520px){#hb{display:none}#hd .l{flex:1;min-width:0}#cn{flex:1;width:auto;min-width:40px}#bk{font-size:16px}#hd .r{gap:4px}#hd .b{padding:0 7px;font-size:10px}}
+#sf{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#sf button{all:unset;box-sizing:border-box;min-height:36px;padding:0 13px;display:inline-flex;align-items:center;border-radius:11px;font:400 12px/1 var(--mono);color:var(--mute);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#sf button:hover{color:var(--ink)}#sf button[aria-pressed=true]{background:var(--ink);color:var(--bg)}#sf button:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+@media(pointer:coarse){#sf button{min-height:44px}}
+body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0392b}
+@media(max-width:900px){#hd .l{flex:1;min-width:0}#cn{flex:1;width:auto;min-width:40px}#bk{font-size:16px}#sf{top:calc(env(safe-area-inset-top,0px) + 58px)}#lt{padding-top:calc(env(safe-area-inset-top,0px) + 112px)}}
 </style>
 </head>
 <body>
@@ -313,10 +318,6 @@ body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-me
   </div>
   <div class="r">
     <span id="sv" class="ci" aria-hidden="true" title="Saved"></span>
-    <button class="b icon" id="hb" aria-label="Help and keyboard shortcuts" title="Help (?)">?</button>
-    <button class="b ci" id="cd">delete</button>
-    <button class="b ci" id="vt" aria-label="Switch between canvas and letter view">letters</button>
-    <button class="b ci" id="fb">folders</button>
     <button class="b" id="mb">menu</button>
   </div>
 </div>
@@ -324,7 +325,7 @@ body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-me
 <div id="zg" role="slider" tabindex="0" aria-label="Zoom" aria-orientation="vertical" aria-valuemin="12" aria-valuemax="250" title="drag to zoom · double-click for 100%"></div>
 <div id="tb"></div>
 <div id="ov" aria-hidden="true"><div id="wh"></div><button class="b" id="cx">close</button>
-<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="reset">reset demo</button></div></div>
+<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="help">help</button><button class="b" data-a="reset">reset demo</button><button class="b" data-a="delcat">delete category</button></div></div>
 <input type="file" id="file" accept="application/json,.json" hidden>
 <div id="cm" hidden></div>
 <div id="toasts" aria-live="polite" aria-atomic="false"></div>
@@ -389,6 +390,7 @@ body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-me
   </div>
 </div>
 
+<div id="sf" role="group" aria-label="Surface"><button data-m="folders">folders</button><button data-m="canvas">canvas</button><button data-m="letters">letters</button></div>
 <div id="lt" role="region" aria-label="Letters"><div id="ltk"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
@@ -773,8 +775,8 @@ const wend=()=>{if(wd&&W&&W.moved){W.tg=Math.round(W.tg);setTimeout(()=>{if(W)W.
 wh.addEventListener('pointerup',wend);wh.addEventListener('pointercancel',wend);
 $('cx').onclick=()=>cw(false);$('bk').onclick=closeCat;
 const cn=$('cn');cn.oninput=()=>{if(V){V.name=cn.value;save()}};cn.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape')cn.blur()};
-$('cd').onclick=async()=>{if(!V)return;const ok=await confirmModal('Delete "'+(V.name||'untitled')+'" and all its folders?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(c=>c!==V);closeCat();save();toast('Category deleted')};
-$('fb').onclick=closeCat;$('mb').onclick=()=>ow('tap');
+const delCat=async()=>{if(!V)return;const ok=await confirmModal('Delete "'+(V.name||'untitled')+'" and all its folders?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(c=>c!==V);closeCat();save();toast('Category deleted')};
+$('mb').onclick=()=>ow('tap');
 addEventListener('keydown',e=>{
 if(W){if(e.key==='Escape'){e.preventDefault();cw(false)}else if(e.key==='Enter'){e.preventDefault();cw(true)}else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();W.tg=clamp(Math.round(W.tg)+(e.key==='ArrowUp'?-1:1),0,C.length)}return}
 if(e.key==='Escape'&&V&&!e.target.matches('textarea,input')){closeCat();return}
@@ -804,7 +806,7 @@ addEventListener('keydown',e=>{if(e.key==='Escape'&&fabMenu.classList.contains('
 const helpEl=$('help');
 function openHelp(){helpEl.classList.add('on');helpEl.setAttribute('aria-hidden','false');const b=helpEl.querySelector('[data-close]');if(b)b.focus()}
 function closeHelp(){helpEl.classList.remove('on');helpEl.setAttribute('aria-hidden','true')}
-$('hb').onclick=openHelp;
+
 helpEl.querySelectorAll('[data-close]').forEach(el=>el.onclick=closeHelp);
 addEventListener('keydown',e=>{
   if(e.key==='?'&&!e.target.matches('textarea,input')){e.preventDefault();helpEl.classList.contains('on')?closeHelp():openHelp()}
@@ -843,6 +845,8 @@ if(a==='fit'){cw(false);fit(true)}
 else if(a==='import')$('file').click();
 else if(a==='export'){const d={app:'frankly',version:2,exportedAt:new Date().toISOString(),theme:dark()?'dark':'light',categories:C.map(c=>({name:c.name,x:Math.round(c.x),y:Math.round(c.y),statements:c.trees.map(t=>({text:t.name,x:Math.round(t.x),y:Math.round(t.y),...(t.w?{w:Math.round(t.w)}:{}),collapsed:false,children:un(t.tree)}))}))},l=h('a');l.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));l.download='frankly-canvas.json';l.click();setTimeout(()=>URL.revokeObjectURL(l.href),1000);toast('Exported frankly-canvas.json')}
 else if(a==='theme'){theme=dark()?'light':'dark';paintTheme();save()}
+else if(a==='help'){cw(false);openHelp()}
+else if(a==='delcat'){cw(false);delCat()}
 else if(a==='reset'){if(rs){rs=0;b.textContent='reset demo';cw(false);C=seed();V=null;F=[];lastCat=null;rc={x:0,y:0,s:1};cams={};H=[];hi=0;Object.assign(cam,{x:0,y:0,s:1});chrome();renderAll();fit();save();toast('Demo reset')}else{rs=1;b.textContent='tap again to reset';setTimeout(()=>{rs=0;b.textContent='reset demo'},2500)}}});
 $('file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;f.text().then(s=>{try{const d=JSON.parse(s),L=d.categories||d.folders;if(!L||!L.length)throw 0;C=L.map((c,i)=>{const tr=[],loose=[];(c.statements||[]).forEach(s=>(s.children&&s.children.length?tr:loose).push(s));const ts=tr.map((s,j)=>({id:nid(),name:String(s.text||''),x:isFinite(s.x)?+s.x:j*300,y:isFinite(s.y)?+s.y:0,...(isFinite(s.w)&&s.w?{w:+s.w}:{}),tree:conv(s.children)}));if(loose.length)ts.unshift({id:nid(),name:'notes',x:-300,y:0,tree:conv(loose)});if(!ts.length)ts.push({id:nid(),name:'',x:0,y:0,tree:[mk()]});return{id:nid(),name:String(c.name||''),x:isFinite(c.x)?+c.x:(i%4)*260,y:isFinite(c.y)?+c.y:Math.floor(i/4)*230,trees:ts}});V=null;F=[];cams={};cw(false);chrome();renderAll();fit();save();toast('Imported '+C.length+' folders',{kind:'ok'})}catch(_){toast('Could not read that file',{kind:'error'})}}).catch(()=>toast('Could not read that file',{kind:'error'}))};
 
@@ -1057,7 +1061,7 @@ function lvSave(){try{localStorage.setItem('frankly:view',JSON.stringify({v:LV?'
 function lvOrder(){return [...F].sort((a,b)=>a.x-b.x||a.y-b.y)}
 function lvRender(){try{lvRender0()}catch(e){console.error(e);try{toast('letter view: '+e.message,{kind:'error'})}catch(_){}}}
 function lvRender0(){
-  const on=lvOn(),vt=$('vt');document.body.classList.toggle('lv',on);if(vt)vt.textContent=LV?'canvas':'letters';
+  const on=lvOn();document.body.classList.toggle('lv',on);sfPaint();
   if(!on){ltk.replaceChildren();return}
   const ord=lvOrder();if(!ord.length){lvNew();return}
   if(lvCat!==V.id){lvCat=V.id;const s=LI[V.id];if(s&&F.some(f=>f.id===s))cur=s}
@@ -1084,7 +1088,11 @@ function lvNew(){const w=f=>f.w||FW,f={id:nid(),name:'',x:F.length?Math.max(...F
 let lvT;ltk.addEventListener('scroll',()=>{clearTimeout(lvT);lvT=setTimeout(()=>{const c=ltk.scrollLeft+ltk.clientWidth/2;let b=0,d=1e9;[...ltk.children].forEach((p,j)=>{const x=Math.abs(p.offsetLeft+p.offsetWidth/2-c);if(x<d){d=x;b=j}});if(b!==lvI)lvAct(b)},90)},{passive:true});
 ltk.addEventListener('click',e=>{const n=e.target.closest('.fn');if(n&&n.readOnly){const f=fobj(n.closest('.fold').dataset.id);if(f)rename(f)}});
 $('lprev').onclick=()=>lvGo(lvI-1);$('lnext').onclick=()=>lvGo(lvI+1);
-$('vt').onclick=()=>{if(!V)return;if(!lvOn())cams[V.id]={...cam};LV=!LV;lvSave();renderAll();if(!LV){cams[V.id]?(Object.assign(cam,cams[V.id]),apply()):fit()}};
+function lvSet(want){if(!V||LV===want)return;if(!lvOn())cams[V.id]={...cam};LV=want;lvSave();renderAll();if(!LV){cams[V.id]?(Object.assign(cam,cams[V.id]),apply()):fit()}}
+function sfSet(m){if(m==='folders'){closeCat();return}const want=m==='letters';
+  if(V){lvSet(want);return}const c=C.find(c=>c.id===lastCat)||C[0];if(!c)return;LV=want;lvSave();openCat(c)}
+function sfPaint(){const m=!V?'folders':LV?'letters':'canvas';document.querySelectorAll('#sf button').forEach(b=>{const on=b.dataset.m===m;b.setAttribute('aria-pressed',on);on?b.setAttribute('aria-current','true'):b.removeAttribute('aria-current')})}
+$('sf').addEventListener('click',e=>{const b=e.target.closest('button');if(b)sfSet(b.dataset.m)});
 addEventListener('keydown',e=>{if(!lvOn()||W||FX||e.metaKey||e.ctrlKey||e.altKey||(e.target.closest&&e.target.closest('textarea,input,[contenteditable]')))return;
   if(e.key==='ArrowLeft'){e.preventDefault();lvGo(lvI-1)}else if(e.key==='ArrowRight'){e.preventDefault();lvGo(lvI+1)}});
 lvRender();
