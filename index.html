@@ -286,7 +286,7 @@ body.lv #lt{display:block}
 body.lv #cv,body.lv #zg,body.lv #zero,body.lv #edge,body.lv #ring,body.lv #hint,body.lv #acts [data-a=fit]{display:none!important}
 #ltk{height:100%;display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;padding:0 calc(50% - min(46vw,380px));position:relative}
 #ltk::-webkit-scrollbar{display:none}
-.lp{flex:0 0 min(92vw,760px);height:100%;overflow-y:auto;scroll-snap-align:center;scroll-snap-stop:always;box-sizing:border-box;padding:0 2px calc(env(safe-area-inset-bottom,0px) + var(--kb) + 130px);opacity:.35;transition:opacity .25s;cursor:pointer;scrollbar-width:none}
+.lp{flex:0 0 min(92vw,760px);overflow-y:auto;scroll-snap-align:center;scroll-snap-stop:always;box-sizing:border-box;padding:0 2px calc(env(safe-area-inset-bottom,0px) + var(--kb) + 130px);opacity:.35;transition:opacity .25s;cursor:pointer;scrollbar-width:none}
 .lp.on{opacity:1;cursor:auto}.lp:not(.on) .fold{pointer-events:none}
 .lk{display:flex;align-items:center;gap:6px;padding:0 4px 8px;font:300 11px/1 var(--mono);color:var(--mute);letter-spacing:.08em;text-transform:uppercase}
 .lk span{flex:1}.lk .b:disabled{opacity:.25;pointer-events:none}
@@ -1056,9 +1056,10 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.key.toLo
 
 /* ── letter view: same data, carousel surface ── */
 function lvOn(){return LV&&!!V}
-const lvSave=()=>{try{localStorage.setItem('frankly:view',JSON.stringify({v:LV?'letters':'canvas',i:LI}))}catch(_){}};
-const lvOrder=()=>[...F].sort((a,b)=>a.x-b.x||a.y-b.y);
-function lvRender(){
+function lvSave(){try{localStorage.setItem('frankly:view',JSON.stringify({v:LV?'letters':'canvas',i:LI}))}catch(_){}}
+function lvOrder(){return [...F].sort((a,b)=>a.x-b.x||a.y-b.y)}
+function lvRender(){try{lvRender0()}catch(e){console.error(e);try{toast('letter view: '+e.message,{kind:'error'})}catch(_){}}}
+function lvRender0(){
   const on=lvOn(),vt=$('vt');document.body.classList.toggle('lv',on);if(vt)vt.textContent=LV?'canvas':'letters';
   if(!on){ltk.replaceChildren();return}
   const ord=lvOrder();if(!ord.length){lvNew();return}
@@ -1079,8 +1080,8 @@ function lvAct(i,sm){
     else if(d>2&&p.dataset.h&&!p.contains(document.activeElement)){delete p.dataset.h;s.replaceChildren()}});
   setCur(ord[i].id);LI[V.id]=ord[i].id;lvSave();
   $('ln').textContent=(i+1)+' / '+ps.length;$('lprev').disabled=!i;$('lnext').disabled=i===ps.length-1;
-  if(sm!==undefined){const p=ps[i];ltk.scrollTo({left:p.offsetLeft-(ltk.clientWidth-p.offsetWidth)/2,behavior:sm&&!RM.matches?'smooth':'instant'})}}
-const lvGo=i=>lvAct(i,true);
+  if(sm!==undefined){const p=ps[i];const x=p.offsetLeft-(ltk.clientWidth-p.offsetWidth)/2;try{ltk.scrollTo({left:x,behavior:sm&&!RM.matches?'smooth':'auto'})}catch(_){ltk.scrollLeft=x}}}
+function lvGo(i){lvAct(i,true)}
 function lvMove(a,b){if(!b)return;[a.x,b.x]=[b.x,a.x];[a.y,b.y]=[b.y,a.y];cur=a.id;save();lvRender()}
 function lvNew(){const w=f=>f.w||FW,f={id:nid(),name:'',x:F.length?Math.max(...F.map(f=>f.x+w(f)))+56:0,y:F.length?Math.min(...F.map(f=>f.y)):0,tree:[mk()]};F.push(f);cur=f.id;save();lvRender();setTimeout(()=>rename(f),60)}
 let lvT;ltk.addEventListener('scroll',()=>{clearTimeout(lvT);lvT=setTimeout(()=>{const c=ltk.scrollLeft+ltk.clientWidth/2;let b=0,d=1e9;[...ltk.children].forEach((p,j)=>{const x=Math.abs(p.offsetLeft+p.offsetWidth/2-c);if(x<d){d=x;b=j}});if(b!==lvI)lvAct(b)},90)},{passive:true});
