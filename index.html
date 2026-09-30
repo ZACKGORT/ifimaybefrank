@@ -321,6 +321,18 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 .po .s,.po .k{flex:0 1 38%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mute);font:300 10px/1.3 var(--mono);text-align:right}
 .po mark{background:none;color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .pe{padding:26px 14px;text-align:center;color:var(--mute);font:400 13px/1.5 var(--sans)}
+
+.lk .lg{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.lp.drag,.lp.shift{position:relative}.lp.drag{z-index:5;opacity:1!important;cursor:grabbing;transition:none!important;box-shadow:0 18px 50px rgba(0,0,0,.3);border-radius:18px;background:var(--bg)}
+.lp.shift{transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .25s}body.lgd,body.lgd *{cursor:grabbing!important}
+::view-transition-group(*){animation-duration:.5s;animation-timing-function:cubic-bezier(.22,1,.36,1)}::view-transition-old(root),::view-transition-new(root){animation-duration:.3s}
+@media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
+#es{position:fixed;inset:0;z-index:2;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;pointer-events:none;padding:24px}#es.on{display:flex}
+#es h3{margin:0;font:500 22px/1.15 var(--sans);letter-spacing:-.02em}#es p{margin:0;max-width:34ch;color:var(--mute);font:400 13px/1.5 var(--sans)}
+#es .b{pointer-events:auto;margin-top:6px;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#eb{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);transform:translateX(-50%);z-index:44;display:none;align-items:center;gap:10px;width:max-content;max-width:min(560px,calc(100vw - 24px));padding:10px 10px 10px 14px;background:var(--ink);color:var(--bg);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);font:400 12px/1.4 var(--sans)}#eb.on{display:flex}#eb span{flex:1}
+@media(max-width:900px){#eb{top:calc(env(safe-area-inset-top,0px) + 116px)}}
+#eb button{border:0;background:none;color:inherit;font:500 12px/1 var(--mono);cursor:pointer;padding:10px 8px;text-decoration:underline;text-underline-offset:3px}
 </style>
 </head>
 <body>
@@ -359,6 +371,8 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
   <hr>
   <button data-a="help" role="menuitem"><span>How it works</span><span class="k">?</span></button>
 </div>
+<div id="es" role="status" aria-live="polite"></div>
+<div id="eb" role="alert"></div>
 <div id="modal-root"></div>
 <div id="pal" role="dialog" aria-modal="true" aria-label="Search and commands" aria-hidden="true"><div class="pal-bg" id="palbg"></div><div class="pal-box"><input id="pali" type="text" role="combobox" aria-expanded="true" aria-controls="pall" aria-autocomplete="list" aria-label="Search letters, lines and actions" placeholder="Jump to a letter, line or action…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><div id="pall" role="listbox" aria-label="Results"></div></div></div>
 <div id="help" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="helptitle">
@@ -460,7 +474,7 @@ H=[JSON.stringify(C)];
 
 /* persistence + history */
 let st;const save=()=>{clearTimeout(st);st=setTimeout(flush,300)};
-function flush(){if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};const s=JSON.stringify(C);if(s!==H[hi]){H=H.slice(0,hi+1);H.push(s);if(H.length>80)H.shift();hi=H.length-1}try{localStorage.setItem(K,JSON.stringify({C,open:V&&V.id,last:lastCat,rc,cams,theme}))}catch(_){}flashSaved()}
+function flush(){if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};const s=JSON.stringify(C);if(s!==H[hi]){H=H.slice(0,hi+1);H.push(s);if(H.length>80)H.shift();hi=H.length-1}try{localStorage.setItem(K,JSON.stringify({C,open:V&&V.id,last:lastCat,rc,cams,theme}));storeOk()}catch(e){storeFail(e);return}flashSaved()}
 const restore=()=>{C=JSON.parse(H[hi]);if(V){V=C.find(c=>c.id===V.id)||null;F=V?V.trees:[];if(!V){Object.assign(cam,rc);chrome()}}renderAll();save()};
 const undo=()=>{flush();if(hi>0){hi--;restore()}},redo=()=>{flush();if(hi<H.length-1){hi++;restore()}};
 
@@ -922,7 +936,7 @@ n.k.length?{l:n.z?'expand branch':'collapse branch',f:()=>{n.z=!n.z;const li=QR(
 const foldMenu=f=>[
 {l:'rename',f:()=>rename(f)},
 {l:'new line',f:()=>{const m=mk();f.tree.push(m);rr(f,m.id,0)}},
-{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>openFocus(f)},{l:'zoom to folder',f:()=>fly(view(f))},'-',
+{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>openFocus(f)},lvOn()?null:{l:'zoom to folder',f:()=>fly(view(f))},'-',
 {l:'collapse all lines',f:()=>{setZ(f.tree,true);rr(f)}},
 {l:'expand all lines',f:()=>{setZ(f.tree,false);rr(f)}},
 {l:'duplicate folder',f:()=>{const d={id:nid(),name:(f.name||'untitled')+' copy',x:f.x+28,y:f.y+28,tree:f.tree.map(cl),...(f.w?{w:f.w}:{})};F.push(d);world.append(rFold(d));setCur(d.id);save()}},
@@ -934,7 +948,8 @@ const catMenu=c=>[
 {l:'rename',f:()=>{openCat(c);setTimeout(()=>{$('cn').focus();$('cn').select()},0)}},'-',
 {l:'delete category',danger:true,f:async()=>{const ok=await confirmModal('Delete "'+(c.name||'untitled')+'"?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(x=>x!==c);if(lastCat===c.id)lastCat=null;cur=null;renderAll();save();toast('Category deleted')}}];
 
-const canvasMenu=(x,y)=>[
+const canvasMenu=(x,y)=>lvOn()?lvMenu():[
+{l:'search & commands',k:mod+'K',f:openPal},'-',
 V?{l:'new folder here',f:()=>newFolder(wx(x),wy(y))}:{l:'new category here',f:()=>newCat(wx(x)-100,wy(y)-60)},'-',
 {l:'fit all',f:()=>fit(true)},{l:'zoom 100%',k:'0',f:()=>zoomTo(1)},{l:'go to zero',f:home},'-',
 {l:'undo',k:mod+'Z',f:undo},{l:'redo',k:mod+'⇧Z',f:redo},'-',
@@ -1094,7 +1109,7 @@ function lvRender0(){
   ord.forEach((f,j)=>{const p=h('div','lp'),k=h('div','lk'),l=h('button','b icon','←'),r=h('button','b icon','→');
     l.setAttribute('aria-label','Move letter earlier');r.setAttribute('aria-label','Move letter later');l.disabled=!j;r.disabled=j===ord.length-1;
     l.onclick=()=>lvMove(f,ord[j-1]);r.onclick=()=>lvMove(f,ord[j+1]);
-    k.append(h('span','','letter '+String(j+1).padStart(2,'0')+' / '+String(ord.length).padStart(2,'0')),l,r);
+    const lg=h('span','lg','letter '+String(j+1).padStart(2,'0')+' / '+String(ord.length).padStart(2,'0'));lg.title='Drag to reorder';k.append(lg,l,r);
     p.dataset.id=f.id;p.append(k,h('div','ls'));
     p.onclick=e=>{if(!p.classList.contains('on')&&!e.target.closest('button'))lvGo(j)};ltk.append(p)});
   lvAct(i,false)}
@@ -1176,7 +1191,7 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey
 const DL=[[helpEl,()=>helpEl.classList.contains('on')],[tourEl,()=>tourEl.classList.contains('on')],[palEl,()=>palEl.classList.contains('on')],[$('modal-root'),()=>!!$('modal-root').querySelector('.modal')],[fxEl,()=>!!FX]],TR=new Map();let lastF=null;
 addEventListener('focusin',e=>{if(!DL.some(([el])=>el.contains(e.target)))lastF=e.target},true);
 function trapSync(){DL.forEach(([el,open])=>{const on=open(),t=TR.get(el);
-  if(on&&!t){const off=[...document.body.children].filter(c=>c!==el&&!c.contains(el)&&!/^(SCRIPT|STYLE|LINK)$/.test(c.tagName)&&c.id!=='toasts'&&!c.inert);off.forEach(c=>{c.inert=true});TR.set(el,{off,prev:lastF});
+  if(on&&!t){const off=[...document.body.children].filter(c=>c!==el&&!c.contains(el)&&!/^(SCRIPT|STYLE|LINK)$/.test(c.tagName)&&c.id!=='toasts'&&c.id!=='eb'&&!c.inert);off.forEach(c=>{c.inert=true});TR.set(el,{off,prev:lastF});
     if(!el.contains(document.activeElement)){const b=el.querySelector('input,textarea,button,[href]');if(b)b.focus()}}
   else if(!on&&t){TR.delete(el);t.off.forEach(c=>{c.inert=false});const p=t.prev;if(p&&document.contains(p)){try{p.focus({preventScroll:true})}catch(_){}}}})}
 let escDlg=false;addEventListener('keydown',e=>{if(e.key==='Escape'){escDlg=DL.some(([,o])=>o());setTimeout(()=>{escDlg=false},0)}},true);
@@ -1186,6 +1201,57 @@ DL.forEach(([el])=>new MutationObserver(trapSync).observe(el,{attributes:true,at
 function ariaTree(){document.querySelectorAll('.fold .fbody>ul.kids').forEach(ul=>{ul.setAttribute('role','tree');ul.setAttribute('aria-label','Lines');(function w(u,d){for(const li of u.children){if(li.tagName!=='LI')continue;li.setAttribute('role','treeitem');li.setAttribute('aria-level',d);const k=li.querySelector(':scope>ul.kids');if(k){li.setAttribute('aria-expanded',String(!li.classList.contains('z')));k.setAttribute('role','group');w(k,d+1)}else li.removeAttribute('aria-expanded')}})(ul,1)})}
 let aq=0;const ariaQ=()=>{if(aq)return;aq=requestAnimationFrame(()=>{aq=0;ariaTree()})};
 [world,ltk].forEach(el=>new MutationObserver(ariaQ).observe(el,{childList:true,subtree:true,attributes:true,attributeFilter:['class']}));ariaQ();
+
+/* ══ canvas ↔ letters: shared-element morph ══ */
+function vtTag(){[...QR().querySelectorAll('.fold')].slice(0,16).forEach(e=>{e.style.viewTransitionName='f'+e.dataset.id})}
+function vtUntag(){document.querySelectorAll('.fold').forEach(e=>{e.style.viewTransitionName=''})}
+const lvSet0=lvSet;
+lvSet=function(want){if(!V||LV===want)return;if(!document.startViewTransition||RM.matches||FX){lvSet0(want);return}
+  vtTag();let t;try{t=document.startViewTransition(()=>{lvSet0(want);vtTag()})}catch(_){vtUntag();lvSet0(want);return}t.finished.then(vtUntag,vtUntag)};
+
+/* ══ letter view: actions menu, press-and-hold, first-run hint ══ */
+function lvMenu(){const ord=lvOrder(),f=ord[lvI];return[{l:'new letter',f:lvNew},{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>f&&openFocus(f)},'-',
+{l:'previous letter',k:'←',f:()=>lvGo(lvI-1)},{l:'next letter',k:'→',f:()=>lvGo(lvI+1)},'-',{l:'search & commands',k:mod+'K',f:openPal},{l:'canvas view',f:()=>sfSet('canvas')},{l:'back to categories',k:'Esc',f:closeCat},'-',
+{l:'undo',k:mod+'Z',f:undo},{l:'redo',k:mod+'⇧Z',f:redo},'-',{l:'help & shortcuts',k:'?',f:openHelp},'-',{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',f:()=>act('theme')},{l:'sound: '+(SND?'on':'off'),f:toggleSnd}]}
+{const lt=$('lt');let t0=0,px=0,py=0;
+lt.addEventListener('pointerdown',e=>{clearTimeout(t0);t0=0;if(e.pointerType!=='touch'||e.target.closest('textarea,input,button,a,.lg'))return;px=e.clientX;py=e.clientY;const tg=e.target;t0=setTimeout(()=>{t0=0;showCtx(px,py,tg)},550)});
+lt.addEventListener('pointermove',e=>{if(t0&&Math.hypot(e.clientX-px,e.clientY-py)>10){clearTimeout(t0);t0=0}});
+['pointerup','pointercancel'].forEach(n=>lt.addEventListener(n,()=>{clearTimeout(t0);t0=0}));ltk.addEventListener('scroll',()=>{clearTimeout(t0);t0=0},{passive:true})}
+const TOUCH=matchMedia('(hover:none) and (pointer:coarse)'),LPK='frankly:lphint';let lpOn=false;try{lpOn=!!localStorage.getItem(LPK)}catch(_){}
+function lpHint(){if(lpOn||!TOUCH.matches||!V||tourEl.classList.contains('on'))return;lpOn=true;try{localStorage.setItem(LPK,'1')}catch(_){}setTimeout(()=>toast('Tip: press and hold a line, card or empty space for more actions',{duration:6500}),900)}
+{const oc=openCat;openCat=function(c){const r=oc.apply(this,arguments);lpHint();return r}}
+
+/* ══ letter view: drag a letter's label to reorder ══ */
+let LG=null;
+ltk.addEventListener('pointerdown',e=>{const g=e.target.closest('.lg');if(!g||e.button>0)return;const p=g.closest('.lp'),ps=[...ltk.children];if(!p||!p.classList.contains('on')||ps.length<2)return;
+  e.preventDefault();const i=ps.indexOf(p),w=Math.abs(ps[1].offsetLeft-ps[0].offsetLeft)||p.offsetWidth+14;
+  LG={p,ps,i,t:i,id:e.pointerId,x0:e.clientX,s0:ltk.scrollLeft,w,moved:false,cx:e.clientX,raf:0,g};try{g.setPointerCapture(e.pointerId)}catch(_){}});
+ltk.addEventListener('pointermove',e=>{const L=LG;if(!L||e.pointerId!==L.id)return;L.cx=e.clientX;
+  if(!L.moved){if(Math.abs(e.clientX-L.x0)<6)return;L.moved=true;L.p.classList.add('drag');document.body.classList.add('lgd');ltk.style.scrollSnapType='none';L.ps.forEach(q=>{if(q!==L.p)q.classList.add('shift')});lgLoop()}lgPlace()});
+function lgPlace(){const L=LG;if(!L||!L.moved)return;const dx=L.cx-L.x0+(ltk.scrollLeft-L.s0),t=clamp(L.i+Math.round(dx/L.w),0,L.ps.length-1);L.p.style.transform='translateX('+dx+'px)';L.t=t;
+  L.ps.forEach((q,j)=>{if(q===L.p)return;const x=L.i<t&&j>L.i&&j<=t?-L.w:L.i>t&&j<L.i&&j>=t?L.w:0;q.style.transform=x?'translateX('+x+'px)':''})}
+function lgLoop(){const L=LG;if(!L)return;const ed=70,v=L.cx<ed?-(ed-L.cx)/4:L.cx>innerWidth-ed?(L.cx-(innerWidth-ed))/4:0;if(v){ltk.scrollLeft+=clamp(v,-18,18);lgPlace()}L.raf=requestAnimationFrame(lgLoop)}
+function lgEnd(e,ok){const L=LG;if(!L||(e&&e.pointerId!==L.id))return;LG=null;cancelAnimationFrame(L.raf);try{L.g.releasePointerCapture(L.id)}catch(_){}
+  document.body.classList.remove('lgd');ltk.style.scrollSnapType='';if(!L.moved)return;L.ps.forEach(q=>{q.classList.remove('drag','shift');q.style.transform=''});
+  if(!ok||L.t===L.i){lvAct(L.i,true);return}
+  const ord=lvOrder(),slots=ord.map(f=>({x:f.x,y:f.y})),f=ord[L.i],n=ord.slice();n.splice(L.i,1);n.splice(L.t,0,f);n.forEach((q,j)=>{q.x=slots[j].x;q.y=slots[j].y});
+  cur=f.id;LI[V.id]=f.id;save();lvRender();say('Moved to position '+(L.t+1)+' of '+n.length)}
+ltk.addEventListener('pointerup',e=>lgEnd(e,true));ltk.addEventListener('pointercancel',e=>lgEnd(e,false));
+addEventListener('keydown',e=>{if(LG&&e.key==='Escape'){e.preventDefault();e.stopPropagation();lgEnd(null,false)}},true);
+
+/* ══ empty + error states ══ */
+const esEl=$('es'),ebEl=$('eb');let ebDis=false;
+function paintEmpty(){const n=(V?F:C).length,on=!lvOn()&&n===0&&!FX;esEl.classList.toggle('on',on);if(!on)return;const k=V?'f':'c';if(esEl.dataset.k===k&&esEl.firstChild)return;esEl.dataset.k=k;
+  const b=h('button','b',V?'New folder':'New category');b.onclick=()=>V?newFolder(wx(innerWidth/2),wy(innerHeight/2)):newCat(0,0);
+  esEl.replaceChildren(h('h3','',V?'This category is empty':'No categories yet'),h('p','',V?'Folders hold your lines. Make one here, or double-click anywhere on the canvas.':'A category is a space for related folders. Create your first one to start writing.'),b)}
+{const ra=renderAll;renderAll=function(){const r=ra.apply(this,arguments);paintEmpty();return r}}
+new MutationObserver(paintEmpty).observe(world,{childList:true});paintEmpty();
+function storeFail(err){if(ebDis)return;const q=err&&(err.name==='QuotaExceededError'||err.code===22);
+  ebEl.replaceChildren(h('span','',q?'This browser’s storage is full, so your latest changes aren’t being saved. Export a backup now.':'This browser is blocking storage, so changes won’t survive a reload. Export a backup to keep your work.'));
+  const e=h('button','','export');e.onclick=()=>act('export');const d=h('button','','dismiss');d.onclick=()=>{ebDis=true;ebEl.classList.remove('on')};ebEl.append(e,d);ebEl.classList.add('on')}
+function storeOk(){if(ebEl.classList.contains('on')&&!ebDis)ebEl.classList.remove('on')}
+let errT=0;const onErr=()=>{const n=Date.now();if(n-errT<8000)return;errT=n;toast('Something went wrong. Reloading usually fixes it — your work autosaves.',{kind:'error',action:'reload',onAction:()=>location.reload(),duration:8000})};
+addEventListener('error',e=>{if(e&&/ResizeObserver|Script error/i.test(e.message||''))return;onErr()});addEventListener('unhandledrejection',onErr);
 </script>
 <script type="text/plain" id="ns-src"><!DOCTYPE html>
 <html lang="en">
