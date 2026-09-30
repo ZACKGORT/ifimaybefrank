@@ -292,6 +292,13 @@ body.lv #cv,body.lv #zg,body.lv #zero,body.lv #edge,body.lv #ring,body.lv #hint,
 .lk span{flex:1}.lk .b:disabled{opacity:.25;pointer-events:none}
 #ltk .fold{position:relative;left:auto!important;top:auto!important;width:auto!important;min-width:0;padding:10px clamp(14px,4vw,28px) 22px;border-radius:18px}
 #ltk .grip,#ltk .rz{display:none}#ltk .fn{font-size:20px;cursor:text}#ltk .fd{opacity:1;padding:12px 8px}
+/* letter view: prev/next hotspots — cursor becomes a chevron (same treatment as the focus-mode X) */
+.lz{display:none;position:absolute;top:calc(env(safe-area-inset-top,0px) + 64px);bottom:0;width:max(48px,calc(50% - min(46vw,380px)));z-index:2;-webkit-tap-highlight-color:transparent}
+.lz.l{left:0;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M17 5L8 14l9 9' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 5L8 14l9 9' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 14 14,w-resize}
+.lz.r{right:0;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M11 5l9 9-9 9' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 5l9 9-9 9' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 14 14,e-resize}
+.lz.off{pointer-events:none}
+@media(hover:hover) and (pointer:fine){body.lv .lz{display:block}body.lv.ed .lz{display:none}
+#lt:has(#lzl:hover:not(.off)) .lp:has(+.lp.on),#lt:has(#lzr:hover:not(.off)) .lp.on+.lp{opacity:.6}}
 #lh{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 36px);z-index:6;display:none;align-items:center;gap:2px;padding:4px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 body.lv #lh{display:flex}body.lv.ed #lh{display:none}
 #lh .b{width:44px;min-height:44px;font-size:18px}#lh .b:disabled{opacity:.25}#lh .n{font:400 12px/1 var(--mono);min-width:56px;text-align:center}
@@ -391,7 +398,7 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 </div>
 
 <div id="sf" role="group" aria-label="Surface"><button data-m="folders">folders</button><button data-m="canvas">canvas</button><button data-m="letters">letters</button></div>
-<div id="lt" role="region" aria-label="Letters"><div id="ltk"></div></div>
+<div id="lt" role="region" aria-label="Letters"><div id="ltk"></div><div class="lz l" id="lzl" aria-hidden="true"></div><div class="lz r" id="lzr" aria-hidden="true"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
 <script>
@@ -1081,6 +1088,7 @@ function lvAct(i,sm){
     else if(d>2&&p.dataset.h&&!p.contains(document.activeElement)){delete p.dataset.h;s.replaceChildren()}});
   setCur(ord[i].id);LI[V.id]=ord[i].id;lvSave();
   $('ln').textContent=(i+1)+' / '+ps.length;$('lprev').disabled=!i;$('lnext').disabled=i===ps.length-1;
+  $('lzl').classList.toggle('off',!i);$('lzr').classList.toggle('off',i===ps.length-1);
   if(sm!==undefined){const p=ps[i];const x=p.offsetLeft-(ltk.clientWidth-p.offsetWidth)/2;try{ltk.scrollTo({left:x,behavior:sm&&!RM.matches?'smooth':'auto'})}catch(_){ltk.scrollLeft=x}}}
 function lvGo(i){lvAct(i,true)}
 function lvMove(a,b){if(!b)return;[a.x,b.x]=[b.x,a.x];[a.y,b.y]=[b.y,a.y];cur=a.id;save();lvRender()}
@@ -1088,6 +1096,9 @@ function lvNew(){const w=f=>f.w||FW,f={id:nid(),name:'',x:F.length?Math.max(...F
 let lvT;ltk.addEventListener('scroll',()=>{clearTimeout(lvT);lvT=setTimeout(()=>{const c=ltk.scrollLeft+ltk.clientWidth/2;let b=0,d=1e9;[...ltk.children].forEach((p,j)=>{const x=Math.abs(p.offsetLeft+p.offsetWidth/2-c);if(x<d){d=x;b=j}});if(b!==lvI)lvAct(b)},90)},{passive:true});
 ltk.addEventListener('click',e=>{const n=e.target.closest('.fn');if(n&&n.readOnly){const f=fobj(n.closest('.fold').dataset.id);if(f)rename(f)}});
 $('lprev').onclick=()=>lvGo(lvI-1);$('lnext').onclick=()=>lvGo(lvI+1);
+$('lzl').onclick=()=>lvGo(lvI-1);$('lzr').onclick=()=>lvGo(lvI+1);
+/* hotspots sit above the peeking cards, so hand wheel/trackpad scrolling through */
+['lzl','lzr'].forEach(id=>$(id).addEventListener('wheel',e=>{const m=e.deltaMode?16:1,p=ltk.children[lvI];if(Math.abs(e.deltaX)>Math.abs(e.deltaY))ltk.scrollLeft+=e.deltaX*m;else if(p)p.scrollTop+=e.deltaY*m;e.preventDefault()},{passive:false}));
 function lvSet(want){if(!V||LV===want)return;if(!lvOn())cams[V.id]={...cam};LV=want;lvSave();renderAll();if(!LV){cams[V.id]?(Object.assign(cam,cams[V.id]),apply()):fit()}}
 function sfSet(m){if(m==='folders'){closeCat();return}const want=m==='letters';
   if(V){lvSet(want);return}const c=C.find(c=>c.id===lastCat)||C[0];if(!c)return;LV=want;lvSave();openCat(c)}
