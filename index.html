@@ -292,12 +292,6 @@ body.lv #cv,body.lv #zg,body.lv #zero,body.lv #edge,body.lv #ring,body.lv #hint,
 .lk span{flex:1}.lk .b:disabled{opacity:.25;pointer-events:none}
 #ltk .fold{position:relative;left:auto!important;top:auto!important;width:auto!important;min-width:0;padding:10px clamp(14px,4vw,28px) 22px;border-radius:18px}
 #ltk .grip,#ltk .rz{display:none}#ltk .fn{font-size:20px;cursor:text}#ltk .fd{opacity:1;padding:12px 8px}
-/* letter view: prev/next hotspots — cursor becomes a chevron (same treatment as the focus-mode X) */
-.lz{display:none;position:absolute;top:calc(env(safe-area-inset-top,0px) + 64px);bottom:0;width:max(48px,calc(50% - min(46vw,380px)));z-index:2;-webkit-tap-highlight-color:transparent}
-.lz.l{left:0;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M17 5L8 14l9 9' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 5L8 14l9 9' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 14 14,w-resize}
-.lz.r{right:0;cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M11 5l9 9-9 9' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11 5l9 9-9 9' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") 14 14,e-resize}
-.lz.off{pointer-events:none}
-@media(hover:hover) and (pointer:fine){body.lv .lz{display:block}body.lv.ed .lz{display:none}}
 #lh{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 36px);z-index:6;display:none;align-items:center;gap:2px;padding:4px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 body.lv #lh{display:flex}body.lv.ed #lh{display:none}
 #lh .b{width:44px;min-height:44px;font-size:18px}#lh .b:disabled{opacity:.25}#lh .n{font:400 12px/1 var(--mono);min-width:56px;text-align:center}
@@ -395,7 +389,7 @@ body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-me
   </div>
 </div>
 
-<div id="lt" role="region" aria-label="Letters"><div id="ltk"></div><div class="lz l" id="lzl" aria-hidden="true"></div><div class="lz r" id="lzr" aria-hidden="true"></div></div>
+<div id="lt" role="region" aria-label="Letters"><div id="ltk"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
 <script>
@@ -661,14 +655,7 @@ el.insertBefore(pw,el.querySelector('.cf'));el.append(pl)}
 function rCat(c){const el=h('div','cat'+(c.id===cur?' cur':'')),n=c.trees.reduce((s,t)=>s+cnt(t.tree),0);el.dataset.id=c.id;el.style.left=c.x+'px';el.style.top=c.y+'px';
 el.innerHTML='<span class="cb"></span><span class="cf"><span class="cl"></span><span class="cs"></span></span>';
 el.querySelector('.cl').textContent=c.name||'untitled';el.querySelector('.cs').textContent=n+(n===1?' item':' items');rExtras(el,c);return el}
-function openCat(c){if(V===c)return;if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};V=c;lastCat=c.id;F=c.trees;cur=F[0]&&F[0].id;const has=cams[c.id];if(has)Object.assign(cam,has);renderAll();chrome();tidy();has?apply():fit();swap()}
-/* spacing: if folders overlap (or forced), re-flow them into tidy columns */
-function tidy(force){if(!V||F.length<2||lvOn())return false;const G=56,it=F.map(f=>{const e=fel(f.id);return e?{f,w:e.offsetWidth,h:e.offsetHeight}:null}).filter(Boolean);
-const ov=it.some((a,i)=>it.some((b,j)=>j>i&&a.f.x<b.f.x+b.w+16&&b.f.x<a.f.x+a.w+16&&a.f.y<b.f.y+b.h+16&&b.f.y<a.f.y+a.h+16));
-if(!force&&!ov)return false;
-it.sort((a,b)=>a.f.x-b.f.x||a.f.y-b.f.y);const n=Math.min(it.length,4),cw=Math.max(...it.map(o=>o.w)),cols=Array(n).fill(0);
-it.forEach(o=>{let c=0;cols.forEach((v,i)=>{if(v<cols[c])c=i});o.f.x=Math.round(c*(cw+G));o.f.y=Math.round(cols[c]);cols[c]+=o.h+G;const e=fel(o.f.id);e.style.left=o.f.x+'px';e.style.top=o.f.y+'px'});
-save();return true}
+function openCat(c){if(V===c)return;if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};V=c;lastCat=c.id;F=c.trees;cur=F[0]&&F[0].id;const has=cams[c.id];if(has)Object.assign(cam,has);renderAll();chrome();has?apply():fit();swap()}
 function closeCat(){if(!V)return;if(!lvOn())cams[V.id]={...cam};lastCat=V.id;V=null;F=[];lvCat=null;Object.assign(cam,rc);cur=lastCat;renderAll();chrome();apply();swap()}
 function newCat(x,y){const c={id:nid(),name:'',x,y,trees:[{id:nid(),name:'',x:0,y:0,tree:[mk()]}]};C.push(c);openCat(c);$('cn').focus()}
 function rename(f){const nm=fel(f.id).querySelector('.fn');if(!nm)return;nm.readOnly=false;nm.focus();nm.select()}
@@ -769,19 +756,19 @@ function startLineDrag(e,li){
 /* wheel */
 let W=null,sT=0;
 function ow(m){if(W||document.activeElement.tagName==='INPUT')return;G=null;P.clear();document.activeElement.blur?.();
-const lv=lvOn(),ord=lv?lvOrder():null,names=lv?[...ord.map(f=>f.name||'untitled'),'+ new letter']:[...C.map(c=>c.name||'untitled'),'+ new folder'],idx=Math.max(0,lv?ord.findIndex(f=>f.id===cur):C.findIndex(c=>c.id===(V?V.id:lastCat))),fs=clamp(innerWidth*.075,26,46);
+const names=[...C.map(c=>c.name||'untitled'),'+ new folder'],idx=Math.max(0,C.findIndex(c=>c.id===(V?V.id:lastCat))),fs=clamp(innerWidth*.075,26,46);
 wh.innerHTML='';wh.style.setProperty('--fs',fs+'px');ov.style.setProperty('--in',(coarse.matches?26:80)+'px');
-W={m,lv,ord,max:names.length-1,tg:idx,pos:idx,i:idx,rh:fs*1.35,moved:false,el:names.map((t,i)=>{const d=h('div','wi',t);d.onclick=()=>{if(W.moved)return;W.tg=i;cw(true)};wh.append(d);return d})};
+W={m,tg:idx,pos:idx,i:idx,rh:fs*1.35,moved:false,el:names.map((t,i)=>{const d=h('div','wi',t);d.onclick=()=>{if(W.moved)return;W.tg=i;cw(true)};wh.append(d);return d})};
 ov.classList.add('on');ov.setAttribute('aria-hidden','false');wl()}
 function wl(){if(!W)return;W.pos+=(W.tg-W.pos)*.2;if(Math.abs(W.tg-W.pos)<.001)W.pos=W.tg;
 W.el.forEach((e,i)=>{const d=i-W.pos,a=Math.abs(d);e.style.transform=`translate(${-a*a*4}px,calc(${d*W.rh}px - 50%)) rotate(${d*6}deg)`;e.style.opacity=Math.max(.06,1-a*.24);e.style.filter=a>.4?`blur(${Math.min(a,3)*.8}px)`:'';e.classList.toggle('on',a<.5)});
 W.raf=requestAnimationFrame(wl)}
 function cw(ok){if(!W)return;cancelAnimationFrame(W.raf);const w=W;W=null;ov.classList.remove('on');ov.setAttribute('aria-hidden','true');
-if(!ok)return;const i=Math.round(w.tg);if(w.lv){if(i>=w.ord.length)lvNew();else lvGo(i);return}if(i>=C.length)newCat((C.length%4)*260,Math.floor(C.length/4)*230);else openCat(C[i])}
-ov.addEventListener('wheel',e=>{e.preventDefault();if(!W)return;W.tg=clamp(W.tg+clamp((e.deltaMode?e.deltaY*16:e.deltaY)/W.rh,-1,1),0,W.max);clearTimeout(W.t);W.t=setTimeout(()=>{if(W)W.tg=Math.round(W.tg)},140)},{passive:false});
+if(!ok)return;const i=Math.round(w.tg);if(i>=C.length)newCat((C.length%4)*260,Math.floor(C.length/4)*230);else openCat(C[i])}
+ov.addEventListener('wheel',e=>{e.preventDefault();if(!W)return;W.tg=clamp(W.tg+clamp((e.deltaMode?e.deltaY*16:e.deltaY)/W.rh,-1,1),0,C.length);clearTimeout(W.t);W.t=setTimeout(()=>{if(W)W.tg=Math.round(W.tg)},140)},{passive:false});
 let wd=null;
 wh.addEventListener('pointerdown',e=>{if(W)wd={y:e.clientY,s:W.tg,id:e.pointerId};if(W)W.moved=false});
-wh.addEventListener('pointermove',e=>{if(!wd||!W)return;const dy=e.clientY-wd.y;if(!W.moved&&Math.abs(dy)>4){W.moved=true;try{wh.setPointerCapture(wd.id)}catch(_){}}if(W.moved)W.tg=clamp(wd.s-dy/W.rh,0,W.max)});
+wh.addEventListener('pointermove',e=>{if(!wd||!W)return;const dy=e.clientY-wd.y;if(!W.moved&&Math.abs(dy)>4){W.moved=true;try{wh.setPointerCapture(wd.id)}catch(_){}}if(W.moved)W.tg=clamp(wd.s-dy/W.rh,0,C.length)});
 const wend=()=>{if(wd&&W&&W.moved){W.tg=Math.round(W.tg);setTimeout(()=>{if(W)W.moved=false},0)}wd=null};
 wh.addEventListener('pointerup',wend);wh.addEventListener('pointercancel',wend);
 $('cx').onclick=()=>cw(false);$('bk').onclick=closeCat;
@@ -789,7 +776,7 @@ const cn=$('cn');cn.oninput=()=>{if(V){V.name=cn.value;save()}};cn.onkeydown=e=>
 $('cd').onclick=async()=>{if(!V)return;const ok=await confirmModal('Delete "'+(V.name||'untitled')+'" and all its folders?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(c=>c!==V);closeCat();save();toast('Category deleted')};
 $('fb').onclick=closeCat;$('mb').onclick=()=>ow('tap');
 addEventListener('keydown',e=>{
-if(W){if(e.key==='Escape'){e.preventDefault();cw(false)}else if(e.key==='Enter'){e.preventDefault();cw(true)}else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();W.tg=clamp(Math.round(W.tg)+(e.key==='ArrowUp'?-1:1),0,W.max)}return}
+if(W){if(e.key==='Escape'){e.preventDefault();cw(false)}else if(e.key==='Enter'){e.preventDefault();cw(true)}else if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();W.tg=clamp(Math.round(W.tg)+(e.key==='ArrowUp'?-1:1),0,C.length)}return}
 if(e.key==='Escape'&&V&&!e.target.matches('textarea,input')){closeCat();return}
 if(e.key==='Shift'&&!e.repeat)sT=setTimeout(()=>ow('shift'),380);else clearTimeout(sT);
 if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&e.target.tagName!=='TEXTAREA'){e.preventDefault();e.shiftKey?redo():undo()}});
@@ -921,7 +908,7 @@ const catMenu=c=>[
 
 const canvasMenu=(x,y)=>[
 V?{l:'new folder here',f:()=>newFolder(wx(x),wy(y))}:{l:'new category here',f:()=>newCat(wx(x)-100,wy(y)-60)},'-',
-V?{l:'tidy up folders',f:()=>{tidy(true);fit(true)}}:null,{l:'fit all',f:()=>fit(true)},{l:'zoom 100%',k:'0',f:()=>zoomTo(1)},{l:'go to zero',f:home},'-',
+{l:'fit all',f:()=>fit(true)},{l:'zoom 100%',k:'0',f:()=>zoomTo(1)},{l:'go to zero',f:home},'-',
 {l:'undo',k:mod+'Z',f:undo},{l:'redo',k:mod+'⇧Z',f:redo},'-',
 V?{l:'back to categories',k:'Esc',f:closeCat}:null,
 {l:'switch category',k:'hold ⇧',f:()=>ow('tap')},'-',
@@ -983,7 +970,7 @@ addEventListener('focusin',()=>setTimeout(tbPlace,0));addEventListener('resize',
 
 /* boot */
 paintTheme();chrome();renderAll();apply();
-tidy();if(needFit){fit();document.fonts&&document.fonts.ready.then(()=>{tidy();fit()})}else document.fonts&&document.fonts.ready.then(()=>{if(tidy())fit(true)})
+if(needFit){fit();document.fonts&&document.fonts.ready.then(()=>fit())}
 if(!coarse.matches)say('click a card to open · double-click empty space to add · hold ⇧ for the wheel · right-click for actions · ? for help');
 else say('tap a card to open · long-press for actions · ? for help');
 if(!tourSeen)setTimeout(()=>openTour(),700);
@@ -1086,7 +1073,6 @@ function lvAct(i,sm){
     else if(d>2&&p.dataset.h&&!p.contains(document.activeElement)){delete p.dataset.h;s.replaceChildren()}});
   setCur(ord[i].id);LI[V.id]=ord[i].id;lvSave();
   $('ln').textContent=(i+1)+' / '+ps.length;$('lprev').disabled=!i;$('lnext').disabled=i===ps.length-1;
-  $('lzl').classList.toggle('off',!i);$('lzr').classList.toggle('off',i===ps.length-1);
   if(sm!==undefined){const p=ps[i];const x=p.offsetLeft-(ltk.clientWidth-p.offsetWidth)/2;try{ltk.scrollTo({left:x,behavior:sm&&!RM.matches?'smooth':'auto'})}catch(_){ltk.scrollLeft=x}}}
 function lvGo(i){lvAct(i,true)}
 function lvMove(a,b){if(!b)return;[a.x,b.x]=[b.x,a.x];[a.y,b.y]=[b.y,a.y];cur=a.id;save();lvRender()}
@@ -1094,10 +1080,7 @@ function lvNew(){const w=f=>f.w||FW,f={id:nid(),name:'',x:F.length?Math.max(...F
 let lvT;ltk.addEventListener('scroll',()=>{clearTimeout(lvT);lvT=setTimeout(()=>{const c=ltk.scrollLeft+ltk.clientWidth/2;let b=0,d=1e9;[...ltk.children].forEach((p,j)=>{const x=Math.abs(p.offsetLeft+p.offsetWidth/2-c);if(x<d){d=x;b=j}});if(b!==lvI)lvAct(b)},90)},{passive:true});
 ltk.addEventListener('click',e=>{const n=e.target.closest('.fn');if(n&&n.readOnly){const f=fobj(n.closest('.fold').dataset.id);if(f)rename(f)}});
 $('lprev').onclick=()=>lvGo(lvI-1);$('lnext').onclick=()=>lvGo(lvI+1);
-$('lzl').onclick=()=>lvGo(lvI-1);$('lzr').onclick=()=>lvGo(lvI+1);
-/* hotspots sit above the peeking cards, so hand wheel/trackpad scrolling through */
-['lzl','lzr'].forEach(id=>$(id).addEventListener('wheel',e=>{const m=e.deltaMode?16:1,p=ltk.children[lvI];if(Math.abs(e.deltaX)>Math.abs(e.deltaY))ltk.scrollLeft+=e.deltaX*m;else if(p)p.scrollTop+=e.deltaY*m;e.preventDefault()},{passive:false}));
-$('vt').onclick=()=>{if(!V)return;if(!lvOn())cams[V.id]={...cam};LV=!LV;lvSave();renderAll();if(!LV){tidy();cams[V.id]?(Object.assign(cam,cams[V.id]),apply()):fit()}};
+$('vt').onclick=()=>{if(!V)return;if(!lvOn())cams[V.id]={...cam};LV=!LV;lvSave();renderAll();if(!LV){cams[V.id]?(Object.assign(cam,cams[V.id]),apply()):fit()}};
 addEventListener('keydown',e=>{if(!lvOn()||W||FX||e.metaKey||e.ctrlKey||e.altKey||(e.target.closest&&e.target.closest('textarea,input,[contenteditable]')))return;
   if(e.key==='ArrowLeft'){e.preventDefault();lvGo(lvI-1)}else if(e.key==='ArrowRight'){e.preventDefault();lvGo(lvI+1)}});
 lvRender();
@@ -6001,4 +5984,3 @@ render();
 </script>
 </body>
 </html>
-
