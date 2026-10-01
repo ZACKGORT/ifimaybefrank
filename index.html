@@ -190,12 +190,12 @@ body.ed #zg{opacity:0;pointer-events:none}
 .toast button:hover{opacity:1}
 .toast.error{background:#e5484d;color:#fff}
 
-#fab{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 172px);z-index:7;width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.25);display:grid;place-items:center;transition:transform .15s cubic-bezier(.23,1,.32,1),box-shadow .15s;font:300 26px/1 var(--sans)}
+#fab{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:var(--fb);z-index:7;width:48px;height:48px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.25);display:grid;place-items:center;transition:transform .15s cubic-bezier(.23,1,.32,1),box-shadow .15s,bottom .3s cubic-bezier(.23,1,.32,1);font:300 26px/1 var(--sans)}
 #fab:hover{transform:scale(1.06);box-shadow:0 14px 34px rgba(0,0,0,.3)}
 #fab:active{transform:scale(.94)}
 #fab.open{transform:rotate(45deg) scale(1.06)}
 #fab svg{width:18px;height:18px;display:block;pointer-events:none}
-#fab-menu{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 230px);z-index:7;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 18px 44px rgba(0,0,0,.28);display:none;flex-direction:column;min-width:200px;transform-origin:bottom right}
+#fab-menu{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(var(--fb) + 58px);z-index:7;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;box-shadow:0 18px 44px rgba(0,0,0,.28);display:none;flex-direction:column;min-width:200px;transform-origin:bottom right}
 #fab-menu.on{display:flex;animation:fabIn .18s cubic-bezier(.23,1,.32,1)}
 @keyframes fabIn{from{opacity:0;transform:translateY(8px) scale(.96)}}
 #fab-menu button{display:flex;justify-content:space-between;align-items:center;gap:16px;text-align:left;padding:11px 13px;border:0;background:none;color:var(--ink);font:400 13px/1.2 var(--sans);letter-spacing:-.005em;cursor:pointer;border-radius:9px}
@@ -203,7 +203,13 @@ body.ed #zg{opacity:0;pointer-events:none}
 #fab-menu button:active{background:color-mix(in srgb,var(--ink) 12%,transparent)}
 #fab-menu .k{color:var(--mute);font:400 10px/1 var(--mono)}
 #fab-menu hr{border:0;border-top:1px solid var(--line);margin:5px 4px}
-@media(max-width:520px){#fab{bottom:calc(env(safe-area-inset-bottom,0px) + 172px);width:52px;height:52px}#fab-menu{bottom:calc(env(safe-area-inset-bottom,0px) + 240px)}}
+@media(max-width:520px){#fab{width:52px;height:52px}#fab-menu{bottom:calc(var(--fb) + 68px)}}
+/* --fb = FAB bottom offset. Default sits above the zoom gauge (#zg: 16px + 140px + 16px gap). Where the gauge isn't shown (letter view, editing) the FAB clamps to the corner and takes its spot. */
+:root{--fb:calc(env(safe-area-inset-bottom,0px) + 172px)}
+body.lv{--fb:calc(env(safe-area-inset-bottom,0px) + 16px)}
+body.ed{--fb:calc(env(safe-area-inset-bottom,0px) + var(--kb,0px) + 16px)}
+@media(max-width:760px){body.ed{--fb:calc(env(safe-area-inset-bottom,0px) + var(--kb,0px) + 68px)}}
+@media(prefers-reduced-motion:reduce){#fab{transition:transform .15s,box-shadow .15s}}
 
 #modal-root{position:fixed;inset:0;z-index:45;pointer-events:none}
 #modal-root:has(.modal){pointer-events:auto}
@@ -302,7 +308,6 @@ body.lv #cv,body.lv #zg,body.lv #zero,body.lv #edge,body.lv #ring,body.lv #hint,
 #lh{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 36px);z-index:6;display:none;align-items:center;gap:2px;padding:4px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 body.lv #lh{display:flex}body.lv.ed #lh{display:none}
 #lh .b{width:44px;min-height:44px;font-size:18px}#lh .b:disabled{opacity:.25}#lh .n{font:400 12px/1 var(--mono);min-width:56px;text-align:center}
-body.lv #fab{bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}body.lv #fab-menu{bottom:calc(env(safe-area-inset-bottom,0px) + 154px)}
 #sf{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 #sf button{all:unset;box-sizing:border-box;min-height:36px;padding:0 13px;display:inline-flex;align-items:center;border-radius:11px;font:400 12px/1 var(--mono);color:var(--mute);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #sf button:hover{color:var(--ink)}#sf button[aria-pressed=true]{background:var(--ink);color:var(--bg)}#sf button:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
@@ -314,7 +319,14 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 .pal-bg{position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 55%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .pal-box{position:absolute;left:50%;top:max(12vh,calc(env(safe-area-inset-top,0px) + 56px));transform:translateX(-50%);width:min(620px,calc(100vw - 24px));max-height:min(520px,calc(100dvh - 120px));display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.35);overflow:hidden}
 #pali{border:0;outline:0;background:none;color:var(--ink);font:400 17px/1.2 var(--sans);padding:18px;width:100%;box-sizing:border-box;border-bottom:1px solid var(--line)}#pali::placeholder{color:var(--mute)}
-#pall{overflow-y:auto;padding:6px;overscroll-behavior:contain}
+#pall{overflow-y:auto;padding:6px;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}#pall::-webkit-scrollbar{display:none}
+/* palette scroll indicator — hairline thumb, fades in on scroll / hover / drag */
+#pals{position:absolute;right:0;width:10px;z-index:2;display:none;opacity:0;transition:opacity .25s;touch-action:none;user-select:none;-webkit-user-select:none;cursor:default}
+#pals.has{display:block}#pals.on,#pals:hover,#pals[data-held='1']{opacity:1}
+#pals i{position:absolute;top:0;right:3px;width:3px;border-radius:3px;background:var(--ink);opacity:.38;will-change:transform;transition:width .15s,right .15s,opacity .15s}
+#pals:hover i{width:5px;right:2px;opacity:.6}#pals[data-held='1'] i{width:5px;right:2px;opacity:.85}
+@media(pointer:coarse){#pals{width:16px}#pals i{right:4px}}
+@media(prefers-reduced-motion:reduce){#pals,#pals i{transition:none}}
 .pg{font:300 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute);padding:10px 10px 6px}
 .po{display:flex;align-items:baseline;gap:12px;padding:10px;border-radius:8px;cursor:pointer;color:var(--ink)}.po.hl{background:color-mix(in srgb,var(--ink) 9%,transparent)}
 .po .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:400 14px/1.3 var(--sans)}
@@ -1186,6 +1198,37 @@ palI.addEventListener('keydown',e=>{const k=e.key;
   else if(k==='Enter'){e.preventDefault();if(!e.isComposing)palRun(palH)}else if(k==='Escape'){e.preventDefault();closePal()}else if(k==='Tab')e.preventDefault();
   e.stopPropagation()});
 addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey&&(e.key||'').toLowerCase()==='k'){e.preventDefault();e.stopPropagation();palEl.classList.contains('on')?closePal():openPal()}},true);
+
+/* ══ palette: custom scroll indicator ══ */
+(function(){
+  const box=palEl.querySelector('.pal-box'),tr=document.createElement('div'),th=document.createElement('i');
+  tr.id='pals';tr.setAttribute('aria-hidden','true');tr.append(th);box.append(tr);
+  const MIN=28,PAD=6;let hideT=0,raf=0,drag=null,tH=0,thH=0;
+  function flash(){tr.classList.add('on');clearTimeout(hideT);hideT=setTimeout(()=>tr.classList.remove('on'),900)}
+  function layout(){raf=0;
+    const ch=palL.clientHeight,sh=palL.scrollHeight,over=ch>0&&sh-ch>1;
+    tr.classList.toggle('has',over);if(!over)return;
+    const t=palL.offsetTop,b=box.clientHeight-(t+palL.offsetHeight);
+    tr.style.top=(t+PAD)+'px';tr.style.bottom=(b+PAD)+'px';
+    tH=tr.clientHeight;thH=Math.min(tH,Math.max(MIN,Math.round(tH*ch/sh)));
+    const p=clamp(palL.scrollTop/(sh-ch),0,1);
+    th.style.height=thH+'px';th.style.transform='translateY('+((tH-thH)*p).toFixed(1)+'px)'}
+  const sched=()=>{if(!raf)raf=requestAnimationFrame(layout)};
+  palL.addEventListener('scroll',()=>{sched();flash()},{passive:true});
+  new MutationObserver(sched).observe(palL,{childList:true});
+  if(window.ResizeObserver){const ro=new ResizeObserver(sched);ro.observe(palL);ro.observe(box)}
+  addEventListener('resize',sched);
+  new MutationObserver(()=>{if(palEl.classList.contains('on')){sched();setTimeout(()=>{if(tr.classList.contains('has'))flash()},120)}}).observe(palEl,{attributes:true,attributeFilter:['class']});
+  /* drag the thumb, or press the track to jump there */
+  tr.addEventListener('mousedown',e=>e.preventDefault());
+  tr.addEventListener('pointerdown',e=>{if(e.button)return;layout();
+    const r=th.getBoundingClientRect(),room=tH-thH,span=palL.scrollHeight-palL.clientHeight;if(room<=0||span<=0)return;
+    if(e.clientY<r.top||e.clientY>r.bottom){const tr0=tr.getBoundingClientRect(),p=clamp((e.clientY-tr0.top-thH/2)/room,0,1);palL.scrollTop=p*span}
+    drag={y0:e.clientY,s0:palL.scrollTop,k:span/room};tr.dataset.held=1;try{tr.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});
+  tr.addEventListener('pointermove',e=>{if(drag)palL.scrollTop=drag.s0+(e.clientY-drag.y0)*drag.k});
+  const up=()=>{if(!drag)return;drag=null;delete tr.dataset.held;flash()};
+  tr.addEventListener('pointerup',up);tr.addEventListener('pointercancel',up);tr.addEventListener('lostpointercapture',up);
+})();
 
 /* ══ a11y: dialogs make the background inert and give focus back ══ */
 const DL=[[helpEl,()=>helpEl.classList.contains('on')],[tourEl,()=>tourEl.classList.contains('on')],[palEl,()=>palEl.classList.contains('on')],[$('modal-root'),()=>!!$('modal-root').querySelector('.modal')],[fxEl,()=>!!FX]],TR=new Map();let lastF=null;
