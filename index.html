@@ -96,13 +96,16 @@ body.grab .fold.cur,.fold.rzg{box-shadow:var(--s3)}body.grab .cat.cur .cb{box-sh
 .fd{border:0;background:none;padding:8px 0 8px 8px;font:300 10px/1 var(--mono);color:var(--mute);cursor:pointer;opacity:0;transition:opacity .2s,color .2s}
 .fold:hover .fd,.fold:focus-within .fd{opacity:1}.fd:hover{color:var(--ink)}
 
-/* TREE CONNECTORS — anchored to row's true vertical center */
-.kids{list-style:none;margin:0;padding:0;position:relative}
-.kids>li{position:relative;padding-left:22px}
+/* TREE CONNECTORS — anchored to row's true vertical center.
+   --ind  = per-level indentation (scales down on mobile, mirroring focus mode)
+   --trunk = trunk offset from the li's left edge; scales with --ind so deep
+            levels stay legible when indentation collapses. */
+.kids{list-style:none;margin:0;padding:0;position:relative;--ind:22px;--trunk:max(2px, calc(var(--ind) * 0.36))}
+.kids>li{position:relative;padding-left:var(--ind)}
 .kids>li>.row{position:relative}
-.kids>li>.row::before{content:'';position:absolute;left:-14px;top:0;width:14px;height:50%;box-sizing:border-box;border-left:1.5px solid var(--line);border-bottom:1.5px solid var(--line);border-bottom-left-radius:9px;transition:border-color .2s;pointer-events:none}
-.kids>li:not(:last-child)>.row::after{content:'';position:absolute;left:-14px;top:50%;bottom:0;width:0;border-left:1.5px solid var(--line);transition:border-color .2s;pointer-events:none}
-.kids>li:not(:last-child)>.kids::before{content:'';position:absolute;left:-14px;top:0;bottom:0;width:0;border-left:1.5px solid var(--line);transition:border-color .2s;pointer-events:none}
+.kids>li>.row::before{content:'';position:absolute;left:calc(var(--trunk) - var(--ind));top:0;width:calc(var(--ind) - var(--trunk));height:50%;box-sizing:border-box;border-left:1.5px solid var(--line);border-bottom:1.5px solid var(--line);border-bottom-left-radius:min(9px, calc(var(--ind) - var(--trunk)));transition:border-color .2s;pointer-events:none}
+.kids>li:not(:last-child)>.row::after{content:'';position:absolute;left:calc(var(--trunk) - var(--ind));top:50%;bottom:0;width:0;border-left:1.5px solid var(--line);transition:border-color .2s;pointer-events:none}
+.kids>li:not(:last-child)>.kids::before{content:'';position:absolute;left:calc(var(--trunk) - var(--ind));top:0;bottom:0;width:0;border-left:1.5px solid var(--line);transition:border-color .2s;pointer-events:none}
 .kids>li>.kids{position:relative}
 li.act>.row::before,li.act>.row::after,li.act>.kids::before{border-color:var(--ink)}
 li.z>.kids{display:none}
@@ -157,7 +160,7 @@ body.ed #tb{display:flex}#tb .b{min-height:36px;padding:0 10px;flex:none}
 .wi.on{color:var(--ink);font-weight:500}
 #acts{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;gap:6px;justify-content:center;flex-wrap:wrap;padding:0 14px}
 #cx{position:absolute;top:calc(env(safe-area-inset-top,0px) + 14px);right:18px}
-@media(hover:none),(pointer:coarse),(max-width:768px){:root{--rh:44px}.ed::after,.ed textarea{font-size:16px}.fd{opacity:.7}.tw{width:40px}.tw::before{left:17px}.fn{font-size:16px}.st{font-size:16px}.spk{opacity:.9}.rgrip{width:18px;opacity:.5}}
+@media(hover:none),(pointer:coarse),(max-width:768px){:root{--rh:44px}.ed::after,.ed textarea{font-size:16px}.fd{opacity:.7}.tw{width:40px}.tw::before{left:17px}.fn{font-size:16px}.st{font-size:16px}.spk{opacity:.9}.rgrip{width:18px;opacity:.5}.kids{--ind:15px}.kids .kids{--ind:12px}.kids .kids .kids{--ind:10px}.kids .kids .kids .kids,.kids .kids .kids .kids .kids,.kids .kids .kids .kids .kids .kids,.kids .kids .kids .kids .kids .kids .kids{--ind:10px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .ed{align-items:stretch;align-content:center}
 .ed::after,.ed textarea{box-sizing:border-box;overflow-wrap:break-word}
@@ -1878,6 +1881,16 @@ body.custom-cursor-active.write-native-cursor,body.custom-cursor-active.write-na
   color:color-mix(in srgb, var(--ow-active-color) calc(var(--ow-p,0) * 100%), var(--ow-text-color));
 }
 .option-wheel__item--selected{font-weight:500}
+/* ── mobile compose: tools dock above the keyboard, hint steps aside ── */
+@media (hover:none),(pointer:coarse),(max-width:768px){
+  .tools{font-size:12px}
+  .tools i{font-size:12px}
+  .row.ed .tools{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:7;margin:0;gap:4px;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;box-sizing:border-box;padding:6px 10px max(6px,calc(env(safe-area-inset-bottom,0px) - var(--kb,0px)));background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);opacity:1}
+  .row.ed .tools::-webkit-scrollbar{display:none}
+  .row.ed .tools button{flex:none}
+  body:has(.row.ed) #hint{opacity:0}
+  body:has(.row.ed) #toast{bottom:calc(84px + env(safe-area-inset-bottom,0px) + var(--kb,0px))}
+}
 </style>
 </head>
 <body>
@@ -7522,8 +7535,8 @@ const fit = t => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'p
 
 const HI   = '<b>click</b> a line to edit &nbsp;·&nbsp; <b>right-click</b> for color &nbsp;·&nbsp; click below to add';
 const HE   = '<b>enter</b> next &nbsp;·&nbsp; <b>shift+enter</b> branch &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>⌥</b>+scroll to move &nbsp;·&nbsp; <b>esc</b> done';
-const HI_T = '<b>tap</b> a line to edit &nbsp;·&nbsp; <b>long-press</b> for color &nbsp;·&nbsp; tap below to add';
-const HE_T = '<b>enter</b> next &nbsp;·&nbsp; <b>branch</b> below &nbsp;·&nbsp; <b>tab</b> indent &nbsp;·&nbsp; <b>esc</b> done';
+const HI_T = '<b>tap</b> a line &nbsp;·&nbsp; <b>long-press</b> for color &nbsp;·&nbsp; tap below to add &nbsp;·&nbsp; <b>paste</b> a list → many lines';
+const HE_T = '<b>return</b> next line &nbsp;·&nbsp; <b>branch</b> goes deeper &nbsp;·&nbsp; <b>in / out</b> indent &nbsp;·&nbsp; <b>↑ ↓</b> move';
 
 function setHint(){
   $('ht').innerHTML = editing ? (coarse.matches ? HE_T : HE) : (coarse.matches ? HI_T : HI);
@@ -7588,15 +7601,29 @@ function buildNode(n, d){
     const rr = find(n.id);
     const canOut = !!(rr && rr.p);
     const canIn  = !!(rr && rr.i > 0);
-    [
+    const syncTools = () => {
+      const q = find(n.id); if(!q) return;
+      const off = { out: !q.p, in: q.i === 0, up: q.i === 0, down: q.i === q.a.length - 1 };
+      t.querySelectorAll('button[data-act]').forEach(b => { if(b.dataset.act in off) b.disabled = off[b.dataset.act] });
+    };
+    const acts = [
       ['↵','next',    () => addPeer(n),                  false],
       ['⇧↵','branch', () => addChild(n),                 false],
       ['⇤','out',     () => outdent(n, i.selectionStart), !canOut],
       ['⇥','in',      () => indent(n, i.selectionStart),  !canIn ],
       ['⌫','delete',  () => remove(n.id),                false]
-    ].forEach(([k,l,f,dis]) => {
+    ];
+    if(coarse.matches){
+      acts.unshift(acts.splice(1, 1)[0]);           /* branch first, then next */
+      acts.splice(4, 0,                              /* ↑ ↓ before delete */
+        ['↑','up',   () => { reorder(n, -1, i.selectionStart); syncTools() }, !!(rr && rr.i === 0)],
+        ['↓','down', () => { reorder(n,  1, i.selectionStart); syncTools() }, !!(rr && rr.i === rr.a.length - 1)]
+      );
+    }
+    acts.forEach(([k,l,f,dis]) => {
       const b = document.createElement('button'); b.type = 'button';
       b.innerHTML = `<i>${k}</i>${l}`;
+      b.dataset.act = l;
       b.onclick = f;
       if(dis) b.disabled = true;
       t.appendChild(b);
@@ -7609,6 +7636,7 @@ function buildNode(n, d){
       n.t = i.value;
       t.classList.toggle('e', !i.value.trim());
       fit(i);
+      scheduleSEV();
       save(true);
     };
     i.onkeydown = e => key(e, n);
@@ -7774,6 +7802,7 @@ function focusTextarea(li, id){
     pendingCaret = null;
   }
   fit(ta);
+  scheduleSEV();
 }
 
 function patchNode(id, caretPos){
@@ -7817,6 +7846,7 @@ function render(){
       : i.value.length;
     pendingCaret = null;
     try { i.setSelectionRange(pos, pos) } catch(_) {}
+    scheduleSEV();
     fit(i);
   }
   setHint();
@@ -8810,11 +8840,30 @@ document.addEventListener('pointerdown', e => {
 
 document.addEventListener('pointermove', e => {
   if(e.pointerType !== 'touch' || !lpTimer) return;
-  if(Math.hypot(e.clientX - lpPos.x, e.clientY - lpPos.y) > 10) cancelLP();
+  if(Math.hypot(e.clientX - lpPos.x, e.clientY - lpPos.y) > 15) cancelLP();
 }, { passive: true });
 
 document.addEventListener('pointerup', cancelLP, { passive: true });
 document.addEventListener('pointercancel', cancelLP, { passive: true });
+
+/* keep the editing row (and the docked tools bar) clear of the soft keyboard */
+var sevRaf = 0;
+function scrollEditIntoView(){
+  if(!coarse.matches) return;
+  const row = treeEl.querySelector('.row.ed'); if(!row) return;
+  const vv = window.visualViewport;
+  const top = (vv ? vv.offsetTop : 0) + 60;                       /* clears the pinned wordmark */
+  let bottom = (vv ? vv.offsetTop + vv.height : window.innerHeight) - 12;
+  const tb = row.querySelector('.tools');
+  if(tb && getComputedStyle(tb).position === 'fixed') bottom -= tb.offsetHeight;
+  const r = row.getBoundingClientRect();
+  if(r.top < top)         window.scrollBy({ top: r.top - top,       behavior: 'smooth' });
+  else if(r.bottom > bottom) window.scrollBy({ top: r.bottom - bottom, behavior: 'smooth' });
+}
+function scheduleSEV(){
+  if(sevRaf) return;
+  sevRaf = requestAnimationFrame(() => { sevRaf = 0; scrollEditIntoView() });
+}
 
 (function kbAware(){
   const vv = window.visualViewport;
@@ -8826,6 +8875,7 @@ document.addEventListener('pointercancel', cancelLP, { passive: true });
       raf = null;
       const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
       document.documentElement.style.setProperty('--kb', (kb > 60 ? kb : 0) + 'px');
+      scheduleSEV();
     });
   };
   vv.addEventListener('resize', adj);
