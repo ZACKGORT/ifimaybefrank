@@ -495,6 +495,11 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 #nmr .nim{max-height:32vh;width:auto;max-width:100%;object-fit:contain}
 #nmr a.nx,#nmr a.n2{color:var(--ink);text-decoration:underline;text-underline-offset:2px;word-break:break-all}
 #nmr a.n2{color:var(--mute)}
+
+.nn.w{height:auto;min-height:30px;align-items:flex-start;padding:7px 7px 7px 11px;border-radius:12px}
+.nn.w .nd{margin-top:5px}
+.nn.w .nl{white-space:pre-wrap;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.4}
+.nn.w .nt{align-self:flex-start;margin:-3px -3px 0 0}
 </style>
 </head>
 <body>
@@ -592,7 +597,7 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 <div id="lt" role="region" aria-label="Letters"><div id="ltk"></div><div class="lz l" id="lzl" aria-hidden="true"></div><div class="lz r" id="lzr" aria-hidden="true"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
-<div id="nm" aria-hidden="true" role="dialog" aria-label="node mode"><div id="nmw" role="tree"><svg id="nms" aria-hidden="true"></svg></div><div id="nmh"><span id="nmt"></span><span class="nmg"><button type="button" data-d="1" title="show 1 level">1</button><button type="button" data-d="2" title="show 2 levels">2</button><button type="button" data-d="3" title="show 3 levels">3</button><button type="button" data-d="99" title="expand everything">all</button><button type="button" data-z="-1" aria-label="zoom out">−</button><button type="button" data-z="1" aria-label="zoom in">+</button><button type="button" data-a="fit">fit</button><button type="button" data-a="focus">edit in focus</button></span></div><div id="nmr" aria-live="polite"></div><button id="nmb" type="button">back to canvas</button></div>
+<div id="nm" aria-hidden="true" role="dialog" aria-label="node mode"><div id="nmw" role="tree"><svg id="nms" aria-hidden="true"></svg></div><div id="nmh"><span id="nmt"></span><span class="nmg"><button type="button" data-d="1" title="show 1 level">1</button><button type="button" data-d="2" title="show 2 levels">2</button><button type="button" data-d="3" title="show 3 levels">3</button><button type="button" data-d="99" title="expand everything">all</button><button type="button" data-z="-1" aria-label="zoom out">−</button><button type="button" data-z="1" aria-label="zoom in">+</button><button type="button" data-a="tx" id="nmx" title="full text / one line per node (t)">text: full</button><button type="button" data-a="fit">fit</button><button type="button" data-a="focus">edit in focus</button></span></div><div id="nmr" aria-live="polite"></div><button id="nmb" type="button">back to canvas</button></div>
 <script>
 const $=id=>document.getElementById(id),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const K='frankly:canvas:v2',TOUR_K='frankly:tour:v1',FW=264,vv=visualViewport,root=document.documentElement,cv=$('cv'),world=$('w'),ov=$('ov'),wh=$('wh'),hint=$('hint'),zeroEl=$('zero'),edgeEl=$('edge');
@@ -1238,7 +1243,7 @@ $('fxb').onclick=$('fxl').onclick=$('fxr').onclick=closeFocus;
    same data model (nodes = lines, edges = parent→child), no new schema. read-only in v1:
    collapse here is local to the view; writing hands off to focus mode. */
 const nmEl=$('nm'),nmW=$('nmw'),nmS=$('nms'),nmR=$('nmr'),nmT=$('nmt');let NM=null;
-const NMW=220,NMH=30,NMX=300,NMG=12,NMMW=260,NMMH=Math.round((NMMW-2)*.625)+2,NMK='⌘'===mod?'⌘⌥N':'Ctrl+Alt+N';
+const NMW=220,NMH=30,NMTW=300,NMG=12,NMMW=260,NMMH=Math.round((NMMW-2)*.625)+2,NMK='⌘'===mod?'⌘⌥N':'Ctrl+Alt+N';
 /* media: reuse the app's own bare-URL detection (isImg / isVid / isFrame) so a line that is just a link renders as a thumbnail, a looping preview, or a live-able site */
 const nmKind=n=>{if(n.v)return null;const t=String(n.t||'');return isImg(t)?'img':isVid(t)?'vid':isFrame(t)?'site':null};
 const nmLab=n=>{const k=nmKind(n);
@@ -1246,13 +1251,14 @@ const nmLab=n=>{const k=nmKind(n);
     try{const u=new URL(t);if(k==='site')return '↗ '+u.hostname+(u.pathname.length>1?u.pathname.replace(/\/$/,''):'');
       let nm=u.pathname.split('/').filter(Boolean).pop()||u.hostname;try{nm=decodeURIComponent(nm)}catch(_){}return (k==='img'?'▣ ':'▶ ')+nm.slice(0,40)}catch(_){return t.slice(0,40)}}
   const x=String(n.t||'').split('\n')[0].trim();return x||'·'};
+const nmFull=n=>String(n.t||'').trim()||'·';
 const nmFind=(a,id)=>{for(const n of a){if(n.id===id)return n;const r=nmFind(n.k||[],id);if(r)return r}return null};
 const nmOpen=n=>NM.o.has(n.id)?NM.o.get(n.id):!n.z;
 const nmRoot=()=>{const f=NM.f;if(NM.rid){const q=nmFind(f.tree,NM.rid);if(q)return q;NM.rid=null}return{id:'__r',t:f.name||'untitled',c:null,s:false,v:1,k:f.tree}};
-const nmDim=n=>nmKind(n)?{w:NMMW,h:NMMH}:{w:NMW,h:NMH};
+const nmDim=n=>nmKind(n)?{w:NMMW,h:NMMH}:{w:NM.full?NMTW:NMW,h:(NM.full&&NM.hm&&NM.hm.get(n.id))||NMH};
 function nmBuild(){const out=[];let cur=0;
   const shift=(e,dy)=>{e.y+=dy;e.ch.forEach(c=>shift(c,dy))};
-  const walk=(n,d,p)=>{const dm=nmDim(n),e={n,d,p,x:d*NMX,y:0,w:dm.w,h:dm.h,ch:[]};out.push(e);const ks=n.k||[],top=cur;
+  const walk=(n,d,p)=>{const dm=nmDim(n),e={n,d,p,x:d*(NM.full?360:300),y:0,w:dm.w,h:dm.h,ch:[]};out.push(e);const ks=n.k||[],top=cur;
     if(ks.length&&(d===0||nmOpen(n))){ks.forEach(k=>e.ch.push(walk(k,d+1,e)));
       const a=e.ch[0],b=e.ch[e.ch.length-1];e.y=(a.y+a.h/2+b.y+b.h/2)/2-e.h/2;
       if(e.y<top){const dy=top-e.y;e.ch.forEach(c=>shift(c,dy));e.y=top;cur+=dy}
@@ -1286,17 +1292,22 @@ function nmNode(e,old){const n=e.n,ks=n.k||[],k=nmKind(n),sig=k?k+'|'+n.t:'t';le
   if(!el){el=h('div','nn'+(k?' m':''));el.dataset.id=n.id;el.dataset.sig=sig;el.setAttribute('role','treeitem');if(k)el.append(nmMedia(n,k))}
   el.classList.toggle('s',!!n.s&&!k);el.classList.toggle('rt',e.d===0);
   el.style.transform='translate('+e.x+'px,'+e.y+'px)';
-  if(k){el.style.width=e.w+'px';el.style.height=e.h+'px';el.querySelectorAll(':scope>.nt').forEach(x=>x.remove())}
-  else{el.replaceChildren();if(!(e.d===0&&n.v)){const i=h('i','nd');if(n.c)i.style.background=n.c;el.append(i)}
-    const lab=h('span','nl',nmLab(n));if(n.c&&!n.v)lab.style.color=n.c;el.append(lab)}
+  el.style.width=e.w+'px';el.classList.toggle('w',!k&&!!NM.full);
+  if(k){el.style.height=e.h+'px';el.querySelectorAll(':scope>.nt').forEach(x=>x.remove())}
+  else{el.style.height='';el.replaceChildren();if(!(e.d===0&&n.v)){const i=h('i','nd');if(n.c)i.style.background=n.c;el.append(i)}
+    const lab=h('span','nl',NM.full?nmFull(n):nmLab(n));if(n.c&&!n.v)lab.style.color=n.c;el.append(lab)}
   if(ks.length&&e.d>0){const open=nmOpen(n),b=h('button','nt',open?'−':'+'+cnt(ks));b.dataset.t=n.id;b.type='button';b.setAttribute('aria-label',(open?'collapse ':'expand ')+nmLab(n));el.append(b);el.setAttribute('aria-expanded',String(open))}
   else el.removeAttribute('aria-expanded');
   return el}
-function nmRender(){const N=NM,out=N.out=nmBuild();
+function nmRender(){const N=NM;let out=nmBuild();
   if(N.sel&&!out.some(e=>e.n.id===N.sel))N.sel=null;
   const seen=new Set();
   out.forEach(e=>{const id=e.n.id,old=N.els.get(id),el=nmNode(e,old);if(el!==old){if(old)old.remove();N.els.set(id,el);nmW.append(el)}seen.add(id)});
   N.els.forEach((el,id)=>{if(!seen.has(id)){el.remove();N.els.delete(id)}});
+  if(N.full){const hm=new Map();out.forEach(e=>{if(!nmKind(e.n))hm.set(e.n.id,N.els.get(e.n.id).offsetHeight)});
+    N.hm=hm;out=nmBuild();out.forEach(e=>{N.els.get(e.n.id).style.transform='translate('+e.x+'px,'+e.y+'px)'})}
+  else N.hm=null;
+  N.out=out;
   nmW.querySelectorAll('[data-src]').forEach(m=>nmIO.observe(m));nmPaint()}
 function nmPanel(){const N=NM,e=N.sel&&N.out.find(x=>x.n.id===N.sel);nmR.replaceChildren();nmR.classList.remove('big');
   if(!e){nmR.append(h('span','nh','click a node to read it · double-click or enter to edit in focus · drag to pan · '+(mod==='⌘'?'⌘':'ctrl')+'-scroll to zoom'));return}
@@ -1322,11 +1333,12 @@ function nmZoom(f,cx,cy){const c=NM.cam,k=clamp(c.k*f,.15,2.5),r=k/c.k;c.x=cx-(c
 function nmDepth(k){NM.o=new Map();const w=(n,d)=>{if((n.k||[]).length){NM.o.set(n.id,d<k);n.k.forEach(c=>w(c,d+1))}};w(nmRoot(),0);nmRender();nmPanel();nmFit(1)}
 function nmTog(id){const e=NM.out.find(x=>x.n.id===id);if(!e||!(e.n.k||[]).length)return;const y0=e.y;NM.o.set(id,!nmOpen(e.n));nmRender();nmPanel();
   const e2=NM.out.find(x=>x.n.id===id);if(e2&&e2.y!==y0){NM.cam.y-=(e2.y-y0)*NM.cam.k;nmApply()}}
+function nmText(){NM.full=!NM.full;$('nmx').textContent='text: '+(NM.full?'full':'1 line');nmRender();nmPanel();nmFit(1)}
 function nmFocus(){if(NM&&!NM.closing&&!FX)openFocus(NM.f)}
 function nmRefresh(){if(!NM||NM.closing)return;const f=F.find(x=>x.id===NM.f.id);if(!f){closeNode();return}NM.f=f;nmRender();nmPanel()}
 function openNode(f,n){if(NM||FX||!f)return;closeMenu();flush();
-  NM={f,rid:n?n.id:null,o:new Map(),sel:null,cam:{x:0,y:0,k:1},out:[],els:new Map()};
-  nmT.textContent=(f.name||'untitled')+(n?'  ›  '+nmLab(n).slice(0,44):'');
+  NM={f,rid:n?n.id:null,o:new Map(),sel:null,cam:{x:0,y:0,k:1},out:[],els:new Map(),full:true,hm:null};
+  $('nmx').textContent='text: full';nmT.textContent=(f.name||'untitled')+(n?'  ›  '+nmLab(n).slice(0,44):'');
   const el=fel(f.id),r=el?el.getBoundingClientRect():{top:innerHeight/2,left:innerWidth/2,right:innerWidth/2,bottom:innerHeight/2};
   nmEl.style.transition='none';nmEl.style.transform=RM.matches?'none':nmTf(r);nmEl.style.opacity=0;nmEl.classList.add('on');nmEl.setAttribute('aria-hidden','false');
   NM.out=nmBuild();if(NM.out.length>90){nmDepth(2)}else{nmRender();nmPanel();nmFit(0)}
@@ -1354,7 +1366,7 @@ $('nmb').onclick=closeNode;
     const bd=T.closest('[data-d]'),bz=T.closest('[data-z]'),ba=T.closest('[data-a]');
     if(bd){nmDepth(+bd.dataset.d);return}
     if(bz){const k=+bz.dataset.z>0?1.25:.8;nmW.classList.remove('an');nmZoom(k,innerWidth/2,innerHeight/2);return}
-    if(ba){if(ba.dataset.a==='fit')nmFit(1);else nmFocus();return}
+    if(ba){if(ba.dataset.a==='fit')nmFit(1);else if(ba.dataset.a==='tx')nmText();else nmFocus();return}
     const nt=T.closest('.nt');if(nt){nmTog(nt.dataset.t);return}
     const nk=T.closest('.nk');if(nk){nmSel(nk.dataset.id,1);return}
     const fs=T.closest('.fshield');if(fs){const nd=fs.closest('.nn');if(nd&&nd.dataset.id===NM.sel){fs.closest('.fbox').classList.add('live');return}}
@@ -1376,6 +1388,7 @@ addEventListener('keydown',e=>{if(!NM||NM.closing||FX)return;
   else if(k==='Enter'){if(cur)nmFocus();else did=0}
   else if(k==='c'||k===' '){if(cur)nmTog(cur.n.id);else did=0}
   else if(k==='0')nmFit(1);
+  else if(k==='t')nmText();
   else if(k==='1'||k==='2'||k==='3'||k==='4')nmDepth(+k);
   else if(k==='a')nmDepth(99);
   else if(k==='+'||k==='='){nmW.classList.remove('an');nmZoom(1.25,innerWidth/2,innerHeight/2)}
