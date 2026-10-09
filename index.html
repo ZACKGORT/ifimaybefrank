@@ -746,6 +746,8 @@ function updateZero(){
   ring(on,zx,zy,vw,vh)
 }
 addEventListener('resize',updateZero);
+/* ctrl/cmd+wheel zoom exponent: mouse notches take a small fixed step (~6%), trackpad pinch stays continuous */
+const wheelZoomK=e=>{const d=e.deltaY*(e.deltaMode?16:1),notch=Math.abs(d)>=40&&(e.deltaMode||Number.isInteger(d));return -(notch?clamp(d,-120,120)/100*.06:clamp(d,-25,25)*.0075)};
 function zoomAt(cx,cy,ns){ns=clamp(ns,ZMIN,ZMAX);const k=ns/cam.s;cam.x=cx-(cx-cam.x)*k;cam.y=cy-(cy-cam.y)*k;cam.s=ns;apply()}
 const wx=x=>(x-cam.x)/cam.s,wy=y=>(y-cam.y)/cam.s;
 let fl=0;function fly(t,d=460){cancelAnimationFrame(fl);if(RM.matches){Object.assign(cam,t);apply();return}const a={...cam},t0=performance.now();const step=n=>{const p=Math.min(1,(n-t0)/d),e=1-Math.pow(1-p,3);for(const k of['x','y','s'])cam[k]=a[k]+(t[k]-a[k])*e;apply();if(p<1)fl=requestAnimationFrame(step)};fl=requestAnimationFrame(step)}
@@ -1013,7 +1015,7 @@ if(!V&&g.f){openCat(g.f);return}
 const now=Date.now(),k=g.f?g.f.id:'bg';
 if(last.k===k&&now-last.t<350&&!g.ta&&(g.f||!g.tgt.closest('.fold'))){last.k=null;g.f?rename(g.f):V?newFolder(wx(e.clientX),wy(e.clientY)):newCat(wx(e.clientX)-100,wy(e.clientY)-60)}else{last.k=k;last.t=now}};
 cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
-cv.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(fl);const m=e.deltaMode?16:1;if(e.ctrlKey||e.metaKey)zoomAt(e.clientX,e.clientY,cam.s*Math.exp(-clamp(e.deltaY*m,-40,40)*.0075));else{cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;apply()}},{passive:false});
+cv.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(fl);const m=e.deltaMode?16:1;if(e.ctrlKey||e.metaKey)zoomAt(e.clientX,e.clientY,cam.s*Math.exp(wheelZoomK(e)));else{cam.x-=e.deltaX*m;cam.y-=e.deltaY*m;apply()}},{passive:false});
 
 /* line drag-reorder */
 let LD=null;
@@ -1462,7 +1464,7 @@ $('nmb').onclick=closeNode;
     if(!P.size){nmEl.classList.remove('pan');setTimeout(()=>{mv=0},0)}};
   nmEl.addEventListener('pointerup',up);nmEl.addEventListener('pointercancel',up);
   nmEl.addEventListener('wheel',e=>{if(!NM||NM.closing||e.target.closest('#nmr'))return;e.preventDefault();nmW.classList.remove('an');
-    if(e.ctrlKey||e.metaKey)nmZoom(Math.exp(-e.deltaY*(e.ctrlKey?.01:.0025)),e.clientX,e.clientY);else{NM.cam.x-=e.deltaX;NM.cam.y-=e.deltaY}nmApply()},{passive:false});
+    if(e.ctrlKey||e.metaKey)nmZoom(Math.exp(wheelZoomK(e)),e.clientX,e.clientY);else{NM.cam.x-=e.deltaX;NM.cam.y-=e.deltaY}nmApply()},{passive:false});
   nmEl.addEventListener('click',e=>{if(!NM||NM.closing)return;const T=e.target;if(T.closest('#nmb'))return;
     if(mv){mv=0;return}
     const bd=T.closest('[data-d]'),bz=T.closest('[data-z]'),ba=T.closest('[data-a]');
