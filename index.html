@@ -500,6 +500,16 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 .nn.w .nd{margin-top:5px}
 .nn.w .nl{white-space:pre-wrap;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.4}
 .nn.w .nt{align-self:flex-start;margin:-3px -3px 0 0}
+
+#nm.mq{cursor:crosshair}
+#nmq{position:absolute;z-index:4;pointer-events:none;box-sizing:border-box;border:1.5px dashed var(--ink);border-radius:4px;background:color-mix(in srgb,var(--ink) 6%,transparent)}
+#nmq[hidden]{display:none}
+#nmq::after{content:'+';position:absolute;inset:0;display:grid;place-items:center;font:300 22px/1 var(--mono);color:var(--ink);opacity:.45}
+#nmq.out{border-style:solid;background:transparent}#nmq.out::after{content:'−'}
+/* the zoom gauge rides above node mode, lifted clear of the back button */
+body.nmo #zg{display:block!important;opacity:1;pointer-events:auto;z-index:191;bottom:calc(env(safe-area-inset-bottom,0px) + 62px)}
+body.nmo.nmc #zg{opacity:0;pointer-events:none}
+@media(max-width:600px){body.nmo #nmr{right:76px}}
 </style>
 </head>
 <body>
@@ -576,6 +586,16 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
           <div><dt>drag ▦ grip</dt><dd>Reorder a line</dd></div>
         </dl>
       </section>
+      <section>
+        <h3>Node mode</h3>
+        <dl>
+          <div><dt>drag</dt><dd>Pan</dd></div>
+          <div><dt>⌘ + scroll</dt><dd>Zoom</dd></div>
+          <div><dt>zoom gauge</dt><dd>Drag to zoom · double-click for 100%</dd></div>
+          <div><dt>right-drag</dt><dd>Zoom in to an area</dd></div>
+          <div><dt>⌘ right-drag</dt><dd>Zoom out into an area</dd></div>
+        </dl>
+      </section>
     </div>
   </div>
 </div>
@@ -597,7 +617,7 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 <div id="lt" role="region" aria-label="Letters"><div id="ltk"></div><div class="lz l" id="lzl" aria-hidden="true"></div><div class="lz r" id="lzr" aria-hidden="true"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
-<div id="nm" aria-hidden="true" role="dialog" aria-label="node mode"><div id="nmw" role="tree"><svg id="nms" aria-hidden="true"></svg></div><div id="nmh"><span id="nmt"></span><span class="nmg"><button type="button" data-d="1" title="show 1 level">1</button><button type="button" data-d="2" title="show 2 levels">2</button><button type="button" data-d="3" title="show 3 levels">3</button><button type="button" data-d="99" title="expand everything">all</button><button type="button" data-z="-1" aria-label="zoom out">−</button><button type="button" data-z="1" aria-label="zoom in">+</button><button type="button" data-a="tx" id="nmx" title="full text / one line per node (t)">text: full</button><button type="button" data-a="fit">fit</button><button type="button" data-a="focus">edit in focus</button></span></div><div id="nmr" aria-live="polite"></div><button id="nmb" type="button">back to canvas</button></div>
+<div id="nm" aria-hidden="true" role="dialog" aria-label="node mode"><div id="nmw" role="tree"><svg id="nms" aria-hidden="true"></svg></div><div id="nmq" hidden></div><div id="nmh"><span id="nmt"></span><span class="nmg"><button type="button" data-d="1" title="show 1 level">1</button><button type="button" data-d="2" title="show 2 levels">2</button><button type="button" data-d="3" title="show 3 levels">3</button><button type="button" data-d="99" title="expand everything">all</button><button type="button" data-z="-1" aria-label="zoom out">−</button><button type="button" data-z="1" aria-label="zoom in">+</button><button type="button" data-a="tx" id="nmx" title="full text / one line per node (t)">text: full</button><button type="button" data-a="fit">fit</button><button type="button" data-a="focus">edit in focus</button></span></div><div id="nmr" aria-live="polite"></div><button id="nmb" type="button">back to canvas</button></div>
 <script>
 const $=id=>document.getElementById(id),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
 const K='frankly:canvas:v2',TOUR_K='frankly:tour:v1',FW=264,vv=visualViewport,root=document.documentElement,cv=$('cv'),world=$('w'),ov=$('ov'),wh=$('wh'),hint=$('hint'),zeroEl=$('zero'),edgeEl=$('edge');
@@ -1155,10 +1175,12 @@ lp=setTimeout(()=>{if(G&&G.t!=='pinch'&&!G.moved&&P.size===1){G.t='none';showCtx
 ['pointerup','pointercancel','pointermove'].forEach(n=>cv.addEventListener(n,()=>{if(n!=='pointermove'||(G&&G.moved))clearTimeout(lp)}));
 
 /* zoom gauge */
-const ZMIN=.12,ZMAX=2.5,LR=Math.log(ZMAX/ZMIN),s2v=s=>100*Math.log(clamp(s,ZMIN,ZMAX)/ZMIN)/LR,v2s=v=>ZMIN*Math.exp(clamp(v,0,100)/100*LR);
+let NM=null; /* node mode state (declared here so the gauge can see it) */
+const ZMIN=.12,ZMAX=2.5,NZMIN=.15,NZMAX=4,ZR={a:ZMIN,b:ZMAX},zlr=()=>Math.log(ZR.b/ZR.a),s2v=s=>100*Math.log(clamp(s,ZR.a,ZR.b)/ZR.a)/zlr(),v2s=v=>ZR.a*Math.exp(clamp(v,0,100)/100*zlr());
+const zcur=()=>NM?NM.cam.k:cam.s; /* the gauge drives whichever surface is on top */
 const zg=$('zg');zg.insertAdjacentHTML('beforeend','<span class="zv"></span><div class="zl"><span class="zv"></span></div><div class="zt"></div><div class="zo"></div><div class="zm"></div>');
 const[zvA,zvB]=zg.querySelectorAll('.zv'),zl=zg.querySelector('.zl'),zm=zg.querySelector('.zm'),Z={x:s2v(1),v:0,L:s2v(1),raf:0,last:0,held:false,r:null};
-zg.querySelector('.zo').style.top=(100-s2v(1))+'%';
+const zo=zg.querySelector('.zo');zo.style.top=(100-s2v(1))+'%';
 function zpaint(){const W=zg.clientWidth,Hh=zg.clientHeight,th=RM.matches?0:clamp(.45*Z.v*.07,-30,30),lean=Math.tan(th*Math.PI/180)*W/2,top=100-Z.x;
 zl.style.clipPath=`polygon(0 calc(${top}% + ${lean}px),100% calc(${top}% - ${lean}px),100% 100%,0 100%)`;zm.style.transform=`translateY(${(100-Z.L)*Hh/100}px)`}
 function ztick(now){const dt=Z.last?Math.min((now-Z.last)/1000,.05):1/120;Z.last=now;
@@ -1167,16 +1189,18 @@ for(let n=Math.ceil(dt*120),hh=dt/n;n>0;n--){Z.v=Z.v*Math.exp(-c*hh)+k*(Z.L-Z.x)
 if(!Z.held&&Math.abs(Z.L-Z.x)<.05&&Math.abs(Z.v)<2){Z.x=Z.L;Z.v=0}
 zpaint();if(!Z.held&&Z.x===Z.L&&Z.v===0){Z.raf=0;Z.last=0}else Z.raf=requestAnimationFrame(ztick)}
 const zwake=()=>{if(!Z.raf)Z.raf=requestAnimationFrame(ztick)};
-function zsync(){const t=Math.round(cam.s*100)+'%';zvA.textContent=zvB.textContent=t;zg.setAttribute('aria-valuenow',Math.round(cam.s*100));zg.setAttribute('aria-valuetext',t);
-if(Z.held)return;const L=s2v(cam.s);if(Math.abs(L-Z.L)>.01){Z.L=L;zwake()}}
-const zoomTo=s=>{s=clamp(s,ZMIN,ZMAX);const k=s/cam.s,cx=innerWidth/2,cy=innerHeight/2;fly({x:cx-(cx-cam.x)*k,y:cy-(cy-cam.y)*k,s},260)};
-function zmove(e){const v=clamp((Z.r.bottom-e.clientY)/Z.r.height*100,0,100);let s=v2s(v);if(Math.abs(s-1)<.05)s=1;Z.L=s2v(s);cancelAnimationFrame(fl);zoomAt(innerWidth/2,innerHeight/2,s);zwake()}
+function zsync(){const sc=zcur(),t=Math.round(sc*100)+'%';zvA.textContent=zvB.textContent=t;zg.setAttribute('aria-valuenow',Math.round(sc*100));zg.setAttribute('aria-valuetext',t);
+if(Z.held)return;const L=s2v(sc);if(Math.abs(L-Z.L)>.01){Z.L=L;zwake()}}
+const zset=(s,cx=innerWidth/2,cy=innerHeight/2)=>{s=clamp(s,ZR.a,ZR.b);if(NM){nmW.classList.remove('an');nmZoom(s/NM.cam.k,cx,cy)}else zoomAt(cx,cy,s)};
+function zmode(){ZR.a=NM?NZMIN:ZMIN;ZR.b=NM?NZMAX:ZMAX;zo.style.top=(100-s2v(1))+'%';zg.setAttribute('aria-valuemin',Math.round(ZR.a*100));zg.setAttribute('aria-valuemax',Math.round(ZR.b*100));Z.held=false;zg.dataset.held=0;Z.x=Z.L=s2v(zcur());Z.v=0;zsync();zpaint()}
+const zoomTo=s=>{s=clamp(s,ZR.a,ZR.b);if(NM){nmW.classList.toggle('an',!RM.matches);nmZoom(s/NM.cam.k,innerWidth/2,innerHeight/2);setTimeout(()=>nmW.classList.remove('an'),380);return}const k=s/cam.s,cx=innerWidth/2,cy=innerHeight/2;fly({x:cx-(cx-cam.x)*k,y:cy-(cy-cam.y)*k,s},260)};
+function zmove(e){const v=clamp((Z.r.bottom-e.clientY)/Z.r.height*100,0,100);let s=v2s(v);if(Math.abs(s-1)<.05)s=1;Z.L=s2v(s);cancelAnimationFrame(fl);zset(s);zwake()}
 const zup=()=>{if(!Z.held)return;Z.held=false;zg.dataset.held=0;zwake()};
 zg.onpointerdown=e=>{if(e.button)return;Z.held=true;Z.r=zg.getBoundingClientRect();zg.dataset.held=1;try{zg.setPointerCapture(e.pointerId)}catch(_){}zmove(e)};
 zg.onpointermove=e=>{if(Z.held)zmove(e)};zg.onpointerup=zg.onpointercancel=zg.onlostpointercapture=zup;zg.ondblclick=()=>zoomTo(1);
-zg.onkeydown=e=>{const d=e.shiftKey?10:2,v=s2v(cam.s),m={ArrowUp:v+d,ArrowRight:v+d,ArrowDown:v-d,ArrowLeft:v-d,PageUp:v+10,PageDown:v-10,Home:0,End:100}[e.key];
-if(e.key==='0'){zoomTo(1);return}if(m==null)return;e.preventDefault();zoomAt(innerWidth/2,innerHeight/2,v2s(m))};
-addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||W||e.target.matches('textarea,input'))return;
+zg.onkeydown=e=>{const d=e.shiftKey?10:2,v=s2v(zcur()),m={ArrowUp:v+d,ArrowRight:v+d,ArrowDown:v-d,ArrowLeft:v-d,PageUp:v+10,PageDown:v-10,Home:0,End:100}[e.key];
+if(e.key==='0'){zoomTo(1);return}if(m==null)return;e.preventDefault();zset(v2s(m))};
+addEventListener('keydown',e=>{if(e.metaKey||e.ctrlKey||e.altKey||W||NM||e.target.matches('textarea,input'))return;
 if(e.key==='='||e.key==='+')zoomTo(cam.s*1.15);else if(e.key==='-')zoomTo(cam.s/1.15);else if(e.key==='0')zoomTo(1)});
 zsync();zpaint();
 
@@ -1242,7 +1266,7 @@ $('fxb').onclick=$('fxl').onclick=$('fxr').onclick=closeFocus;
 /* node mode: a reading surface — one folder's tree (or one branch) as a branching graph.
    same data model (nodes = lines, edges = parent→child), no new schema. read-only in v1:
    collapse here is local to the view; writing hands off to focus mode. */
-const nmEl=$('nm'),nmW=$('nmw'),nmS=$('nms'),nmR=$('nmr'),nmT=$('nmt');let NM=null;
+const nmEl=$('nm'),nmW=$('nmw'),nmS=$('nms'),nmR=$('nmr'),nmT=$('nmt');
 const NMW=220,NMH=30,NMTW=300,NMG=12,NMMW=260,NMMH=Math.round((NMMW-2)*.625)+2,NMK='⌘'===mod?'⌘⌥N':'Ctrl+Alt+N';
 /* media: reuse the app's own bare-URL detection (isImg / isVid / isFrame) so a line that is just a link renders as a thumbnail, a looping preview, or a live-able site */
 const nmKind=n=>{if(n.v)return null;const t=String(n.t||'');return isImg(t)?'img':isVid(t)?'vid':isFrame(t)?'site':null};
@@ -1267,7 +1291,7 @@ function nmBuild(){const out=[];let cur=0;
     return e};
   walk(nmRoot(),0,null);return out}
 const nmTf=r=>'translate('+r.left+'px,'+r.top+'px) scale('+Math.max(.02,(r.right-r.left)/innerWidth)+','+Math.max(.02,(r.bottom-r.top)/innerHeight)+')';
-const nmApply=()=>{const c=NM.cam;nmW.style.transform='translate('+c.x+'px,'+c.y+'px) scale('+c.k+')'};
+const nmApply=()=>{const c=NM.cam;nmW.style.transform='translate('+c.x+'px,'+c.y+'px) scale('+c.k+')';zsync()};
 /* media elements load lazily, only once they scroll near the viewport */
 const nmIO=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;const m=en.target,u=m.dataset.src;if(u){m.src=u;delete m.dataset.src}nmIO.unobserve(m)}),{root:nmEl,rootMargin:'300px'});
 function nmMedia(n,k){const u=String(n.t).trim(),w=h('div','mw');
@@ -1310,7 +1334,7 @@ function nmRender(){const N=NM;let out=nmBuild();
   N.out=out;
   nmW.querySelectorAll('[data-src]').forEach(m=>nmIO.observe(m));nmPaint()}
 function nmPanel(){const N=NM,e=N.sel&&N.out.find(x=>x.n.id===N.sel);nmR.replaceChildren();nmR.classList.remove('big');
-  if(!e){nmR.append(h('span','nh','click a node to read it · double-click or enter to edit in focus · drag to pan · '+(mod==='⌘'?'⌘':'ctrl')+'-scroll to zoom'));return}
+  if(!e){nmR.append(h('span','nh','click a node to read it · double-click or enter to edit in focus · drag to pan · '+(mod==='⌘'?'⌘':'ctrl')+'-scroll to zoom · right-drag (or shift-drag) to zoom to an area · hold '+(mod==='⌘'?'⌘':'ctrl')+' to zoom out'));return}
   const cr=h('div','nc'),chain=[];for(let q=e;q;q=q.p)chain.unshift(q);
   chain.forEach((q,i)=>{if(i)cr.append(h('span',null,'›'));const b=h('button','nk',nmLab(q.n).slice(0,26));b.type='button';b.dataset.id=q.n.id;cr.append(b)});
   nmR.append(cr);const k=nmKind(e.n),u=String(e.n.t||'').trim();
@@ -1327,9 +1351,9 @@ function nmReveal(id){const e=NM.out.find(x=>x.n.id===id);if(!e)return;const c=N
   if(dx||dy){nmW.classList.toggle('an',!RM.matches);c.x+=dx;c.y+=dy;nmApply();setTimeout(()=>nmW.classList.remove('an'),380)}}
 function nmSel(id,reveal){const had=nmEl.contains(document.activeElement);NM.sel=id;nmPaint();nmPanel();if(reveal)nmReveal(id);const el=id&&nmW.querySelector('.nn.sel');if(el&&had)try{el.focus({preventScroll:true})}catch(_){}}
 function nmFit(anim){const o=NM.out;let mx=1,my=1;o.forEach(e=>{mx=Math.max(mx,e.x+e.w);my=Math.max(my,e.y+e.h)});
-  const aw=innerWidth-80,ah=innerHeight-60-(nmR.offsetHeight||90)-76,k=clamp(Math.min(aw/mx,ah/my,1),.15,1);
+  const aw=innerWidth-80,ah=innerHeight-60-(nmR.offsetHeight||90)-76,k=clamp(Math.min(aw/mx,ah/my,1),NZMIN,1);
   NM.cam={k,x:40,y:60+Math.max(0,(ah-my*k)/2)};nmW.classList.toggle('an',!!anim&&!RM.matches);nmApply();if(anim)setTimeout(()=>nmW.classList.remove('an'),380)}
-function nmZoom(f,cx,cy){const c=NM.cam,k=clamp(c.k*f,.15,2.5),r=k/c.k;c.x=cx-(cx-c.x)*r;c.y=cy-(cy-c.y)*r;c.k=k;nmApply()}
+function nmZoom(f,cx,cy){const c=NM.cam,k=clamp(c.k*f,NZMIN,NZMAX),r=k/c.k;c.x=cx-(cx-c.x)*r;c.y=cy-(cy-c.y)*r;c.k=k;nmApply()}
 function nmDepth(k){NM.o=new Map();const w=(n,d)=>{if((n.k||[]).length){NM.o.set(n.id,d<k);n.k.forEach(c=>w(c,d+1))}};w(nmRoot(),0);nmRender();nmPanel();nmFit(1)}
 function nmTog(id){const e=NM.out.find(x=>x.n.id===id);if(!e||!(e.n.k||[]).length)return;const y0=e.y;NM.o.set(id,!nmOpen(e.n));nmRender();nmPanel();
   const e2=NM.out.find(x=>x.n.id===id);if(e2&&e2.y!==y0){NM.cam.y-=(e2.y-y0)*NM.cam.k;nmApply()}}
@@ -1338,15 +1362,16 @@ function nmFocus(){if(NM&&!NM.closing&&!FX)openFocus(NM.f)}
 function nmRefresh(){if(!NM||NM.closing)return;const f=F.find(x=>x.id===NM.f.id);if(!f){closeNode();return}NM.f=f;nmRender();nmPanel()}
 function openNode(f,n){if(NM||FX||!f)return;closeMenu();flush();
   NM={f,rid:n?n.id:null,o:new Map(),sel:null,cam:{x:0,y:0,k:1},out:[],els:new Map(),full:true,hm:null};
+  document.body.classList.remove('nmc');document.body.classList.add('nmo');zmode();
   $('nmx').textContent='text: full';nmT.textContent=(f.name||'untitled')+(n?'  ›  '+nmLab(n).slice(0,44):'');
   const el=fel(f.id),r=el?el.getBoundingClientRect():{top:innerHeight/2,left:innerWidth/2,right:innerWidth/2,bottom:innerHeight/2};
   nmEl.style.transition='none';nmEl.style.transform=RM.matches?'none':nmTf(r);nmEl.style.opacity=0;nmEl.classList.add('on');nmEl.setAttribute('aria-hidden','false');
   NM.out=nmBuild();if(NM.out.length>90){nmDepth(2)}else{nmRender();nmPanel();nmFit(0)}
   const nms=NM;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(NM!==nms)return;nmEl.style.transition='';nmEl.style.transform='none';nmEl.style.opacity=1;try{nmEl.querySelector('#nmb').focus({preventScroll:true})}catch(_){}}));
   snd('open')}
-function closeNode(){if(!NM||NM.closing)return;const x=NM;x.closing=1;const el=fel(x.f.id),r=el?el.getBoundingClientRect():null;
+function closeNode(){if(!NM||NM.closing)return;const x=NM;x.closing=1;document.body.classList.add('nmc');const el=fel(x.f.id),r=el?el.getBoundingClientRect():null;
   if(r&&!RM.matches)nmEl.style.transform=nmTf(r);nmEl.style.opacity=0;snd('close');
-  setTimeout(()=>{nmEl.classList.remove('on');nmEl.setAttribute('aria-hidden','true');nmEl.style.opacity='';nmEl.style.transform='';nmEl.classList.remove('pan');nmIO.disconnect();nmW.replaceChildren(nmS);nmR.replaceChildren();NM=null},520)}
+  setTimeout(()=>{nmEl.classList.remove('on');nmEl.setAttribute('aria-hidden','true');nmEl.style.opacity='';nmEl.style.transform='';nmEl.classList.remove('pan');nmIO.disconnect();nmW.replaceChildren(nmS);nmR.replaceChildren();NM=null;document.body.classList.remove('nmo','nmc');zmode()},520)}
 $('nmb').onclick=closeNode;
 {const P=new Map();let mv=0,lx=0,ly=0,pd=0;
   const two=()=>{const a=[...P.values()];return{d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)||1,x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2}};
@@ -1376,10 +1401,38 @@ $('nmb').onclick=closeNode;
   /* video previews play while hovered */
   nmEl.addEventListener('pointerover',e=>{if(!NM||e.pointerType!=='mouse')return;const nn=e.target.closest&&e.target.closest('.nn.m'),v=nn&&nn.querySelector('video');if(v&&v.src){const p=v.play();if(p)p.catch(()=>{});nn.classList.add('pl')}});
   nmEl.addEventListener('pointerout',e=>{if(!NM)return;const nn=e.target.closest&&e.target.closest('.nn.m');if(!nn||nn.contains(e.relatedTarget))return;const v=nn.querySelector('video');if(v){v.pause();nn.classList.remove('pl')}})}
+
+/* zoom-to-area: hold right mouse (or shift + left) and drag; the box keeps the viewport's proportions.
+   plain: the area inside the box fills the screen with 10% breathing room.
+   holding ctrl/⌘: the inverse — everything you're looking at now shrinks to fit inside the box.
+   ctrl/⌘ + a plain right-click (no drag) steps out around the cursor. */
+let nmQ=null,nmQs=0;
+function nmZoomRect(r,out){const c=NM.cam,W=innerWidth,H=innerHeight,rx=r.l+r.w/2,ry=r.t+r.h/2,
+  k=clamp(out?c.k*r.w/W:c.k*W/(r.w*1.1),NZMIN,NZMAX),
+  sx=out?W/2:rx,sy=out?H/2:ry,wx=(sx-c.x)/c.k,wy=(sy-c.y)/c.k,dx=out?rx:W/2,dy=out?ry:H/2;
+  nmW.classList.toggle('an',!RM.matches);NM.cam={k,x:dx-wx*k,y:dy-wy*k};nmApply();setTimeout(()=>nmW.classList.remove('an'),380)}
+function nmStep(f,cx,cy){nmW.classList.toggle('an',!RM.matches);nmZoom(f,cx,cy);setTimeout(()=>nmW.classList.remove('an'),380)}
+{const q=$('nmq');
+  const rectOf=(x0,y0,x1,y1)=>{const A=innerWidth/innerHeight,dx=x1-x0,dy=y1-y0,w=Math.max(Math.abs(dx),Math.abs(dy)*A),h=w/A;return{l:dx<0?x0-w:x0,t:dy<0?y0-h:y0,w,h}};
+  const end=()=>{if(!nmQ)return;q.hidden=true;q.classList.remove('out');nmEl.classList.remove('mq');nmQ=null};
+  nmEl.addEventListener('pointerdown',e=>{if(!NM||NM.closing||!(e.button===2||(e.button===0&&e.shiftKey&&e.pointerType==='mouse'))||e.target.closest('#nmh,#nmr,#nmb'))return;
+    nmW.querySelectorAll('.fbox.live').forEach(b=>b.classList.remove('live'));e.preventDefault();e.stopPropagation();
+    nmQ={id:e.pointerId,x:e.clientX,y:e.clientY,on:0,r:null};try{nmEl.setPointerCapture(e.pointerId)}catch(_){}},true);
+  nmEl.addEventListener('pointermove',e=>{if(!nmQ||e.pointerId!==nmQ.id)return;e.stopPropagation();
+    if(!nmQ.on){if(Math.hypot(e.clientX-nmQ.x,e.clientY-nmQ.y)<8)return;nmQ.on=1;q.hidden=false;nmEl.classList.add('mq')}
+    nmQ.r=rectOf(nmQ.x,nmQ.y,e.clientX,e.clientY);const r=nmQ.r;q.classList.toggle('out',e.ctrlKey||e.metaKey);q.style.left=r.l+'px';q.style.top=r.t+'px';q.style.width=r.w+'px';q.style.height=r.h+'px'},true);
+  nmEl.addEventListener('pointerup',e=>{if(!nmQ||e.pointerId!==nmQ.id)return;e.stopPropagation();const r=nmQ.on&&nmQ.r,out=e.ctrlKey||e.metaKey,was=nmQ.on,qx=nmQ.x,qy=nmQ.y;end();try{nmEl.releasePointerCapture(e.pointerId)}catch(_){}
+    nmQs=1;setTimeout(()=>{nmQs=0},0);if(!NM||NM.closing)return;
+    if(r){if(r.w>=40)nmZoomRect(r,out)}else if(!was&&out)nmStep(1/1.6,qx,qy)},true);
+  nmEl.addEventListener('click',e=>{if(nmQs){e.stopPropagation();e.preventDefault()}},true);
+  nmEl.addEventListener('pointercancel',e=>{if(nmQ&&e.pointerId===nmQ.id)end()},true);
+  nmEl.addEventListener('contextmenu',e=>{if(!NM)return;e.stopPropagation();if(!e.target.closest('#nmr'))e.preventDefault()});
+  window.nmQend=end}
 addEventListener('keydown',e=>{if(!NM||NM.closing||FX)return;
-  if(e.key==='Escape'){e.preventDefault();e.stopPropagation();const lv=nmW.querySelector('.fbox.live');if(lv)lv.classList.remove('live');else closeNode();return}
+  if(e.key==='Escape'){e.preventDefault();e.stopPropagation();if(nmQ){nmQend();return}const lv=nmW.querySelector('.fbox.live');if(lv)lv.classList.remove('live');else closeNode();return}
   if(e.metaKey||e.ctrlKey||e.altKey)return;
   const a=document.activeElement,inCtl=a&&a.closest&&a.closest('#nmh,#nmr,#nmb');
+  if(a&&a.id==='zg')return; /* the zoom gauge handles its own arrows / 0 */
   if(inCtl&&(e.key==='Enter'||e.key===' '))return;
   const cur=NM.sel&&NM.out.find(x=>x.n.id===NM.sel),k=e.key;let did=1;
   if(k==='ArrowRight'){if(!cur)nmSel(NM.out[0].n.id,1);else if((cur.n.k||[]).length){if(cur.d>0&&!nmOpen(cur.n)){nmTog(cur.n.id);nmSel(cur.n.id,1)}const c=NM.out.find(x=>x.n.id===cur.n.id);if(c&&c.ch[0])nmSel(c.ch[0].n.id,1)}}
@@ -1564,7 +1617,7 @@ addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&!e.altKey
 const DL=[[helpEl,()=>helpEl.classList.contains('on')],[tourEl,()=>tourEl.classList.contains('on')],[palEl,()=>palEl.classList.contains('on')],[$('modal-root'),()=>!!$('modal-root').querySelector('.modal')],[fxEl,()=>!!FX],[nmEl,()=>!!NM]],TR=new Map();let lastF=null;
 addEventListener('focusin',e=>{if(!DL.some(([el])=>el.contains(e.target)))lastF=e.target},true);
 function trapSync(){DL.forEach(([el,open])=>{const on=open(),t=TR.get(el);
-  if(on&&!t){const off=[...document.body.children].filter(c=>c!==el&&!c.contains(el)&&!/^(SCRIPT|STYLE|LINK)$/.test(c.tagName)&&c.id!=='toasts'&&c.id!=='eb'&&!c.inert);off.forEach(c=>{c.inert=true});TR.set(el,{off,prev:lastF});
+  if(on&&!t){const off=[...document.body.children].filter(c=>c!==el&&!c.contains(el)&&!/^(SCRIPT|STYLE|LINK)$/.test(c.tagName)&&c.id!=='toasts'&&c.id!=='eb'&&!(c.id==='zg'&&el===nmEl)&&!c.inert);off.forEach(c=>{c.inert=true});TR.set(el,{off,prev:lastF});
     if(!el.contains(document.activeElement)){const b=el.querySelector('input,textarea,button,[href]');if(b)b.focus()}}
   else if(!on&&t){TR.delete(el);t.off.forEach(c=>{c.inert=false});const p=t.prev;if(p&&document.contains(p)){try{p.focus({preventScroll:true})}catch(_){}}}})}
 let escDlg=false;addEventListener('keydown',e=>{if(e.key==='Escape'){escDlg=DL.some(([,o])=>o());setTimeout(()=>{escDlg=false},0)}},true);
