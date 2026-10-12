@@ -586,7 +586,7 @@ body.nmo.nmc #zg{opacity:0;pointer-events:none}
 <div id="zg" role="slider" tabindex="0" aria-label="Zoom" aria-orientation="vertical" aria-valuemin="12" aria-valuemax="250" title="drag to zoom · double-click for 100%"></div>
 <div id="tb"></div>
 <div id="ov" aria-hidden="true"><div id="wh"></div><button class="b" id="cx">close</button>
-<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="theme">theme</button><button class="b" data-a="search">search</button><button class="b" data-a="help">help</button><button class="b" data-a="reset">reset demo</button><button class="b" data-a="delcat">delete category</button></div></div>
+<div id="acts"><button class="b" data-a="fit">fit all</button><button class="b" data-a="import">import</button><button class="b" data-a="export">export</button><button class="b" data-a="link">copy link</button><button class="b" data-a="theme">theme</button><button class="b" data-a="search">search</button><button class="b" data-a="help">help</button><button class="b" data-a="reset">reset demo</button><button class="b" data-a="delcat">delete category</button></div></div>
 <input type="file" id="file" accept="application/json,.json" hidden>
 <div id="cm" hidden></div>
 <div id="toasts" aria-live="polite" aria-atomic="false"></div>
@@ -1041,8 +1041,8 @@ el.insertBefore(pw,el.querySelector('.cf'));el.append(pl)}
 function rCat(c){const el=h('div','cat'+(c.id===cur?' cur':'')),n=c.trees.reduce((s,t)=>s+cnt(t.tree),0);el.dataset.id=c.id;el.style.left=c.x+'px';el.style.top=c.y+'px';
 el.innerHTML='<span class="cb"></span><span class="cf"><span class="edge-light"></span><span class="spot"></span><span class="cl"></span><span class="cs"></span></span>';
 el.querySelector('.cl').textContent=c.name||'untitled';el.querySelector('.cs').textContent=n+(n===1?' item':' items');rExtras(el,c);return el}
-function openCat(c){if(V===c)return;if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};V=c;lastCat=c.id;F=c.trees;cur=F[0]&&F[0].id;const has=cams[c.id];if(has)Object.assign(cam,has);renderAll();const sp=autoSpace();chrome();has&&!sp?apply():fit();swap()}
-function closeCat(){if(!V)return;if(!lvOn())cams[V.id]={...cam};lastCat=V.id;V=null;F=[];lvCat=null;Object.assign(cam,rc);cur=lastCat;renderAll();const sp=autoSpaceF();chrome();sp?fit():apply();swap()}
+function openCat(c){if(V===c)return;if(V){if(!lvOn())cams[V.id]={...cam}}else rc={...cam};V=c;lastCat=c.id;F=c.trees;cur=F[0]&&F[0].id;const has=cams[c.id];if(has)Object.assign(cam,has);renderAll();const sp=autoSpace();chrome();has&&!sp?apply():fit();swap();syncHash()}
+function closeCat(){if(!V)return;if(!lvOn())cams[V.id]={...cam};lastCat=V.id;V=null;F=[];lvCat=null;Object.assign(cam,rc);cur=lastCat;renderAll();const sp=autoSpaceF();chrome();sp?fit():apply();swap();syncHash()}
 function newCat(x,y){const c={id:nid(),name:'',x,y,trees:[{id:nid(),name:'',x:0,y:0,tree:[mk()]}]};C.push(c);openCat(c);$('cn').focus()}
 function rename(f){const nm=fel(f.id).querySelector('.fn');if(!nm)return;nm.readOnly=false;nm.focus();nm.select()}
 function newFolder(x,y){const f={id:nid(),name:'',x:x-FW/2,y:y-30,tree:[mk()]};F.push(f);world.append(rFold(f));setCur(f.id);save();rename(f);return f}
@@ -1158,7 +1158,7 @@ wh.addEventListener('pointermove',e=>{if(!wd||!W)return;const dy=e.clientY-wd.y;
 const wend=()=>{if(wd&&W&&W.moved){W.tg=Math.round(W.tg);setTimeout(()=>{if(W)W.moved=false},0)}wd=null};
 wh.addEventListener('pointerup',wend);wh.addEventListener('pointercancel',wend);
 $('cx').onclick=()=>cw(false);$('bk').onclick=closeCat;
-const cn=$('cn');cn.oninput=()=>{if(V){V.name=cn.value;save()}};cn.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape')cn.blur()};
+const cn=$('cn');cn.oninput=()=>{if(V){V.name=cn.value;save();syncHash(1)}};cn.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape')cn.blur()};
 const delCat=async()=>{if(!V)return;const ok=await confirmModal('Delete "'+(V.name||'untitled')+'" and all its folders?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(c=>c!==V);closeCat();save();toast('Category deleted')};
 $('mb').onclick=()=>ow('tap');
 addEventListener('keydown',e=>{
@@ -1228,6 +1228,7 @@ let rs=0;
 document.querySelectorAll('#acts [data-a]').forEach(b=>b.onclick=async()=>{const a=b.dataset.a;
 if(a==='fit'){cw(false);fit(true)}
 else if(a==='import')$('file').click();
+else if(a==='link'){copy(linkFor(V))}
 else if(a==='export'){const d={app:'frankly',version:2,exportedAt:new Date().toISOString(),theme:curTheme(),categories:C.map(c=>({name:c.name,x:Math.round(c.x),y:Math.round(c.y),statements:c.trees.map(t=>({text:t.name,x:Math.round(t.x),y:Math.round(t.y),...(t.w?{w:Math.round(t.w)}:{}),collapsed:false,children:un(t.tree)}))}))},l=h('a');l.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));l.download='frankly-canvas.json';l.click();setTimeout(()=>URL.revokeObjectURL(l.href),1000);toast('Exported frankly-canvas.json')}
 else if(a==='theme'){theme=nextTheme();paintTheme();save()}
 else if(a==='search'){cw(false);openPal()}
@@ -1285,6 +1286,7 @@ n.k.length?{l:n.z?'expand branch':'collapse branch',f:()=>{n.z=!n.z;const li=QR(
 
 const foldMenu=f=>[
 {l:'rename',f:()=>rename(f)},
+{l:'copy link',f:()=>copy(linkFor(V,f))},
 {l:'new line',f:()=>{const m=mk();f.tree.push(m);rr(f,m.id,0)}},
 {l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>openFocus(f)},{l:'node mode',k:mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N',f:()=>openNode(f)},{l:'reader',k:mod==='⌘'?'⌘⌥R':'Ctrl+Alt+R',f:()=>openRead(f)},lvOn()?null:{l:'zoom to folder',f:()=>fly(view(f))},'-',
 {l:'collapse all lines',f:()=>{setZ(f.tree,true);rr(f)}},
@@ -1295,6 +1297,7 @@ f.w?{l:'reset width',f:()=>{delete f.w;const e=fel(f.id);if(e)e.style.width='';s
 
 const catMenu=c=>[
 {l:'open',f:()=>openCat(c)},
+{l:'copy link',f:()=>copy(linkFor(c))},
 {l:'rename',f:()=>{openCat(c);setTimeout(()=>{$('cn').focus();$('cn').select()},0)}},'-',
 {l:'delete category',danger:true,f:async()=>{const ok=await confirmModal('Delete "'+(c.name||'untitled')+'"?',{title:'Delete category?',ok:'Delete',danger:1});if(!ok)return;C=C.filter(x=>x!==c);if(lastCat===c.id)lastCat=null;cur=null;renderAll();save();toast('Category deleted')}}];
 
@@ -1365,8 +1368,31 @@ hg.addEventListener('pointermove',mv);hg.addEventListener('pointerup',up);hg.add
 hg.ondblclick=()=>{tp=null;hsave();tbPlace()};
 addEventListener('focusin',()=>setTimeout(tbPlace,0));addEventListener('resize',tbPlace);if(vv)vv.addEventListener('resize',tbPlace);
 
+/* deep links — #/category and #/category/folder. slugs come from names, so they follow renames. */
+const sg=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'untitled';
+const slugOf=(list,item)=>{const seen={};for(const x of list){const b=sg(x.name),n=seen[b]=(seen[b]||0)+1,u=n>1?b+'-'+n:b;if(x===item)return u}return sg(item&&item.name)};
+const bySlug=(list,u)=>list.find(x=>slugOf(list,x)===u);
+const hashFor=(c,f)=>c?'#/'+slugOf(C,c)+(f?'/'+slugOf(c.trees,f):''):'';
+const linkFor=(c,f)=>location.href.split('#')[0]+hashFor(c,f);
+let routing=0;
+function syncHash(rep){if(routing)return;const h=V?hashFor(V):'';if((location.hash||'')===h||(!V&&!location.hash))return;
+  try{history[rep?'replaceState':'pushState'](null,'',h||location.pathname+location.search)}catch(_){}}
+function applyRoute(){
+  const p=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean).map(x=>{try{return decodeURIComponent(x)}catch(_){return x}});
+  routing=1;
+  try{
+    if(!p.length){if(V)closeCat();return false}
+    const c=bySlug(C,p[0]);if(!c)return false;
+    if(V!==c)openCat(c);
+    const f=p[1]&&bySlug(c.trees,p[1]);if(f){needFit=false;goFolder(c,f)}
+    return true;
+  }finally{routing=0}
+}
+addEventListener('popstate',applyRoute);
+
 /* boot */
 paintTheme();chrome();renderAll();apply();
+applyRoute();
 if(needFit){const bs=()=>{V?autoSpace():autoSpaceF();fit()};bs();document.fonts&&document.fonts.ready.then(bs)}
 if(!coarse.matches)say('click a card to open · double-click empty space to add · hold ⇧ for the wheel · right-click for actions · ? for help');
 else say('tap a card to open · long-press for actions · ? for help');
