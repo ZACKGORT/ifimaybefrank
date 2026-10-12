@@ -6,6 +6,7 @@
 <title>Frankly,</title>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff;--cv:#f0f0f2;--ink:#1c1c1e;--line:#e6e6e8;--accent:#E5E567;--mute:color-mix(in srgb,var(--ink) 55%,var(--bg));--kb:0px;--rh:34px;--sans:'Satoshi',ui-sans-serif,system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]):not([data-theme=material]){--bg:#232325;--cv:#1c1c1e;--ink:#fff;--line:rgba(255,255,255,.12)}}
@@ -518,6 +519,36 @@ body:not(.in) #acts [data-a=delcat]{display:none}#acts [data-a=delcat]{color:#c0
 body.nmo #zg{display:block!important;opacity:1;pointer-events:auto;z-index:191;bottom:calc(env(safe-area-inset-bottom,0px) + 62px)}
 body.nmo.nmc #zg{opacity:0;pointer-events:none}
 @media(max-width:600px){body.nmo #nmr{right:76px}}
+
+/* reader — typography only */
+#rd{--serif:'Source Serif 4',Charter,'Iowan Old Style','Palatino Linotype',Georgia,serif;position:fixed;inset:0;z-index:195;background:var(--bg);color:var(--ink);visibility:hidden;pointer-events:none;transform-origin:0 0;opacity:0;will-change:transform,opacity;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;user-select:text;-webkit-user-select:text;outline:0;transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s ease}
+#rd.on{visibility:visible;pointer-events:auto}
+#rda{box-sizing:border-box;max-width:728px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 14vh) 24px calc(env(safe-area-inset-bottom,0px) + 22vh);font:400 21px/1.62 var(--serif);letter-spacing:-.003em;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#rda h1{font:500 clamp(34px,6vw,50px)/1.1 var(--sans);letter-spacing:-.028em;margin:0 0 .5em;text-wrap:balance}
+#rda .rdd{font:400 clamp(19px,2.6vw,23px)/1.4 var(--sans);letter-spacing:-.01em;color:var(--mute);margin:0 0 1.1em}
+#rda .rdm{font:300 12px/1 var(--mono);color:var(--mute);margin:0 0 3.4em}
+#rda p{margin:1.5em 0 0}
+#rda h2,#rda h3,#rda h4{font-family:var(--sans);font-weight:500;letter-spacing:-.02em;text-wrap:balance;margin:2.4em 0 0}
+#rda h2{font-size:30px;line-height:1.2}#rda h3{font-size:23px;line-height:1.28;margin-top:2em}#rda h4{font-size:18px;line-height:1.35;margin-top:1.8em;color:var(--mute)}
+#rda h2+p,#rda h3+p,#rda h4+p{margin-top:.75em}
+#rda blockquote{margin:2em 0 0;padding:0 0 0 1.1em;border-left:3px solid var(--ink);font-style:italic;font-size:1.22em;line-height:1.45}
+#rda hr{border:0;margin:3em 0;text-align:center}#rda hr::before{content:'···';letter-spacing:.7em;padding-left:.7em;font-size:28px;color:var(--mute)}
+#rda a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,var(--ink) 45%,transparent)}#rda a:hover{text-decoration-color:var(--ink)}
+#rda code{font:400 .82em var(--mono);padding:.12em .36em;border-radius:4px;background:color-mix(in srgb,var(--ink) 8%,var(--bg))}
+#rda s{color:var(--mute)}
+#rda mark{color:inherit;background:linear-gradient(transparent 58%,color-mix(in srgb,var(--hl) 62%,transparent) 58%);padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+#rda .sh{background:linear-gradient(100deg,var(--ink) 38%,color-mix(in srgb,var(--ink) 30%,var(--bg)) 50%,var(--ink) 62%) 0 0/250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:rdsh 3.6s linear infinite}
+@keyframes rdsh{from{background-position:200% 0}to{background-position:-100% 0}}
+#rda figure{margin:2.4em calc((100% - min(1040px,100vw - 32px))/2) 0}
+#rda figure img,#rda figure video{display:block;width:100%;height:auto;border-radius:3px;background:color-mix(in srgb,var(--ink) 6%,var(--bg))}
+#rda figcaption{margin-top:.8em;text-align:center;font:300 11px/1.3 var(--mono);color:var(--mute)}#rda figcaption a{text-decoration:none}
+.rdf{position:relative;aspect-ratio:16/10;border-radius:3px;overflow:hidden;background:color-mix(in srgb,var(--ink) 5%,var(--bg))}.rdf iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.rds{position:absolute;inset:0;cursor:pointer}.rdf.live .rds{display:none}
+#rdb{position:fixed;z-index:196;top:calc(env(safe-area-inset-top,0px) + 12px);right:max(14px,env(safe-area-inset-right));width:40px;height:40px;border:0;border-radius:50%;padding:0;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--ink);cursor:pointer;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .3s}
+#rdb svg{width:14px;height:14px}
+#rd.on.ui~#rdb,#rd.on~#rdb:focus-visible{visibility:visible;opacity:1;pointer-events:auto}
+@media(max-width:600px){#rda{font-size:19px;padding-left:20px;padding-right:20px}#rda h2{font-size:26px}}
+@media(prefers-reduced-motion:reduce){#rda .sh{animation:none;background:none;-webkit-text-fill-color:currentcolor}}
 </style>
 </head>
 <body>
@@ -595,6 +626,16 @@ body.nmo.nmc #zg{opacity:0;pointer-events:none}
         </dl>
       </section>
       <section>
+        <h3>Reader</h3>
+        <dl>
+          <div><dt>esc</dt><dd>Close</dd></div>
+          <div><dt>**b** ~~s~~ _i_</dt><dd>Bold · strike · italic</dd></div>
+          <div><dt>`c` [t](url)</dt><dd>Code · link</dd></div>
+          <div><dt># ## ###</dt><dd>Line start: headings</dd></div>
+          <div><dt>&gt; ---</dt><dd>Line start: quote · divider</dd></div>
+        </dl>
+      </section>
+      <section>
         <h3>Node mode</h3>
         <dl>
           <div><dt>drag</dt><dd>Pan</dd></div>
@@ -625,6 +666,7 @@ body.nmo.nmc #zg{opacity:0;pointer-events:none}
 <div id="lt" role="region" aria-label="Letters"><div id="ltk"></div><div class="lz l" id="lzl" aria-hidden="true"></div><div class="lz r" id="lzr" aria-hidden="true"></div></div>
 <div id="lh" role="group" aria-label="Letter navigation"><button class="b icon" id="lprev" aria-label="Previous letter">‹</button><span class="n" id="ln" role="status" aria-live="polite"></span><button class="b icon" id="lnext" aria-label="Next letter">›</button></div>
 <div id="fx" aria-hidden="true"><div class="fxh l" id="fxl" aria-hidden="true"></div><div class="fxh r" id="fxr" aria-hidden="true"></div><button id="fxb" type="button">back to canvas</button></div>
+<div id="rd" tabindex="-1" aria-hidden="true" role="dialog" aria-label="reader"><article id="rda"></article></div><button id="rdb" type="button" aria-label="close reader"><svg viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
 <div id="nm" aria-hidden="true" role="dialog" aria-label="node mode"><div id="nmw" role="tree"><svg id="nms" aria-hidden="true"></svg></div><div id="nmq" hidden></div><div id="nmh"><span id="nmt"></span><span class="nmg"><button type="button" data-d="1" title="show 1 level">1</button><button type="button" data-d="2" title="show 2 levels">2</button><button type="button" data-d="3" title="show 3 levels">3</button><button type="button" data-d="99" title="expand everything">all</button><button type="button" data-z="-1" aria-label="zoom out">−</button><button type="button" data-z="1" aria-label="zoom in">+</button><button type="button" data-a="tx" id="nmx" title="full text / one line per node (t)">text: full</button><button type="button" data-a="fit">fit</button><button type="button" data-a="focus">edit in focus</button></span></div><div id="nmr" aria-live="polite"></div><button id="nmb" type="button">back to canvas</button></div>
 <script>
 const $=id=>document.getElementById(id),h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
@@ -934,7 +976,7 @@ nm.oninput=()=>{if(/\n/.test(nm.value))nm.value=nm.value.replace(/\n+/g,' ');fv(
 nm.onkeydown=e=>{if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();nm.blur()}};
 nm.onblur=()=>{nm.readOnly=true;f.name=nm.value.trim();fv();save();updateBC()};
 del.onclick=async()=>{const ok=await confirmModal('Delete this folder and everything in it?',{title:'Delete folder?',ok:'Delete',danger:1});if(!ok)return;V.trees=F=F.filter(x=>x!==f);el.remove();save();lvOn()&&lvRender();toast('Folder deleted')};
-const fx=h('button','fd','focus');fx.title='focus mode';fx.onclick=e=>{e.stopPropagation();openFocus(f)};const nb=h('button','fd','nodes');nb.title='node mode';nb.onclick=e=>{e.stopPropagation();openNode(f)};fw.append(nm);fu.append(nb,fx,del);hd.append(grip,fw,fu);
+const fx=h('button','fd','focus');fx.title='focus mode';fx.onclick=e=>{e.stopPropagation();openFocus(f)};const rb=h('button','fd','read');rb.title='reader';rb.onclick=e=>{e.stopPropagation();openRead(f)};const nb=h('button','fd','nodes');nb.title='node mode';nb.onclick=e=>{e.stopPropagation();openNode(f)};fw.append(nm);fu.append(rb,nb,fx,del);hd.append(grip,fw,fu);
 const body=h('div','fbody');body.append(rList(f.tree));
 const rz=h('div','rz');
 rz.addEventListener('pointerdown',e=>{
@@ -1212,14 +1254,14 @@ return[
 {l:'outdent',k:'⇧⇥',off:!r.p,f:()=>O.out(n)},
 {l:'move up',k:'⌥↑',off:!r.i,f:()=>O.mv(n,-1)},
 {l:'move down',k:'⌥↓',off:r.i>=r.a.length-1,f:()=>O.mv(n,1)},'-',
-{l:'node view from here',off:!n.k.length,f:()=>{const q=loc(id);q&&openNode(q.f,n)}},{l:n.s?'shiny ✓':'shiny',f:()=>toggleShine(n)},'-',
+{l:'read from here',off:!n.k.length,f:()=>{const q=loc(id);q&&openRead(q.f,n)}},{l:'node view from here',off:!n.k.length,f:()=>{const q=loc(id);q&&openNode(q.f,n)}},{l:n.s?'shiny ✓':'shiny',f:()=>toggleShine(n)},'-',
 n.k.length?{l:n.z?'expand branch':'collapse branch',f:()=>{n.z=!n.z;const li=QR().querySelector(`li[data-id="${id}"]`);if(li)li.classList.toggle('z',n.z);save()}}:null,
 {l:n.k.length?`delete line + ${cnt(n.k)} nested`:'delete line',danger:n.k.length>0,f:()=>O.del(n)}]}
 
 const foldMenu=f=>[
 {l:'rename',f:()=>rename(f)},
 {l:'new line',f:()=>{const m=mk();f.tree.push(m);rr(f,m.id,0)}},
-{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>openFocus(f)},{l:'node mode',k:mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N',f:()=>openNode(f)},lvOn()?null:{l:'zoom to folder',f:()=>fly(view(f))},'-',
+{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>openFocus(f)},{l:'node mode',k:mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N',f:()=>openNode(f)},{l:'reader',k:mod==='⌘'?'⌘⌥R':'Ctrl+Alt+R',f:()=>openRead(f)},lvOn()?null:{l:'zoom to folder',f:()=>fly(view(f))},'-',
 {l:'collapse all lines',f:()=>{setZ(f.tree,true);rr(f)}},
 {l:'expand all lines',f:()=>{setZ(f.tree,false);rr(f)}},
 {l:'duplicate folder',f:()=>{const d={id:nid(),name:(f.name||'untitled')+' copy',x:f.x+28,y:f.y+28,tree:f.tree.map(cl),...(f.w?{w:f.w}:{})};F.push(d);world.append(rFold(d));setCur(d.id);save()}},
@@ -1254,7 +1296,7 @@ lp=setTimeout(()=>{if(G&&G.t!=='pinch'&&!G.moved&&P.size===1){G.t='none';showCtx
 ['pointerup','pointercancel','pointermove'].forEach(n=>cv.addEventListener(n,()=>{if(n!=='pointermove'||(G&&G.moved))clearTimeout(lp)}));
 
 /* zoom gauge */
-let NM=null; /* node mode state (declared here so the gauge can see it) */
+let NM=null,RD=null; /* node mode state (declared here so the gauge can see it) */
 const ZMIN=.12,ZMAX=2.5,NZMIN=.15,NZMAX=4,ZR={a:ZMIN,b:ZMAX},zlr=()=>Math.log(ZR.b/ZR.a),s2v=s=>100*Math.log(clamp(s,ZR.a,ZR.b)/ZR.a)/zlr(),v2s=v=>ZR.a*Math.exp(clamp(v,0,100)/100*zlr());
 const zcur=()=>NM?NM.cam.k:cam.s; /* the gauge drives whichever surface is on top */
 const zg=$('zg');zg.insertAdjacentHTML('beforeend','<span class="zv"></span><div class="zl"><span class="zv"></span></div><div class="zt"></div><div class="zo"></div><div class="zm"></div>');
@@ -1310,7 +1352,7 @@ document.addEventListener('pointerdown',()=>{hint.style.opacity=0},{once:true});
 const fxEl=$('fx');let FX=null;
 const adopt=a=>(Array.isArray(a)?a:[]).map(x=>({id:x.id||nid(),t:String(x.t||''),c:typeof x.c==='string'?x.c:null,s:!!x.s,z:!!x.z,k:adopt(x.k)}));
 const nsSrc=()=>document.getElementById('ns-src').textContent.replace(/<\\\/script/g,'<\/script');
-function openFocus(f){if(FX)return;closeMenu();flush();const ord=lvOrder();
+function openFocus(f){if(FX||RD)return;closeMenu();flush();const ord=lvOrder();
 const el=fel(f.id),r=el?el.getBoundingClientRect():{top:innerHeight/2,left:innerWidth/2,right:innerWidth/2,bottom:innerHeight/2};
 const boot=JSON.stringify({cur:Math.max(0,ord.indexOf(f)),list:ord.map(t=>({id:t.id,name:t.name,tree:t.tree})),theme}).replace(/</g,'\\u003c');
 const shim='<script>(function(){var B='+boot+',K="frankly:categories:v1",KT="frankly:theme",m={};m[K]=JSON.stringify({app:"frankly",v:2,current:B.cur,list:B.list});if(B.theme)m[KT]=B.theme;'
@@ -1439,7 +1481,7 @@ function nmTog(id){const e=NM.out.find(x=>x.n.id===id);if(!e||!(e.n.k||[]).lengt
 function nmText(){NM.full=!NM.full;$('nmx').textContent='text: '+(NM.full?'full':'1 line');nmRender();nmPanel();nmFit(1)}
 function nmFocus(){if(NM&&!NM.closing&&!FX)openFocus(NM.f)}
 function nmRefresh(){if(!NM||NM.closing)return;const f=F.find(x=>x.id===NM.f.id);if(!f){closeNode();return}NM.f=f;nmRender();nmPanel()}
-function openNode(f,n){if(NM||FX||!f)return;closeMenu();flush();
+function openNode(f,n){if(NM||FX||RD||!f)return;closeMenu();flush();
   NM={f,rid:n?n.id:null,o:new Map(),sel:null,cam:{x:0,y:0,k:1},out:[],els:new Map(),full:true,hm:null};
   document.body.classList.remove('nmc');document.body.classList.add('nmo');zmode();
   $('nmx').textContent='text: full';nmT.textContent=(f.name||'untitled')+(n?'  ›  '+nmLab(n).slice(0,44):'');
@@ -1451,6 +1493,72 @@ function openNode(f,n){if(NM||FX||!f)return;closeMenu();flush();
 function closeNode(){if(!NM||NM.closing)return;const x=NM;x.closing=1;document.body.classList.add('nmc');const el=fel(x.f.id),r=el?el.getBoundingClientRect():null;
   if(r&&!RM.matches)nmEl.style.transform=nmTf(r);nmEl.style.opacity=0;snd('close');
   setTimeout(()=>{nmEl.classList.remove('on');nmEl.setAttribute('aria-hidden','true');nmEl.style.opacity='';nmEl.style.transform='';nmEl.classList.remove('pan');nmIO.disconnect();nmW.replaceChildren(nmS);nmR.replaceChildren();NM=null;document.body.classList.remove('nmo','nmc');zmode()},520)}
+/* reader: a typography-only surface — one folder's tree (or one branch) stitched into a single article.
+   same data model, no new schema. shape decides structure: a short line with children becomes a heading (depth sets the level),
+   everything else is a paragraph, bare media links become figures. emphasis lives in the line's own text, so every surface stays plain strings:
+   **bold** ~~strike~~ _italic_ `code` [text](url) · at line start: # ## ### headings · > pull quote · --- divider */
+const rdEl=$('rd'),rdA=$('rda'),rdX=$('rdb');
+const rdEsc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function rdInline(s){const P=[],ph=x=>'\u0001'+(P.push(x)-1)+'\u0002';let t=rdEsc(s);
+  t=t.replace(/`([^`]+)`/g,(_,c)=>ph('<code>'+c+'</code>'));
+  t=t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,(_,a,u)=>ph('<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+a+'</a>'));
+  t=t.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,(_,p,u)=>p+ph('<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+u.replace(/^https?:\/\/(www\.)?/,'')+'</a>'));
+  t=t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/~~(.+?)~~/g,'<s>$1</s>').replace(/(^|[^\w*])_(\S(?:.*?\S)?)_(?!\w)/g,'$1<i>$2</i>').replace(/(^|[^*\w])\*(\S(?:.*?\S)?)\*(?!\*)/g,'$1<i>$2</i>');
+  return t.replace(/\n/g,'<br>').replace(/\u0001(\d+)\u0002/g,(_,i)=>P[i])}
+function rdBuild(f,n){const B=[];
+  const walk=(a,d)=>a.forEach(x=>{const t=String(x.t||'').trim(),ks=x.k||[];let m;
+    if(t){
+      if(isImg(t))B.push({k:'img',t,x});
+      else if(isVid(t))B.push({k:'vid',t,x});
+      else if(isFrame(t))B.push({k:'site',t,x});
+      else if(/^-{3,}$/.test(t))B.push({k:'hr'});
+      else if(m=t.match(/^(#{1,3})\s+(\S[\s\S]*)$/))B.push({k:'h',l:m[1].length+1,t:m[2],x});
+      else if(/^>\s?/.test(t))B.push({k:'q',t:t.replace(/^>\s?/,''),x});
+      else if(ks.length&&t.length<=80&&!t.includes('\n')&&!/[.!?…]$/.test(t))B.push({k:'h',l:Math.min(d,2)+2,t:t.replace(/:$/,''),x});
+      else B.push({k:'p',t,x})}
+    walk(ks,d+1)});
+  walk(n?(n.k||[]):f.tree,0);return B}
+function rdTxt(el,t,x){let s=rdInline(t);const c=x&&x.c;if(c&&/^[#\w(),.%\s-]+$/.test(c))s='<mark style="--hl:'+c+'">'+s+'</mark>';el.innerHTML=s;if(x&&x.s)el.classList.add('sh');return el}
+const rdIO=new IntersectionObserver(es=>es.forEach(en=>{const m=en.target;
+  if(m.dataset.src){if(!en.isIntersecting)return;m.src=m.dataset.src;delete m.dataset.src}
+  if(m.tagName==='VIDEO'){if(en.isIntersecting)m.play().catch(()=>{});else m.pause()}}),{root:rdEl,rootMargin:'400px'});
+function rdRender(f,n){const B=rdBuild(f,n);rdA.replaceChildren();
+  const title=n?String(n.t||'').split('\n')[0].replace(/^#{1,3}\s+/,'').trim():(f.name||'untitled');
+  const words=B.reduce((s,b)=>s+(b.k==='p'||b.k==='h'||b.k==='q'?b.t.split(/\s+/).length:0),0);
+  const hd=h('header');hd.append(h('h1','',title||'untitled'));
+  if(B.length>1&&B[0].k==='p'&&B[0].t.length<=180&&!B[0].t.includes('\n')){const d=B.shift();hd.append(rdTxt(h('p','rdd'),d.t,d.x))}
+  hd.append(h('div','rdm',Math.max(1,Math.round(words/230))+' min read'));rdA.append(hd);
+  B.forEach(b=>{
+    if(b.k==='hr')rdA.append(h('hr'));
+    else if(b.k==='h')rdA.append(rdTxt(h('h'+b.l),b.t,b.x));
+    else if(b.k==='q')rdA.append(rdTxt(h('blockquote'),b.t,b.x));
+    else if(b.k==='p')b.t.split(/\n{2,}/).forEach(p=>rdA.append(rdTxt(h('p'),p,b.x)));
+    else{const e=h('figure');
+      if(b.k==='img'){const i=document.createElement('img');i.src=b.t;i.alt='';i.loading='lazy';i.decoding='async';e.append(i)}
+      else if(b.k==='vid'){const v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.setAttribute('muted','');v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='metadata';v.dataset.src=b.t;e.append(v);rdIO.observe(v)}
+      else{const bx=h('div','rdf'),fr=document.createElement('iframe'),sh=h('span','rds'),c=h('figcaption'),a=h('a');
+        fr.dataset.src=b.t;fr.title=b.t;fr.setAttribute('allowfullscreen','');fr.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation');
+        sh.onclick=()=>bx.classList.add('live');bx.onpointerleave=ev=>{if(ev.pointerType!=='touch')bx.classList.remove('live')};
+        let host=b.t;try{host=new URL(b.t).hostname}catch(_){}a.href=b.t;a.target='_blank';a.rel='noopener noreferrer';a.textContent=host+' ↗';
+        bx.append(fr,sh);c.append(a);e.append(bx,c);rdIO.observe(fr)}
+      rdA.append(e)}})}
+let rdT;const rdUi=()=>{rdEl.classList.add('ui');clearTimeout(rdT);rdT=setTimeout(()=>rdEl.classList.remove('ui'),2200)};
+rdEl.addEventListener('pointermove',rdUi);rdEl.addEventListener('pointerdown',rdUi);rdEl.addEventListener('scroll',rdUi,{passive:true});
+function openRead(f,n){if(RD||NM||FX||!f)return;closeMenu();flush();
+  RD={f,n};rdRender(f,n);
+  const el=fel(f.id),r=el?el.getBoundingClientRect():{top:innerHeight/2,left:innerWidth/2,right:innerWidth/2,bottom:innerHeight/2};
+  rdEl.scrollTop=0;rdEl.style.transition='none';rdEl.style.transform=RM.matches?'none':nmTf(r);rdEl.style.opacity=0;rdEl.classList.add('on');rdEl.setAttribute('aria-hidden','false');
+  const x=RD;requestAnimationFrame(()=>requestAnimationFrame(()=>{if(RD!==x)return;rdEl.style.transition='';rdEl.style.transform='none';rdEl.style.opacity=1;try{rdEl.focus({preventScroll:true})}catch(_){}rdUi()}));
+  snd('open')}
+function closeRead(){if(!RD||RD.closing)return;const x=RD;x.closing=1;const el=fel(x.f.id),r=el?el.getBoundingClientRect():null;
+  if(r&&!RM.matches)rdEl.style.transform=nmTf(r);rdEl.style.opacity=0;snd('close');
+  setTimeout(()=>{rdEl.classList.remove('on','ui');rdEl.setAttribute('aria-hidden','true');rdEl.style.opacity='';rdEl.style.transform='';rdIO.disconnect();rdA.replaceChildren();RD=null},520)}
+rdX.onclick=closeRead;
+addEventListener('keydown',e=>{if(!RD)return;
+  if(e.key==='Escape'){e.preventDefault();e.stopPropagation();const lv=rdA.querySelector('.rdf.live');if(lv)lv.classList.remove('live');else closeRead();return}
+  if((e.metaKey||e.ctrlKey)&&e.altKey&&e.code==='KeyR'){e.preventDefault();e.stopPropagation();closeRead();return}
+  e.stopPropagation()},true);
+addEventListener('keydown',e=>{if(!(e.metaKey||e.ctrlKey)||!e.altKey||e.code!=='KeyR'||RD||NM||FX)return;e.preventDefault();const f=fobj(cur);if(V&&f)openRead(f)});
 $('nmb').onclick=closeNode;
 {const P=new Map();let mv=0,lx=0,ly=0,pd=0;
   const two=()=>{const a=[...P.values()];return{d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)||1,x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2}};
@@ -1623,7 +1731,7 @@ const psc=(text,toks)=>{const L=text.toLowerCase();let s=0;for(const t of toks){
 function palActs(){const v=!!V,a=[];
   if(v){a.push(['New line',()=>fabDo('line'),'↵'],[lvOn()?'New letter':'New folder',()=>fabDo('folder')])}
   a.push(['New category',()=>fabDo('category')]);
-  if(v&&fobj(cur))a.push(['Focus mode',()=>openFocus(fobj(cur)),mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F'],['Node mode',()=>openNode(fobj(cur)),mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N']);
+  if(v&&fobj(cur))a.push(['Focus mode',()=>openFocus(fobj(cur)),mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F'],['Node mode',()=>openNode(fobj(cur)),mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N'],['Reader',()=>openRead(fobj(cur)),mod==='⌘'?'⌘⌥R':'Ctrl+Alt+R']);
   if(v)a.push(['All categories',()=>sfSet('folders'),'Esc']);
   if(!v||LV)a.push(['Canvas view',()=>sfSet('canvas')]);if(!v||!LV)a.push(['Letters view',()=>sfSet('letters')]);
   a.push(['Undo',undo,mod+'Z'],['Redo',redo,mod+'⇧Z'],['Switch to '+nextTheme()+' theme',()=>act('theme')],['Export backup',()=>act('export')],['Import…',()=>act('import')],['Help & shortcuts',openHelp,'?'],['Take the tour',openTour]);
@@ -1715,7 +1823,7 @@ lvSet=function(want){if(!V||LV===want)return;if(!document.startViewTransition||R
   vtTag();let t;try{t=document.startViewTransition(()=>{lvSet0(want);vtTag()})}catch(_){vtUntag();lvSet0(want);return}t.finished.then(vtUntag,vtUntag)};
 
 /* ══ letter view: actions menu, press-and-hold, first-run hint ══ */
-function lvMenu(){const ord=lvOrder(),f=ord[lvI];return[{l:'new letter',f:lvNew},{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>f&&openFocus(f)},{l:'node mode',k:mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N',f:()=>f&&openNode(f)},'-',
+function lvMenu(){const ord=lvOrder(),f=ord[lvI];return[{l:'new letter',f:lvNew},{l:'focus mode',k:mod==='⌘'?'⌘⇧F':'Ctrl+Shift+F',f:()=>f&&openFocus(f)},{l:'node mode',k:mod==='⌘'?'⌘⌥N':'Ctrl+Alt+N',f:()=>f&&openNode(f)},{l:'reader',k:mod==='⌘'?'⌘⌥R':'Ctrl+Alt+R',f:()=>f&&openRead(f)},'-',
 {l:'previous letter',k:'←',f:()=>lvGo(lvI-1)},{l:'next letter',k:'→',f:()=>lvGo(lvI+1)},'-',{l:'search & commands',k:mod+'K',f:openPal},{l:'canvas view',f:()=>sfSet('canvas')},{l:'back to categories',k:'Esc',f:closeCat},'-',
 {l:'undo',k:mod+'Z',f:undo},{l:'redo',k:mod+'⇧Z',f:redo},'-',{l:'help & shortcuts',k:'?',f:openHelp},'-',{l:'import…',f:()=>act('import')},{l:'export',f:()=>act('export')},{l:'toggle theme',sw:themeSw(),f:()=>act('theme')},{l:'sound: '+(SND?'on':'off'),f:toggleSnd}]}
 {const lt=$('lt');let t0=0,px=0,py=0;
