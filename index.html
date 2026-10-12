@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Frankly,</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='4'%20fill='%23fff'/%3E%3Ctext%20x='32'%20y='41'%20text-anchor='middle'%20font-family='Satoshi,Helvetica%20Neue,Arial,sans-serif'%20font-weight='500'%20font-size='23'%20textLength='49'%20lengthAdjust='spacingAndGlyphs'%20fill='%233a3a3c'%3EFrnk%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%225%22 fill=%22%23fff%22/%3E%3Ctext x=%2232%22 y=%2242%22 text-anchor=%22middle%22 font-family=%22Satoshi,'Helvetica Neue',Arial,sans-serif%22 font-size=%2227%22 font-weight=%22500%22 fill=%22%2339393b%22 textLength=%2250%22 lengthAdjust=%22spacingAndGlyphs%22%3EFrnk%3C/text%3E%3C/svg%3E">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
@@ -1369,23 +1369,34 @@ hg.addEventListener('pointermove',mv);hg.addEventListener('pointerup',up);hg.add
 hg.ondblclick=()=>{tp=null;hsave();tbPlace()};
 addEventListener('focusin',()=>setTimeout(tbPlace,0));addEventListener('resize',tbPlace);if(vv)vv.addEventListener('resize',tbPlace);
 
-/* deep links — #/category and #/category/folder. slugs come from names, so they follow renames. */
+/* deep links — /@/category and /@/category/folder (falls back to #/category when the page is opened as a .html file or from disk).
+   slugs come from names so they follow renames; matching ignores case and separators, so nonsequitur = non-sequitur. */
 const sg=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'untitled';
+const slugKey=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
 const slugOf=(list,item)=>{const seen={};for(const x of list){const b=sg(x.name),n=seen[b]=(seen[b]||0)+1,u=n>1?b+'-'+n:b;if(x===item)return u}return sg(item&&item.name)};
-const bySlug=(list,u)=>list.find(x=>slugOf(list,x)===u);
-const hashFor=(c,f)=>c?'#/'+slugOf(C,c)+(f?'/'+slugOf(c.trees,f):''):'';
-const linkFor=(c,f)=>location.href.split('#')[0]+hashFor(c,f);
+const bySlug=(list,u)=>list.find(x=>slugKey(slugOf(list,x))===slugKey(u));
+const BASE=location.pathname.replace(/\/@(\/.*)?$/,'').replace(/\/$/,'');
+const PM=/^https?:$/.test(location.protocol)&&!/\.html?$/i.test(BASE);
+const urlFor=(c,f)=>{const u=c?slugOf(C,c)+(f?'/'+slugOf(c.trees,f):''):'';return PM?location.origin+BASE+'/@/'+u:location.href.split('#')[0]+'#/'+u};
+const linkFor=urlFor;
 let routing=0;
-function syncHash(rep){if(routing)return;const h=V?hashFor(V):'';if((location.hash||'')===h||(!V&&!location.hash))return;
-  try{history[rep?'replaceState':'pushState'](null,'',h||location.pathname+location.search)}catch(_){}}
+function syncHash(rep){if(routing)return;
+  const cur=PM?location.pathname:location.hash;
+  const want=V?(PM?BASE+'/@/'+slugOf(C,V):'#/'+slugOf(C,V)):(PM?(BASE||'/'):'');
+  if(cur===want||(!V&&!PM&&!location.hash))return;
+  try{history[rep?'replaceState':'pushState'](null,'',want||location.pathname+location.search)}catch(_){}}
+function routeParts(){
+  const m=location.pathname.match(/\/@\/(.+)$/);
+  return (m?m[1]:location.hash.replace(/^#\/?/,'')).split('/').filter(Boolean).map(x=>{try{return decodeURIComponent(x)}catch(_){return x}})}
 function applyRoute(){
-  const p=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean).map(x=>{try{return decodeURIComponent(x)}catch(_){return x}});
+  const p=routeParts();
   routing=1;
   try{
     if(!p.length){if(V)closeCat();return false}
     const c=bySlug(C,p[0]);if(!c)return false;
     if(V!==c)openCat(c);
     const f=p[1]&&bySlug(c.trees,p[1]);if(f){needFit=false;goFolder(c,f)}
+    if(PM&&location.hash){try{history.replaceState(null,'',BASE+'/@/'+slugOf(C,c)+(f?'/'+slugOf(c.trees,f):''))}catch(_){}} // upgrade old #/ links
     return true;
   }finally{routing=0}
 }
