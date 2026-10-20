@@ -57,6 +57,9 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:Satoshi,system-ui
 /* writing: the paragraph you're in is sharp, the rest soften */
 .w-on .rd:not(.ef){opacity:var(--inactive);filter:blur(var(--blur))}
 .w-on .rd.ef{opacity:1;filter:none}
+/* neighbours of the line you're writing stay legible: closer = clearer */
+.w-on .rd[data-near="1"]:not(.ef){opacity:max(var(--inactive),.85);filter:blur(calc(var(--blur)*.2))}
+.w-on .rd[data-near="2"]:not(.ef){opacity:max(var(--inactive),.55);filter:blur(calc(var(--blur)*.5))}
 .w .body{max-height:min(72vh,calc(100vh - 150px));overflow:auto;overflow-x:hidden}
 
 /* links + hover preview */
@@ -121,6 +124,19 @@ input[type=range]{width:100%;margin:0;accent-color:var(--fg);height:16px}
 .stat span#hc{color:var(--muted)}
 #msg{padding:0 12px 8px;color:var(--muted);line-height:1.4;font-size:11px}#msg:empty{display:none}
 .st.pulse{animation:pl .35s}@keyframes pl{30%{transform:translateX(-3px)}60%{transform:translateX(3px)}}
+/* touch / small screens: a static hint of softness instead of the animated blur.
+   The filter value is fixed and never transitioned (animating it repaints every paragraph per frame, which was the cost);
+   the fade is opacity + a small lift, which stay on the compositor. */
+@media (hover:none),(pointer:coarse),(max-width:640px){
+  .rd{filter:blur(1.5px)!important;transform:translate3d(0,6px,0);transition:opacity .45s ease,transform .45s ease,color .3s}
+  .rd.in{filter:none!important;transform:none}
+  .w-on .rd:not(.ef){filter:blur(1.5px)!important;transform:none}
+  .w-on .rd.ef{filter:none!important;transform:none}
+  .w-on .rd[data-near="1"]:not(.ef){filter:none!important}
+  .w-on .rd[data-near="2"]:not(.ef){filter:blur(1px)!important}
+  .w,.pv{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
+  .top{background:linear-gradient(var(--bg) 60%,transparent)}
+}
 @media (prefers-reduced-motion:reduce){.rd,.hl,.st,.pv,.blk{transition-duration:.01s!important;transition-delay:0s!important;animation:none!important}}
 </style>
 </head>
@@ -183,7 +199,7 @@ var SEED=[['kicker',"by [zack.cx](https://zack.cx)"],
 
 ['p',"Of course, I have enterprise ==0-1 experience== with notable institutions occupying the ==Financial Software As A Service== arena; granted it was in 2023-2024, ==pre-AI influence== or output, ==where human gray matter mattered==, and combined as part of a team effort in ==redefining both the data model and design system supporting it==, resulting in BNY Mellon's WOVE, by Pershing X  — https://zack.cx/bny  "],
 ['p',"Since then, well, it's been challenging for me to ==convey my career in a way that both accommodates and astonishes==. I am still working that out, but meanwhile, my progress can be seen @ https://zack.cx/px, or https://zack.cx/xp, but definitely not https://zack.cx/cosmo; though https://zack.cx/foundry is what inspired https://ifimaybefrank.com/classic, which then elevated into https://neverever.land, which inspired/influenced a scaled-up exploration https://intoview.pro; whilst dabbling with https://dab.cx that ultimately informed https://zack.cx"],
-['p',"If you're wondering why I am looking for a job?  It's mostly because things like https://zack.cx/kolo & https://zack.cx/k2, or https://zack.cx/duck can be made in a single session using a free-tier LLM, using less than a 5 total prompts (granted, I pulled from past projects for some things)"],
+['p',"If you're wondering why I am looking for a job?  It's mostly because things like https://zack.cx/kolo & https://zack.cx/k2 can be made in a single session using a free-tier LLM, using less than a 5 total prompts (granted, I pulled from past projects for some things)"],
 ['p',"Anyway, I would really enjoy being part of a team environment, contributing in any meaningful way — hmu: zckgrt@gmail.com"],
 ['sig',"— not Frank, but wholeheartedly Zack"]];
 var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:1,wt:400,lh:1.45,ls:0,ff:'sans',c:''},p:{sz:.7,wt:400,lh:1.58,ls:0,ff:'sans',c:''},meta:{sz:1,wt:400,lh:1.3,ls:0,ff:'sans',c:''}},
@@ -403,12 +419,13 @@ function setTarget(i) {
   applyType();
 }
 
+function near(i){els.forEach(function(el,j){var k=Math.abs(j-i);if(k===1||k===2)el.dataset.near=k;else delete el.dataset.near})}
 wrap.addEventListener('focusin',function(e){var t=e.target;
   if(t.classList&&t.classList.contains('vw')&&!md){edit(idx(t));return}
   if(t.tagName==='TEXTAREA'){
     var d = t.closest('.blk'), i = idx(t);
     if(act !== i) { setTarget(i); els.forEach(function(el, j){ el.classList.toggle('act', j === i); }); }
-    d.classList.add('ef');wrap.classList.add('w-on');
+    d.classList.add('ef');wrap.classList.add('w-on');near(i);
     if(msg.dataset.x!=='1'){msg.dataset.x='1';say('')}}});
 
 wrap.addEventListener('focusout',function(e){var t=e.target;if(t.tagName!=='TEXTAREA')return;var d=t.closest('.blk');
