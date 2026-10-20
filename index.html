@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ifimaybefrank — writer</title>
+<script>
+  // Set theme immediately to prevent FOUC (Flash of Unstyled Content)
+  (function() {
+    var theme = localStorage.getItem('ifmf-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fcfcfb;--fg:#151515;--muted:#76767a;--line:#e6e6e3;--panel:#ffffffee;--chip:#efefec;--hl:#fffcb3;--s0:0% 100%;--s1:100% 100%;--pos:left center;--blur:8px;--inactive:.3;--hdur:1s;--hdelay:.4s}
@@ -127,8 +134,8 @@ input[type=range]{width:100%;margin:0;accent-color:var(--fg);height:16px}
 <main class="wrap" id="wrap"><div id="doc"></div></main>
 
 <div class="hud">
-  <section class="w" id="wTune">
-    <button type="button" aria-expanded="true"><span>Controls</span>
+  <section class="w closed" id="wTune">
+    <button type="button" aria-expanded="false"><span>Controls</span>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button>
     
     <div class="stat">
@@ -176,8 +183,9 @@ var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:1,wt:400,lh:
 var S=Object.assign({},D),B,els=[],saveT,msgT,md=0,act=null;
 
 // Theme Toggle Logic
-var themePref = localStorage.getItem('ifmf-theme');
-if(themePref) root.setAttribute('data-theme', themePref);
+var themePref = localStorage.getItem('ifmf-theme') || 'light';
+root.setAttribute('data-theme', themePref);
+
 function toggleTheme() {
   var current = root.getAttribute('data-theme');
   if(!current) current = dark.matches ? 'dark' : 'light';
