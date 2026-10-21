@@ -273,15 +273,16 @@ body.editing .sg-dock{opacity:0;visibility:hidden;pointer-events:none;transition
 (function(){
 var $=function(i){return document.getElementById(i)},root=document.documentElement,wrap=$('wrap'),doc=$('doc'),tune=$('tune'),msg=$('msg'),
   RM=matchMedia('(prefers-reduced-motion: reduce)'),dark=matchMedia('(prefers-color-scheme: dark)');
-var KEY='ifmf-writer-v1',D={fs:100,blur:0,inactive:.3,hdur:1.7,dir:'left',bv:4,role:'p',cLight:'#fffcb3',cDark:'#007bff'};
+var KEY='ifmf-writer-v1',D={fs:100,blur:0,inactive:.3,hdur:1.7,dir:'left',bv:4,role:'dek',cLight:'#fffcb3',cDark:'#007bff'};
 var PH={kicker:'label',title:'Title',dek:'One line that holds the rest',p:'Say it simply',sig:'— signature'};
-var SEEDV=21;
+var SEEDV=23;
 var SEED=[['kicker',"by [zack.cx](https://zack.cx)"],
 ['title',"If I may be Frank,"],
-['dek',"…notably not Curt, decidedly not Dick — rather, unregrettably Rich."],
+['dek',"*notably not a Curt & decidedly not a—uhm—Rich…ard"],
 ['p',"& now that we’ve established boundaries and [I’ve] filtered my audience, I may speak freely — abstractly & through alliterative anachronistic apropos."],
 ['p',"**Hi, I'm Zack **"],
 ['p',"![Zack](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*8_MRtbQfWZ-oPvEYL1uAhQ.png) "],
+['p',"![in my element](https://raw.githubusercontent.com/ZACKGORT/zack/main/media/frankly_skate.mp4) "],
 ['p',"I have been building things — differently. "],
 ['p',"I think differently. I function differently. I flow differently. "],
 ['p',"For starters, you aren't getting a typical presentation here — if that's what you want, I invite you to https://zack.cx/classic, but otherwise, everything hereafter is bespoke."],
@@ -302,7 +303,7 @@ var SEED=[['kicker',"by [zack.cx](https://zack.cx)"],
 ['p',"Anyway, I would really enjoy being part of a team environment, contributing in any meaningful way — hmu: zckgrt@gmail.com "],
 ['p',"I clean up okay, btw ![I clean up okay, btw ](https://raw.githubusercontent.com/ZACKGORT/zack/main/media/zack375hudson.png)"],
 ['sig',"— not Frank, but wholeheartedly Zack"]];
-var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:1,wt:400,lh:1.45,ls:0,ff:'sans',c:''},p:{sz:.7,wt:400,lh:1.58,ls:0,ff:'sans',c:''},meta:{sz:1,wt:400,lh:1.3,ls:0,ff:'sans',c:''}},
+var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:.6,wt:400,lh:1.45,ls:0,ff:'sans',c:''},p:{sz:.7,wt:400,lh:1.58,ls:0,ff:'sans',c:''},meta:{sz:1,wt:400,lh:1.3,ls:0,ff:'sans',c:''}},
   ROLES=[['kicker','Kicker'],['title','Title'],['dek','Dek'],['p','Body'],['sig','Sig']],WTS=[300,400,500,700],
   FF={sans:"Satoshi,system-ui,sans-serif",serif:"Georgia,'Iowan Old Style','Times New Roman',serif",mono:"ui-monospace,'SF Mono',Menlo,Consolas,monospace"};
 var S=Object.assign({},D),B,els=[],saveT,msgT,md=0,act=null;
