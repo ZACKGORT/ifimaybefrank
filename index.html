@@ -222,25 +222,25 @@ body.editing .sg-dock{opacity:0;visibility:hidden;pointer-events:none;transition
 .fbar .hlb{background:var(--hl);color:var(--fg);padding:1px 4px;border-radius:3px;font-size:13px}
 
 /* resume hover preview: first page of the .docx, rendered live (docx-preview, loaded on first hover) */
-.rv{position:relative;display:flex}
-.rv-pv{position:absolute;top:100%;left:0;margin-top:6px;width:220px;padding:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.14);opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none;z-index:20}
-.rv-doc{display:block;width:100%;aspect-ratio:8.5/11;overflow:hidden;position:relative;background:#fff;border-radius:4px}
-.rv-doc .docx-wrapper{background:none!important;padding:0!important;position:absolute;top:0;left:0;transform:scale(var(--s,.25));transform-origin:0 0}
-.rv-doc .docx-wrapper>section.docx{margin:0!important;box-shadow:none!important}
-.rv-cap{display:block;margin-top:6px;font:400 11px/1.3 ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--muted)}
-@media (hover:hover){.rv:hover .rv-pv,.rv:focus-within .rv-pv{opacity:1;visibility:visible;transform:none}}
+#rsp{position:fixed;top:64px;left:20px;z-index:25;width:min(300px,calc((100vh - 96px) * .7727));aspect-ratio:612/792;box-sizing:border-box;display:block;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 14px 40px rgba(0,0,0,.22);opacity:0;visibility:hidden;transform:translateY(-6px) scale(.98);transform-origin:top left;pointer-events:none;transition:opacity .18s,transform .22s cubic-bezier(.23,1,.32,1),visibility .18s}
+#rsp.on{opacity:1;visibility:visible;transform:none}
+#rsp .rsd{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+#rsp.rdy .rsd{visibility:visible}
+#rsp .rsd .docx-wrapper{background:none!important;padding:0!important;position:absolute;top:0;left:0;transform:scale(var(--s,.37));transform-origin:0 0}
+#rsp .rsd .docx-wrapper>section.docx{margin:0!important;box-shadow:none!important}
+#rsp>.rsl{position:absolute;inset:0;display:grid;place-items:center;padding:0 16px;text-align:center;font:300 10.5px/1.4 ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:#6c685f}
+#rsp.rdy>.rsl{display:none}
+@media(hover:none){#rsp{display:none!important}}
+@media(prefers-reduced-motion:reduce){#rsp{transition-duration:.01s}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-left">
     <div class="logo" id="logo" aria-label="ifimaybefrank"></div>
-    <span class="rv">
     <a class="resume-btn" id="rsm" href="https://raw.githubusercontent.com/ZACKGORT/zack/main/media/zack.craft.experience.resume.docx" download="zack.craft.experience.resume.docx" target="_blank" rel="noopener noreferrer" aria-label="Download Resume" title="Download Resume (Word .docx)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </a>
-    <span class="rv-pv" aria-hidden="true"><span class="rv-doc" id="rvDoc"></span><span class="rv-cap">resume.docx · click to download</span></span>
-    </span>
   </div>
   <div class="top-actions">
     <div class="tool-btn" id="toolBtn" role="button" tabindex="0" aria-label="Writing controls" aria-expanded="false" aria-controls="wTune" title="Controls">
@@ -977,32 +977,31 @@ var rt;$('rst').addEventListener('click',function(){var b=this;
 apply(false);render();
 })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://unpkg.com/docx-preview@0.3.3/dist/docx-preview.min.js"></script>
 <script>
-/* resume: live .docx preview on hover + save via fetch/blob (other origin) */
-(function(){
-  var rv=document.querySelector('.rv'),box=document.getElementById('rvDoc'),a=document.getElementById('rsm'),done=false,MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-  if(!rv||!box||!a) return;
-  function fit(){var pg=box.querySelector('section.docx');if(pg&&pg.offsetWidth&&box.clientWidth)box.style.setProperty('--s',box.clientWidth/pg.offsetWidth)}
-  function load(){
-    if(done) return; done=true;
-    fetch(a.href+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){
-      return docx.renderAsync(b,box,null,{inWrapper:true,ignoreWidth:false,breakPages:true});
-    }).then(fit).catch(function(){done=false});
-  }
-  rv.addEventListener('mouseenter',load,{once:true});
-  rv.addEventListener('focusin',load,{once:true});
-  a.addEventListener('click',function(e){
-    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button) return;
-    e.preventDefault();
-    fetch(a.href+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){
-      var u=URL.createObjectURL(new Blob([b],{type:MIME})),d=document.createElement('a');
-      d.href=u;d.download=a.getAttribute('download');document.body.appendChild(d);d.click();d.remove();
-      setTimeout(function(){URL.revokeObjectURL(u)},4000);
-    }).catch(function(){window.open(a.href,'_blank','noopener')});
-  });
-})();
+/* resume button: save the .docx (other origin, so fetch + blob) and show a live first-page preview on hover (docx-preview, loaded on first hover) */
+(function(){var a=document.getElementById('rsm');if(!a)return;
+var pv=document.createElement('div');pv.id='rsp';pv.setAttribute('aria-hidden','true');pv.innerHTML='<div class="rsd"></div><span class="rsl">loading preview\u2026</span>';document.body.appendChild(pv);
+var bx=pv.firstChild,lb=pv.lastChild,st='idle',tm=0,MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+var JZ=['https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js','https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'];
+var DP=['https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js','https://unpkg.com/docx-preview@0.3.3/dist/docx-preview.min.js'];
+function src(u){return new Promise(function(ok,no){var s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=function(){s.remove();no()};document.head.appendChild(s)})}
+function first(list,ok){return list.reduce(function(p,u){return p.catch(function(){return ok()?0:src(u)})},Promise.reject())}
+function lib(){return first(JZ,function(){return window.JSZip}).then(function(){return first(DP,function(){return window.docx&&docx.renderAsync})})}
+function place(){var r=a.getBoundingClientRect();pv.style.left=Math.max(8,r.left)+'px';pv.style.top=(r.bottom+8)+'px'}
+function fit(){var pg=bx.querySelector('section.docx');if(pg&&pg.offsetWidth&&bx.clientWidth)bx.style.setProperty('--s',bx.clientWidth/pg.offsetWidth)}
+function load(){if(st==='load'||st==='ok')return;st='load';lb.textContent='loading preview\u2026';
+var doc=fetch(a.href+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.blob()});
+Promise.all([doc,lib()]).then(function(r){bx.innerHTML='';return docx.renderAsync(r[0],bx,null,{inWrapper:true,ignoreWidth:false,breakPages:true})})
+.then(function(){fit();st='ok';pv.classList.add('rdy')}).catch(function(){st='idle';lb.textContent='preview unavailable \u2014 click to download'})}
+function show(){clearTimeout(tm);place();load();tm=setTimeout(function(){place();fit();pv.classList.add('on')},140)}
+function hide(){clearTimeout(tm);pv.classList.remove('on')}
+addEventListener('resize',function(){place();fit()});
+a.addEventListener('mouseenter',function(){if(matchMedia('(hover:hover)').matches)show()});
+a.addEventListener('focus',function(){try{if(a.matches(':focus-visible'))show()}catch(_){}});
+a.addEventListener('mouseleave',hide);a.addEventListener('blur',hide);
+addEventListener('keydown',function(e){if(e.key==='Escape')hide()});
+a.addEventListener('click',function(e){hide();if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button)return;e.preventDefault();
+fetch(a.href+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.blob()}).then(function(b){var u=URL.createObjectURL(new Blob([b],{type:MIME})),d=document.createElement('a');d.href=u;d.download=a.getAttribute('download');document.body.appendChild(d);d.click();d.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}).catch(function(){window.open(a.href,'_blank','noopener')})})})();
 </script>
 </body>
 </html>
