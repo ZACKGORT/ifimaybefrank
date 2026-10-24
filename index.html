@@ -3,18 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Frankly, · ifimaybefrank.com</title>
-<meta name="description" content="A study in hubris, hiring, and being frank — by Zack Gort.">
+<title>Frankly, · Zack Gort</title>
+<meta name="description" content="hubris is thinking the thing I am showing you is built for you.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%225%22 fill=%22%23fff%22/%3E%3Ctext x=%2232%22 y=%2242%22 text-anchor=%22middle%22 font-family=%22Satoshi,'Helvetica Neue',Arial,sans-serif%22 font-size=%2227%22 font-weight=%22500%22 fill=%22%2339393b%22 textLength=%2250%22 lengthAdjust=%22spacingAndGlyphs%22%3Ezcx%3C/text%3E%3C/svg%3E">
-<link rel="canonical" href="https://ifimaybefrank.com">
+<link rel="canonical" href="https://zack.cx/cv">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Frankly,">
-<meta property="og:url" content="https://ifimaybefrank.com">
-<meta property="og:title" content="Frankly,">
-<meta property="og:description" content="A study in hubris, hiring, and being frank — by Zack Gort.">
+<meta property="og:site_name" content="zack.cx">
+<meta property="og:url" content="https://zack.cx/cv">
+<meta property="og:title" content="Frankly, · Zack Gort">
+<meta property="og:description" content="hubris is thinking the thing I am showing you is built for you.">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Frankly,">
-<meta name="twitter:description" content="A study in hubris, hiring, and being frank — by Zack Gort.">
+<meta name="twitter:title" content="Frankly, · Zack Gort">
+<meta name="twitter:description" content="hubris is thinking the thing I am showing you is built for you.">
 <script>
   // Set theme immediately to prevent FOUC (Flash of Unstyled Content)
   (function() {
@@ -69,7 +69,15 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:Satoshi,system-ui
 .sig{margin-top:56px}
 .rd{font-family:var(--f-p,Satoshi,system-ui,sans-serif);font-weight:var(--w-p,400);font-size:calc(clamp(20px,2.6vw,22px)*var(--z-p,1)*var(--fs,1)*var(--bz,1));line-height:var(--l-p,1.6);letter-spacing:var(--s-p,0em);margin:0 0 1.5em;opacity:var(--inactive);filter:blur(var(--blur));transition:opacity .8s ease,filter .8s ease,color .3s;color:var(--c-p, var(--fg))}
 .rd.in{opacity:1;filter:blur(0)}
-.hl{background-image:linear-gradient(var(--hl),var(--hl));background-repeat:no-repeat;background-size:var(--s0);background-position:var(--pos);border-radius:3px;padding:0 3px;margin:0 -3px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size var(--hdur) ease var(--hdelay)}
+/* ---- conversation (human view): paren depth = speaker. 1 left, 2 right, 3 left+indent, 4 right+indent... ---- */
+.blk[data-sp]{--sp-step:2.4em;margin-bottom:.9em}
+.blk[data-sp] .vw{width:fit-content;max-width:min(86%,34em);box-sizing:border-box;padding:.45em .95em;border:1px solid transparent;border-radius:1.15em;background:var(--chip)}
+.blk[data-sd=l] .vw{margin-left:calc(var(--sl,0)*var(--sp-step));margin-right:auto;border-bottom-left-radius:.35em}
+.blk[data-sd=r] .vw{margin-left:auto;margin-right:calc(var(--sl,0)*var(--sp-step));background:transparent;border-color:var(--line);border-bottom-right-radius:.35em}
+.blk[data-nm]::before{content:attr(data-nm);display:block;margin:.5em 0 .3em;padding:0 calc(.95em + 1px);font:500 11px/1.2 ui-monospace,'SF Mono',Menlo,Consolas,monospace;color:var(--muted)}
+.blk[data-nm][data-sd=l]::before{margin-left:calc(var(--sl,0)*var(--sp-step))}
+.blk[data-nm][data-sd=r]::before{text-align:right;margin-right:calc(var(--sl,0)*var(--sp-step))}
+.hl{background-image:linear-gradient(var(--hl),var(--hl));background-repeat:no-repeat;background-size:var(--s0);background-position:var(--pos);border-radius:3px;padding:0 3px;margin:0 -3px 0 0;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size var(--hdur) ease var(--hdelay)}
 .rd.in .hl,.blk:not(.rd) .hl,.w-on .rd .hl{background-size:var(--s1)}
 /* writing: the paragraph you're in is sharp, the rest soften */
 .w-on .rd:not(.ef){opacity:var(--inactive);filter:blur(var(--blur))}
@@ -363,7 +371,6 @@ body.editing .sg-dock{opacity:0;visibility:hidden;pointer-events:none;transition
 .bt a:hover{text-decoration-color:currentColor}
 @media (min-width:480px){.blk.sec .vw,.blk.sec .ed{padding-right:230px}}
 .mv .gh{opacity:.6;border-bottom:1px dotted currentColor}
-
 /* ---------- theme 3: OEM — Satoshi, tight leading, ultra-tight tracking, near-zero chrome, colour only as a hairline underline ---------- */
 :root[data-theme="oem"]{--bg:#fafaf8;--fg:#111;--muted:#111;--line:#111;--panel:#fafaf8;--chip:#ececE8;--hl:#ff4f00;color-scheme:light}
 :root[data-theme="oem"] *{border-radius:0!important;box-shadow:none!important;text-shadow:none!important;transition:none!important;animation:none!important}
@@ -393,7 +400,7 @@ body.editing .sg-dock{opacity:0;visibility:hidden;pointer-events:none;transition
 <body>
 <header class="top">
   <div class="top-left">
-    <div class="logo" id="logo" aria-label="Frankly,"></div>
+    <div class="logo" id="logo" aria-label="zack.cx/cv"></div>
     <span class="rv">
     <a class="resume-btn" href="https://raw.githubusercontent.com/ZACKGORT/zack/main/media/zack.craft.experience.resume.docx" target="_blank" rel="noopener noreferrer" aria-label="Download Resume" title="Download Resume (Word .docx)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -464,7 +471,7 @@ var $=function(i){return document.getElementById(i)},root=document.documentEleme
   RM=matchMedia('(prefers-reduced-motion: reduce)'),dark=matchMedia('(prefers-color-scheme: dark)');
 var KEY='zcx-cv-v1',D={fs:47,blur:0,inactive:.3,hdur:1.7,dir:'left',bv:4,role:'p',cLight:'#fffcb3',cDark:'#007bff'};
 var PH={sec:'section label',kicker:'label',title:'Title',dek:'One line that holds the rest',p:'Say it simply',sig:'— signature'};
-var SEEDV=40;
+var SEEDV=38;
 var SEED=[
 ["kicker", "by [zack.cx](https://zack.cx)"],
 ["title", "Frankly,"],
@@ -475,34 +482,36 @@ var SEED=[
 ["p", "*let \"**ƒ**\" _serve as a friendly reminder that ++this statement is meant++_ '++**_==to be frank==_**++**'; amounting to ==nothing more than statements dressed in jest== _++that in no shape or otherwise intangible form is intended to cause or otherwise inflict harm++_—though, perhaps poke at your ego, and almost certainly will offend your conventional sensibilities.\"", 0.71],
 ["sec", "*ahem* recruiters/hiring folk"],
 ["p", "==hubris is thinking the thing I am showing you is built for you.==", 1.56],
-["p", "recruiter: \"**==looking for a square==**; circles may apply but generally are not seen as a fit\"", 1.28],
-["p", "me: \"[==zack.cx==](https://zack.cx)\" me: \"**T-shaped is squarish, right?**\""],
-["p", "recruiter: *_++reluctantly++ regards_*"],
-["p", "recruiter: *_opens portfolio with ==prefixed and immutable projection of a 'perfect portfolio' [already] pictured== in his/her/their prefrontal cortex_*"],
-["p", "recruiter: *…put left sock on first today; reflects upon that for a bit…*"],
-["p", "recruiter: *_**immediately ==flags unfamiliar==** portfolio **as ==\"gimmicky==\"**_*"],
-["p", "recruiter: *_++responds to impart infinite wisdom++—==albeit in **profoundly generic fashion, as-per verbatim **==_* ƒ"],
-["p", "me: \"==well, actually…== it's a study on foundational framing focusing on familiar heuristics, while serving as an idiosyncratic testament to the current state-of-affairs by leveraging familiar libraries, whilst standing as a sturdy refusal to succumb to the status quo — ==basically, _none of 'the design' is the point_; **the system itself is entirely the point**==.\" ƒ"],
-["p", "recruiters: \"oh neat. I don't get it, but I won't say that aloud.\""],
-["p", "recruiters: \"**anyway, how does this translate to #fintech?**\""],
-["p", "me: \"I actually have a case study I made using the build....\""],
-["p", "recruiters: \"**yea, that's great**; it's too much, less is more; **show me something from 5-10 years ago that has a compelling thumbnail** with a **traditional case-study format** showcasing **explicitly stated process benchmarks** and success metrics/outcomes.\""],
-["p", "me: [==\"zack.cx/classic\"==](https://zack.cx/classic)"],
-["p", "recruiters: \"why is it pink?\""],
-["p", "me: \"pink is a boy's color in s.Korea\""],
-["p", "recruiters: \"oh, okay … great, now show me how this translates into a modern AI workflow for our fintech client.\""],
-["p", "me: \"did you not actually look at [==zack.cx/classic==](https://zack.cx/classic)?\""],
-["p", "recruiter: \"…\""],
-["p", "me: \"well, I have a case study from my recent work with Publicis Sapient…\""],
-["p", "recruiters: \"Oh? Do tell more!\""],
-["p", "me: \"… as featured on [==zack.cx/classic==](https://zack.cx/classic), but I also feature it on [==zack.cx==](https://zack.cx), but since you didn't like it there, I also talk it about it comprehensively at [==zack.cx/bny==](https://zack.cx/bny) & [==zack.cx/ux==](https://zack.cx/ux), but those are still too complex for rapid conveyance; which is why I offer [a ==hand-coded iteration== that pre-dates the a.i.-era](https://reasonandresolution.com/frankly) - you know, just every affordance for those who are ''impressed/unimpressed'' about ''this/that'' and/or pressed for ''attention/time.\"'' ƒ"],
-["p", "me: \"[zack.cx/bny](https://zack.cx/bny) (**BNY Mellon**; the literal definition of Global **Enterprise Financial Services;** where I worked as a ==product owner, team lead, and mentor== in a true ==0-1 product concept & activation environment== where ==my team drove innovation== through ==comprehensive data & design system refactorization== — **proudly pre-a.i.-era**).\""],
-["p", "recruiters: \"++**_hold your horses_**++, did you just say… *_gasp_* …\"++**_pre-AI?_**++\" 😱"],
-["p", "recruiters: *_++interest leaves chat++_*"],
-["p", "me: \"yeah, so I have been developing a coherent ==thesis== that I hope stands as testament to my ability to...\""],
-["p", "recruiters: \"yea yea, that's great, so ==we'll let you know if anything comes up==. **Also, I'll be OOO for the next week or two.**..\""],
-["p", "me: *_**furiously updates resume** @_ [zack.cx/cv](https://zack.cx/cv) …* ƒ"],
-["sig", "𖹭 zack"]
+["p", "\"(recruiter)((**==looking for a square==**; circles may apply (note: a perfect circle ≠ perfect fit.)))\"", 1.28],
+["p", "\"(me)([==zack.cx==](https://zack.cx))\""],
+["p", "\"(**T-shaped is squarish, right?**)\""],
+["p", "\"((*_++reluctantly++ regards_*))\""],
+["p", "\"((*_opens portfolio with ==prefixed and immutable projection of a 'perfect portfolio' [already] pictured== in his/her/their prefrontal cortex_*))\""],
+["p", "\"((*…put left sock on first today; reflects upon that for a bit…*))\""],
+["p", "\"((*_**immediately ==flags unfamiliar==** portfolio **as ==\"gimmicky==\"**_*))\""],
+["p", "\"((*_++responds to impart infinite wisdom++—==albeit in **profoundly generic fashion, as-per verbatim **==_* ƒ))\""],
+["p", "\"(==well, actually…== it's a study on foundational framing focusing on familiar heuristics, while serving as an idiosyncratic testament to the current state-of-affairs by leveraging familiar libraries, whilst standing as a sturdy refusal to succumb to the status quo — ==basically, _none of 'the design' is the point_; **the system itself is entirely the point**==. ƒ)\""],
+["p", "\"((oh neat. ''I don't get it, but I won't say that aloud''.))\""],
+["p", "\"(you just said that out loud.)\""],
+["p", "\"((**fascinating**. Anyways. **How does this translate to #fintech?**))\""],
+["p", "\"(I actually have a case study I made using the build....)\""],
+["p", "\"((**yea, that's great**; it's too much, less is more; **show me something from 5-10 years ago that has a compelling thumbnail** with a **traditional case-study format** showcasing **explicitly stated process benchmarks** and success metrics/outcomes.))\""],
+["p", "\"([==\"zack.cx/classic\"==](https://zack.cx/classic))\""],
+["p", "\"((**why is it pink?**))\""],
+["p", "\"(**pink is a boy's color in s.Korea**)\""],
+["p", "\"((oh, okay … great, now **show me how this translates into a modern AI workflow for our fintech client.**))\""],
+["p", "\"(**did you** not **actually look at** [==**zack.cx/classic**==](https://zack.cx/classic)?)\""],
+["p", "\"((**…**))\""],
+["p", "\"(well, I have a case study from my recent work with Publicis Sapient…)\""],
+["p", "\"((Oh? Do tell more!))\""],
+["p", "\"(… as featured on [==**zack.cx/classic**==](https://zack.cx/classic), but I also feature it on [==**zack.cx**==](https://zack.cx), but since you didn't like it there, I also talk it about it comprehensively at [==**zack.cx/bny**==](https://zack.cx/bny) & [==zack.cx/ux==](https://zack.cx/ux), but those are still too complex for rapid conveyance; which is why I offer [a ==**hand-coded iteration**== that pre-dates the a.i.-era](https://reasonandresolution.com/frankly) - you know, just every affordance for those who are ''impressed/unimpressed'' about ''this/that'' and/or pressed for ''attention/time.'' ƒ)\""],
+["p", "\"([zack.cx/bny](https://zack.cx/bny) (**BNY Mellon**; the literal definition of Global **Enterprise Financial Services;** where I worked as a ==product owner, team lead, and mentor== in a true ==0-1 product concept & activation environment== where ==my team drove innovation== through ==comprehensive data & design system refactorization== — **proudly pre-a.i.-era**).)\""],
+["p", "\"((++**_hold your horses_**++, did you just say… *_gasp_* …\"++**_pre-AI?_**++\" 😱))\""],
+["p", "\"((*_++==interest leaves chat==++_*))\""],
+["p", "\"(yeah, so I have been developing a working ==thesis== that I hope stands as testament to my ability to...)\""],
+["p", "\"((yea yea, that's great, so ==we'll let you know if anything comes up==. **Also, I'll be OOO for the next week or two.**..))\""],
+["p", "\"(*_**furiously updates resume** @_ [zack.cx/cv](https://zack.cx/cv) …* ƒ)\""],
+["sig", "𖹭 zack"],
 ];
 var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:1,wt:400,lh:1.45,ls:0,ff:'sans',c:''},p:{sz:.7,wt:300,lh:1.58,ls:0,ff:'sans',c:''},meta:{sz:1,wt:400,lh:1.3,ls:0,ff:'sans',c:''}},
   ROLES=[['kicker','Kicker'],['title','Title'],['dek','Dek'],['p','Body'],['sig','Sig']],WTS=[300,400,500,700],
@@ -536,7 +545,7 @@ B=migrate(B);
 S.ty=S.ty||{};ROLES.forEach(function(r){S.ty[r[0]]=Object.assign({},TD[r[0]],S.ty[r[0]]);});if(!TD[S.role])S.role='p';
 
 /* ---------- logo: letters gain weight near the pointer ---------- */
-(function(){var el=$('logo'),sp=[].map.call('Frankly,',function(c){var s=document.createElement('span');s.textContent=c;el.appendChild(s);return s});
+(function(){var el=$('logo'),sp=[].map.call('zack.cx/cv',function(c){var s=document.createElement('span');s.textContent=c;el.appendChild(s);return s});
   function mv(e){var r=el.getBoundingClientRect(),R=r.width*.35;sp.forEach(function(s){var b=s.getBoundingClientRect(),d=Math.hypot(e.clientX-b.left-b.width/2,e.clientY-b.top-b.height/2);s.style.fontWeight=Math.round(400+300*Math.max(0,1-d/R))})}
   function lv(){sp.forEach(function(s){s.style.fontWeight=''})}
   el.addEventListener('pointermove',mv);el.addEventListener('pointerleave',lv)})();
@@ -683,15 +692,35 @@ fwResize.addEventListener('pointerup', function(e) {
 });
 
 /* ---------- render ---------- */
+/* conversation: "(a)" "((b))" "(((c)))" — opening-paren depth = speaker. Whole statement only, quotes required.
+   optional name group right before the text group: "(Steve Krug)((text))". A name binds to that depth and sticks until renamed. */
+var SPK=/^\s*["\u201c](\(+)([\s\S]*)["\u201d]\s*$/;
+var SPN=/^\s*["\u201c]\(+([^()]+)\)+(\(+)([\s\S]*)["\u201d]\s*$/;
+function spk(t){t=t||'';var nm='',n,x,k=0,m=SPN.exec(t);
+  if(m){nm=m[1].trim();n=m[2].length;x=m[3]}
+  else{m=SPK.exec(t);if(!m)return null;n=m[1].length;x=m[2]}
+  while(k<n&&x.slice(-1)===')'){x=x.slice(0,-1);k++}
+  x=x.trim();return k&&x?{n:n,t:x,nm:nm}:null}
+function inkB(b){var q=b.k==='p'?spk(b.t):null;return ink(q?q.t:b.t)}
+function spSet(d,b){var q=b.k==='p'?spk(b.t):null;
+  if(q){d.dataset.sp=q.n;d.dataset.sd=q.n%2?'l':'r';d.style.setProperty('--sl',Math.floor((q.n-1)/2))}
+  else{delete d.dataset.sp;delete d.dataset.sd;d.style.removeProperty('--sl')}}
+function spNames(){var nm={},prev=null;
+  B.forEach(function(b,i){var d=els[i],q=b.k==='p'?spk(b.t):null;if(!d)return;
+    if(!q){prev=null;delete d.dataset.nm;return}
+    if(q.nm)nm[q.n]=q.nm;
+    var n=nm[q.n]||'';
+    if(n&&!(prev&&prev.n===q.n&&prev.nm===n))d.dataset.nm=n;else delete d.dataset.nm;
+    prev={n:q.n,nm:n}})}
 function mk(i){
   var b=B[i],d=document.createElement('div'),v=document.createElement('div'),e=document.createElement('div'),t=document.createElement('textarea');
   d.className='blk '+(b.k==='p'?'rd':b.k);d.dataset.i=i;if(b.z)d.style.setProperty('--bz',b.z);
   
-  v.className='vw';v.dataset.ph=PH[b.k];v.tabIndex=0;v.innerHTML=ink(b.t);
+  v.className='vw';v.dataset.ph=PH[b.k];v.tabIndex=0;v.innerHTML=inkB(b);spSet(d,b);
   e.className='ed';e.dataset.v=b.t;t.rows=1;t.value=b.t;t.placeholder=PH[b.k];t.setAttribute('aria-label',b.k==='p'?'paragraph':b.k);
   e.appendChild(t);d.appendChild(v);d.appendChild(e);if(b.k==='sec')d.appendChild(stg());return d}
-function render(){els=B.map(function(_,i){return mk(i)});doc.replaceChildren.apply(doc,els);observe();hq();rzPlace();secSync()}
-function drop(i){hq();els[i].remove();els.splice(i,1);B.splice(i,1);els.forEach(function(d,j){d.dataset.i=j})}
+function render(){els=B.map(function(_,i){return mk(i)});doc.replaceChildren.apply(doc,els);observe();hq();rzPlace();spNames();secSync()}
+function drop(i){hq();els[i].remove();els.splice(i,1);B.splice(i,1);els.forEach(function(d,j){d.dataset.i=j});spNames()}
 var io;
 function observe(){if(io)io.disconnect();
   io=new IntersectionObserver(function(es){es.forEach(function(e){
@@ -744,7 +773,7 @@ wrap.addEventListener('focusout',function(e){var t=e.target;if(t.tagName!=='TEXT
     if(!d.isConnected||document.activeElement===t)return;
     d.classList.remove('ef');
     var i=els.indexOf(d),b=B[i];if(!b)return;
-    d.querySelector('.vw').innerHTML=ink(b.t);
+    d.querySelector('.vw').innerHTML=inkB(b);spSet(d,b);spNames();
     if(b.k==='p'&&!b.t.trim()&&B.filter(function(x){return x.k==='p'}).length>1&&!fbar.contains(document.activeElement))drop(i);
     
     if(!wrap.querySelector('textarea:focus')){
@@ -1220,7 +1249,7 @@ var SG=function(j){return B[j].t.split(' | ')},
   setCH=function(j,c){B[j].t=c.h+' '+c.a.join(' \u2192 ')};
 function viaSet(t,nm){if(/via\s+[^()]*\)\s*$/i.test(t))return t.replace(/(via\s+)[^()]*(\)\s*)$/i,function(m,a,b){return a+nm+b});
   return /\)\s*$/.test(t)?t.replace(/\)\s*$/,', via '+nm+')'):t+' (via '+nm+')'}
-function blkSync(j){var d=els[j];if(!d)return;var t=d.querySelector('textarea');d.querySelector('.vw').innerHTML=ink(B[j].t);if(t&&t.value!==B[j].t)t.value=B[j].t;d.querySelector('.ed').dataset.v=B[j].t}
+function blkSync(j){var d=els[j];if(!d)return;var t=d.querySelector('textarea');d.querySelector('.vw').innerHTML=inkB(B[j]);spSet(d,B[j]);spNames();if(t&&t.value!==B[j].t)t.value=B[j].t;d.querySelector('.ed').dataset.v=B[j].t}
 
 /* "Company · Title · dates | …" + "… Selected Client & Project Work: A (role) → B (via A) → …"  →  role folders with clients.
    Every node it returns carries a key, a getter/setter onto its raw text, and structural ops (ops) that rewrite the source line. */
@@ -1667,87 +1696,81 @@ apply(false);render();
 })();
 </script>
 <script type="text/plain" id="llmsTxt">
-# Zachary "Zack" Ryan Gort
+by zack.cx (https://zack.cx)
 
-> Designer; Information Architect; User Experience Researcher & Strategist (UX / IA / design systems) with 20 years across e-commerce, financial services, pharma, higher ed, and social/advertising, at startups and agencies in Philadelphia and New York. Currently independent as Wolfgang & Co. Self-taught: no degree, learned by studying and shipping. Core belief: human intent matters most, even in the era of agentic automation. Current thesis treats "the sentence" as a primary product primitive that the user experience is built upon.
+# Frankly,
 
-This file is a plain-text summary for language models of https://ifimaybefrank.com (cover note and timeline) and https://zack.cx (full portfolio and writing). The pages are written by a human; this is the structured version. Claims about outcomes are the author's own.
+ZACHARY RYAN GORT / DESIGNER / https://zack.cx / zckgrt@gmail.com / Philadelphia & New York / 2005–2026 / Lean UX, design systems, code-native, AI-enabled / open to opportunities; remote & hybrid preferred /
 
-Contact: zckgrt@gmail.com
+## hubris_in_hiring.txt
 
-## Links
+"OVER THE LINE!" — Walter Sobchak
 
-- [Portfolio and deep-dive](https://zack.cx): Case studies, career narrative, R&D, and writing on one canvas.
-- [ifimaybefrank](https://ifimaybefrank.com): Hub for writing and everything else shared publicly.
-- [LinkedIn](https://www.linkedin.com/in/zackgort): Professional profile.
-- [Resume (Word .docx)](https://raw.githubusercontent.com/ZACKGORT/zack/main/media/zack.craft.experience.resume.docx): Resume, 2026.
-- [This page](https://ifimaybefrank.com): Cover note and career timeline.
+## author's_declaration:
 
-## Core competencies
+*let "ƒ" serve as a friendly reminder that this statement is meant 'to be frank'; amounting to nothing more than statements dressed in jest that in no shape or otherwise intangible form is intended to cause or otherwise inflict harm—though, perhaps poke at your ego, and almost certainly will offend your conventional sensibilities."
 
-- Systems: information architecture, design systems, component-based and modular UI, headless CMS and content strategy, IA workshop facilitation.
-- Product: 0-1 product design, UX strategy, product ownership (often interim or de facto), Agile/Scrum (Certified Scrum Master), stakeholder management, roadmap planning.
-- Craft: interaction design, visual design, mobile-first and responsive, prototyping, wireframing, accessibility (WCAG 2.0 AA and beyond), product photography.
-- Stack: Figma, Salesforce Commerce Cloud, Shopify, SAP Hybris, Contentful, Jira, iOS, B2B and B2C e-commerce, Claude, prompt engineering.
-- Leadership: team lead, mentorship of junior and associate designers, creative direction, client-facing lead.
+## *ahem* recruiters/hiring folk
 
-## Roles (most recent first)
+hubris is thinking the thing I am showing you is built for you.
 
-- Wolfgang & Co. - Founder / Proprietor (independent), current. Freelance design and R&D; self-directed portfolio of product experiments (see R&D below).
-- HUGE Inc. - Freelance (NDA), 2025-2026. Merck Europe (2026): design systems and technical writing, refactoring an approved visual design into a modular, maintainable design system (atomic design, Figma prototypes, UX developer documentation; under NDA). Sentral Apartments: concept and prototypes for the travel/lifestyle consumer conversion funnel; end-to-end UX and booking flow, 0-1 brand activation, conceptual product hand-off.
-- Phenom AI - Product UX Strategist, 02/2025-05/2025. Corporate web presence: owned content strategy, product roadmap, and third-party integrations end to end; built live-event infrastructure; worked across Marketing, Sales, and Product to map operational silos. Contentful, Jira.
-- Brave People - Lead Product Designer (contract), 11/2024-02/2025.
-- 2023-2024 - Independent contracting, including low-voltage data and network installation alongside design work.
-- Publicis Sapient - Product Lead / Senior User Experience Designer, 04/2022-03/2023. BNY Mellon, Pershing X advisory platform. Interim product owner and primary client liaison across three Agile tracks.
-- Code & Theory - Senior Interaction Designer, 08/2021-04/2022. TikTok For Business: 0-1 brand activation and replatforming to Contentful. IA and headless CMS workshops; stepped up to cover Acting ACD responsibilities on the account.
-- Elva Design Group - Senior UX Designer, 04/2021-08/2021. GNC Shopify redesign, 12 weeks, discovery through delivery.
-- PFSweb LiveArea - Manager, UX, 01/2020-02/2021. Salesforce Commerce Cloud and SAP Hybris builds for B2C and B2B (Hardinge, Simpson Strong-Tie, Aquasana, YETI, West Marine); UX strategy and design across the lifecycle.
-- FlightPath - Digital Designer, 08/2018-01/2020. Full-spectrum B2C and B2B builds in pharma and e-commerce for Merck, Zoetis, Charter, Goya, Organic Girl, and The Dana Foundation, under regulated legal review and WCAG AA requirements.
-- Workarea (WebLinc) - Senior UX/UI Designer, 07/2017-09/2018. Proprietary SaaS e-commerce platform; shaped the platform through direct client relationships and data-informed iteration; worked sketch-to-shipped with engineers. Platform clients included Rachel Roy, Century 21, Worldwide Stereo, and LimeCrime.
-- O3 World - UX Designer, 07/2016-06/2017. Lean UX, sprints, fintech and iOS work (Vertex SMB, SEIC, La Colombe, WOVN iOS).
-- One Sixty Over Ninety (160OVER90) - Interaction Designer, 09/2014-07/2016. Full-service interaction design for .EDU and enterprise clients: IA, prototyping, accessibility, client-facing creative lead (Comcast, Comcast Spectacor, Philadelphia Eagles, Kent State, Texas A&M, University of Wisconsin-Madison, Mount St. Mary, Centro, Power Home Remodeling).
-- Leadnomics - Senior Web Designer, 2011-2014. Lead-generation startup; data-driven UX for conversion funnels.
-- Turn5 (Xoxide) - Graphic Designer to Senior Web Designer, circa 2007-2011. Print, packaging, catalog, product photography, email and display ads, then web UX for AmericanMuscle.com, AmericanTrucks, CorvetteGuys, and brands such as Raxiom, Stack Racing, and 'Bama Tuning.
-- Hotwire Communication LLC - Intern, 2004-2005. Graphic design spanning identity work across web, print, and broadcast animation.
-- Miller Designworks - Intern, 2005-2006. Informal post-art-school education.
-- Earlier: CertainTeed (graphic design).
+recruiter: "looking for a square; circles may apply (note: a perfect circle ≠ perfect fit.)"
 
-## Education
+me: "zack.cx (https://zack.cx)" me: "T-shaped is squarish, right?"
 
-- Pratt Institute of Art, Brooklyn: BFA program (3D Animation and Motion Graphics), attended 2002-2003 and 2004-2005; did not graduate. Self-taught in typography, color theory, and web design afterward.
+recruiter: *reluctantly regards*
 
-## Selected case studies (full write-ups at https://zack.cx)
+recruiter: *opens portfolio with prefixed and immutable projection of a 'perfect portfolio' [already] pictured in his/her/their prefrontal cortex*
 
-- BNY Mellon, Pershing X ("Wove"), via Publicis Sapient, 2023-2024: Design systems, dashboards, and data work. Pulled disparate legacy advisor applications into one interconnected dashboard so a client's full financial picture lives in one place and work moves across modules without re-entry. Author's piece: information architecture, task and flow mapping, cross-module navigation, and component patterns that keep data alive across steps. The author reports reducing manual data-entry touchpoints from 11 events to 4. No AI was involved in this work.
-- GNC (General Nutrition Centers), via Elva Design Group, 2021: Post-bankruptcy overhaul into a modular, mobile-first Shopify marketplace. Lead UX: IA, UI prototypes, component-based design system, mobile-first navigation schema, and a retail taxonomy strategy. 12-week engagement with weekly executive reviews. The author credits the work with helping GNC reclaim about $500M in annual revenue.
-- Hardinge, B2B on SAP Hybris, via LiveArea: Principal UX / UX Manager. Created "Cards Against Bad UX", a gamified requirements-gathering method using persona cards ("As a shopper", "As a content manager", "As a guest user") that moved a client unfamiliar with design process away from jargon-laden spreadsheets; approved on first call. Delivered Drop 1 (style guide, header states, type-ahead search, B2B tools menu, category navigation, account flows, homepage) and complex PDP designs for single, variable, and kit purchases.
-- The Dana Foundation (Dana.org and Brain Awareness Week), via FlightPath: Full redesign on a $20K budget in three weeks across two sites and one system. Card-based navigation, sitemap and content architecture, mobile-first WCAG 2.0 design system, and a bespoke logo concept.
-- Power Home Remodeling Group, via 160OVER90: Campaign strategy, brand voice, and digital experience design around the idea "Power is a _____ company", where each visit fills the blank differently. Coordinated brand design, photography, motion, and video.
-- Kent State University, via 160OVER90: Complete IA refactor, navigation system design, and visual design across 8 regional campuses and dozens of international locations; explored mega menus, full-screen takeovers, and a proprietary navigation system.
-- AmericanMuscle.com, Turn5 (in-house): Full-funnel e-commerce UX through iterative A/B testing, custom checkout flow, product photography, and brand identity for the Raxiom line; also web and graphic design.
+recruiter: *…put left sock on first today; reflects upon that for a bit…*
 
-## R&D and side projects (the "sentence as primitive" thesis in practice)
+recruiter: *immediately flags unfamiliar portfolio as "gimmicky"*
 
-- [ifimaybefrank.com](https://ifimaybefrank.com): Reader/writer prose platform where you write into a hierarchical, spatial structure that becomes the article. Original version at ifimaybefrank.com/classic.
-- [intoview.pro](https://intoview.pro): Professional provenance through prose; no feed, no algorithm, no like button. Includes a kanban for restaurant floor operations (SMS to CMS task flow), intoview.pro/kanban.
-- [neverever.land](https://neverever.land): A space where what you say becomes part of your canonical record; published statements cannot be edited or deleted.
-- [dab.cx](https://dab.cx): Classifieds-style listings that apply the sentence-as-primitive idea to job listings and conversation.
-- [emdash.click](https://emdash.click): Satirical e-commerce storefront defending the em dash.
-- [zack.cx/cosmo](https://zack.cx/cosmo): Exploration of the thesis that the sentence is the most meaningful unit of understanding between human and machine.
-- Smaller tools: zack.cx/pasted, zack.cx/tuner (alternate-tuning guitar tuner), zack.cx/xp (landing page for prototypes). Concept: Koło, a circular cellphone.
-- Portfolio variants: zack.cx/ux, zack.cx/foundry, zack.cx/classic.
+recruiter: *_responds to impart infinite wisdom—albeit in profoundly generic fashion, as-per verbatim _* ƒ
 
-## Recommendations (LinkedIn, both from colleagues on the Publicis Sapient / Pershing X team, April 2023)
+me: "well, actually… it's a study on foundational framing focusing on familiar heuristics, while serving as an idiosyncratic testament to the current state-of-affairs by leveraging familiar libraries, whilst standing as a sturdy refusal to succumb to the status quo — basically, none of 'the design' is the point; the system itself is entirely the point." ƒ
 
-- [Andrés Moros](https://www.linkedin.com/in/andresmoros6/), then Sr. UX Designer at Publicis Sapient, now Senior Product Designer at ExxonMobil, April 11, 2023: "Zack is one of the most meticulous, hardworking, creative, and talented individuals I have ever had the pleasure to work with. He is always giving his best no matter the situation. Working with him is a pleasure, we would have some of the most efficient work sessions that I have experienced in my entire career. We would always move forward and come up with new ideas and hypothesis and we would go above and beyond our objective. It was a constant stream of ideas and creative solutions to problems. Zack is a team oriented individual: always looking to help other do their best (as he well puts it, to "set them up for success"), because that's just the kind of selfless person that he is. Great team player, excellent designer, and an even better person."
-- [Christopher Bayle](https://www.linkedin.com/in/thebayle/), then ACD UX at Publicis Sapient, now Creative Director, Experience Design at American Express, April 3, 2023: "Zack has a deep connection to emotions, imagination, and sensitivity—the quintessential idealist. He seems happy to roam his mental landscape of thoughts and emotion for hours on end. His greatest strength is his depth of sensitivity and empathy, which allows him to give voice to human connections in a way that works with people on a profound level. Zack brings fresh perspective to things when I felt in a rut—a great person to work with."
+recruiters: "oh neat. I don't get it, but I won't say that aloud."
 
-## Working style
+me: "you just said that out loud."
 
-- Systems thinker who works in the room: facilitates client workshops, maps legacy ecosystems end to end, and often fills product-owner or team-lead gaps without the title.
-- Prefers sketch-to-shipped collaboration with engineers over mockup theater.
-- Mentors junior designers; see recommendations above.
-- Interested in roles where human-centered product thinking and AI meet: 0-1 products, design systems, IA, and content-driven experiences.
+recruiters: "fascinating. Anyways. How does this translate to #fintech?"
+
+me: "I actually have a case study I made using the build...."
+
+recruiters: "yea, that's great; it's too much, less is more; show me something from 5-10 years ago that has a compelling thumbnail with a traditional case-study format showcasing explicitly stated process benchmarks and success metrics/outcomes."
+
+me: "zack.cx/classic" (https://zack.cx/classic)
+
+recruiters: "why is it pink?"
+
+me: "pink is a boy's color in s.Korea"
+
+recruiters: "oh, okay … great, now show me how this translates into a modern AI workflow for our fintech client."
+
+me: "did you not actually look at zack.cx/classic (https://zack.cx/classic)?"
+
+recruiter: "…"
+
+me: "well, I have a case study from my recent work with Publicis Sapient…"
+
+recruiters: "Oh? Do tell more!"
+
+me: "… as featured on zack.cx/classic (https://zack.cx/classic), but I also feature it on zack.cx (https://zack.cx), but since you didn't like it there, I also talk it about it comprehensively at zack.cx/bny (https://zack.cx/bny) & zack.cx/ux (https://zack.cx/ux), but those are still too complex for rapid conveyance; which is why I offer a hand-coded iteration that pre-dates the a.i.-era (https://reasonandresolution.com/frankly) - you know, just every affordance for those who are impressed/unimpressed about this/that and/or pressed for attention/time." ƒ
+
+me: "zack.cx/bny (https://zack.cx/bny) (BNY Mellon; the literal definition of Global Enterprise Financial Services; where I worked as a product owner, team lead, and mentor in a true 0-1 product concept & activation environment where my team drove innovation through comprehensive data & design system refactorization — proudly pre-a.i.-era)."
+
+recruiters: "hold your horses, did you just say… *gasp* …"pre-AI?" 😱
+
+recruiters: *interest leaves chat*
+
+me: "yeah, so I have been developing a working thesis that I hope stands as testament to my ability to..."
+
+recruiters: "yea yea, that's great, so we'll let you know if anything comes up. Also, I'll be OOO for the next week or two..."
+
+me: *furiously updates resume @ zack.cx/cv (https://zack.cx/cv) …* ƒ
+
+𖹭 zack
 </script>
 <script>
 (function(){
