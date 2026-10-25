@@ -291,7 +291,9 @@ body.editing .sg-dock{opacity:0;visibility:hidden;pointer-events:none;transition
 /* ---- sections: real label dividers in the compose markup ---- */
 .blk.sec{margin-top:clamp(30px,5vw,52px);margin-bottom:18px;padding-top:14px;font:500 calc(12px*var(--fs,1)*var(--bz,1))/1.3 ui-monospace,'SF Mono',Menlo,Consolas,monospace;letter-spacing:0;color:var(--muted)}
 .blk.sec::before{content:'';position:absolute;top:0;left:15px;right:0;border-top:1px solid var(--line)}
-.blk.sec .vw,.blk.sec .ed{padding-right:150px}
+.blk.sec .vw,.blk.sec .ed{padding-right:185px}
+.stg .sx{font-size:15px;line-height:1;padding:6px 8px}
+.stg .sx:hover{color:var(--fg)}
 .blk.mh{display:none}
 .stg{position:absolute;right:0;top:calc(50% + 7px);transform:translateY(-50%);opacity:0;transition:opacity .18s ease}
 .blk.sec.hot .stg,.stg:focus-within{opacity:1}
@@ -471,47 +473,21 @@ var $=function(i){return document.getElementById(i)},root=document.documentEleme
   RM=matchMedia('(prefers-reduced-motion: reduce)'),dark=matchMedia('(prefers-color-scheme: dark)');
 var KEY='zcx-cv-v1',D={fs:47,blur:0,inactive:.3,hdur:1.7,dir:'left',bv:4,role:'p',cLight:'#fffcb3',cDark:'#007bff'};
 var PH={sec:'section label',kicker:'label',title:'Title',dek:'One line that holds the rest',p:'Say it simply',sig:'— signature'};
-var SEEDV=38;
+var SEEDV=39;
 var SEED=[
-["kicker", "by [zack.cx](https://zack.cx)"],
-["title", "Frankly,"],
-["p", "ZACHARY RYAN GORT _/_ ==DESIGNER== _/_ https://zack.cx _/_ zckgrt@gmail.com _/_ Philadelphia & New York _/_ 2005–2026 _/_ Lean UX, design systems, code-native, AI-enabled _/_ open to opportunities; remote & hybrid preferred _/_", 0.83],
-["sec", "hubris_in_hiring.txt", 0.74],
-["p", "\"OVER THE LINE!\" — Walter Sobchak", 0.82],
-["sec", "author's_declaration:"],
-["p", "*let \"**ƒ**\" _serve as a friendly reminder that ++this statement is meant++_ '++**_==to be frank==_**++**'; amounting to ==nothing more than statements dressed in jest== _++that in no shape or otherwise intangible form is intended to cause or otherwise inflict harm++_—though, perhaps poke at your ego, and almost certainly will offend your conventional sensibilities.\"", 0.71],
-["sec", "*ahem* recruiters/hiring folk"],
-["p", "==hubris is thinking the thing I am showing you is built for you.==", 1.56],
-["p", "\"(recruiter)((**==looking for a square==**; circles may apply (note: a perfect circle ≠ perfect fit.)))\"", 1.28],
-["p", "\"(me)([==zack.cx==](https://zack.cx))\""],
-["p", "\"(**T-shaped is squarish, right?**)\""],
-["p", "\"((*_++reluctantly++ regards_*))\""],
-["p", "\"((*_opens portfolio with ==prefixed and immutable projection of a 'perfect portfolio' [already] pictured== in his/her/their prefrontal cortex_*))\""],
-["p", "\"((*…put left sock on first today; reflects upon that for a bit…*))\""],
-["p", "\"((*_**immediately ==flags unfamiliar==** portfolio **as ==\"gimmicky==\"**_*))\""],
-["p", "\"((*_++responds to impart infinite wisdom++—==albeit in **profoundly generic fashion, as-per verbatim **==_* ƒ))\""],
-["p", "\"(==well, actually…== it's a study on foundational framing focusing on familiar heuristics, while serving as an idiosyncratic testament to the current state-of-affairs by leveraging familiar libraries, whilst standing as a sturdy refusal to succumb to the status quo — ==basically, _none of 'the design' is the point_; **the system itself is entirely the point**==. ƒ)\""],
-["p", "\"((oh neat. ''I don't get it, but I won't say that aloud''.))\""],
-["p", "\"(you just said that out loud.)\""],
-["p", "\"((**fascinating**. Anyways. **How does this translate to #fintech?**))\""],
-["p", "\"(I actually have a case study I made using the build....)\""],
-["p", "\"((**yea, that's great**; it's too much, less is more; **show me something from 5-10 years ago that has a compelling thumbnail** with a **traditional case-study format** showcasing **explicitly stated process benchmarks** and success metrics/outcomes.))\""],
-["p", "\"([==\"zack.cx/classic\"==](https://zack.cx/classic))\""],
-["p", "\"((**why is it pink?**))\""],
-["p", "\"(**pink is a boy's color in s.Korea**)\""],
-["p", "\"((oh, okay … great, now **show me how this translates into a modern AI workflow for our fintech client.**))\""],
-["p", "\"(**did you** not **actually look at** [==**zack.cx/classic**==](https://zack.cx/classic)?)\""],
-["p", "\"((**…**))\""],
-["p", "\"(well, I have a case study from my recent work with Publicis Sapient…)\""],
-["p", "\"((Oh? Do tell more!))\""],
-["p", "\"(… as featured on [==**zack.cx/classic**==](https://zack.cx/classic), but I also feature it on [==**zack.cx**==](https://zack.cx), but since you didn't like it there, I also talk it about it comprehensively at [==**zack.cx/bny**==](https://zack.cx/bny) & [==zack.cx/ux==](https://zack.cx/ux), but those are still too complex for rapid conveyance; which is why I offer [a ==**hand-coded iteration**== that pre-dates the a.i.-era](https://reasonandresolution.com/frankly) - you know, just every affordance for those who are ''impressed/unimpressed'' about ''this/that'' and/or pressed for ''attention/time.'' ƒ)\""],
-["p", "\"([zack.cx/bny](https://zack.cx/bny) (**BNY Mellon**; the literal definition of Global **Enterprise Financial Services;** where I worked as a ==product owner, team lead, and mentor== in a true ==0-1 product concept & activation environment== where ==my team drove innovation== through ==comprehensive data & design system refactorization== — **proudly pre-a.i.-era**).)\""],
-["p", "\"((++**_hold your horses_**++, did you just say… *_gasp_* …\"++**_pre-AI?_**++\" 😱))\""],
-["p", "\"((*_++==interest leaves chat==++_*))\""],
-["p", "\"(yeah, so I have been developing a working ==thesis== that I hope stands as testament to my ability to...)\""],
-["p", "\"((yea yea, that's great, so ==we'll let you know if anything comes up==. **Also, I'll be OOO for the next week or two.**..))\""],
-["p", "\"(*_**furiously updates resume** @_ [zack.cx/cv](https://zack.cx/cv) …* ƒ)\""],
-["sig", "𖹭 zack"],
+["kicker", "Welcome to [ifimaybefrank.com](https://ifimaybefrank.com)"],
+["title", "Write —however the ƒ* your 𖹭 so wants and/or desires."],
+["dek", "This is an honest writing space—proceed accordingly. ƒ*"],
+["sec", "These are your tools."],
+["p", "ƒ* / signal_flare—frankly."],
+["p", "𖹭* / facsimile—suffice to say."],
+["p", "✿* / nicety—sub-for: \"something 'nice' to say.\""],
+["p", "✓* / reality—check ✓"],
+["p", "✔* / perform…/pejor…/affirm…—ative"],
+["sec", "(or not, that's fine …you do you)"],
+["p", "~ written with love (albeit wholly motivated by annoyance with the status quo.)"],
+["sec", "{note to self (as the author, live-demo'ing his own product prototype): write in function to enable section -delete [button:x, context menu, etc]}"],
+["sig", "*Not frank, btw — zack.ryan.gort [in/zackgort](https://linkedin.com/in/zackgort/) / (https://zack.cx) / (https://zack.cx/cv)"],
 ];
 var TD={title:{sz:1,wt:500,lh:1.08,ls:-.025,ff:'sans',c:''},dek:{sz:1,wt:400,lh:1.45,ls:0,ff:'sans',c:''},p:{sz:.7,wt:300,lh:1.58,ls:0,ff:'sans',c:''},meta:{sz:1,wt:400,lh:1.3,ls:0,ff:'sans',c:''}},
   ROLES=[['kicker','Kicker'],['title','Title'],['dek','Dek'],['p','Body'],['sig','Sig']],WTS=[300,400,500,700],
@@ -1229,7 +1205,7 @@ var effView=function(i){var o=SV[secKey(i)];return o==='human'||o==='machine'||o
 var vis=function(j){return !!els[j]&&!els[j].classList.contains('mh')};
 function nxt(i,d){var j=i+d;while(j>=0&&j<B.length&&!vis(j))j+=d;return j>=0&&j<B.length?j:-1}
 function stg(){var s=document.createElement('div');s.className='stg';s.setAttribute('role','group');s.setAttribute('aria-label','This section');
-  s.innerHTML='<button type="button" data-v="brutal" aria-pressed="false" aria-label="brutal view of this section" title="Brutal: this section as one continuous string"><span class="f">brutal</span><span class="s">b</span></button><i aria-hidden="true">:</i><button type="button" data-v="human" aria-pressed="true" aria-label="human view of this section" title="Human: the lines as written"><span class="f">human</span><span class="s">h</span></button><i aria-hidden="true">:</i><button type="button" data-v="machine" aria-pressed="false" aria-label="machine view of this section" title="Machine: the same lines as a file tree"><span class="f">machine</span><span class="s">m</span></button>';return s}
+  s.innerHTML='<button type="button" data-v="brutal" aria-pressed="false" aria-label="brutal view of this section" title="Brutal: this section as one continuous string"><span class="f">brutal</span><span class="s">b</span></button><i aria-hidden="true">:</i><button type="button" data-v="human" aria-pressed="true" aria-label="human view of this section" title="Human: the lines as written"><span class="f">human</span><span class="s">h</span></button><i aria-hidden="true">:</i><button type="button" data-v="machine" aria-pressed="false" aria-label="machine view of this section" title="Machine: the same lines as a file tree"><span class="f">machine</span><span class="s">m</span></button><i aria-hidden="true">|</i><button type="button" data-a="del" class="sx" aria-label="delete this section" title="Delete this section (undoable)">\u00d7</button>';return s}
 
 /*PARSE-START*/
 var Z={},MVD=0;
@@ -1424,7 +1400,7 @@ function secSync(){var s=-1,m=B.map(function(b){if(b.k==='sec')s++;return b.k===
   [].forEach.call(doc.querySelectorAll('.mv,.bt'),function(x){x.remove()});
   els.forEach(function(d,i){if(m[i]>=0)d.dataset.s=m[i];else delete d.dataset.s;d.classList.remove('mh')});
   B.forEach(function(b,i){if(b.k!=='sec')return;var d=els[i],v=effView(i),mem=[];
-    [].forEach.call(d.querySelectorAll('.stg button'),function(x){x.setAttribute('aria-pressed',String(x.dataset.v===v))});
+    [].forEach.call(d.querySelectorAll('.stg button[data-v]'),function(x){x.setAttribute('aria-pressed',String(x.dataset.v===v))});
     if(v==='human')return;
     B.forEach(function(_,j){if(j!==i&&m[j]===m[i])mem.push(j)});
     mem.forEach(function(j){els[j].classList.add('mh')});
@@ -1442,7 +1418,7 @@ function setView(v,user){v=v==='machine'||v==='brutal'?v:'human';blurEd();fw.cla
 document.getElementById('vt').addEventListener('click',function(e){var b=e.target.closest('button');if(b)setView(b.dataset.v,true)});
 addEventListener('hashchange',function(){var h=location.hash.slice(1);if(h==='human'||h==='machine'||h==='brutal')setView(h)});
 doc.addEventListener('click',function(e){
-  var b=e.target.closest('.stg button');if(b){setSecView(secKey(+b.closest('.blk').dataset.i),b.dataset.v);return}
+  var b=e.target.closest('.stg button');if(b){if(b.dataset.a==='del')return;setSecView(secKey(+b.closest('.blk').dataset.i),b.dataset.v);return}
   var x=e.target.closest('.mvb button');if(x){var open=x.dataset.a==='open';[].forEach.call(x.closest('.mv').querySelectorAll('li'),function(li){setOpen(li,open)})}});
 /* hover anywhere in a section (its lines or its tree) → its divider shows the toggle */
 doc.addEventListener('mousemove',function(e){if(e.target===doc)return;var b=e.target.closest&&e.target.closest('[data-s]'),
@@ -1576,6 +1552,13 @@ function moveBlk(i,d){var j=i+d;if(j<0||j>=B.length)return;var x=B[i];B[i]=B[j];
 function setRole(i,k){if(!B[i]||B[i].k===k)return;B[i].k=k;render();edit(i,null)}
 function dup(i){var b=B[i],n={k:b.k,t:b.t};if(b.z)n.z=b.z;B.splice(i+1,0,n);render();edit(i+1,null,true)}
 function ins(i,k){B.splice(i+1,0,{k:k,t:''});render();edit(i+1,0,true)}
+function delSec(s){var r=rng(s),n=r[1]-r[0];
+  if(B[s]==null||B[s].k!=='sec')return;
+  if(B.length-n<1){say('can\u2019t delete the only content');return}
+  blurEd();wrap.classList.remove('w-on');setTarget(null);
+  B.splice(r[0],n);render();save();
+  say('section deleted \u00b7 '+MOD+'Z to undo')}
+doc.addEventListener('click',function(e){var x=e.target.closest&&e.target.closest('.stg button[data-a="del"]');if(x)delSec(+x.closest('.blk').dataset.i)});
 function rm(i){if(B.length<2)return;B.splice(i,1);render();edit(Math.min(i,B.length-1),null,true)}
 function clearFmt(){var t=document.activeElement;if(!t||t.tagName!=='TEXTAREA'||!wrap.contains(t))return;
   var a=t.selectionStart,e=t.selectionEnd;if(a===e){a=0;e=t.value.length}
@@ -1632,6 +1615,7 @@ function items(c){
   if(sc>=0)mv.push({l:'Section up',dis:sp<1,fn:function(){moveSec(sc,-1)}},{l:'Section down',dis:sp<0||sp>=a.length-1,fn:function(){moveSec(sc,1)}});
   if(mv.length)r.push({hr:1},{l:'Move',sub:mv});
   if(b)r.push({l:'Line',sub:[{l:'New line below',fn:function(){ins(i,'p')}},{l:'New section below',fn:function(){ins(i,'sec')}},{l:'Duplicate',fn:function(){dup(i)}},{hr:1},{l:'Delete',dis:B.length<2,fn:function(){rm(i)}}]});
+  if(sc>=0)r.push({l:'Delete section',dis:B.length-(rng(sc)[1]-sc)<1,fn:function(){delSec(sc)}});
   var sv=sc>=0?effView(sc):null,
     view=[{l:'This section as one string',ck:sv==='brutal',dis:sc<0,fn:function(){setSecView(secKey(sc),'brutal')}},
       {l:'This section as written',ck:sv==='human',dis:sc<0,fn:function(){setSecView(secKey(sc),'human')}},
@@ -1696,81 +1680,32 @@ apply(false);render();
 })();
 </script>
 <script type="text/plain" id="llmsTxt">
-by zack.cx (https://zack.cx)
+Welcome to ifimaybefrank.com (https://ifimaybefrank.com)
 
-# Frankly,
+# Write —however the ƒ* your 𖹭 so wants and/or desires.
 
-ZACHARY RYAN GORT / DESIGNER / https://zack.cx / zckgrt@gmail.com / Philadelphia & New York / 2005–2026 / Lean UX, design systems, code-native, AI-enabled / open to opportunities; remote & hybrid preferred /
+This is an honest writing space—proceed accordingly. ƒ*
 
-## hubris_in_hiring.txt
+## These are your tools.
 
-"OVER THE LINE!" — Walter Sobchak
+ƒ* / signal_flare—frankly.
 
-## author's_declaration:
+𖹭* / facsimile—suffice to say.
 
-*let "ƒ" serve as a friendly reminder that this statement is meant 'to be frank'; amounting to nothing more than statements dressed in jest that in no shape or otherwise intangible form is intended to cause or otherwise inflict harm—though, perhaps poke at your ego, and almost certainly will offend your conventional sensibilities."
+✿* / nicety—sub-for: "something 'nice' to say."
 
-## *ahem* recruiters/hiring folk
+✓* / reality—check ✓
 
-hubris is thinking the thing I am showing you is built for you.
+✔* / perform…/pejor…/affirm…—ative
 
-recruiter: "looking for a square; circles may apply (note: a perfect circle ≠ perfect fit.)"
+## (or not, that's fine …you do you)
 
-me: "zack.cx (https://zack.cx)" me: "T-shaped is squarish, right?"
+~ written with love (albeit wholly motivated by annoyance with the status quo.)
 
-recruiter: *reluctantly regards*
+## {note to self (as the author, live-demo'ing his own product prototype): write in function to enable section -delete [button:x, context menu, etc]}
 
-recruiter: *opens portfolio with prefixed and immutable projection of a 'perfect portfolio' [already] pictured in his/her/their prefrontal cortex*
+*Not frank, btw — zack.ryan.gort in/zackgort (https://linkedin.com/in/zackgort/) / (https://zack.cx) / (https://zack.cx/cv)
 
-recruiter: *…put left sock on first today; reflects upon that for a bit…*
-
-recruiter: *immediately flags unfamiliar portfolio as "gimmicky"*
-
-recruiter: *_responds to impart infinite wisdom—albeit in profoundly generic fashion, as-per verbatim _* ƒ
-
-me: "well, actually… it's a study on foundational framing focusing on familiar heuristics, while serving as an idiosyncratic testament to the current state-of-affairs by leveraging familiar libraries, whilst standing as a sturdy refusal to succumb to the status quo — basically, none of 'the design' is the point; the system itself is entirely the point." ƒ
-
-recruiters: "oh neat. I don't get it, but I won't say that aloud."
-
-me: "you just said that out loud."
-
-recruiters: "fascinating. Anyways. How does this translate to #fintech?"
-
-me: "I actually have a case study I made using the build...."
-
-recruiters: "yea, that's great; it's too much, less is more; show me something from 5-10 years ago that has a compelling thumbnail with a traditional case-study format showcasing explicitly stated process benchmarks and success metrics/outcomes."
-
-me: "zack.cx/classic" (https://zack.cx/classic)
-
-recruiters: "why is it pink?"
-
-me: "pink is a boy's color in s.Korea"
-
-recruiters: "oh, okay … great, now show me how this translates into a modern AI workflow for our fintech client."
-
-me: "did you not actually look at zack.cx/classic (https://zack.cx/classic)?"
-
-recruiter: "…"
-
-me: "well, I have a case study from my recent work with Publicis Sapient…"
-
-recruiters: "Oh? Do tell more!"
-
-me: "… as featured on zack.cx/classic (https://zack.cx/classic), but I also feature it on zack.cx (https://zack.cx), but since you didn't like it there, I also talk it about it comprehensively at zack.cx/bny (https://zack.cx/bny) & zack.cx/ux (https://zack.cx/ux), but those are still too complex for rapid conveyance; which is why I offer a hand-coded iteration that pre-dates the a.i.-era (https://reasonandresolution.com/frankly) - you know, just every affordance for those who are impressed/unimpressed about this/that and/or pressed for attention/time." ƒ
-
-me: "zack.cx/bny (https://zack.cx/bny) (BNY Mellon; the literal definition of Global Enterprise Financial Services; where I worked as a product owner, team lead, and mentor in a true 0-1 product concept & activation environment where my team drove innovation through comprehensive data & design system refactorization — proudly pre-a.i.-era)."
-
-recruiters: "hold your horses, did you just say… *gasp* …"pre-AI?" 😱
-
-recruiters: *interest leaves chat*
-
-me: "yeah, so I have been developing a working thesis that I hope stands as testament to my ability to..."
-
-recruiters: "yea yea, that's great, so we'll let you know if anything comes up. Also, I'll be OOO for the next week or two..."
-
-me: *furiously updates resume @ zack.cx/cv (https://zack.cx/cv) …* ƒ
-
-𖹭 zack
 </script>
 <script>
 (function(){
